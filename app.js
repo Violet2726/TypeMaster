@@ -8,9 +8,10 @@
  * 5. 结果可视化 (Canvas 图表)
  */
 
-// GLM-4 API 配置 (智谱 AI)
-const AI_API_KEY = "94a7aa623f314a069d394926191f54fd.g5GIUDJF9pJ8a7ZH";
-const AI_API_URL = "https://open.bigmodel.cn/api/paas/v4/chat/completions";
+// GLM-4 API 配置 (通过本地后端代理转发，隐藏 Key)
+// 注意：必须运行 node server.js 才能使用 AI 功能
+const AI_API_URL = "/api/chat";
+// API Key 已移至 server.js，前端不再持有
 
 // 常用英文单词库（内联以避免 ES 模块跨域问题）
 // 用于基础的随机单词生成
@@ -167,11 +168,11 @@ async function fetchAIContent() {
         const response = await fetch(AI_API_URL, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${AI_API_KEY}`
+                'Content-Type': 'application/json'
+                // Authorization 由后端 server.js 统一添加
             },
             body: JSON.stringify({
-                model: "glm-4-flash",
+                // model 等参数由后端或此处透传均可，目前 server.js 会提取 messages
                 messages: [
                     {
                         role: "user",

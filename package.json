@@ -1,0 +1,13 @@
+{
+  "name": "typemaster",
+  "version": "1.0.0",
+  "description": "Typing Speed Test Application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=18.x"
+  }
+}
