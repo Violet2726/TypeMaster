@@ -1,10 +1,18 @@
 const https = require('https');
 const url = require('url');
 
-// 引入统一配置
-const config = require('../config');
-const AI_API_KEY = config.AI_API_KEY;
-const AI_API_URL = config.AI_API_URL;
+// 尝试读取 config.js (本地环境)，如果不存在 (Vercel 环境) 则使用环境变量
+let AI_API_KEY = process.env.AI_API_KEY;
+let AI_API_URL = process.env.AI_API_URL;
+
+try {
+    const config = require('../config');
+    if (config.AI_API_KEY) AI_API_KEY = config.AI_API_KEY;
+    if (config.AI_API_URL) AI_API_URL = config.AI_API_URL;
+} catch (error) {
+    // config.js 不存在，忽略错误，依赖环境变量
+    console.log("Config file not found, using Environment Variables");
+}
 
 module.exports = (req, res) => {
     // 1. 仅接受 POST
