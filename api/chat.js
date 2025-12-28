@@ -1,7 +1,7 @@
 const https = require('https');
 const url = require('url');
 
-// 引入统一配置 (注意路径：.. 代表上一级目录)
+// 引入统一配置
 const config = require('../config');
 const AI_API_KEY = config.AI_API_KEY;
 const AI_API_URL = config.AI_API_URL;

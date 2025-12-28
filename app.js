@@ -11,7 +11,6 @@
 // GLM-4 API 配置 (通过本地后端代理转发，隐藏 Key)
 // 注意：必须运行 node server.js 才能使用 AI 功能
 const AI_API_URL = "/api/chat";
-// API Key 已移至 server.js，前端不再持有
 
 // 常用英文单词库（内联以避免 ES 模块跨域问题）
 // 用于基础的随机单词生成
