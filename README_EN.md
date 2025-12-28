@@ -4,7 +4,7 @@
 
 A minimalist, modern typing speed test application integrated with AI content generation.
 
-🔗 **Live Demo**: [https://typing2726.vercel.app/](https://typing2726.vercel.app/)
+🔗 **Live Demo**: [https://type-master-2726.vercel.app/](https://type-master-2726.vercel.app/)
 
 ## ✨ Features
 

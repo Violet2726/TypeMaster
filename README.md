@@ -4,7 +4,7 @@
 
 一个简约、现代的打字速度测试应用，集成 AI 智能出题功能。
 
-🔗 **在线体验**: [https://typing2726.vercel.app/](https://typing2726.vercel.app/)
+🔗 **在线体验**: [https://type-master-2726.vercel.app/](https://type-master-2726.vercel.app/)
 
 ## ✨ 特性
 
