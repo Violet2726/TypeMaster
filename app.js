@@ -8,7 +8,7 @@
  * 5. 结果可视化 (Canvas 图表)
  */
 
-// GLM-4 API 配置 (通过本地后端代理转发，隐藏 Key)
+// API 配置 (通过本地后端代理转发，隐藏 Key)
 // 注意：必须运行 node server.js 才能使用 AI 功能
 const AI_API_URL = "/api/chat";
 

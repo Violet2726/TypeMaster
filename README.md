@@ -1,46 +1,67 @@
+[English](./README_EN.md) | [简体中文](./README.md)
+
 # TypeMaster ⌨️
 
-一个简约、现代的打字速度测试应用。支持实时 WPM 统计、准确率分析以及 **AI 智能出题**。
+一个简约、现代的打字速度测试应用，集成 AI 智能出题功能。
 
 🔗 **在线体验**: [https://typing2726.vercel.app/](https://typing2726.vercel.app/)
 
-## ✨ 功能特点
+## ✨ 特性
 
-*   **多种模式**：支持倒计时模式 (15/30/60s) 和单词定额模式。
-*   **AI 赋能**：集成 GLM-4 模型，自动生成连贯的英语练习文本。
-*   **数据可视化**：测试结束后展示 WPM 趋势图、准确率及字符统计。
-*   **极致体验**：Serika Dark 深色主题，流畅的输入反馈与动画。
+*   **智能出题**: 基于 AI 模型生成的连贯英语文本，告别枯燥的随机单词。
+*   **多模式**: 支持倒计时 (Time) 和定额单词 (Words) 模式。
+*   **隐私安全**: 采用后端代理架构 (Serverless)，API Key 绝不暴露给前端。
+*   **数据分析**: 实时 WPM、准确率统计以及图表分析。
+*   **极简设计**: Serika Dark 深色主题，专注于打字体验。
 
-## 🚀 本地运行
+## ☁️ 部署指南 (Vercel)
 
-1.  **克隆项目**
+本项目已针对 Vercel Serverless 进行优化。
+
+1.  **Fork/Clone** 本仓库到你的 GitHub。
+2.  在 **Vercel** 中导入本项目。
+3.  **配置环境变量 (Environment Variables)**:
+    为了让 AI 功能正常工作，请在 Vercel 项目设置中添加：
+    *   `AI_API_KEY`: AI Key
+    *   `AI_API_URL`: AI API 地址
+4.  保存并部署。
+
+## 🛠️ 本地开发
+
+1.  **环境准备**
+    确保安装了 Node.js (v18+)。
+
+2.  **Clone 项目**
     ```bash
-    git clone <your-repo-url>
+    git clone https://github.com/your-username/typemaster.git
     cd typemaster
     ```
 
-2.  **配置 API Key**
-    在项目根目录创建 `config.js` 文件：
+3.  **配置密钥**
+    复制 `config.js` 并填入你的 Key：
     ```javascript
+    // config.js
     module.exports = {
-        AI_API_KEY: "your_api_key_here", // 填入你的智谱 AI Key
-        AI_API_URL: "https://open.bigmodel.cn/api/paas/v4/chat/completions"
+        AI_API_KEY: "your_key_here",
+        AI_API_URL: "your_url_here"
     };
     ```
 
-3.  **启动服务**
+4.  **运行服务**
+    必须通过后端服务启动 (代理 API 请求)：
     ```bash
-    npm install
-    npm start
-    # 或者直接: node server.js
+    node server.js
     ```
 
-4.  **访问**
+5.  **访问**
     打开浏览器访问 `http://localhost:8080`
 
-## 📦 部署
+## 📂 项目结构
 
-本项目支持一键部署到 **Vercel**。
-由于使用了 Serverless Function (`api/chat.js`) 代理 AI 请求，请确保在 Vercel 后台配置环境变量 `AI_API_KEY` (虽然本项目目前支持从 `config.js` 读取，但推荐使用环境变量)。
+*   `/api`: Vercel Serverless 函数 (代理 AI 请求)
+*   `server.js`: 本地开发服务器 (提供静态资源 + API 代理)
+*   `app.js`: 前端核心逻辑
+*   `config.js`: 本地配置文件 (已在 .gitignore 中忽略)
 
 ---
+Designed for Typing Enthusiasts.
