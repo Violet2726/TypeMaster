@@ -1,25 +1,34 @@
 /**
  * AI 服务层。
  *
- * 它是前端和 `/api/chat` 代理之间的唯一桥梁，负责两类能力：
- * 1. 生成练习文本（流式）
- * 2. 生成结构化教练建议（非流式 JSON）
- *
- * 另外，这里也负责做超时控制、返回值清洗和本地兜底入口。
+ * 统一处理：
+ * - AI 练习文本生成
+ * - AI 教练建议生成
+ * - 错误归类与超时控制
+ * - 本地规则兜底入口
  */
 import {
     buildLocalCoachAdvice,
     createDraftFromText,
     estimateTargetWordCount,
+    getDifficultyLabel,
     getDifficultyMeta,
+    getTemplateLabel,
     getTemplateMeta
 } from '../engine';
 
 const AI_API_URL = '/api/chat';
 
-/**
- * 为 fetch 构造超时控制器。
- */
+export class AiServiceError extends Error {
+    constructor(code, message, options = {}) {
+        super(message);
+        this.name = 'AiServiceError';
+        this.code = code || 'unknown';
+        this.status = options.status || null;
+        this.cause = options.cause || null;
+    }
+}
+
 function withTimeout(timeoutMs = 15000) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -30,9 +39,6 @@ function withTimeout(timeoutMs = 15000) {
     };
 }
 
-/**
- * 清洗模型有时返回的 ```json 包裹。
- */
 function cleanJsonText(text) {
     const trimmed = (text || '').trim();
     if (!trimmed) return '';
@@ -42,9 +48,6 @@ function cleanJsonText(text) {
     return trimmed;
 }
 
-/**
- * 兼容不同上游模型返回格式，抽取文本内容。
- */
 function extractMessageContent(payload) {
     if (!payload || !Array.isArray(payload.choices) || payload.choices.length === 0) {
         return '';
@@ -70,9 +73,38 @@ function extractMessageContent(payload) {
     return '';
 }
 
-/**
- * 解析 SSE 流式响应，把 delta 内容拼接为完整文本。
- */
+async function throwResponseError(response) {
+    const text = await response.text().catch(() => '');
+    const message = (text || '').trim();
+    const code = !message
+        ? 'server_error'
+        : /Missing AI_API_KEY|Missing AI_API_URL/i.test(message)
+            ? 'missing_config'
+            : response.status >= 500
+                ? 'server_error'
+                : 'server_error';
+
+    throw new AiServiceError(code, message || 'The AI service returned an error.', {
+        status: response.status
+    });
+}
+
+function normalizeThrownError(error) {
+    if (error instanceof AiServiceError) {
+        return error;
+    }
+
+    if (error?.name === 'AbortError') {
+        return new AiServiceError('timeout', 'The AI request timed out.', { cause: error });
+    }
+
+    if (error instanceof TypeError) {
+        return new AiServiceError('network', 'The AI request failed before a response arrived.', { cause: error });
+    }
+
+    return new AiServiceError('unknown', error?.message || 'Unknown AI service error.', { cause: error });
+}
+
 async function streamTextResponse(response) {
     const reader = response.body?.getReader();
     const decoder = new TextDecoder('utf-8');
@@ -107,7 +139,7 @@ async function streamTextResponse(response) {
                 const parsed = JSON.parse(data);
                 fullText += parsed.choices?.[0]?.delta?.content || '';
             } catch (error) {
-                // 流式帧可能会被拆包，这里允许无害失败。
+                // 流式帧拆包时允许无害忽略。
             }
         });
     }
@@ -117,17 +149,50 @@ async function streamTextResponse(response) {
             const parsed = JSON.parse(carry.trim().slice(6));
             fullText += parsed.choices?.[0]?.delta?.content || '';
         } catch (error) {
-            // 收尾帧如果不完整，直接忽略即可。
+            // 收尾帧不完整时忽略。
         }
     }
 
     return fullText.trim();
 }
 
-/**
- * 根据当前训练配置生成 AI 练习文本。
- */
-export async function generatePracticeText(config, promptOverride = '') {
+function normalizeCoachAdvicePayload(rawAdvice, language = 'zh-CN') {
+    let advice;
+    try {
+        advice = typeof rawAdvice === 'string' ? JSON.parse(cleanJsonText(rawAdvice)) : rawAdvice;
+    } catch (error) {
+        throw new AiServiceError('server_error', 'The AI returned an invalid coach payload.', { cause: error });
+    }
+
+    const isEnglish = language === 'en-US';
+
+    return {
+        headline: advice.headline || (isEnglish ? 'Keep moving into the next drill' : '继续下一练'),
+        summary: advice.summary || (isEnglish
+            ? 'This round is complete. Keep iterating on the current weakness.'
+            : '本次训练已完成，建议继续根据弱项迭代。'),
+        strengths: Array.isArray(advice.strengths) ? advice.strengths.filter(Boolean) : [],
+        weaknesses: Array.isArray(advice.weaknesses) ? advice.weaknesses.filter(Boolean) : [],
+        nextDrill: {
+            label: advice.nextDrill?.label || (isEnglish ? 'Start next drill' : '开始下一练'),
+            reason: advice.nextDrill?.reason || (isEnglish
+                ? 'Keep reinforcing the current weakness.'
+                : '继续强化本次训练短板'),
+            configPatch: advice.nextDrill?.configPatch || {},
+            aiPrompt: advice.nextDrill?.aiPrompt || ''
+        },
+        comparison: advice.comparison || {
+            label: 'mixed',
+            summary: advice.comparison?.summary || (isEnglish
+                ? 'A training summary has been generated for this round.'
+                : '已生成本次训练建议。')
+        },
+        language
+    };
+}
+
+export async function generatePracticeText(config, promptOverride = '', options = {}) {
+    const language = options.language || 'zh-CN';
     const template = getTemplateMeta(config.aiTemplate);
     const difficulty = getDifficultyMeta(config.difficulty);
     const targetWords = estimateTargetWordCount(config);
@@ -171,62 +236,32 @@ export async function generatePracticeText(config, promptOverride = '') {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to generate practice text');
+            await throwResponseError(response);
         }
 
         const text = await streamTextResponse(response);
         if (!text) {
-            throw new Error('The AI returned an empty practice text.');
+            throw new AiServiceError('empty_response', 'The AI returned an empty practice text.');
         }
 
         return createDraftFromText(text, { ...config, source: 'ai' }, {
-            label: `${template.label} · ${difficulty.label}`,
+            label: `${getTemplateLabel(template, language)} · ${getDifficultyLabel(difficulty, language)}`,
             template: config.aiTemplate,
             difficulty: config.difficulty,
             prompt: promptOverride || null,
-            generatedBy: 'ai'
+            generatedBy: 'ai',
+            language
         });
+    } catch (error) {
+        throw normalizeThrownError(error);
     } finally {
         cleanup();
     }
 }
 
-/**
- * 规范化 AI 教练返回结果，确保页面拿到的结构稳定。
- */
-function normalizeCoachAdvicePayload(rawAdvice) {
-    const advice = typeof rawAdvice === 'string' ? JSON.parse(cleanJsonText(rawAdvice)) : rawAdvice;
-
-    return {
-        headline: advice.headline || '继续下一练',
-        summary: advice.summary || '本次训练已完成，建议继续根据弱项迭代。',
-        strengths: Array.isArray(advice.strengths) ? advice.strengths.filter(Boolean) : [],
-        weaknesses: Array.isArray(advice.weaknesses) ? advice.weaknesses.filter(Boolean) : [],
-        nextDrill: {
-            label: advice.nextDrill?.label || '开始下一练',
-            reason: advice.nextDrill?.reason || '继续强化本次训练短板',
-            configPatch: advice.nextDrill?.configPatch || {},
-            aiPrompt: advice.nextDrill?.aiPrompt || ''
-        },
-        comparison: advice.comparison || {
-            label: 'mixed',
-            summary: advice.comparison?.summary || '已生成本次训练建议。'
-        },
-        language: 'zh-CN'
-    };
-}
-
-/**
- * 生成 AI 教练建议。
- * 这里强制要求模型返回结构化 JSON，而不是自由文本。
- */
-export async function generateCoachAdvice({ session, history }) {
+export async function generateCoachAdvice({ session, history, language = 'zh-CN' }) {
     const { config, result, sourceTextMeta } = session;
     const template = getTemplateMeta(config.aiTemplate);
-
-    /**
-     * 只传最近 5 次摘要，避免 prompt 过长。
-     */
     const recentHistory = history.slice(0, 5).map((item) => ({
         completedAt: item.result.completedAt,
         wpm: item.result.wpm,
@@ -253,13 +288,14 @@ export async function generateCoachAdvice({ session, history }) {
                 messages: [
                     {
                         role: 'system',
-                        content: 'You are an AI typing coach. Return only valid JSON. Keep the language zh-CN. Do not wrap the JSON in markdown.'
+                        content: `You are an AI typing coach. Return only valid JSON. Keep the language ${language}. Do not wrap the JSON in markdown.`
                     },
                     {
                         role: 'user',
                         content: JSON.stringify({
                             goal: 'Generate coaching feedback for a typing test result.',
-                            template: template.label,
+                            language,
+                            template: getTemplateLabel(template, language),
                             sourceTextMeta,
                             config,
                             result,
@@ -288,7 +324,7 @@ export async function generateCoachAdvice({ session, history }) {
                                     },
                                     aiPrompt: 'string'
                                 },
-                                language: 'zh-CN'
+                                language
                             }
                         })
                     }
@@ -297,24 +333,24 @@ export async function generateCoachAdvice({ session, history }) {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to generate coach advice');
+            await throwResponseError(response);
         }
 
         const payload = await response.json();
         const content = extractMessageContent(payload);
         if (!content) {
-            throw new Error('The AI returned an empty coach payload.');
+            throw new AiServiceError('empty_response', 'The AI returned an empty coach payload.');
         }
 
-        return normalizeCoachAdvicePayload(content);
+        return normalizeCoachAdvicePayload(content, language);
+    } catch (error) {
+        throw normalizeThrownError(error);
     } finally {
         cleanup();
     }
 }
 
-/**
- * 暴露本地回退入口，方便 store 在 AI 失败时快速切换。
- */
 export function buildFallbackCoachAdvice(payload) {
     return buildLocalCoachAdvice(payload);
 }
+

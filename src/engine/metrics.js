@@ -275,7 +275,7 @@ export function createTimelinePoint({
  * 把本次成绩与最近几次结果做轻量比较。
  * 该结果既可展示给用户，也可喂给 AI 教练。
  */
-export function deriveComparison(sessions, currentSessionId, currentResult) {
+export function deriveComparison(sessions, currentSessionId, currentResult, language = 'zh-CN') {
     const baseline = sessions
         .filter((session) => session.id !== currentSessionId)
         .slice(0, 5);
@@ -283,7 +283,9 @@ export function deriveComparison(sessions, currentSessionId, currentResult) {
     if (baseline.length === 0) {
         return {
             label: 'baseline',
-            summary: '这是你的第一条有效样本，后续结果会开始形成趋势比较。',
+            summary: language === 'en-US'
+                ? 'This is your first valid sample. Future sessions will start forming a trend baseline.'
+                : '这是你的第一条有效样本，后续结果会开始形成趋势比较。',
             wpmDelta: null,
             accuracyDelta: null
         };
@@ -300,11 +302,19 @@ export function deriveComparison(sessions, currentSessionId, currentResult) {
             ? 'down'
             : 'mixed';
 
-    const summary = direction === 'up'
-        ? `相比最近 5 次平均值，速度 +${wpmDelta}，准确率 +${accuracyDelta}%。`
-        : direction === 'down'
-            ? `相比最近 5 次平均值，速度 ${wpmDelta}，准确率 ${accuracyDelta}%。`
-            : `相比最近 5 次平均值，速度 ${wpmDelta >= 0 ? '+' : ''}${wpmDelta}，准确率 ${accuracyDelta >= 0 ? '+' : ''}${accuracyDelta}%。`;
+    const signedWpm = `${wpmDelta >= 0 ? '+' : ''}${wpmDelta}`;
+    const signedAccuracy = `${accuracyDelta >= 0 ? '+' : ''}${accuracyDelta}`;
+    const summary = language === 'en-US'
+        ? direction === 'up'
+            ? `Versus the recent 5-session average, speed is ${signedWpm} and accuracy is ${signedAccuracy}%.`
+            : direction === 'down'
+                ? `Versus the recent 5-session average, speed is ${signedWpm} and accuracy is ${signedAccuracy}%.`
+                : `Versus the recent 5-session average, speed is ${signedWpm} and accuracy is ${signedAccuracy}%.`
+        : direction === 'up'
+            ? `相比最近 5 次平均值，速度 ${signedWpm}，准确率 ${signedAccuracy}%。`
+            : direction === 'down'
+                ? `相比最近 5 次平均值，速度 ${signedWpm}，准确率 ${signedAccuracy}%。`
+                : `相比最近 5 次平均值，速度 ${signedWpm}，准确率 ${signedAccuracy}%。`;
 
     return {
         label: direction,

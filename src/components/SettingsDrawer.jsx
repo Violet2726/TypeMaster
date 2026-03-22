@@ -1,15 +1,6 @@
-/**
- * 全局设置抽屉。
- *
- * 目前管理的都是前端本地设置：
- * - 主题
- * - 字号
- * - 专注模式
- * - 音效开关占位
- *
- * 这里暂时不接账号体系，因此所有改动都只会进入本地存储。
- */
-export function SettingsDrawer({ isOpen, settings, onClose, onChange }) {
+import { SUPPORTED_LANGUAGES } from '../engine/config';
+
+export function SettingsDrawer({ isOpen, settings, copy, onClose, onChange }) {
     if (!isOpen) {
         return null;
     }
@@ -20,58 +11,65 @@ export function SettingsDrawer({ isOpen, settings, onClose, onChange }) {
                 className="settings-drawer"
                 role="dialog"
                 aria-modal="true"
-                aria-label="设置"
+                aria-label={copy.settings.title}
                 onClick={(event) => event.stopPropagation()}
             >
                 <div className="panel-head">
                     <div>
-                        <p className="panel-kicker">Workspace</p>
-                        <h2>设置中心</h2>
+                        <p className="panel-kicker">{copy.settings.kicker}</p>
+                        <h2>{copy.settings.title}</h2>
                     </div>
-                    <button type="button" className="ghost-btn" onClick={onClose}>关闭</button>
+                    <button type="button" className="ghost-btn" onClick={onClose}>{copy.common.close}</button>
                 </div>
 
                 <div className="settings-grid">
                     <label className="field">
-                        <span>主题</span>
-                        <select value={settings.theme} onChange={(event) => onChange({ theme: event.target.value })}>
-                            <option value="serika-dark">Serika Dark</option>
-                            <option value="serika-light">Serika Light</option>
+                        <span>{copy.settings.language}</span>
+                        <select value={settings.language} onChange={(event) => onChange({ language: event.target.value })}>
+                            {SUPPORTED_LANGUAGES.map((language) => (
+                                <option key={language.id} value={language.id}>{language.label}</option>
+                            ))}
                         </select>
                     </label>
 
                     <label className="field">
-                        <span>字号密度</span>
+                        <span>{copy.settings.theme}</span>
+                        <select value={settings.theme} onChange={(event) => onChange({ theme: event.target.value })}>
+                            <option value="serika-dark">{copy.settings.themeDark}</option>
+                            <option value="serika-light">{copy.settings.themeLight}</option>
+                        </select>
+                    </label>
+
+                    <label className="field">
+                        <span>{copy.settings.fontScale}</span>
                         <select value={settings.fontScale} onChange={(event) => onChange({ fontScale: event.target.value })}>
-                            <option value="sm">紧凑</option>
-                            <option value="md">标准</option>
-                            <option value="lg">舒展</option>
+                            <option value="sm">{copy.settings.fontSm}</option>
+                            <option value="md">{copy.settings.fontMd}</option>
+                            <option value="lg">{copy.settings.fontLg}</option>
                         </select>
                     </label>
 
                     <label className="toggle-field">
-                        <span>专注模式</span>
+                        <span>{copy.settings.focusMode}</span>
                         <button
                             type="button"
                             className={`toggle-btn ${settings.focusMode ? 'active' : ''}`}
                             onClick={() => onChange({ focusMode: !settings.focusMode })}
                         >
-                            {settings.focusMode ? '已开启' : '已关闭'}
+                            {settings.focusMode ? copy.settings.focusOn : copy.settings.focusOff}
                         </button>
                     </label>
 
-                    <label className="toggle-field">
-                        <span>音效占位</span>
-                        <button
-                            type="button"
-                            className={`toggle-btn ${settings.soundEffects ? 'active' : ''}`}
-                            onClick={() => onChange({ soundEffects: !settings.soundEffects })}
-                        >
-                            {settings.soundEffects ? '已开启' : '已关闭'}
+                    <div className="toggle-field disabled-card">
+                        <span>{copy.settings.sound}</span>
+                        <button type="button" className="toggle-btn" disabled>
+                            {copy.common.comingSoon}
                         </button>
-                    </label>
+                        <p className="muted-text">{copy.settings.soundComingSoon}</p>
+                    </div>
                 </div>
             </aside>
         </div>
     );
 }
+

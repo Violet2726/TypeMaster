@@ -12,6 +12,10 @@ import { commonWords } from '../data/words';
 
 const punctuationMarks = ['.', ',', '!', '?', ';', ':'];
 
+function getBuiltinLabel(language = 'zh-CN') {
+    return language === 'en-US' ? 'Built-in word bank' : '标准词库训练';
+}
+
 /**
  * 统一清洗文本，避免换行、多空格等格式噪声影响单词切分。
  */
@@ -99,9 +103,12 @@ export function createDraftFromWords(words, config, meta = {}) {
         id: crypto.randomUUID(),
         text,
         words: safeWords,
+        configSnapshot: {
+            ...config
+        },
         sourceTextMeta: {
             source: config.source || 'builtin',
-            label: meta.label || (config.source === 'ai' ? 'AI 训练文本' : '标准词库训练'),
+            label: meta.label || (config.source === 'ai' ? 'AI practice text' : getBuiltinLabel(meta.language)),
             template: meta.template || null,
             difficulty: meta.difficulty || null,
             createdAt: meta.createdAt || new Date().toISOString(),
@@ -114,9 +121,10 @@ export function createDraftFromWords(words, config, meta = {}) {
 /**
  * 生成一份标准词库草稿。
  */
-export function createBuiltinDraft(config) {
+export function createBuiltinDraft(config, options = {}) {
     return createDraftFromWords(createBuiltinWords(config), config, {
-        label: '标准词库训练',
+        label: getBuiltinLabel(options.language),
+        language: options.language,
         generatedBy: 'builtin'
     });
 }
@@ -127,4 +135,23 @@ export function createBuiltinDraft(config) {
  */
 export function createDraftFromText(text, config, meta = {}) {
     return createDraftFromWords(tokenizeText(text), config, meta);
+}
+
+export function doesDraftMatchConfig(config, draft) {
+    if (!draft?.configSnapshot) {
+        return false;
+    }
+
+    const comparableKeys = [
+        'mode',
+        'durationSeconds',
+        'wordCount',
+        'includePunctuation',
+        'includeNumbers',
+        'source',
+        'aiTemplate',
+        'difficulty'
+    ];
+
+    return comparableKeys.every((key) => draft.configSnapshot[key] === config[key]);
 }

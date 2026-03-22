@@ -1,17 +1,12 @@
-/**
- * 打字主区域组件。
- *
- * 它承担三类职责：
- * 1. 显示实时指标和当前文本。
- * 2. 管理光标位置的视觉反馈。
- * 3. 把输入事件转发给 `useTypingSession`。
- *
- * 真正的练习状态仍然由 hook 持有，这里只做展示和 DOM 测量。
- */
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { buildRenderedWords } from '../engine';
 
+function getSessionStatusText(copy, status) {
+    return copy.statuses[status] || copy.statuses.idle;
+}
+
 export function TypingArea({
+    copy,
     words,
     typedHistory,
     currentInput,
@@ -28,7 +23,10 @@ export function TypingArea({
     onFocus,
     onBlur,
     onActivate,
-    onReset
+    onReset,
+    isLocked = false,
+    lockTitle,
+    lockBody
 }) {
     const wrapperRef = useRef(null);
     const wordRefs = useRef(new Map());
@@ -36,23 +34,16 @@ export function TypingArea({
     const extraRefs = useRef(new Map());
     const [caretStyle, setCaretStyle] = useState({});
 
-    /**
-     * 先把状态映射成渲染模型，避免 JSX 里堆太多条件判断。
-     */
     const renderedWords = useMemo(
         () => buildRenderedWords(words, typedHistory, currentInput, currentWordIndex),
         [words, typedHistory, currentInput, currentWordIndex]
     );
 
-    /**
-     * 每次当前输入或当前词变化后，重新计算光标和滚动位置。
-     * 这里使用 useLayoutEffect，是为了在浏览器绘制前同步更新视觉状态。
-     */
     useLayoutEffect(() => {
         const currentWordEl = wordRefs.current.get(currentWordIndex);
         const currentWord = words[currentWordIndex] || '';
 
-        if (!wrapperRef.current || !currentWordEl || status === 'complete') {
+        if (!wrapperRef.current || !currentWordEl || status === 'complete' || isLocked || !words.length) {
             setCaretStyle({ opacity: 0 });
             return;
         }
@@ -89,22 +80,37 @@ export function TypingArea({
             left: `${useRightEdge ? targetRect.right - wrapperRect.left : targetRect.left - wrapperRect.left}px`,
             top: `${targetRect.top - wrapperRect.top + (targetRect.height - fontSize * 1.15) / 2}px`
         });
-    }, [currentInput, currentWordIndex, isFocused, renderedWords, status, words]);
+    }, [currentInput, currentWordIndex, isFocused, isLocked, renderedWords, status, words]);
 
     return (
         <section className="panel typing-panel">
             <div className="typing-panel__head">
                 <div>
-                    <p className="panel-kicker">Practice Arena</p>
-                    <h2>{sourceLabel}</h2>
+                    <p className="panel-kicker">{copy.practice.pageTitle}</p>
+                    <h2>{sourceLabel || copy.common.emptyValue}</h2>
                 </div>
-                <button type="button" className="ghost-btn" onClick={onReset}>重置本轮</button>
+                <button type="button" className="ghost-btn" onClick={onReset}>{copy.common.resetRound}</button>
+            </div>
+
+            <div className="status-strip">
+                <div className="feedback-card">
+                    <span className="summary-label">{copy.practice.statusCard}</span>
+                    <strong>{getSessionStatusText(copy, status)}</strong>
+                </div>
+                <div className="feedback-card">
+                    <span className="summary-label">{copy.practice.textMetaTitle}</span>
+                    <strong>{isLocked ? copy.statuses.stale : copy.statuses.ready}</strong>
+                </div>
+                <div className="feedback-card">
+                    <span className="summary-label">{copy.practice.helperTitle}</span>
+                    <p>{status === 'paused' ? copy.practice.pausedBody : status === 'running' ? copy.practice.runningHint : status === 'complete' ? copy.practice.completeHint : copy.practice.idleHint}</p>
+                </div>
             </div>
 
             <div className="live-stats">
                 <div className="live-stat">
                     <span className="live-stat-value">{liveMetrics.wpm}</span>
-                    <span className="live-stat-label">wpm</span>
+                    <span className="live-stat-label">{copy.common.wpm}</span>
                 </div>
                 <div className="live-stat">
                     <span className="live-stat-value">{liveMetrics.accuracy}</span>
@@ -112,85 +118,109 @@ export function TypingArea({
                 </div>
                 <div className="live-stat">
                     <span className="live-stat-value">{timerDisplay}</span>
-                    <span className="live-stat-label">{mode === 'time' ? '剩余秒' : '已用秒'}</span>
+                    <span className="live-stat-label">{mode === 'time' ? copy.practice.timeRemaining : copy.practice.timeElapsed}</span>
                 </div>
             </div>
+
+            {status === 'paused' && (
+                <div className="banner banner-warning">
+                    <div>
+                        <strong>{copy.practice.pausedTitle}</strong>
+                        <p>{copy.practice.pausedBody}</p>
+                    </div>
+                    <button type="button" className="action-btn" onClick={onActivate}>
+                        {copy.common.resumeTyping}
+                    </button>
+                </div>
+            )}
 
             <div className="words-shell" onClick={onActivate} role="presentation">
                 <div className="words-container">
-                    <div className="words-wrapper" ref={wrapperRef}>
-                        <div className={`caret ${status === 'running' ? 'active' : ''}`} style={caretStyle} />
-                        <div className="words">
-                            {renderedWords.map((word) => (
-                                <div
-                                    key={`${word.wordIndex}-${word.word}`}
-                                    className={`word ${word.isCurrent ? 'current' : ''}`}
-                                    ref={(node) => {
-                                        if (node) {
-                                            wordRefs.current.set(word.wordIndex, node);
-                                        } else {
-                                            wordRefs.current.delete(word.wordIndex);
-                                        }
-                                    }}
-                                >
-                                    {word.chars.map((char) => (
-                                        <span
-                                            key={`${word.wordIndex}-${char.index}`}
-                                            className={`letter ${char.status}`}
-                                            ref={(node) => {
-                                                const key = `${word.wordIndex}-${char.index}`;
-                                                if (node) {
-                                                    charRefs.current.set(key, node);
-                                                } else {
-                                                    charRefs.current.delete(key);
-                                                }
-                                            }}
-                                        >
-                                            {char.char}
-                                        </span>
-                                    ))}
-
-                                    {word.extraChars.map((char) => (
-                                        <span
-                                            key={`extra-${word.wordIndex}-${char.index}`}
-                                            className="letter extra"
-                                            ref={(node) => {
-                                                const key = `${word.wordIndex}-${char.index}`;
-                                                if (node) {
-                                                    extraRefs.current.set(key, node);
-                                                } else {
-                                                    extraRefs.current.delete(key);
-                                                }
-                                            }}
-                                        >
-                                            {char.char}
-                                        </span>
-                                    ))}
-                                </div>
-                            ))}
+                    {isLocked || !words.length ? (
+                        <div className="typing-empty-state">
+                            <strong>{lockTitle}</strong>
+                            <p>{lockBody}</p>
                         </div>
-                    </div>
+                    ) : (
+                        <div className="words-wrapper" ref={wrapperRef}>
+                            <div className={`caret ${status === 'running' ? 'active' : ''}`} style={caretStyle} />
+                            <div className="words">
+                                {renderedWords.map((word) => (
+                                    <div
+                                        key={`${word.wordIndex}-${word.word}`}
+                                        className={`word ${word.isCurrent ? 'current' : ''}`}
+                                        ref={(node) => {
+                                            if (node) {
+                                                wordRefs.current.set(word.wordIndex, node);
+                                            } else {
+                                                wordRefs.current.delete(word.wordIndex);
+                                            }
+                                        }}
+                                    >
+                                        {word.chars.map((char) => (
+                                            <span
+                                                key={`${word.wordIndex}-${char.index}`}
+                                                className={`letter ${char.status}`}
+                                                ref={(node) => {
+                                                    const key = `${word.wordIndex}-${char.index}`;
+                                                    if (node) {
+                                                        charRefs.current.set(key, node);
+                                                    } else {
+                                                        charRefs.current.delete(key);
+                                                    }
+                                                }}
+                                            >
+                                                {char.char}
+                                            </span>
+                                        ))}
+
+                                        {word.extraChars.map((char) => (
+                                            <span
+                                                key={`extra-${word.wordIndex}-${char.index}`}
+                                                className="letter extra"
+                                                ref={(node) => {
+                                                    const key = `${word.wordIndex}-${char.index}`;
+                                                    if (node) {
+                                                        extraRefs.current.set(key, node);
+                                                    } else {
+                                                        extraRefs.current.delete(key);
+                                                    }
+                                                }}
+                                            >
+                                                {char.char}
+                                            </span>
+                                        ))}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
-                {!isFocused && status !== 'complete' && (
-                    <div className="focus-overlay">点击这里继续输入</div>
+                {!isFocused && status !== 'complete' && !isLocked && words.length > 0 && (
+                    <div className="focus-overlay">{copy.practice.focusLost}</div>
                 )}
             </div>
 
-            <input
-                ref={inputRef}
-                type="text"
-                className="hidden-input"
-                value={currentInput}
-                onChange={onInputChange}
-                onKeyDown={onKeyDown}
-                onFocus={onFocus}
-                onBlur={onBlur}
-                autoComplete="off"
-                autoCapitalize="off"
-                autoCorrect="off"
-                spellCheck="false"
-            />
+            <label className="typing-input-wrap">
+                <span className="summary-label">{copy.common.startTyping}</span>
+                <input
+                    ref={inputRef}
+                    type="text"
+                    className="typing-input"
+                    value={currentInput}
+                    onChange={onInputChange}
+                    onKeyDown={onKeyDown}
+                    onFocus={onFocus}
+                    onBlur={onBlur}
+                    autoComplete="off"
+                    autoCapitalize="off"
+                    autoCorrect="off"
+                    spellCheck="false"
+                    disabled={isLocked}
+                    placeholder={copy.practice.wordsPlaceholder}
+                />
+            </label>
         </section>
     );
 }

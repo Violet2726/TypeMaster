@@ -117,6 +117,6 @@ export function getCoachAdviceBySessionId(sessionId) {
  * 生成应用初始草稿。
  * 当前统一回到内置词库模式，保证首屏无 AI 依赖。
  */
-export function createInitialDraft(config) {
-    return createBuiltinDraft(config || DEFAULT_CONFIG);
+export function createInitialDraft(config, options = {}) {
+    return createBuiltinDraft(config || DEFAULT_CONFIG, options);
 }

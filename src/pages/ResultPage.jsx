@@ -1,47 +1,130 @@
-/**
- * 结果页。
- *
- * 结果页是 2.0 切片的关键闭环页面：
- * - 展示本次结果
- * - 展示趋势图
- * - 自动请求 AI 教练建议
- * - 提供“下一练”入口
- */
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TrendChart } from '../components/TrendChart';
 import { deriveComparison } from '../engine';
+import { getErrorMessage } from '../i18n';
 import { usePracticeStore } from '../store/practice-store';
+
+function CoachState({ copy, language, status, issue, coachRecord, onRetryAdvice, onNextDrill, nextDrillState, nextDrillError }) {
+    const fallbackCode = coachRecord?.fallbackReasonCode || issue?.code || 'unknown';
+    const errorCopy = getErrorMessage(language, fallbackCode);
+
+    if ((status === 'loading' || status === 'idle') && !coachRecord) {
+        return (
+            <div className="feedback-card feedback-info">
+                <strong>{copy.result.coachLoadingTitle}</strong>
+                <p>{copy.result.coachLoadingBody}</p>
+            </div>
+        );
+    }
+
+    if (status === 'error' && !coachRecord) {
+        return (
+            <div className="feedback-card feedback-error">
+                <strong>{copy.result.coachErrorTitle}</strong>
+                <p>{copy.result.coachErrorBody}</p>
+                <div className="inline-actions">
+                    <button type="button" className="action-btn primary" onClick={onRetryAdvice}>
+                        {copy.common.refreshAdvice}
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <>
+            {status === 'fallback' && (
+                <div className="feedback-card feedback-warning">
+                    <strong>{errorCopy.title}</strong>
+                    <p>{copy.result.coachFallbackBody}</p>
+                    <div className="inline-actions">
+                        <button type="button" className="action-btn" onClick={onRetryAdvice}>
+                            {copy.common.refreshAdvice}
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            <div className="summary-block">
+                <strong>{coachRecord?.headline}</strong>
+                <p>{coachRecord?.summary}</p>
+            </div>
+
+            {nextDrillState === 'loading' && (
+                <div className="feedback-card feedback-info">
+                    <strong>{copy.common.loading}</strong>
+                    <p>{copy.result.nextDrillLoading}</p>
+                </div>
+            )}
+
+            {nextDrillState === 'error' && (
+                <div className="feedback-card feedback-error">
+                    <strong>{getErrorMessage(language, nextDrillError?.code || 'unknown').title}</strong>
+                    <p>{copy.result.nextDrillError}</p>
+                </div>
+            )}
+
+            <div className="coach-section">
+                <h3>{copy.result.issuesTitle}</h3>
+                <ul className="flat-list">
+                    {(coachRecord?.weaknesses || []).map((item) => <li key={item}>{item}</li>)}
+                </ul>
+            </div>
+
+            <div className="coach-section">
+                <h3>{copy.result.strengthsTitle}</h3>
+                <ul className="flat-list">
+                    {(coachRecord?.strengths || []).map((item) => <li key={item}>{item}</li>)}
+                </ul>
+            </div>
+
+            <div className="coach-section">
+                <h3>{copy.result.nextTitle}</h3>
+                <p>{coachRecord?.nextDrill?.reason || copy.result.nextReasonFallback}</p>
+                <div className="inline-actions">
+                    <button
+                        type="button"
+                        className="action-btn primary"
+                        onClick={onNextDrill}
+                        disabled={nextDrillState === 'loading'}
+                    >
+                        {nextDrillState === 'error' ? copy.common.nextDrillRetry : coachRecord?.nextDrill?.label || copy.common.nextDrill}
+                    </button>
+                </div>
+            </div>
+        </>
+    );
+}
 
 export function ResultPage() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const {
+        copy,
+        language,
         sessions,
         lastCompletedSession,
         getAdviceForSession,
+        getCoachStatusForSession,
+        getCoachIssueForSession,
         generateCoachForSession,
         launchNextDrill
     } = usePracticeStore();
 
     const sessionId = searchParams.get('session');
-
-    /**
-     * 优先按 query 里的 session id 读取结果。
-     * 如果没有，就回退到最近一次完成的练习。
-     */
     const session = useMemo(
         () => sessions.find((item) => item.id === sessionId) || lastCompletedSession,
         [lastCompletedSession, sessionId, sessions]
     );
 
     const [coachRecord, setCoachRecord] = useState(() => (session ? getAdviceForSession(session.id) : null));
-    const [isLoadingAdvice, setIsLoadingAdvice] = useState(false);
+    const [nextDrillState, setNextDrillState] = useState('idle');
+    const [nextDrillError, setNextDrillError] = useState(null);
 
-    /**
-     * 结果页首次进入时自动触发 AI 教练诊断。
-     * 如果本地已有缓存，则直接复用。
-     */
+    const coachStatus = session ? getCoachStatusForSession(session.id) : 'idle';
+    const coachIssue = session ? getCoachIssueForSession(session.id) : null;
+
     useEffect(() => {
         if (!session) {
             return;
@@ -53,51 +136,55 @@ export function ResultPage() {
             return;
         }
 
-        let isActive = true;
-        setIsLoadingAdvice(true);
-
+        let active = true;
         generateCoachForSession(session.id)
             .then((record) => {
-                if (isActive) {
+                if (active) {
                     setCoachRecord(record);
                 }
             })
-            .finally(() => {
-                if (isActive) {
-                    setIsLoadingAdvice(false);
-                }
-            });
+            .catch(() => {});
 
         return () => {
-            isActive = false;
+            active = false;
         };
     }, [generateCoachForSession, getAdviceForSession, session]);
 
     if (!session) {
         return (
             <section className="panel empty-panel">
-                <h2>还没有可展示的结果</h2>
-                <p className="muted-text">先完成一次练习，再回来查看结果页和 AI 教练建议。</p>
-                <Link to="/practice" className="action-btn primary">去练习</Link>
+                <h2>{copy.result.emptyTitle}</h2>
+                <p className="muted-text">{copy.result.emptyBody}</p>
+                <button type="button" className="action-btn primary" onClick={() => navigate('/practice')}>
+                    {copy.result.emptyAction}
+                </button>
             </section>
         );
     }
 
-    const comparison = coachRecord?.comparison || deriveComparison(sessions, session.id, session.result);
+    const comparison = coachRecord?.comparison || deriveComparison(sessions, session.id, session.result, language);
 
-    /**
-     * “下一练”按钮会直接拿教练建议里的 configPatch 和 aiPrompt，
-     * 生成一份新的 AI 草稿，然后跳回练习页。
-     */
+    const handleRetryAdvice = async () => {
+        const record = await generateCoachForSession(session.id, { force: true });
+        setCoachRecord(record);
+    };
+
     const handleNextDrill = async () => {
-        if (coachRecord?.nextDrill) {
-            try {
-                await launchNextDrill(coachRecord);
-            } catch (error) {
-                // 失败时仍然允许返回练习页，练习页会显示已有内容。
-            }
+        if (!coachRecord?.nextDrill) {
+            return;
         }
-        navigate('/practice');
+
+        setNextDrillState('loading');
+        setNextDrillError(null);
+
+        try {
+            await launchNextDrill(coachRecord);
+            setNextDrillState('idle');
+            navigate('/practice');
+        } catch (error) {
+            setNextDrillState('error');
+            setNextDrillError(error);
+        }
     };
 
     return (
@@ -105,105 +192,104 @@ export function ResultPage() {
             <section className="panel result-hero">
                 <div className="result-hero__stats">
                     <div className="result-big">
-                        <span className="result-label">wpm</span>
+                        <span className="result-label">{copy.common.wpm}</span>
                         <span className="result-value">{session.result.wpm}</span>
                     </div>
                     <div className="result-big">
-                        <span className="result-label">acc</span>
+                        <span className="result-label">{copy.common.accuracy}</span>
                         <span className="result-value">{session.result.accuracy}<span className="result-unit">%</span></span>
                     </div>
                 </div>
 
                 <div className="result-copy">
-                    <p className="panel-kicker">Outcome</p>
+                    <p className="panel-kicker">{copy.result.heroKicker}</p>
                     <h2>{comparison.summary}</h2>
                     <p className="muted-text">
-                        本次文本来源于 {session.sourceTextMeta?.label || '训练文本'}，稳定度 {session.result.consistency}%。
+                        {session.sourceTextMeta?.label || copy.common.emptyValue} · {copy.common.consistency} {session.result.consistency}%
                     </p>
                 </div>
             </section>
 
-            <TrendChart timeline={session.timeline || { labels: [], wpm: [], raw: [], burst: [], errors: [] }} />
+            <section className="panel">
+                <div className="panel-head">
+                    <div>
+                        <p className="panel-kicker">{copy.result.detailsTitle}</p>
+                        <h2>{copy.result.summaryTitle}</h2>
+                    </div>
+                    <span className={`panel-badge badge-${coachStatus}`}>
+                        {coachStatus === 'success'
+                            ? copy.common.coachReady
+                            : coachStatus === 'fallback'
+                                ? copy.common.coachFallback
+                                : coachStatus === 'loading' || coachStatus === 'idle'
+                                    ? copy.common.coachLoading
+                                    : copy.common.coachError}
+                    </span>
+                </div>
 
-            <section className="panel result-grid">
                 <div className="results-details">
                     <div className="result-item">
-                        <span className="result-item-label">test type</span>
-                        <span className="result-item-value">
-                            {session.config.mode === 'time' ? `time ${session.config.durationSeconds}` : `words ${session.config.wordCount}`}
-                        </span>
+                        <span className="result-item-label">{copy.common.wpm}</span>
+                        <span className="result-item-value">{session.result.wpm}</span>
                     </div>
                     <div className="result-item">
-                        <span className="result-item-label">raw</span>
+                        <span className="result-item-label">Raw</span>
                         <span className="result-item-value">{session.result.rawWpm}</span>
                     </div>
                     <div className="result-item">
-                        <span className="result-item-label">characters</span>
+                        <span className="result-item-label">{copy.common.accuracy}</span>
+                        <span className="result-item-value">{session.result.accuracy}%</span>
+                    </div>
+                    <div className="result-item">
+                        <span className="result-item-label">{copy.common.consistency}</span>
+                        <span className="result-item-value">{session.result.consistency}%</span>
+                    </div>
+                    <div className="result-item">
+                        <span className="result-item-label">Chars</span>
                         <span className="result-item-value">
                             {session.result.correctChars}/{session.result.incorrectChars}/{session.result.extraChars}/{session.result.missedChars}
                         </span>
                     </div>
                     <div className="result-item">
-                        <span className="result-item-label">consistency</span>
-                        <span className="result-item-value">{session.result.consistency}%</span>
-                    </div>
-                    <div className="result-item">
-                        <span className="result-item-label">time</span>
+                        <span className="result-item-label">Time</span>
                         <span className="result-item-value">{session.result.durationSeconds}s</span>
                     </div>
                 </div>
-
-                <div className="coach-card">
-                    <div className="panel-head">
-                        <div>
-                            <p className="panel-kicker">AI Coach</p>
-                            <h2>{coachRecord?.headline || '正在生成本次建议...'}</h2>
-                        </div>
-                        <span className="panel-badge">
-                            {coachRecord ? (coachRecord.source === 'ai' ? 'AI 诊断' : '本地兜底') : '处理中'}
-                        </span>
-                    </div>
-
-                    {isLoadingAdvice && !coachRecord ? (
-                        <p className="muted-text">正在基于本次结果和最近历史生成教练建议...</p>
-                    ) : (
-                        <>
-                            <p className="lead-text">{coachRecord?.summary}</p>
-
-                            <div className="coach-section">
-                                <h3>本次结论</h3>
-                                <p>{comparison.summary}</p>
-                            </div>
-
-                            <div className="coach-section">
-                                <h3>主要问题</h3>
-                                <ul className="flat-list">
-                                    {(coachRecord?.weaknesses || []).map((item) => <li key={item}>{item}</li>)}
-                                </ul>
-                            </div>
-
-                            <div className="coach-section">
-                                <h3>做得好的地方</h3>
-                                <ul className="flat-list">
-                                    {(coachRecord?.strengths || []).map((item) => <li key={item}>{item}</li>)}
-                                </ul>
-                            </div>
-
-                            <div className="coach-section">
-                                <h3>下一练建议</h3>
-                                <p>{coachRecord?.nextDrill?.reason}</p>
-                                <button type="button" className="action-btn primary" onClick={handleNextDrill}>
-                                    {coachRecord?.nextDrill?.label || '开始下一练'}
-                                </button>
-                            </div>
-                        </>
-                    )}
-                </div>
             </section>
 
+            <section className="panel coach-card">
+                <div className="panel-head">
+                    <div>
+                        <p className="panel-kicker">{copy.result.coachTitle}</p>
+                        <h2>{coachRecord?.headline || copy.result.coachLoadingTitle}</h2>
+                    </div>
+                </div>
+
+                <CoachState
+                    copy={copy}
+                    language={language}
+                    status={coachStatus}
+                    issue={coachIssue}
+                    coachRecord={coachRecord}
+                    onRetryAdvice={handleRetryAdvice}
+                    onNextDrill={handleNextDrill}
+                    nextDrillState={nextDrillState}
+                    nextDrillError={nextDrillError}
+                />
+            </section>
+
+            <TrendChart
+                copy={copy}
+                timeline={session.timeline || { labels: [], wpm: [], raw: [], burst: [], errors: [] }}
+            />
+
             <div className="results-actions">
-                <button type="button" className="action-btn" onClick={() => navigate('/practice')}>返回练习页</button>
-                <Link to="/coach" className="action-btn">打开教练页</Link>
+                <button type="button" className="action-btn" onClick={() => navigate('/practice')}>
+                    {copy.common.returnPractice}
+                </button>
+                <button type="button" className="action-btn" onClick={() => navigate('/insights')}>
+                    {copy.common.viewInsights}
+                </button>
             </div>
         </div>
     );

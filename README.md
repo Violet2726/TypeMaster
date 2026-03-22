@@ -1,55 +1,77 @@
 [English](./README_EN.md) | [简体中文](./README.md)
 
-# TypeMaster 2.0
+# TypeMaster
 
-一个以 `AI 教练` 为核心的打字训练应用。  
-当前版本已经从旧的单文件前端演进为 `React + Vite + Node API Proxy` 架构，并完成首个 2.0 开发切片：
+TypeMaster 是一个面向英文打字训练的 `AI Training Studio`。当前仓库已经完成一轮围绕 `首页 / 练习 / 结果 / 成长洞察` 的体验重构，核心目标是把练习闭环做清楚，把 AI 教练反馈做稳定，并让桌面端与移动端都能顺畅完成一轮训练。
 
-- AI 训练工坊
-- React 练习页 / 结果页 / 教练页
-- 自动生成 AI 教练建议
-- 本地历史记录与设置持久化
-- 下一练建议回填
+它提供两条训练路径：
 
-## 当前版本重点
+- `标准词库训练`：不依赖 AI，可直接开始
+- `AI 训练工坊`：选择主题模板与难度，生成英文练习文本，再进入训练
+
+## 当前版本包含什么
 
 ### 产品能力
 
-- `标准词库练习`：不依赖 AI，也能直接开始练习
-- `AI 训练工坊`：支持主题模板、难度、标点、数字配置
-- `结果页诊断`：练习结束后自动生成本次总结、主要问题、亮点和下一练建议
-- `教练页`：查看最近一次完整建议和最近几次练习摘要
-- `本地持久化`：最近 50 条练习记录、设置项、教练建议会保存在浏览器本地
+- `双入口首页`：支持直接开始 AI 训练或快速进入标准练习，并展示最近一次建议、最近 7 次概览和最近练习记录
+- `训练工作台`：练习页拆分为配置区、AI 工坊和打字区，AI 训练采用明确三步流转
+- `AI 文本状态管理`：支持 `idle / loading / ready / stale / error`，配置变更后会要求重新生成文本
+- `结果页反馈`：展示 WPM、Raw WPM、准确率、一致性、字符统计、趋势图，以及 AI 教练建议
+- `教练建议兜底`：AI 建议失败时，会自动退回本地规则建议，并保留明确状态
+- `成长洞察页`：汇总最近建议、近 7/30 次趋势、最佳 WPM、平均准确率、AI 使用占比、高频错误字符/单词和最近历史
+- `双语界面`：支持 `简体中文 / English`，语言设置持久化到本地
+- `本地持久化`：设置、最近 50 次练习记录、最近 50 条教练建议都会存入 `localStorage`
+- `桌面 / 移动体验分流`：桌面端保持内嵌打字体验，移动端使用显式输入框避免软键盘场景迷失
 
 ### 技术能力
 
-- `React + Vite`：前端采用组件化结构和 HashRouter
-- `Node API Proxy`：本地通过 `server.js` 代理 `/api/chat`
-- `Vercel Serverless`：部署时可使用 `api/chat.js` 作为同构代理入口
-- `本地兜底教练`：如果 AI 建议生成失败，结果页会回退到本地规则建议
+- `React 18 + Vite` 前端
+- `React Router Data Router + Hash URL` 路由方案，地址形如 `#/practice`
+- `Node 本地代理`：通过 [`server.js`](./server.js) 暴露 `/api/chat`
+- `Vercel Serverless 代理`：通过 [`api/chat.js`](./api/chat.js) 兼容部署环境
+- `本地规则引擎`：打字草稿、统计指标、趋势、洞察和本地教练逻辑均在 `src/engine/` 中维护
 
-## 目录结构
+## 页面与核心流程
+
+### 页面结构
+
+- `首页 /`：双入口首屏、最近建议、最近训练概览
+- `练习 /practice`：配置、AI 工坊、打字区
+- `结果 /result`：结算、问题总结、亮点、下一练建议、趋势图
+- `成长洞察 /insights`：长期表现和错误热点
+- `旧入口 /coach`：自动重定向到 `/insights`
+
+### AI 训练闭环
+
+1. 进入练习页并切换到 `AI` 来源
+2. 选择模板与难度
+3. 生成训练文本
+4. 完成一轮练习
+5. 结果页自动生成 AI 教练建议
+6. 如 AI 失败，则使用本地规则建议兜底
+7. 可直接从结果页发起 `下一练`
+
+## 项目结构
 
 ```text
 typemaster/
 ├─ api/
-│  └─ chat.js                    # Vercel Serverless 代理
+│  └─ chat.js                    # Vercel Serverless AI 代理
 ├─ docs/
-│  └─ v2-major-update-plan.md    # 2.0 版本规划文档
+│  └─ v2-major-update-plan.md    # 历史版本规划文档
 ├─ src/
-│  ├─ components/                # 通用 UI 组件
-│  ├─ data/                      # 内置数据，例如高频词库
-│  ├─ engine/                    # 练习引擎：配置、草稿、渲染模型、统计、教练规则
-│  ├─ hooks/                     # React 业务 hook
-│  ├─ pages/                     # 页面级组件
-│  ├─ services/                  # AI 服务、本地存储、云端契约占位
-│  ├─ store/                     # 全局业务状态
-│  ├─ App.jsx                    # 应用根组件
+│  ├─ components/                # Header、设置抽屉、图表、确认弹窗、打字区等
+│  ├─ data/                      # 标准词库等静态数据
+│  ├─ engine/                    # 配置常量、草稿生成、统计、洞察、本地教练规则
+│  ├─ hooks/                     # 练习时序与输入控制
+│  ├─ i18n/                      # 中英文文案与格式化方法
+│  ├─ pages/                     # Home / Practice / Result / Insights
+│  ├─ services/                  # AI 调用、本地存储、云端契约占位
+│  ├─ store/                     # 全局业务状态编排
+│  ├─ App.jsx                    # 应用路由与壳层
 │  └─ main.jsx                   # 前端入口
-├─ index.css                     # 全局样式与主题
-├─ index.html                    # Vite HTML 入口
-├─ server.js                     # 本地 Node 代理 + 静态资源服务
-├─ vite.config.js                # Vite 配置
+├─ index.css                     # 全局样式与主题系统
+├─ server.js                     # 本地静态服务 + /api/chat 代理
 ├─ package.json
 └─ README.md / README_EN.md
 ```
@@ -61,15 +83,17 @@ typemaster/
 
 ## AI 配置
 
-如果你只想体验标准词库模式，可以跳过这一步。  
-如果你要使用 `AI 训练工坊` 和 `AI 教练建议`，需要提供：
+如果你只使用标准词库训练，可以跳过这一节。  
+如果你要启用 `AI 训练工坊` 或 `AI 教练建议`，需要提供：
 
 - `AI_API_KEY`
 - `AI_API_URL`
 
-你可以使用以下任一方式配置：
+支持两种方式：
 
-### 方式 1：本地 `config.js`
+### 方式一：本地 `config.js`
+
+在项目根目录创建 `config.js`：
 
 ```js
 module.exports = {
@@ -79,10 +103,11 @@ module.exports = {
 ```
 
 说明：
-- `config.js` 已被 `.gitignore` 忽略
-- 本地 `server.js` 和 `api/chat.js` 都会优先读取它
 
-### 方式 2：环境变量
+- `config.js` 已被 `.gitignore` 忽略
+- [`server.js`](./server.js) 和 [`api/chat.js`](./api/chat.js) 都会优先读取它
+
+### 方式二：环境变量
 
 ```bash
 AI_API_KEY=your_key_here
@@ -97,39 +122,40 @@ AI_API_URL=your_url_here
 npm install
 ```
 
-### 2. 启动 API 代理
+### 2. 启动本地 API 代理
 
-在终端 A 中运行：
+终端 A：
 
 ```bash
 npm run api
 ```
 
-默认监听：
+默认地址：
 
 ```text
 http://localhost:8080
 ```
 
-### 3. 启动前端开发服务器
+### 3. 启动前端开发服务
 
-在终端 B 中运行：
+终端 B：
 
 ```bash
 npm run dev
 ```
 
-默认访问地址：
+打开：
 
 ```text
 http://localhost:5173/#/
 ```
 
 说明：
-- 开发模式下，Vite 会把 `/api` 代理到 `http://localhost:8080`
-- HashRouter 已启用，因此页面路径会出现在 `#/...`
 
-## 构建后运行
+- 开发时，Vite 会把 `/api` 代理到 `http://localhost:8080`
+- 当前使用的是 `Hash` 路由，因此地址会显示为 `#/...`
+
+## 构建与运行
 
 ### 构建前端
 
@@ -137,104 +163,97 @@ http://localhost:5173/#/
 npm run build
 ```
 
-### 启动本地静态服务 + API 代理
+### 启动构建产物
 
 ```bash
 npm run serve
 ```
 
-访问：
+打开：
 
 ```text
 http://localhost:8080/#/
 ```
 
-### 一条命令方式
+### 一键启动
 
 ```bash
 npm start
 ```
 
 说明：
-- `npm start` 会先执行 `npm run build`
-- 然后启动 `server.js`
 
-## 脚本说明
+- `npm start` 会先执行 `npm run build`
+- 然后启动 [`server.js`](./server.js)
+
+## 可用脚本
 
 ```bash
-npm run dev      # 启动 Vite 前端开发服务器
-npm run api      # 启动本地 Node 代理服务
+npm run dev      # 启动 Vite 前端开发服务
+npm run api      # 启动本地 Node 代理
 npm run build    # 构建前端到 dist/
-npm run preview  # 使用 Vite preview 预览构建产物
-npm run serve    # 使用 server.js 托管 dist/ 并提供 /api/chat
-npm start        # 先 build，再 serve
+npm run preview  # 用 Vite 预览构建结果
+npm run serve    # 用 server.js 提供 dist/ 与 /api/chat
+npm start        # 先构建，再启动本地服务
 ```
 
-## 关键业务流
+## 数据与状态约定
 
-### 练习流
+### 本地存储
 
-1. 用户在练习页选择 `标准词库` 或 `AI 训练`
-2. AI 模式下可以选择模板和难度
-3. 练习完成后自动写入本地历史
-4. 结果页自动触发 AI 教练建议生成
-5. 如果 AI 失败，自动回退到本地规则教练
-6. 用户可以点击“下一练建议”直接开始下一轮 AI 练习
+- `settings`：主题、字号、专注模式、语言、上次练习配置
+- `sessions`：最近 50 次练习记录
+- `coachAdvices`：最近 50 条教练建议
 
-### 数据流
+### 关键状态合同
 
-- `settings`：保存在 localStorage
-- `sessions`：最近 50 条练习记录保存在 localStorage
-- `coachAdvices`：最近 50 条教练建议保存在 localStorage
-- `challenge / sync`：当前仅保留前端契约，不连接真实后端
+- `aiPracticeStatus = idle | loading | ready | stale | error`
+- `coach status = idle | loading | success | fallback | error`
+
+前端页面统一消费这些显式状态，不再依赖隐式推断。
 
 ## 架构说明
 
 ### 前端分层
 
-- `pages`：页面级入口，负责把业务模块串起来
-- `components`：纯展示组件
-- `hooks`：页面级交互时序与副作用
-- `store`：全局业务状态协调
-- `services`：AI、本地存储、云端占位契约
-- `engine`：练习规则、统计、草稿和本地教练规则
+- `pages`：路由级页面
+- `components`：通用 UI 组件
+- `hooks`：输入、焦点、计时、结束判定
+- `store`：练习配置、草稿、历史、AI 状态、教练状态统一编排
+- `services`：AI 请求、本地存储、云端接口占位
+- `engine`：练习规则、文本草稿、指标计算、趋势与洞察规则
 
-### 后端代理
+### 代理层
 
-- `server.js`：本地 Node 服务，兼顾静态资源和 `/api/chat`
-- `api/chat.js`：Vercel Serverless 代理
+- [`server.js`](./server.js)：本地开发和本地部署共用的 Node 代理
+- [`api/chat.js`](./api/chat.js)：Vercel Serverless 版本
 
-两者都采用同样的请求白名单策略，允许前端传递：
-
-- `messages`
-- `stream`
-- `temperature`
-- `max_tokens`
-- `response_format`
-- `model`
-
-## 文档
-
-- 2.0 规划文档：[docs/v2-major-update-plan.md](./docs/v2-major-update-plan.md)
+两者都使用同一套字段白名单，只允许前端透传安全字段给上游模型接口。
 
 ## 当前限制
 
-- 暂无真实账号体系
-- 暂无跨设备同步
-- 暂无真实挑战后端
-- 暂无自动化测试套件
+- 还没有账号系统
+- 还没有跨设备同步
+- `challenge / sync` 仍然只是前端契约占位
+- 还没有自动化测试套件
+- 包版本号目前仍停留在 `package.json` 的 `2.0.0`，但当前代码已经是更新后的体验版本
 
 ## 建议阅读顺序
 
-如果你是新接手这个项目的开发者，建议按这个顺序阅读：
+如果你要快速熟悉这个项目，建议按下面顺序看：
 
-1. `src/App.jsx`
-2. `src/store/practice-store.jsx`
-3. `src/hooks/useTypingSession.jsx`
-4. `src/engine/`
-5. `src/services/ai-service.js`
-6. `server.js` / `api/chat.js`
+1. [`src/App.jsx`](./src/App.jsx)
+2. [`src/store/practice-store.jsx`](./src/store/practice-store.jsx)
+3. [`src/pages/PracticePage.jsx`](./src/pages/PracticePage.jsx)
+4. [`src/hooks/useTypingSession.jsx`](./src/hooks/useTypingSession.jsx)
+5. [`src/engine/`](./src/engine)
+6. [`src/services/ai-service.js`](./src/services/ai-service.js)
+7. [`server.js`](./server.js) / [`api/chat.js`](./api/chat.js)
+
+## 相关文档
+
+- 历史版本规划：[docs/v2-major-update-plan.md](./docs/v2-major-update-plan.md)
 
 ---
 
-TypeMaster 2.0 当前处于“首个 2.0 切片已落地，可继续沿 AI 教练主线扩展”的状态。
+TypeMaster 目前更适合作为一个围绕 `AI 教练 + 本地训练数据` 持续迭代的前端产品基线。后续如果继续扩展，优先方向通常会是账号、同步、挑战机制和更细的练习模式。

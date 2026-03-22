@@ -1,22 +1,22 @@
 /**
  * 练习全局状态仓库。
  *
- * 这里是整个前端业务的核心编排层，统一管理：
- * - 用户设置
- * - 当前练习配置
- * - 当前草稿
- * - 历史练习记录
- * - AI 教练建议缓存
- *
- * 组件层只消费这里暴露的状态和动作，不直接碰存储或 AI 接口。
+ * 2.1 版本在这里统一编排：
+ * - 多语言 UI 文案
+ * - 当前练习配置与草稿
+ * - AI 文本状态
+ * - 教练建议状态
+ * - 本地历史和设置持久化
  */
 import { createContext, startTransition, useContext, useEffect, useMemo, useState } from 'react';
 import {
     DEFAULT_CONFIG,
     buildLocalCoachAdvice,
     createBuiltinDraft,
-    deriveComparison
+    deriveComparison,
+    doesDraftMatchConfig
 } from '../engine';
+import { getCopy } from '../i18n';
 import { buildFallbackCoachAdvice, generateCoachAdvice, generatePracticeText } from '../services/ai-service';
 import { challengeGateway, sessionSyncGateway } from '../services/cloud-contracts';
 import {
@@ -32,9 +32,6 @@ import {
 
 const PracticeContext = createContext(null);
 
-/**
- * 统一修正配置对象，保证 mode / 时长 / 词数等字段总是合法。
- */
 function normalizeConfig(config) {
     const next = {
         ...DEFAULT_CONFIG,
@@ -50,32 +47,96 @@ function normalizeConfig(config) {
     return next;
 }
 
+function getCoachStatusFromRecord(record) {
+    if (!record) return 'idle';
+    return record.source === 'ai' ? 'success' : 'fallback';
+}
+
+function normalizeAiIssue(error) {
+    return {
+        code: error?.code || 'unknown',
+        message: error?.message || 'Unknown error'
+    };
+}
+
+function relabelDraft(draft, language) {
+    if (!draft) return draft;
+
+    if (draft.sourceTextMeta?.generatedBy === 'builtin') {
+        return {
+            ...draft,
+            sourceTextMeta: {
+                ...draft.sourceTextMeta,
+                label: language === 'en-US' ? 'Built-in word bank' : '标准词库训练'
+            }
+        };
+    }
+
+    if (draft.sourceTextMeta?.generatedBy === 'ai') {
+        const template = draft.sourceTextMeta.template;
+        const difficulty = draft.sourceTextMeta.difficulty;
+        const templateLabel = template
+            ? (language === 'en-US'
+                ? {
+                    daily: 'Daily conversation',
+                    business: 'Business English',
+                    tech: 'Tech writing',
+                    developer: 'Developer workflow'
+                }[template]
+                : {
+                    daily: '日常对话',
+                    business: '商务英语',
+                    tech: '科技写作',
+                    developer: '开发者常用语'
+                }[template])
+            : null;
+        const difficultyLabel = difficulty
+            ? (language === 'en-US'
+                ? { easy: 'Easy', medium: 'Medium', hard: 'Hard' }[difficulty]
+                : { easy: '入门', medium: '进阶', hard: '挑战' }[difficulty])
+            : null;
+
+        return {
+            ...draft,
+            sourceTextMeta: {
+                ...draft.sourceTextMeta,
+                label: templateLabel && difficultyLabel
+                    ? `${templateLabel} · ${difficultyLabel}`
+                    : draft.sourceTextMeta.label
+            }
+        };
+    }
+
+    return draft;
+}
+
 export function PracticeProvider({ children }) {
     const initialSettings = loadSettings();
     const initialConfig = normalizeConfig(initialSettings.lastConfig || DEFAULT_CONFIG);
 
-    /**
-     * 把需要跨页面共享的状态全部集中在这里。
-     */
     const [settings, setSettingsState] = useState(initialSettings);
     const [config, setConfigState] = useState(initialConfig);
     const [sessions, setSessions] = useState(loadSessions());
     const [coachAdviceRecords, setCoachAdviceRecords] = useState(loadCoachAdvices());
-    const [currentDraft, setCurrentDraft] = useState(() => createBuiltinDraft(initialConfig));
-    const [isGeneratingPractice, setIsGeneratingPractice] = useState(false);
-    const [practiceError, setPracticeError] = useState('');
-    const [isAiDraftStale, setIsAiDraftStale] = useState(false);
+    const [currentDraft, setCurrentDraft] = useState(() => createBuiltinDraft(initialConfig, { language: initialSettings.language }));
+    const [aiPracticeStatus, setAiPracticeStatus] = useState(initialConfig.source === 'ai' ? 'idle' : 'idle');
+    const [practiceError, setPracticeError] = useState(null);
     const [lastCompletedSession, setLastCompletedSession] = useState(() => loadSessions()[0] || null);
+    const [coachStatusBySessionId, setCoachStatusBySessionId] = useState({});
+    const [coachIssueBySessionId, setCoachIssueBySessionId] = useState({});
 
-    /**
-     * 设置与最近配置发生变化后，立即同步回本地存储。
-     */
     useEffect(() => {
         saveSettings({
             ...settings,
             lastConfig: config
         });
     }, [settings, config]);
+
+    useEffect(() => {
+        setCurrentDraft((previous) => relabelDraft(previous, settings.language));
+    }, [settings.language]);
+
+    const copy = useMemo(() => getCopy(settings.language), [settings.language]);
 
     const updateSettings = (patch) => {
         setSettingsState((previous) => ({
@@ -84,20 +145,12 @@ export function PracticeProvider({ children }) {
         }));
     };
 
-    /**
-     * 切回标准词库草稿，并清空 AI 生成状态。
-     */
     const setBuiltinDraft = (nextConfig) => {
-        setCurrentDraft(createBuiltinDraft({ ...nextConfig, source: 'builtin' }));
-        setPracticeError('');
-        setIsAiDraftStale(false);
+        setCurrentDraft(createBuiltinDraft({ ...nextConfig, source: 'builtin' }, { language: settings.language }));
+        setPracticeError(null);
+        setAiPracticeStatus('idle');
     };
 
-    /**
-     * 更新练习配置。
-     * - builtin 模式下立即重建草稿
-     * - ai 模式下只标记“当前草稿已过期”，等用户主动重新生成
-     */
     const updateConfig = (patch) => {
         let nextConfig;
         setConfigState((previous) => {
@@ -116,12 +169,30 @@ export function PracticeProvider({ children }) {
             return;
         }
 
-        setIsAiDraftStale(true);
+        setPracticeError(null);
+        if (currentDraft?.sourceTextMeta?.source === 'ai' && doesDraftMatchConfig(nextConfig, currentDraft)) {
+            setAiPracticeStatus('ready');
+            return;
+        }
+
+        setAiPracticeStatus(currentDraft?.sourceTextMeta?.source === 'ai' ? 'stale' : 'idle');
     };
 
-    /**
-     * 请求 AI 生成新的练习文本。
-     */
+    function restoreAiDraftConfig() {
+        if (!currentDraft?.configSnapshot || currentDraft.sourceTextMeta?.source !== 'ai') {
+            return;
+        }
+
+        const restored = normalizeConfig({
+            ...currentDraft.configSnapshot,
+            source: 'ai'
+        });
+
+        setConfigState(restored);
+        setPracticeError(null);
+        setAiPracticeStatus('ready');
+    }
+
     async function generateAiPractice({ promptOverride = '', configPatch = {} } = {}) {
         const nextConfig = normalizeConfig({
             ...config,
@@ -130,29 +201,24 @@ export function PracticeProvider({ children }) {
         });
 
         setConfigState(nextConfig);
-        setIsGeneratingPractice(true);
-        setPracticeError('');
+        setAiPracticeStatus('loading');
+        setPracticeError(null);
 
         try {
-            const draft = await generatePracticeText(nextConfig, promptOverride);
+            const draft = await generatePracticeText(nextConfig, promptOverride, {
+                language: settings.language
+            });
             setCurrentDraft(draft);
-            setIsAiDraftStale(false);
+            setAiPracticeStatus('ready');
             return draft;
         } catch (error) {
             console.error('Failed to generate AI practice', error);
-            setPracticeError('AI 训练文本生成失败，已保留当前练习内容。');
-            if (!currentDraft) {
-                setBuiltinDraft({ ...nextConfig, source: 'builtin' });
-            }
+            setPracticeError(normalizeAiIssue(error));
+            setAiPracticeStatus('error');
             throw error;
-        } finally {
-            setIsGeneratingPractice(false);
         }
     }
 
-    /**
-     * 回到标准词库模式。
-     */
     function resetPracticeToBuiltin() {
         const nextConfig = normalizeConfig({
             ...config,
@@ -163,16 +229,16 @@ export function PracticeProvider({ children }) {
         setBuiltinDraft(nextConfig);
     }
 
-    /**
-     * 一轮练习完成后，立刻落一条 session。
-     */
     function completePractice({ result, timeline }) {
         const session = {
             id: crypto.randomUUID(),
             config,
             result,
             timeline,
-            sourceTextMeta: currentDraft?.sourceTextMeta || { source: config.source || 'builtin' },
+            sourceTextMeta: currentDraft?.sourceTextMeta || {
+                source: config.source || 'builtin',
+                label: settings.language === 'en-US' ? 'Practice text' : '训练文本'
+            },
             coachAdviceId: null
         };
 
@@ -180,16 +246,10 @@ export function PracticeProvider({ children }) {
         setSessions(nextSessions);
         setLastCompletedSession(session);
 
-        /**
-         * 同步网关当前只是占位，因此这里只做无害调用。
-         */
         sessionSyncGateway.syncSession(session).catch(() => {});
         return session;
     }
 
-    /**
-     * 保存教练建议，并把 advice id 回填到 session 上。
-     */
     function saveCoachRecord(sessionId, advice, source) {
         const record = {
             id: crypto.randomUUID(),
@@ -210,45 +270,104 @@ export function PracticeProvider({ children }) {
         return record;
     }
 
-    /**
-     * 优先从内存态查询建议，找不到再从 localStorage 兜底。
-     */
     function getAdviceForSession(sessionId) {
         if (!sessionId) return null;
         return coachAdviceRecords.find((record) => record.sessionId === sessionId)
             || getCoachAdviceBySessionId(sessionId);
     }
 
-    /**
-     * 为某条 session 生成教练建议。
-     * 先尝试 AI，失败则切到本地规则建议。
-     */
-    async function generateCoachForSession(sessionId) {
+    function getCoachStatusForSession(sessionId) {
+        if (!sessionId) return 'idle';
+        return coachStatusBySessionId[sessionId] || getCoachStatusFromRecord(getAdviceForSession(sessionId));
+    }
+
+    function getCoachIssueForSession(sessionId) {
+        if (!sessionId) return null;
+        return coachIssueBySessionId[sessionId] || null;
+    }
+
+    async function generateCoachForSession(sessionId, options = {}) {
+        const { force = false } = options;
         const existing = getAdviceForSession(sessionId);
-        if (existing) {
+        if (existing && !force && existing.source === 'ai') {
+            setCoachStatusBySessionId((previous) => ({
+                ...previous,
+                [sessionId]: 'success'
+            }));
             return existing;
         }
 
         const session = sessions.find((item) => item.id === sessionId) || lastCompletedSession;
         if (!session) {
+            setCoachStatusBySessionId((previous) => ({
+                ...previous,
+                [sessionId]: 'error'
+            }));
             return null;
         }
 
         const history = sessions.filter((item) => item.id !== session.id);
 
+        setCoachStatusBySessionId((previous) => ({
+            ...previous,
+            [sessionId]: 'loading'
+        }));
+        setCoachIssueBySessionId((previous) => ({
+            ...previous,
+            [sessionId]: null
+        }));
+
         try {
-            const advice = await generateCoachAdvice({ session, history });
-            return saveCoachRecord(session.id, advice, 'ai');
+            const advice = await generateCoachAdvice({
+                session,
+                history,
+                language: settings.language
+            });
+
+            const record = saveCoachRecord(session.id, advice, 'ai');
+            setCoachStatusBySessionId((previous) => ({
+                ...previous,
+                [sessionId]: 'success'
+            }));
+            return record;
         } catch (error) {
             console.error('Failed to generate AI coach advice', error);
-            const fallback = buildFallbackCoachAdvice({ session, history });
-            return saveCoachRecord(session.id, fallback, 'local');
+            const issue = normalizeAiIssue(error);
+
+            try {
+                const fallback = buildFallbackCoachAdvice({
+                    session,
+                    history,
+                    language: settings.language
+                });
+                const record = saveCoachRecord(session.id, {
+                    ...fallback,
+                    fallbackReasonCode: issue.code,
+                    fallbackReasonMessage: issue.message
+                }, 'fallback');
+                setCoachStatusBySessionId((previous) => ({
+                    ...previous,
+                    [sessionId]: 'fallback'
+                }));
+                setCoachIssueBySessionId((previous) => ({
+                    ...previous,
+                    [sessionId]: issue
+                }));
+                return record;
+            } catch (fallbackError) {
+                setCoachStatusBySessionId((previous) => ({
+                    ...previous,
+                    [sessionId]: 'error'
+                }));
+                setCoachIssueBySessionId((previous) => ({
+                    ...previous,
+                    [sessionId]: issue
+                }));
+                throw fallbackError;
+            }
         }
     }
 
-    /**
-     * 基于“下一练建议”直接生成下一份 AI 草稿。
-     */
     async function launchNextDrill(adviceRecord) {
         const nextDrill = adviceRecord?.nextDrill;
         if (!nextDrill) {
@@ -263,14 +382,13 @@ export function PracticeProvider({ children }) {
 
     const latestCoachAdvice = coachAdviceRecords[0] || null;
     const latestComparison = lastCompletedSession
-        ? deriveComparison(sessions, lastCompletedSession.id, lastCompletedSession.result)
+        ? deriveComparison(sessions, lastCompletedSession.id, lastCompletedSession.result, settings.language)
         : null;
 
-    /**
-     * 暴露给全应用的统一上下文值。
-     */
     const value = useMemo(() => ({
         settings,
+        language: settings.language,
+        copy,
         updateSettings,
         config,
         updateConfig,
@@ -278,34 +396,36 @@ export function PracticeProvider({ children }) {
         coachAdviceRecords,
         currentDraft,
         setCurrentDraft,
-        isGeneratingPractice,
+        aiPracticeStatus,
         practiceError,
-        isAiDraftStale,
         lastCompletedSession,
         latestCoachAdvice,
         latestComparison,
         setPracticeError,
         resetPracticeToBuiltin,
+        restoreAiDraftConfig,
         generateAiPractice,
         completePractice,
         getAdviceForSession,
+        getCoachStatusForSession,
+        getCoachIssueForSession,
         generateCoachForSession,
         launchNextDrill,
         challengeGateway,
         sessionSyncGateway,
         buildLocalCoachAdvice
     }), [
-        settings,
-        config,
-        sessions,
+        aiPracticeStatus,
         coachAdviceRecords,
+        config,
+        copy,
         currentDraft,
-        isGeneratingPractice,
-        practiceError,
-        isAiDraftStale,
         lastCompletedSession,
         latestCoachAdvice,
-        latestComparison
+        latestComparison,
+        practiceError,
+        sessions,
+        settings
     ]);
 
     return (
@@ -315,9 +435,6 @@ export function PracticeProvider({ children }) {
     );
 }
 
-/**
- * 统一的 store 消费入口。
- */
 export function usePracticeStore() {
     const context = useContext(PracticeContext);
     if (!context) {
@@ -325,3 +442,4 @@ export function usePracticeStore() {
     }
     return context;
 }
+

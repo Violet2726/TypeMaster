@@ -1,70 +1,127 @@
-/**
- * AI 训练工坊。
- *
- * 这一块承担两种职责：
- * 1. 让用户配置 AI 文本模板与难度。
- * 2. 清晰展示当前 AI 草稿是否过期、是否需要重新生成。
- *
- * 这里不直接请求接口，请求动作仍由 store 统一调度。
- */
-import { AI_TEMPLATES, DIFFICULTY_OPTIONS } from '../engine';
+import { AI_TEMPLATES, DIFFICULTY_OPTIONS, getDifficultyLabel, getTemplateLabel } from '../engine';
+import { getErrorMessage } from '../i18n';
+
+function getStatusLabel(copy, status) {
+    if (status === 'loading') return copy.common.aiGenerating;
+    if (status === 'ready') return copy.common.aiReady;
+    if (status === 'stale') return copy.common.aiStale;
+    if (status === 'error') return copy.common.aiFailed;
+    return copy.common.aiNeedsGenerate;
+}
+
+function getStatusBody(copy, status) {
+    if (status === 'loading') return copy.practice.aiLoading;
+    if (status === 'ready') return copy.practice.aiReady;
+    if (status === 'stale') return copy.practice.aiStale;
+    if (status === 'error') return copy.practice.aiError;
+    return copy.practice.aiIdle;
+}
 
 export function AIWorkshop({
+    copy,
+    language,
     config,
     currentDraft,
-    isGenerating,
-    isDraftStale,
+    aiPracticeStatus,
     practiceError,
     onConfigChange,
-    onGenerate
+    onGenerate,
+    onRestoreConfig,
+    onUseBuiltin
 }) {
+    const errorCopy = practiceError ? getErrorMessage(language, practiceError.code) : null;
+
     return (
-        <section className="panel workshop-panel">
+        <section className="panel workspace-card">
             <div className="panel-head">
                 <div>
-                    <p className="panel-kicker">AI Workshop</p>
-                    <h2>训练工坊</h2>
+                    <p className="panel-kicker">{copy.practice.pageTitle}</p>
+                    <h2>{copy.practice.aiPanelTitle}</h2>
                 </div>
-                <span className="panel-badge">自动接入结果页教练诊断</span>
+                <span className={`panel-badge badge-${aiPracticeStatus}`}>{getStatusLabel(copy, aiPracticeStatus)}</span>
             </div>
 
-            <div className="workshop-grid">
-                <label className="field">
-                    <span>主题模板</span>
-                    <select value={config.aiTemplate} onChange={(event) => onConfigChange({ aiTemplate: event.target.value, source: 'ai' })}>
-                        {AI_TEMPLATES.map((template) => (
-                            <option key={template.id} value={template.id}>{template.label}</option>
-                        ))}
-                    </select>
-                </label>
+            <p className="muted-text">{copy.practice.aiPanelBody}</p>
 
-                <label className="field">
-                    <span>难度</span>
-                    <select value={config.difficulty} onChange={(event) => onConfigChange({ difficulty: event.target.value, source: 'ai' })}>
-                        {DIFFICULTY_OPTIONS.map((difficulty) => (
-                            <option key={difficulty.id} value={difficulty.id}>{difficulty.label}</option>
-                        ))}
-                    </select>
-                </label>
-            </div>
+            <div className="step-list">
+                <div className="step-item">
+                    <span className="step-index">{copy.practice.stepPick}</span>
+                    <div className="workshop-grid">
+                        <label className="field">
+                            <span>{copy.practice.templateLabel}</span>
+                            <select value={config.aiTemplate} onChange={(event) => onConfigChange({ aiTemplate: event.target.value, source: 'ai' }, { risky: true, intent: 'config' })}>
+                                {AI_TEMPLATES.map((template) => (
+                                    <option key={template.id} value={template.id}>{getTemplateLabel(template, language)}</option>
+                                ))}
+                            </select>
+                        </label>
 
-            <div className="workshop-summary">
-                <div>
-                    <p className="summary-label">当前文本</p>
-                    <strong>{currentDraft?.sourceTextMeta?.label || '尚未生成'}</strong>
+                        <label className="field">
+                            <span>{copy.practice.difficultyLabel}</span>
+                            <select value={config.difficulty} onChange={(event) => onConfigChange({ difficulty: event.target.value, source: 'ai' }, { risky: true, intent: 'config' })}>
+                                {DIFFICULTY_OPTIONS.map((difficulty) => (
+                                    <option key={difficulty.id} value={difficulty.id}>{getDifficultyLabel(difficulty, language)}</option>
+                                ))}
+                            </select>
+                        </label>
+                    </div>
                 </div>
-                <div>
-                    <p className="summary-label">状态</p>
-                    <strong>{isDraftStale ? '配置已变化，建议重新生成' : '可以直接开始练习'}</strong>
-                </div>
-            </div>
 
-            <div className="workshop-actions">
-                <button type="button" className="action-btn primary" onClick={onGenerate} disabled={isGenerating}>
-                    {isGenerating ? '正在生成训练文本...' : '生成 AI 训练文本'}
-                </button>
-                {practiceError && <span className="inline-error">{practiceError}</span>}
+                <div className="step-item status-card">
+                    <span className="step-index">{copy.practice.stepGenerate}</span>
+                    <div className="status-card__row">
+                        <div>
+                            <p className="summary-label">{copy.common.currentText}</p>
+                            <strong>{currentDraft?.sourceTextMeta?.source === 'ai' ? currentDraft.sourceTextMeta.label : copy.common.emptyValue}</strong>
+                        </div>
+                        <div>
+                            <p className="summary-label">{copy.common.status}</p>
+                            <strong>{getStatusLabel(copy, aiPracticeStatus)}</strong>
+                        </div>
+                    </div>
+                    <p className="muted-text">{getStatusBody(copy, aiPracticeStatus)}</p>
+
+                    {errorCopy && (
+                        <div className="feedback-card feedback-error">
+                            <strong>{errorCopy.title}</strong>
+                            <p>{errorCopy.description}</p>
+                        </div>
+                    )}
+
+                    <div className="workshop-actions">
+                        <button
+                            type="button"
+                            className="action-btn primary"
+                            onClick={onGenerate}
+                            disabled={aiPracticeStatus === 'loading'}
+                        >
+                            {aiPracticeStatus === 'stale'
+                                ? copy.common.reGenerateAiText
+                                : aiPracticeStatus === 'loading'
+                                    ? copy.common.loading
+                                    : copy.common.generateAiText}
+                        </button>
+                        {aiPracticeStatus === 'stale' && (
+                            <button type="button" className="action-btn" onClick={onRestoreConfig}>
+                                {copy.common.restoreLastConfig}
+                            </button>
+                        )}
+                        {aiPracticeStatus === 'error' && (
+                            <button type="button" className="action-btn" onClick={onUseBuiltin}>
+                                {copy.common.useBuiltIn}
+                            </button>
+                        )}
+                    </div>
+                </div>
+
+                <div className="step-item">
+                    <span className="step-index">{copy.practice.stepType}</span>
+                    <p className="muted-text">
+                        {config.source === 'builtin' ? copy.practice.builtInReady : getStatusBody(copy, aiPracticeStatus)}
+                    </p>
+                </div>
             </div>
         </section>
     );
 }
+

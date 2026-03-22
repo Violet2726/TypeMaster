@@ -1,102 +1,99 @@
-/**
- * 练习配置面板。
- *
- * 这是练习页最核心的控制台，负责切换：
- * - 文本来源（标准词库 / AI 训练）
- * - 标点、数字开关
- * - 时间模式 / 词数模式
- * - 时间长度 / 词数规模
- *
- * 组件本身不保存状态，所有配置都交给外层 store 管理。
- */
 const timeOptions = [15, 30, 60, 120];
 const wordOptions = [10, 25, 50, 100];
 
-export function ConfigPanel({ config, onConfigChange, onUseBuiltin }) {
+function SegmentedButton({ active, children, onClick }) {
     return (
-        <section className="config-shell">
-            <div className="config-bar">
-                <div className="config-group">
-                    <button
-                        type="button"
-                        className={`config-btn ${config.source === 'builtin' ? 'active' : ''}`}
-                        onClick={() => onUseBuiltin()}
-                    >
-                        标准词库
-                    </button>
-                    <button
-                        type="button"
-                        className={`config-btn ${config.source === 'ai' ? 'active' : ''}`}
-                        onClick={() => onConfigChange({ source: 'ai' })}
-                    >
-                        AI 训练
-                    </button>
+        <button
+            type="button"
+            className={`segment-btn ${active ? 'active' : ''}`}
+            onClick={onClick}
+        >
+            {children}
+        </button>
+    );
+}
+
+export function ConfigPanel({ copy, config, onConfigChange }) {
+    return (
+        <section className="panel workspace-card">
+            <div className="panel-head">
+                <div>
+                    <p className="panel-kicker">{copy.practice.pageTitle}</p>
+                    <h2>{copy.practice.configTitle}</h2>
                 </div>
+            </div>
 
-                <div className="config-separator" />
+            <p className="muted-text">{copy.practice.configBody}</p>
 
-                <div className="config-group">
-                    <button
-                        type="button"
-                        className={`config-btn ${config.includePunctuation ? 'active' : ''}`}
-                        onClick={() => onConfigChange({ includePunctuation: !config.includePunctuation })}
-                    >
-                        @ 标点
-                    </button>
-                    <button
-                        type="button"
-                        className={`config-btn ${config.includeNumbers ? 'active' : ''}`}
-                        onClick={() => onConfigChange({ includeNumbers: !config.includeNumbers })}
-                    >
-                        # 数字
-                    </button>
+            <div className="control-group">
+                <div className="control-label-row">
+                    <span className="control-label">{copy.practice.sourceTitle}</span>
                 </div>
-
-                <div className="config-separator" />
-
-                <div className="config-group">
-                    <button
-                        type="button"
-                        className={`config-btn ${config.mode === 'time' ? 'active' : ''}`}
-                        onClick={() => onConfigChange({ mode: 'time' })}
-                    >
-                        ⏱ 时间
-                    </button>
-                    <button
-                        type="button"
-                        className={`config-btn ${config.mode === 'words' ? 'active' : ''}`}
-                        onClick={() => onConfigChange({ mode: 'words' })}
-                    >
-                        📝 单词
-                    </button>
+                <div className="segmented-group">
+                    <SegmentedButton active={config.source === 'ai'} onClick={() => onConfigChange({ source: 'ai' }, { risky: true, intent: 'config' })}>
+                        {copy.practice.sourceAi}
+                    </SegmentedButton>
+                    <SegmentedButton active={config.source === 'builtin'} onClick={() => onConfigChange({ source: 'builtin' }, { risky: true, intent: 'config' })}>
+                        {copy.practice.sourceBuiltin}
+                    </SegmentedButton>
                 </div>
+            </div>
 
-                <div className="config-separator" />
+            <div className="control-group">
+                <div className="control-label-row">
+                    <span className="control-label">{copy.practice.modeTitle}</span>
+                </div>
+                <div className="segmented-group">
+                    <SegmentedButton active={config.mode === 'time'} onClick={() => onConfigChange({ mode: 'time' }, { risky: true, intent: 'config' })}>
+                        {copy.common.timeMode}
+                    </SegmentedButton>
+                    <SegmentedButton active={config.mode === 'words'} onClick={() => onConfigChange({ mode: 'words' }, { risky: true, intent: 'config' })}>
+                        {copy.common.wordsMode}
+                    </SegmentedButton>
+                </div>
+            </div>
+
+            <div className="control-group">
+                <div className="control-label-row">
+                    <span className="control-label">{copy.practice.optionsTitle}</span>
+                </div>
+                <div className="segmented-group">
+                    <SegmentedButton active={config.includePunctuation} onClick={() => onConfigChange({ includePunctuation: !config.includePunctuation }, { risky: true, intent: 'config' })}>
+                        {copy.common.punctuation}
+                    </SegmentedButton>
+                    <SegmentedButton active={config.includeNumbers} onClick={() => onConfigChange({ includeNumbers: !config.includeNumbers }, { risky: true, intent: 'config' })}>
+                        {copy.common.numbers}
+                    </SegmentedButton>
+                </div>
+            </div>
+
+            <div className="control-group">
+                <div className="control-label-row">
+                    <span className="control-label">{copy.practice.volumeTitle}</span>
+                </div>
 
                 {config.mode === 'time' ? (
-                    <div className="config-group">
+                    <div className="segmented-group">
                         {timeOptions.map((value) => (
-                            <button
+                            <SegmentedButton
                                 key={value}
-                                type="button"
-                                className={`config-btn ${config.durationSeconds === value ? 'active' : ''}`}
-                                onClick={() => onConfigChange({ durationSeconds: value })}
+                                active={config.durationSeconds === value}
+                                onClick={() => onConfigChange({ durationSeconds: value }, { risky: true, intent: 'config' })}
                             >
-                                {value}
-                            </button>
+                                {value}s
+                            </SegmentedButton>
                         ))}
                     </div>
                 ) : (
-                    <div className="config-group">
+                    <div className="segmented-group">
                         {wordOptions.map((value) => (
-                            <button
+                            <SegmentedButton
                                 key={value}
-                                type="button"
-                                className={`config-btn ${config.wordCount === value ? 'active' : ''}`}
-                                onClick={() => onConfigChange({ wordCount: value })}
+                                active={config.wordCount === value}
+                                onClick={() => onConfigChange({ wordCount: value }, { risky: true, intent: 'config' })}
                             >
-                                ~{value}
-                            </button>
+                                {value}
+                            </SegmentedButton>
                         ))}
                     </div>
                 )}
@@ -104,3 +101,4 @@ export function ConfigPanel({ config, onConfigChange, onUseBuiltin }) {
         </section>
     );
 }
+

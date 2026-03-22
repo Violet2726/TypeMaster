@@ -1,16 +1,3 @@
-/**
- * 结果页趋势图组件。
- *
- * 当前实现使用 SVG，而不是 Canvas。
- * 这样做的原因是：
- * - 代码更易维护
- * - 不需要额外的绘制生命周期管理
- * - 对当前这类轻量折线图已经足够
- */
-
-/**
- * 根据数值序列生成 polyline 所需的点位字符串。
- */
 function buildPoints(values, width, height, padding, maxValue) {
     if (!values.length) return '';
 
@@ -21,7 +8,7 @@ function buildPoints(values, width, height, padding, maxValue) {
     }).join(' ');
 }
 
-export function TrendChart({ timeline }) {
+export function TrendChart({ copy, timeline }) {
     const width = 820;
     const height = 260;
     const padding = 28;
@@ -31,7 +18,7 @@ export function TrendChart({ timeline }) {
     if (!timeline.wpm.length) {
         return (
             <div className="panel chart-empty">
-                <p>完成一次练习后，这里会显示速度曲线。</p>
+                <p>{copy.result.trendEmpty}</p>
             </div>
         );
     }
@@ -44,17 +31,17 @@ export function TrendChart({ timeline }) {
         <div className="panel chart-panel">
             <div className="panel-head">
                 <div>
-                    <p className="panel-kicker">Result Trend</p>
-                    <h2>本次速度曲线</h2>
+                    <p className="panel-kicker">{copy.chart.kicker}</p>
+                    <h2>{copy.chart.title}</h2>
                 </div>
                 <div className="chart-legend">
-                    <span><i className="swatch swatch-main" />wpm</span>
-                    <span><i className="swatch swatch-raw" />raw</span>
-                    <span><i className="swatch swatch-burst" />burst</span>
+                    <span><i className="swatch swatch-main" />{copy.chart.wpm}</span>
+                    <span><i className="swatch swatch-raw" />{copy.chart.raw}</span>
+                    <span><i className="swatch swatch-burst" />{copy.chart.burst}</span>
                 </div>
             </div>
 
-            <svg viewBox={`0 0 ${width} ${height}`} className="result-chart" aria-label="速度曲线图">
+            <svg viewBox={`0 0 ${width} ${height}`} className="result-chart" aria-label={copy.chart.title}>
                 {[0, 1, 2, 3].map((line) => {
                     const y = padding + (line * ((height - padding * 2) / 3));
                     return <line key={y} x1={padding} x2={width - padding} y1={y} y2={y} className="grid-line" />;
@@ -66,3 +53,4 @@ export function TrendChart({ timeline }) {
         </div>
     );
 }
+

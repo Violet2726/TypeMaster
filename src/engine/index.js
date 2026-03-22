@@ -10,3 +10,4 @@ export * from './draft';
 export * from './rendering';
 export * from './metrics';
 export * from './coach';
+export * from './insights';
