@@ -1,7 +1,13 @@
+/**
+ * Vercel Serverless 版本的 AI 代理。
+ *
+ * 它与本地 `server.js` 的代理逻辑保持同一套白名单规则，
+ * 方便开发环境和部署环境表现一致。
+ */
+const http = require('http');
 const https = require('https');
-const url = require('url');
+const { URL } = require('url');
 
-// 尝试读取 config.js (本地环境)，如果不存在 (Vercel 环境) 则使用环境变量
 let AI_API_KEY = process.env.AI_API_KEY;
 let AI_API_URL = process.env.AI_API_URL;
 
@@ -10,60 +16,82 @@ try {
     if (config.AI_API_KEY) AI_API_KEY = config.AI_API_KEY;
     if (config.AI_API_URL) AI_API_URL = config.AI_API_URL;
 } catch (error) {
-    // config.js 不存在，忽略错误，依赖环境变量
-    console.log("Config file not found, using Environment Variables");
+    console.log('Config file not found, using environment variables');
+}
+
+/**
+ * 根据目标地址选择 http / https。
+ */
+function getTransport(targetUrl) {
+    return targetUrl.protocol === 'http:' ? http : https;
+}
+
+/**
+ * 白名单化上游请求体。
+ */
+function buildProxyPayload(payload) {
+    const body = typeof payload === 'string' ? JSON.parse(payload) : payload;
+    const safePayload = {
+        model: typeof body.model === 'string' ? body.model : 'glm-4.7-flash',
+        messages: Array.isArray(body.messages) ? body.messages : [],
+        stream: body.stream !== false,
+        max_tokens: typeof body.max_tokens === 'number' ? body.max_tokens : 4096,
+        temperature: typeof body.temperature === 'number' ? body.temperature : 0.8
+    };
+
+    if (body.response_format && typeof body.response_format === 'object') {
+        safePayload.response_format = body.response_format;
+    }
+
+    return safePayload;
 }
 
 module.exports = (req, res) => {
-    // 1. 仅接受 POST
     if (req.method !== 'POST') {
         res.status(405).send('Method Not Allowed');
         return;
     }
 
-    // 2. 解析请求体
-    let payload = req.body;
-    if (typeof payload === 'string') {
-        try {
-            payload = JSON.parse(payload);
-        } catch (e) {
-            res.status(400).send('Invalid JSON');
-            return;
-        }
+    if (!AI_API_KEY || !AI_API_URL) {
+        res.status(500).send('Missing AI_API_KEY or AI_API_URL');
+        return;
     }
 
-    // 3. 构造发给 AI 的请求
-    const aiReqPayload = JSON.stringify({
-        model: "glm-4-flash",
-        messages: payload.messages,
-        stream: true,
-        max_tokens: 4096,
-        temperature: 0.8
-    });
+    let payload;
+    try {
+        payload = buildProxyPayload(req.body);
+    } catch (error) {
+        res.status(400).send('Invalid JSON');
+        return;
+    }
 
-    const targetUrl = new url.URL(AI_API_URL);
+    const targetUrl = new URL(AI_API_URL);
+    const transport = getTransport(targetUrl);
+    const serializedBody = JSON.stringify(payload);
 
-    const options = {
-        hostname: targetUrl.hostname,
-        path: targetUrl.pathname,
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${AI_API_KEY}`
+    const proxyReq = transport.request(
+        {
+            hostname: targetUrl.hostname,
+            port: targetUrl.port || undefined,
+            path: `${targetUrl.pathname}${targetUrl.search}`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(serializedBody),
+                'Authorization': `Bearer ${AI_API_KEY}`
+            }
+        },
+        (proxyRes) => {
+            res.writeHead(proxyRes.statusCode || 502, proxyRes.headers);
+            proxyRes.pipe(res);
         }
-    };
+    );
 
-    // 4. 发起请求并流式转发
-    const aiReq = https.request(options, (aiRes) => {
-        res.writeHead(aiRes.statusCode, aiRes.headers);
-        aiRes.pipe(res);
-    });
-
-    aiReq.on('error', (e) => {
-        console.error('API Request Error:', e);
+    proxyReq.on('error', (error) => {
+        console.error('API Request Error:', error);
         res.status(500).send('Internal Server Error');
     });
 
-    aiReq.write(aiReqPayload);
-    aiReq.end();
+    proxyReq.write(serializedBody);
+    proxyReq.end();
 };

@@ -1,2 +1,14 @@
-# 核心配置 (防止 Key 泄露)
+# Core config
 config.js
+
+# Frontend build
+node_modules
+dist
+.vite
+
+
+docs
+.history
+
+
+!src/engine/config.js
