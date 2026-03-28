@@ -32,96 +32,82 @@ export function AIWorkshop({
     const errorCopy = practiceError ? getErrorMessage(language, practiceError.code) : null;
 
     return (
-        <section className="panel workspace-card">
-            <div className="panel-head">
+        <section className="ai-custom-panel">
+            <div className="ai-custom-panel__head">
                 <div>
-                    <p className="panel-kicker">{copy.practice.pageTitle}</p>
-                    <h2>{copy.practice.aiPanelTitle}</h2>
+                    <p className="panel-kicker">{copy.practice.customTitle}</p>
+                    <strong>{copy.practice.customTitle}</strong>
                 </div>
                 <span className={`panel-badge badge-${aiPracticeStatus}`}>{getStatusLabel(copy, aiPracticeStatus)}</span>
             </div>
 
-            <p className="muted-text">{copy.practice.aiPanelBody}</p>
+            <p className="muted-text">{copy.practice.customBody}</p>
 
-            <div className="step-list">
-                <div className="step-item">
-                    <span className="step-index">{copy.practice.stepPick}</span>
-                    <div className="workshop-grid">
-                        <label className="field">
-                            <span>{copy.practice.templateLabel}</span>
-                            <select value={config.aiTemplate} onChange={(event) => onConfigChange({ aiTemplate: event.target.value, source: 'ai' }, { risky: true, intent: 'config' })}>
-                                {AI_TEMPLATES.map((template) => (
-                                    <option key={template.id} value={template.id}>{getTemplateLabel(template, language)}</option>
-                                ))}
-                            </select>
-                        </label>
+            <div className="workshop-grid">
+                <label className="field">
+                    <span>{copy.practice.templateLabel}</span>
+                    <select value={config.aiTemplate} onChange={(event) => onConfigChange({ aiTemplate: event.target.value, source: 'ai' }, { risky: true, intent: 'config' })}>
+                        {AI_TEMPLATES.map((template) => (
+                            <option key={template.id} value={template.id}>{getTemplateLabel(template, language)}</option>
+                        ))}
+                    </select>
+                </label>
 
-                        <label className="field">
-                            <span>{copy.practice.difficultyLabel}</span>
-                            <select value={config.difficulty} onChange={(event) => onConfigChange({ difficulty: event.target.value, source: 'ai' }, { risky: true, intent: 'config' })}>
-                                {DIFFICULTY_OPTIONS.map((difficulty) => (
-                                    <option key={difficulty.id} value={difficulty.id}>{getDifficultyLabel(difficulty, language)}</option>
-                                ))}
-                            </select>
-                        </label>
+                <label className="field">
+                    <span>{copy.practice.difficultyLabel}</span>
+                    <select value={config.difficulty} onChange={(event) => onConfigChange({ difficulty: event.target.value, source: 'ai' }, { risky: true, intent: 'config' })}>
+                        {DIFFICULTY_OPTIONS.map((difficulty) => (
+                            <option key={difficulty.id} value={difficulty.id}>{getDifficultyLabel(difficulty, language)}</option>
+                        ))}
+                    </select>
+                </label>
+            </div>
+
+            <div className="status-card">
+                <div className="status-card__row">
+                    <div>
+                        <p className="summary-label">{copy.common.currentText}</p>
+                        <strong>{currentDraft?.sourceTextMeta?.source === 'ai' ? currentDraft.sourceTextMeta.label : copy.common.emptyValue}</strong>
+                    </div>
+                    <div>
+                        <p className="summary-label">{copy.common.status}</p>
+                        <strong>{getStatusLabel(copy, aiPracticeStatus)}</strong>
                     </div>
                 </div>
+                <p className="muted-text">{getStatusBody(copy, aiPracticeStatus)}</p>
+            </div>
 
-                <div className="step-item status-card">
-                    <span className="step-index">{copy.practice.stepGenerate}</span>
-                    <div className="status-card__row">
-                        <div>
-                            <p className="summary-label">{copy.common.currentText}</p>
-                            <strong>{currentDraft?.sourceTextMeta?.source === 'ai' ? currentDraft.sourceTextMeta.label : copy.common.emptyValue}</strong>
-                        </div>
-                        <div>
-                            <p className="summary-label">{copy.common.status}</p>
-                            <strong>{getStatusLabel(copy, aiPracticeStatus)}</strong>
-                        </div>
-                    </div>
-                    <p className="muted-text">{getStatusBody(copy, aiPracticeStatus)}</p>
-
-                    {errorCopy && (
-                        <div className="feedback-card feedback-error">
-                            <strong>{errorCopy.title}</strong>
-                            <p>{errorCopy.description}</p>
-                        </div>
-                    )}
-
-                    <div className="workshop-actions">
-                        <button
-                            type="button"
-                            className="action-btn primary"
-                            onClick={onGenerate}
-                            disabled={aiPracticeStatus === 'loading'}
-                        >
-                            {aiPracticeStatus === 'stale'
-                                ? copy.common.reGenerateAiText
-                                : aiPracticeStatus === 'loading'
-                                    ? copy.common.loading
-                                    : copy.common.generateAiText}
-                        </button>
-                        {aiPracticeStatus === 'stale' && (
-                            <button type="button" className="action-btn" onClick={onRestoreConfig}>
-                                {copy.common.restoreLastConfig}
-                            </button>
-                        )}
-                        {aiPracticeStatus === 'error' && (
-                            <button type="button" className="action-btn" onClick={onUseBuiltin}>
-                                {copy.common.useBuiltIn}
-                            </button>
-                        )}
-                    </div>
+            {errorCopy && (
+                <div className="feedback-card feedback-error">
+                    <strong>{errorCopy.title}</strong>
+                    <p>{errorCopy.description}</p>
                 </div>
+            )}
 
-                <div className="step-item">
-                    <span className="step-index">{copy.practice.stepType}</span>
-                    <p className="muted-text">
-                        {config.source === 'builtin' ? copy.practice.builtInReady : getStatusBody(copy, aiPracticeStatus)}
-                    </p>
-                </div>
+            <div className="workshop-actions">
+                <button
+                    type="button"
+                    className="action-btn primary"
+                    onClick={onGenerate}
+                    disabled={aiPracticeStatus === 'loading'}
+                >
+                    {aiPracticeStatus === 'stale'
+                        ? copy.common.reGenerateAiText
+                        : aiPracticeStatus === 'loading'
+                            ? copy.common.loading
+                            : copy.common.generateAiText}
+                </button>
+                {aiPracticeStatus === 'stale' && (
+                    <button type="button" className="action-btn" onClick={onRestoreConfig}>
+                        {copy.common.restoreLastConfig}
+                    </button>
+                )}
+                {aiPracticeStatus === 'error' && (
+                    <button type="button" className="action-btn" onClick={onUseBuiltin}>
+                        {copy.common.useBuiltIn}
+                    </button>
+                )}
             </div>
         </section>
     );
 }
-

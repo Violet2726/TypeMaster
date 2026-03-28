@@ -1,14 +1,3 @@
-/**
- * 打字练习会话 Hook。
- *
- * 它是练习页的核心状态机，负责：
- * - 练习开始 / 暂停 / 恢复 / 结束
- * - 当前输入和历史输入
- * - 计时与趋势数据
- * - 实时统计与最终结果计算
- *
- * 页面组件只负责渲染和 DOM 测量，真正的练习规则都集中在这里。
- */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { calculateMetrics, createTimelinePoint } from '../engine';
 
@@ -16,17 +5,12 @@ export function useTypingSession({ draft, config, onComplete }) {
     const words = draft?.words || [];
     const inputRef = useRef(null);
 
-    /**
-     * 这些 ref 用来保存“不会驱动 UI 重绘，但时序上必须持久存在”的中间值。
-     */
     const tabPressedRef = useRef(false);
+    const isComposingRef = useRef(false);
     const lastHistorySecondRef = useRef(-1);
     const lastCharCountRef = useRef(0);
     const lastCheckMsRef = useRef(0);
 
-    /**
-     * 这些 state 才是真正驱动页面更新的练习状态。
-     */
     const [typedHistory, setTypedHistory] = useState([]);
     const [currentInput, setCurrentInput] = useState('');
     const [currentWordIndex, setCurrentWordIndex] = useState(0);
@@ -47,10 +31,6 @@ export function useTypingSession({ draft, config, onComplete }) {
         errors: []
     });
 
-    /**
-     * 把整轮练习完全重置到初始状态。
-     * 这个方法会在切换草稿或手动重来时触发。
-     */
     const resetSession = useCallback(() => {
         setTypedHistory([]);
         setCurrentInput('');
@@ -71,6 +51,8 @@ export function useTypingSession({ draft, config, onComplete }) {
             burst: [],
             errors: []
         });
+        tabPressedRef.current = false;
+        isComposingRef.current = false;
         lastHistorySecondRef.current = -1;
         lastCharCountRef.current = 0;
         lastCheckMsRef.current = 0;
@@ -79,17 +61,10 @@ export function useTypingSession({ draft, config, onComplete }) {
         }
     }, []);
 
-    /**
-     * 只要练习草稿发生变化，就视为进入了全新练习。
-     */
     useEffect(() => {
         resetSession();
     }, [draft?.id, resetSession]);
 
-    /**
-     * 统一计算“当前有效已用时间”。
-     * 会自动扣除暂停区间，避免暂停时继续消耗时长。
-     */
     const elapsedMs = useMemo(() => {
         if (!startedAt) {
             return 0;
@@ -104,10 +79,6 @@ export function useTypingSession({ draft, config, onComplete }) {
         return Math.max(0, endReference - startedAt - pausedDurationMs);
     }, [completedAt, nowMs, pausedAt, pausedDurationMs, startedAt, status]);
 
-    /**
-     * 实时指标与最终指标共用一套算法。
-     * 当前是否包含 currentInput，由调用场景决定。
-     */
     const liveMetrics = useMemo(() => calculateMetrics({
         words,
         typedHistory,
@@ -128,23 +99,22 @@ export function useTypingSession({ draft, config, onComplete }) {
         status
     ]);
 
-    /**
-     * 结束本轮练习，并把最终结果交给外层。
-     */
-    const finishSession = useCallback((forcedElapsedMs = null) => {
+    const finishSession = useCallback((options = {}) => {
+        const { forcedElapsedMs = null, finalHistoryOverride = null } = options;
+
         if (status === 'complete') {
             return null;
         }
 
         const finishedAt = Date.now();
         const effectiveElapsedMs = forcedElapsedMs ?? Math.max(0, finishedAt - (startedAt || finishedAt) - pausedDurationMs);
-        const finalHistory = currentInput ? [...typedHistory, currentInput] : typedHistory;
+        const finalHistory = Array.isArray(finalHistoryOverride)
+            ? finalHistoryOverride
+            : currentInput
+                ? [...typedHistory, currentInput]
+                : typedHistory;
         const finalTimeline = { ...timeline };
 
-        /**
-         * 如果用户在极短时间内完成练习，可能还没来得及生成趋势点。
-         * 这里手动补一个最小时间点，保证结果页图表不至于完全空白。
-         */
         if (finalTimeline.labels.length === 0) {
             const bootstrapMetrics = calculateMetrics({
                 words,
@@ -177,6 +147,7 @@ export function useTypingSession({ draft, config, onComplete }) {
 
         setTypedHistory(finalHistory);
         setCurrentInput('');
+        setCurrentWordIndex(Math.min(finalHistory.length, words.length));
         setStatus('complete');
         setCompletedAt(finishedAt);
         setNowMs(finishedAt);
@@ -201,9 +172,28 @@ export function useTypingSession({ draft, config, onComplete }) {
         words
     ]);
 
-    /**
-     * 第一次输入时启动练习。
-     */
+    const commitCurrentWord = useCallback((inputOverride = currentInput) => {
+        if (!inputOverride || currentWordIndex >= words.length) {
+            return null;
+        }
+
+        const nextHistory = [...typedHistory, inputOverride];
+        const nextWordIndex = currentWordIndex + 1;
+
+        setTypedHistory(nextHistory);
+        setCurrentWordIndex(nextWordIndex);
+        setCurrentInput('');
+
+        if (inputRef.current) {
+            inputRef.current.value = '';
+        }
+
+        return {
+            nextHistory,
+            nextWordIndex
+        };
+    }, [currentInput, currentWordIndex, typedHistory, words.length]);
+
     const startSession = useCallback(() => {
         if (status !== 'idle') {
             return;
@@ -219,9 +209,6 @@ export function useTypingSession({ draft, config, onComplete }) {
         lastCheckMsRef.current = 0;
     }, [status]);
 
-    /**
-     * 失焦时暂停。
-     */
     const pauseSession = useCallback(() => {
         if (status !== 'running') {
             return;
@@ -231,9 +218,6 @@ export function useTypingSession({ draft, config, onComplete }) {
         setStatus('paused');
     }, [status]);
 
-    /**
-     * 重新聚焦时恢复，并把暂停时间累加进去。
-     */
     const resumeSession = useCallback(() => {
         if (status !== 'paused') {
             return;
@@ -246,12 +230,6 @@ export function useTypingSession({ draft, config, onComplete }) {
         setNowMs(resumedAt);
     }, [pausedAt, status]);
 
-    /**
-     * 运行时定时器：
-     * - 驱动计时显示
-     * - 生成趋势图点位
-     * - 在时间模式下判断是否到时
-     */
     useEffect(() => {
         if (status !== 'running' || !startedAt) {
             return undefined;
@@ -290,7 +268,7 @@ export function useTypingSession({ draft, config, onComplete }) {
             }
 
             if (config.mode === 'time' && nextElapsedMs >= (config.durationSeconds * 1000)) {
-                finishSession(config.durationSeconds * 1000);
+                finishSession({ forcedElapsedMs: config.durationSeconds * 1000 });
             }
         }, 200);
 
@@ -312,9 +290,6 @@ export function useTypingSession({ draft, config, onComplete }) {
         words
     ]);
 
-    /**
-     * 词数模式下，最后一个词完整输入后直接结束。
-     */
     useEffect(() => {
         if (config.mode !== 'words' || status === 'complete') {
             return;
@@ -326,9 +301,6 @@ export function useTypingSession({ draft, config, onComplete }) {
         }
     }, [config.mode, currentInput, currentWordIndex, finishSession, status, words]);
 
-    /**
-     * 窗口失焦时也要暂停，避免只依赖 input blur 漏掉场景。
-     */
     useEffect(() => {
         const handleWindowBlur = () => {
             setIsFocused(false);
@@ -341,57 +313,55 @@ export function useTypingSession({ draft, config, onComplete }) {
         };
     }, [pauseSession]);
 
-    /**
-     * 让外层可以主动把焦点打回隐藏输入框。
-     */
     const focusInput = useCallback(() => {
         if (inputRef.current) {
             inputRef.current.focus();
         }
     }, []);
 
-    /**
-     * 输入事件只负责两件事：
-     * - 首次输入触发开始
-     * - 记录按键准确率
-     */
-    const handleInputChange = useCallback((event) => {
+    const applyInputValue = useCallback((nextValue) => {
         if (status === 'complete') {
             return;
         }
 
-        const value = event.target.value;
-        if (status === 'idle' && value.length > 0) {
+        if (status === 'idle' && nextValue.length > 0) {
             startSession();
         }
 
-        const currentWord = words[currentWordIndex] || '';
-        const nativeInputType = event.nativeEvent?.inputType;
+        if (nextValue.length > currentInput.length) {
+            const addedChars = nextValue.slice(currentInput.length);
+            const currentWord = words[currentWordIndex] || '';
 
-        if (value.length > currentInput.length && nativeInputType === 'insertText') {
-            const insertedIndex = value.length - 1;
-            const typedChar = value[insertedIndex];
-            const expectedChar = currentWord[insertedIndex];
+            if (addedChars.length > 0) {
+                let correctDelta = 0;
 
-            setTotalKeystrokes((previous) => previous + 1);
-            if (typedChar === expectedChar) {
-                setCorrectKeystrokes((previous) => previous + 1);
+                addedChars.split('').forEach((char, index) => {
+                    const expectedChar = currentWord[currentInput.length + index];
+                    if (char === expectedChar) {
+                        correctDelta += 1;
+                    }
+                });
+
+                setTotalKeystrokes((previous) => previous + addedChars.length);
+                if (correctDelta > 0) {
+                    setCorrectKeystrokes((previous) => previous + correctDelta);
+                }
             }
         }
 
-        setCurrentInput(value);
+        setCurrentInput(nextValue);
     }, [currentInput.length, currentWordIndex, startSession, status, words]);
 
-    /**
-     * 键盘事件控制核心打字规则。
-     * 包括：
-     * - 空格切词
-     * - Tab + Enter 快速重开
-     * - Esc 重置
-     * - 空输入时 Backspace 回退上一词
-     */
+    const handleInputChange = useCallback((event) => {
+        if (event.nativeEvent?.isComposing || isComposingRef.current) {
+            return;
+        }
+
+        applyInputValue(event.target.value);
+    }, [applyInputValue]);
+
     const handleKeyDown = useCallback((event) => {
-        if (status === 'complete') {
+        if (status === 'complete' || event.nativeEvent?.isComposing || isComposingRef.current) {
             return;
         }
 
@@ -430,34 +400,39 @@ export function useTypingSession({ draft, config, onComplete }) {
 
         if (event.key === ' ') {
             event.preventDefault();
-            const trimmed = currentInput.trim();
-            if (!trimmed) {
+
+            if (currentInput.length === 0) {
                 return;
             }
 
-            const nextHistory = [...typedHistory, trimmed];
-            const nextWordIndex = currentWordIndex + 1;
-            setTypedHistory(nextHistory);
-            setCurrentWordIndex(nextWordIndex);
-            setCurrentInput('');
-            if (inputRef.current) {
-                inputRef.current.value = '';
+            const committed = commitCurrentWord(currentInput);
+            if (!committed) {
+                return;
             }
 
-            if (config.mode === 'words' && nextWordIndex >= words.length) {
-                finishSession();
+            if (config.mode === 'words' && committed.nextWordIndex >= words.length) {
+                finishSession({ finalHistoryOverride: committed.nextHistory });
             }
         }
     }, [
+        commitCurrentWord,
         config.mode,
         currentInput,
         currentWordIndex,
         finishSession,
         resetSession,
         status,
-        typedHistory,
-        words.length
+        typedHistory
     ]);
+
+    const handleCompositionStart = useCallback(() => {
+        isComposingRef.current = true;
+    }, []);
+
+    const handleCompositionEnd = useCallback((event) => {
+        isComposingRef.current = false;
+        applyInputValue(event.currentTarget.value);
+    }, [applyInputValue]);
 
     const handleFocus = useCallback(() => {
         setIsFocused(true);
@@ -471,11 +446,6 @@ export function useTypingSession({ draft, config, onComplete }) {
         pauseSession();
     }, [pauseSession]);
 
-    /**
-     * 根据模式决定计时显示语义：
-     * - 时间模式：显示剩余秒数
-     * - 词数模式：显示已用秒数
-     */
     const timerDisplay = config.mode === 'time'
         ? Math.max(0, Math.ceil(((config.durationSeconds * 1000) - elapsedMs) / 1000))
         : Math.max(0, Math.floor(elapsedMs / 1000));
@@ -494,6 +464,8 @@ export function useTypingSession({ draft, config, onComplete }) {
         liveMetrics,
         handleInputChange,
         handleKeyDown,
+        handleCompositionStart,
+        handleCompositionEnd,
         handleFocus,
         handleBlur,
         focusInput,

@@ -1,8 +1,10 @@
 import { NavLink, useLocation } from 'react-router-dom';
+import { getLanguageMeta } from '../i18n';
 
 export function Header({ settings, copy, onToggleTheme, onOpenSettings }) {
     const location = useLocation();
     const compact = settings.focusMode && location.pathname === '/practice';
+    const languageMeta = getLanguageMeta(settings.language);
 
     return (
         <header className={`app-header ${compact ? 'is-compact' : ''}`}>
@@ -25,14 +27,13 @@ export function Header({ settings, copy, onToggleTheme, onOpenSettings }) {
 
                 <div className="nav-actions">
                     <button className="nav-icon" type="button" onClick={onToggleTheme} title={copy.nav.toggleTheme}>
-                        {settings.theme === 'serika-dark' ? 'Light' : 'Dark'}
+                        {settings.theme === 'serika-dark' ? copy.settings.themeLight : copy.settings.themeDark}
                     </button>
                     <button className="nav-icon" type="button" onClick={onOpenSettings} title={copy.nav.openSettings}>
-                        {copy.common.language}: {settings.language === 'en-US' ? 'EN' : '中文'}
+                        {copy.common.language}: {languageMeta.shortLabel}
                     </button>
                 </div>
             </div>
         </header>
     );
 }
-

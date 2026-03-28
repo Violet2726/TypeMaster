@@ -41,6 +41,7 @@ export function PracticePage() {
         completePractice
     } = usePracticeStore();
     const [confirmState, setConfirmState] = useState(null);
+    const [controlsOpen, setControlsOpen] = useState(() => config.source === 'ai');
     const bypassBlockerRef = useRef(false);
     const isDirtyRef = useRef(false);
 
@@ -90,6 +91,12 @@ export function PracticePage() {
     useEffect(() => {
         bypassBlockerRef.current = false;
     }, [displayDraft?.id]);
+
+    useEffect(() => {
+        if (config.source === 'ai') {
+            setControlsOpen(true);
+        }
+    }, [config.source]);
 
     useEffect(() => {
         if ((config.source === 'builtin' || aiPracticeStatus === 'ready') && displayDraft?.id) {
@@ -142,7 +149,7 @@ export function PracticePage() {
             typingSession.resetSession();
             typingSession.focusInput();
         } catch (error) {
-            // 状态已经由 store 统一记录。
+            // store handles the status and error state
         }
     };
 
@@ -185,25 +192,31 @@ export function PracticePage() {
 
     const lockTitle = config.source === 'ai' ? copy.practice.wordsLockedTitle : '';
     const lockBody = config.source === 'ai' ? copy.practice.wordsLockedBody : '';
+    const sourceLabel = displayDraft?.sourceTextMeta?.label
+        || (config.source === 'ai' ? copy.practice.sourceAi : copy.practice.sourceBuiltin);
 
     return (
-        <div className="page-stack">
-            <section className="practice-hero">
-                <div>
-                    <p className="panel-kicker">{copy.practice.pageTitle}</p>
-                    <h1>{copy.practice.pageTitle}</h1>
-                    <p className="hero-body">{copy.practice.pageBody}</p>
+        <div className="page-stack practice-page">
+            <section className="panel practice-toolbar">
+                <div className="practice-toolbar__row">
+                    <div>
+                        <p className="panel-kicker">{copy.practice.configTitle}</p>
+                        <h2>{sourceLabel}</h2>
+                    </div>
+                    <button type="button" className="ghost-btn ghost-btn--small" onClick={handleReset}>
+                        {copy.common.resetRound}
+                    </button>
                 </div>
-            </section>
 
-            <div className="workspace-layout">
-                <div className="workspace-sidebar">
-                    <ConfigPanel
-                        copy={copy}
-                        config={config}
-                        onConfigChange={handleConfigChange}
-                    />
+                <ConfigPanel
+                    copy={copy}
+                    config={config}
+                    onConfigChange={handleConfigChange}
+                    showAdvanced={controlsOpen}
+                    onToggleAdvanced={() => setControlsOpen((value) => !value)}
+                />
 
+                {controlsOpen && config.source === 'ai' && (
                     <AIWorkshop
                         copy={copy}
                         language={language}
@@ -216,34 +229,38 @@ export function PracticePage() {
                         onRestoreConfig={restoreAiDraftConfig}
                         onUseBuiltin={handleUseBuiltin}
                     />
-                </div>
+                )}
 
-                <div className="workspace-main">
-                    <TypingArea
-                        copy={copy}
-                        words={typingSession.words}
-                        typedHistory={typingSession.typedHistory}
-                        currentInput={typingSession.currentInput}
-                        currentWordIndex={typingSession.currentWordIndex}
-                        isFocused={typingSession.isFocused}
-                        status={typingSession.status}
-                        liveMetrics={typingSession.liveMetrics}
-                        timerDisplay={typingSession.timerDisplay}
-                        mode={config.mode}
-                        sourceLabel={displayDraft?.sourceTextMeta?.label || copy.common.emptyValue}
-                        inputRef={typingSession.inputRef}
-                        onInputChange={typingSession.handleInputChange}
-                        onKeyDown={typingSession.handleKeyDown}
-                        onFocus={typingSession.handleFocus}
-                        onBlur={typingSession.handleBlur}
-                        onActivate={typingSession.focusInput}
-                        onReset={handleReset}
-                        isLocked={config.source === 'ai' && aiPracticeStatus !== 'ready'}
-                        lockTitle={lockTitle}
-                        lockBody={lockBody}
-                    />
-                </div>
-            </div>
+                {controlsOpen && config.source === 'builtin' && (
+                    <p className="muted-text practice-toolbar__hint">{copy.practice.builtInReady}</p>
+                )}
+            </section>
+
+            <TypingArea
+                copy={copy}
+                words={typingSession.words}
+                typedHistory={typingSession.typedHistory}
+                currentInput={typingSession.currentInput}
+                currentWordIndex={typingSession.currentWordIndex}
+                isFocused={typingSession.isFocused}
+                status={typingSession.status}
+                liveMetrics={typingSession.liveMetrics}
+                timerDisplay={typingSession.timerDisplay}
+                mode={config.mode}
+                sourceLabel={sourceLabel}
+                inputRef={typingSession.inputRef}
+                onInputChange={typingSession.handleInputChange}
+                onKeyDown={typingSession.handleKeyDown}
+                onCompositionStart={typingSession.handleCompositionStart}
+                onCompositionEnd={typingSession.handleCompositionEnd}
+                onFocus={typingSession.handleFocus}
+                onBlur={typingSession.handleBlur}
+                onActivate={typingSession.focusInput}
+                onReset={handleReset}
+                isLocked={config.source === 'ai' && aiPracticeStatus !== 'ready'}
+                lockTitle={lockTitle}
+                lockBody={lockBody}
+            />
 
             <div className="sticky-action-bar">
                 <div>

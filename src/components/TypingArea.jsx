@@ -5,6 +5,20 @@ function getSessionStatusText(copy, status) {
     return copy.statuses[status] || copy.statuses.idle;
 }
 
+function getBadgeStatus(status) {
+    if (status === 'running') return 'loading';
+    if (status === 'paused') return 'stale';
+    if (status === 'complete') return 'success';
+    return 'idle';
+}
+
+function getHintText(copy, status) {
+    if (status === 'paused') return copy.practice.pausedBody;
+    if (status === 'running') return copy.practice.runningHint;
+    if (status === 'complete') return copy.practice.completeHint;
+    return copy.practice.idleHint;
+}
+
 export function TypingArea({
     copy,
     words,
@@ -20,6 +34,8 @@ export function TypingArea({
     inputRef,
     onInputChange,
     onKeyDown,
+    onCompositionStart,
+    onCompositionEnd,
     onFocus,
     onBlur,
     onActivate,
@@ -42,13 +58,47 @@ export function TypingArea({
     useLayoutEffect(() => {
         const currentWordEl = wordRefs.current.get(currentWordIndex);
         const currentWord = words[currentWordIndex] || '';
+        const viewportEl = wrapperRef.current?.parentElement;
 
         if (!wrapperRef.current || !currentWordEl || status === 'complete' || isLocked || !words.length) {
+            if (wrapperRef.current) {
+                wrapperRef.current.style.transform = 'translateY(0px)';
+            }
+            wordRefs.current.forEach((node) => {
+                if (node) {
+                    delete node.dataset.lineState;
+                }
+            });
             setCaretStyle({ opacity: 0 });
             return;
         }
 
-        wrapperRef.current.style.transform = `translateY(-${currentWordEl.offsetTop}px)`;
+        const viewportHeight = viewportEl?.clientHeight || 0;
+        const lineHeight = currentWordEl.offsetHeight || 0;
+        const desiredOffset = Math.max(viewportHeight * 0.32, lineHeight * 0.95);
+        const maxTranslate = Math.max(wrapperRef.current.scrollHeight - viewportHeight, 0);
+        const translateY = Math.min(Math.max(currentWordEl.offsetTop - desiredOffset, 0), maxTranslate);
+
+        wrapperRef.current.style.transform = `translateY(-${translateY}px)`;
+
+        wordRefs.current.forEach((node) => {
+            if (!node) {
+                return;
+            }
+
+            const offsetDelta = node.offsetTop - currentWordEl.offsetTop;
+            if (Math.abs(offsetDelta) < lineHeight * 0.45) {
+                node.dataset.lineState = 'current';
+                return;
+            }
+
+            if (offsetDelta < 0) {
+                node.dataset.lineState = Math.abs(offsetDelta) <= lineHeight * 1.35 ? 'previous' : 'past';
+                return;
+            }
+
+            node.dataset.lineState = offsetDelta <= lineHeight * 1.35 ? 'next' : 'future';
+        });
 
         let targetEl = null;
         let useRightEdge = false;
@@ -83,43 +133,23 @@ export function TypingArea({
     }, [currentInput, currentWordIndex, isFocused, isLocked, renderedWords, status, words]);
 
     return (
-        <section className="panel typing-panel">
-            <div className="typing-panel__head">
-                <div>
-                    <p className="panel-kicker">{copy.practice.pageTitle}</p>
-                    <h2>{sourceLabel || copy.common.emptyValue}</h2>
+        <section className="panel typing-stage">
+            <div className="typing-stage__head">
+                <div className="typing-stage__source">
+                    <span className="summary-label">{copy.common.currentText}</span>
+                    <strong>{sourceLabel || copy.common.emptyValue}</strong>
                 </div>
-                <button type="button" className="ghost-btn" onClick={onReset}>{copy.common.resetRound}</button>
-            </div>
 
-            <div className="status-strip">
-                <div className="feedback-card">
-                    <span className="summary-label">{copy.practice.statusCard}</span>
-                    <strong>{getSessionStatusText(copy, status)}</strong>
+                <div className="typing-stage__status">
+                    <span className={`panel-badge badge-${getBadgeStatus(status)}`}>
+                        {copy.practice.sessionLabel}: {getSessionStatusText(copy, status)}
+                    </span>
+                    <span className={`panel-badge badge-${isLocked ? 'stale' : 'ready'}`}>
+                        {isLocked ? copy.practice.textPendingLabel : copy.practice.textReadyLabel}
+                    </span>
                 </div>
-                <div className="feedback-card">
-                    <span className="summary-label">{copy.practice.textMetaTitle}</span>
-                    <strong>{isLocked ? copy.statuses.stale : copy.statuses.ready}</strong>
-                </div>
-                <div className="feedback-card">
-                    <span className="summary-label">{copy.practice.helperTitle}</span>
-                    <p>{status === 'paused' ? copy.practice.pausedBody : status === 'running' ? copy.practice.runningHint : status === 'complete' ? copy.practice.completeHint : copy.practice.idleHint}</p>
-                </div>
-            </div>
 
-            <div className="live-stats">
-                <div className="live-stat">
-                    <span className="live-stat-value">{liveMetrics.wpm}</span>
-                    <span className="live-stat-label">{copy.common.wpm}</span>
-                </div>
-                <div className="live-stat">
-                    <span className="live-stat-value">{liveMetrics.accuracy}</span>
-                    <span className="live-stat-label">%</span>
-                </div>
-                <div className="live-stat">
-                    <span className="live-stat-value">{timerDisplay}</span>
-                    <span className="live-stat-label">{mode === 'time' ? copy.practice.timeRemaining : copy.practice.timeElapsed}</span>
-                </div>
+                <button type="button" className="ghost-btn ghost-btn--small" onClick={onReset}>{copy.common.resetRound}</button>
             </div>
 
             {status === 'paused' && (
@@ -135,6 +165,27 @@ export function TypingArea({
             )}
 
             <div className="words-shell" onClick={onActivate} role="presentation">
+                {!isLocked && words.length > 0 && (
+                    <input
+                        ref={inputRef}
+                        type="text"
+                        className="typing-capture-input"
+                        value={currentInput}
+                        onChange={onInputChange}
+                        onKeyDown={onKeyDown}
+                        onCompositionStart={onCompositionStart}
+                        onCompositionEnd={onCompositionEnd}
+                        onFocus={onFocus}
+                        onBlur={onBlur}
+                        autoComplete="off"
+                        autoCapitalize="off"
+                        autoCorrect="off"
+                        spellCheck={false}
+                        inputMode="text"
+                        enterKeyHint="done"
+                        aria-label={copy.common.startTyping}
+                    />
+                )}
                 <div className="words-container">
                     {isLocked || !words.length ? (
                         <div className="typing-empty-state">
@@ -148,7 +199,7 @@ export function TypingArea({
                                 {renderedWords.map((word) => (
                                     <div
                                         key={`${word.wordIndex}-${word.word}`}
-                                        className={`word ${word.isCurrent ? 'current' : ''}`}
+                                        className={`word ${word.isCurrent ? 'current' : ''} word-${word.phase}`}
                                         ref={(node) => {
                                             if (node) {
                                                 wordRefs.current.set(word.wordIndex, node);
@@ -177,7 +228,7 @@ export function TypingArea({
                                         {word.extraChars.map((char) => (
                                             <span
                                                 key={`extra-${word.wordIndex}-${char.index}`}
-                                                className="letter extra"
+                                                className={`letter ${char.status}`}
                                                 ref={(node) => {
                                                     const key = `${word.wordIndex}-${char.index}`;
                                                     if (node) {
@@ -202,25 +253,23 @@ export function TypingArea({
                 )}
             </div>
 
-            <label className="typing-input-wrap">
-                <span className="summary-label">{copy.common.startTyping}</span>
-                <input
-                    ref={inputRef}
-                    type="text"
-                    className="typing-input"
-                    value={currentInput}
-                    onChange={onInputChange}
-                    onKeyDown={onKeyDown}
-                    onFocus={onFocus}
-                    onBlur={onBlur}
-                    autoComplete="off"
-                    autoCapitalize="off"
-                    autoCorrect="off"
-                    spellCheck="false"
-                    disabled={isLocked}
-                    placeholder={copy.practice.wordsPlaceholder}
-                />
-            </label>
+            <div className="typing-stage__footer">
+                <p className="muted-text typing-stage__hint">{getHintText(copy, status)}</p>
+                <div className="live-stats">
+                    <div className="live-stat">
+                        <span className="live-stat-value">{liveMetrics.wpm}</span>
+                        <span className="live-stat-label">{copy.common.wpm}</span>
+                    </div>
+                    <div className="live-stat">
+                        <span className="live-stat-value">{liveMetrics.accuracy}%</span>
+                        <span className="live-stat-label">{copy.common.accuracy}</span>
+                    </div>
+                    <div className="live-stat">
+                        <span className="live-stat-value">{timerDisplay}</span>
+                        <span className="live-stat-label">{mode === 'time' ? copy.practice.timeRemaining : copy.practice.timeElapsed}</span>
+                    </div>
+                </div>
+            </div>
         </section>
     );
 }

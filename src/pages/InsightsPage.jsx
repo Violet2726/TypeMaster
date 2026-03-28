@@ -37,47 +37,45 @@ export function InsightsPage() {
 
     return (
         <div className="page-stack">
-            <section className="panel insights-hero">
-                <div>
-                    <p className="panel-kicker">{copy.insights.heroKicker}</p>
-                    <h1>{copy.insights.heroTitle}</h1>
-                    <p className="hero-body">{copy.insights.heroBody}</p>
+            <section className="panel insights-header">
+                <div className="insights-header__body">
+                    <p className="panel-kicker">{copy.nav.insights}</p>
+                    <h1>{copy.insights.title}</h1>
+                    <p className="muted-text">{copy.insights.body}</p>
                 </div>
                 <button type="button" className="action-btn primary" onClick={() => navigate('/practice')}>
                     {copy.home.primaryCta}
                 </button>
             </section>
 
-            <section className="panel dual-grid">
-                <div className="coach-highlight">
+            <section className="home-stats-strip" aria-label={copy.insights.recentTrend}>
+                <div className="metric-card">
+                    <span>{copy.insights.bestWpm}</span>
+                    <strong>{insights.bestWpmOverall} {copy.common.wpm}</strong>
+                </div>
+                <div className="metric-card">
+                    <span>{copy.insights.avgAccuracy}</span>
+                    <strong>{Math.round(insights.avgAccuracyOverall)}%</strong>
+                </div>
+                <div className="metric-card">
+                    <span>{copy.insights.recentAvgWpm}</span>
+                    <strong>{insights.recent7.avgWpm} {copy.common.wpm}</strong>
+                </div>
+                <div className="metric-card">
+                    <span>{copy.common.sessions}</span>
+                    <strong>{insights.totalSessions}</strong>
+                </div>
+            </section>
+
+            <section className="insights-overview-grid">
+                <div className="panel insights-latest-card">
                     <p className="panel-kicker">{copy.insights.latestCoach}</p>
                     <h2>{latestCoachAdvice?.headline || copy.common.none}</h2>
                     <p className="lead-text">{latestCoachAdvice?.summary || copy.insights.noCoach}</p>
                     <p className="muted-text">{latestCoachAdvice?.comparison?.summary}</p>
                 </div>
 
-                <div className="metric-grid">
-                    <div className="metric-card">
-                        <span>{copy.insights.bestWpm}</span>
-                        <strong>{insights.bestWpmOverall} {copy.common.wpm}</strong>
-                    </div>
-                    <div className="metric-card">
-                        <span>{copy.insights.avgAccuracy}</span>
-                        <strong>{Math.round(insights.avgAccuracyOverall)}%</strong>
-                    </div>
-                    <div className="metric-card">
-                        <span>{copy.insights.aiShare}</span>
-                        <strong>{insights.aiShareOverall}%</strong>
-                    </div>
-                    <div className="metric-card">
-                        <span>{copy.common.sessions}</span>
-                        <strong>{insights.totalSessions}</strong>
-                    </div>
-                </div>
-            </section>
-
-            <section className="panel dual-grid">
-                <div>
+                <div className="panel">
                     <div className="panel-head">
                         <div>
                             <p className="panel-kicker">{copy.insights.recentTrend}</p>
@@ -93,18 +91,9 @@ export function InsightsPage() {
                             </div>
                         ))}
                     </div>
-                </div>
-
-                <div>
-                    <div className="panel-head">
-                        <div>
-                            <p className="panel-kicker">{copy.insights.recentTrend}</p>
-                            <h2>{copy.insights.sessions30}</h2>
-                        </div>
-                    </div>
-                    <div className="summary-stack">
+                    <div className="summary-stack summary-stack--compact">
                         <div className="metric-card">
-                            <span>{copy.common.sessions}</span>
+                            <span>{copy.insights.sessions30}</span>
                             <strong>{insights.recent30.count}</strong>
                         </div>
                         <div className="metric-card">
@@ -119,20 +108,22 @@ export function InsightsPage() {
                 </div>
             </section>
 
-            <section className="panel dual-grid">
-                <div>
-                    <p className="panel-kicker">{copy.insights.topErrorChars}</p>
-                    <h2>{copy.insights.topErrorChars}</h2>
-                    <HotspotList items={insights.topErrorChars} emptyText={copy.insights.noErrors} />
-                </div>
-                <div>
-                    <p className="panel-kicker">{copy.insights.topErrorWords}</p>
-                    <h2>{copy.insights.topErrorWords}</h2>
-                    <HotspotList items={insights.topErrorWords} emptyText={copy.insights.noErrors} />
+            <section className="panel">
+                <div className="insights-hotspots">
+                    <div>
+                        <p className="panel-kicker">{copy.insights.topErrorChars}</p>
+                        <h2>{copy.insights.topErrorChars}</h2>
+                        <HotspotList items={insights.topErrorChars} emptyText={copy.insights.noErrors} />
+                    </div>
+                    <div>
+                        <p className="panel-kicker">{copy.insights.topErrorWords}</p>
+                        <h2>{copy.insights.topErrorWords}</h2>
+                        <HotspotList items={insights.topErrorWords} emptyText={copy.insights.noErrors} />
+                    </div>
                 </div>
             </section>
 
-            <section className="panel">
+            <section className="panel home-records-panel">
                 <div className="panel-head">
                     <div>
                         <p className="panel-kicker">{copy.insights.recentHistory}</p>
@@ -143,7 +134,7 @@ export function InsightsPage() {
                 <div className="history-table">
                     {sessions.slice(0, 10).map((session) => (
                         <div key={session.id} className="history-row">
-                            <div>
+                            <div className="history-row__meta">
                                 <strong>{session.sourceTextMeta?.label || copy.common.emptyValue}</strong>
                                 <p className="muted-text">{formatDateTime(session.result.completedAt, language)}</p>
                             </div>
@@ -159,4 +150,3 @@ export function InsightsPage() {
         </div>
     );
 }
-
