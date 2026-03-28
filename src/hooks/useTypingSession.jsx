@@ -1,6 +1,19 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { calculateMetrics, createTimelinePoint } from '../engine';
 
+function createEmptyTimeline() {
+    return {
+        samples: [],
+        labels: [],
+        wpm: [],
+        raw: [],
+        accuracy: [],
+        burst: [],
+        errors: [],
+        pauseMoments: []
+    };
+}
+
 export function useTypingSession({ draft, config, onComplete }) {
     const words = draft?.words || [];
     const inputRef = useRef(null);
@@ -23,13 +36,7 @@ export function useTypingSession({ draft, config, onComplete }) {
     const [pausedAt, setPausedAt] = useState(null);
     const [pausedDurationMs, setPausedDurationMs] = useState(0);
     const [nowMs, setNowMs] = useState(Date.now());
-    const [timeline, setTimeline] = useState({
-        labels: [],
-        wpm: [],
-        raw: [],
-        burst: [],
-        errors: []
-    });
+    const [timeline, setTimeline] = useState(createEmptyTimeline);
 
     const resetSession = useCallback(() => {
         setTypedHistory([]);
@@ -44,13 +51,7 @@ export function useTypingSession({ draft, config, onComplete }) {
         setPausedAt(null);
         setPausedDurationMs(0);
         setNowMs(Date.now());
-        setTimeline({
-            labels: [],
-            wpm: [],
-            raw: [],
-            burst: [],
-            errors: []
-        });
+        setTimeline(createEmptyTimeline());
         tabPressedRef.current = false;
         isComposingRef.current = false;
         lastHistorySecondRef.current = -1;
@@ -113,7 +114,16 @@ export function useTypingSession({ draft, config, onComplete }) {
             : currentInput
                 ? [...typedHistory, currentInput]
                 : typedHistory;
-        const finalTimeline = { ...timeline };
+        const finalTimeline = {
+            samples: [...(timeline.samples || [])],
+            labels: [...(timeline.labels || [])],
+            wpm: [...(timeline.wpm || [])],
+            raw: [...(timeline.raw || [])],
+            accuracy: [...(timeline.accuracy || [])],
+            burst: [...(timeline.burst || [])],
+            errors: [...(timeline.errors || [])],
+            pauseMoments: [...(timeline.pauseMoments || [])]
+        };
 
         if (finalTimeline.labels.length === 0) {
             const bootstrapMetrics = calculateMetrics({
@@ -130,8 +140,17 @@ export function useTypingSession({ draft, config, onComplete }) {
             finalTimeline.labels = [Math.max(0, Math.floor(effectiveElapsedMs / 1000))];
             finalTimeline.wpm = [bootstrapMetrics.wpm];
             finalTimeline.raw = [bootstrapMetrics.rawWpm];
+            finalTimeline.accuracy = [bootstrapMetrics.accuracy];
             finalTimeline.burst = [bootstrapMetrics.rawWpm];
             finalTimeline.errors = [bootstrapMetrics.incorrectChars + bootstrapMetrics.extraChars];
+            finalTimeline.samples = [{
+                time: finalTimeline.labels[0],
+                wpm: bootstrapMetrics.wpm,
+                raw: bootstrapMetrics.rawWpm,
+                accuracy: bootstrapMetrics.accuracy,
+                burst: bootstrapMetrics.rawWpm,
+                errors: bootstrapMetrics.incorrectChars + bootstrapMetrics.extraChars
+            }];
         }
 
         const finalResult = calculateMetrics({
@@ -214,9 +233,17 @@ export function useTypingSession({ draft, config, onComplete }) {
             return;
         }
 
-        setPausedAt(Date.now());
+        const pauseTime = Date.now();
+        const pauseSecond = Math.max(0, Math.floor((pauseTime - (startedAt || pauseTime) - pausedDurationMs) / 1000));
+        setTimeline((previous) => ({
+            ...previous,
+            pauseMoments: previous.pauseMoments.includes(pauseSecond)
+                ? previous.pauseMoments
+                : [...previous.pauseMoments, pauseSecond]
+        }));
+        setPausedAt(pauseTime);
         setStatus('paused');
-    }, [status]);
+    }, [pausedDurationMs, startedAt, status]);
 
     const resumeSession = useCallback(() => {
         if (status !== 'paused') {
@@ -255,9 +282,11 @@ export function useTypingSession({ draft, config, onComplete }) {
                 });
 
                 setTimeline((previous) => ({
+                    samples: [...previous.samples, point],
                     labels: [...previous.labels, point.time],
                     wpm: [...previous.wpm, point.wpm],
                     raw: [...previous.raw, point.raw],
+                    accuracy: [...previous.accuracy, point.accuracy],
                     burst: [...previous.burst, point.burst],
                     errors: [...previous.errors, point.errors]
                 }));
@@ -315,7 +344,11 @@ export function useTypingSession({ draft, config, onComplete }) {
 
     const focusInput = useCallback(() => {
         if (inputRef.current) {
-            inputRef.current.focus();
+            try {
+                inputRef.current.focus({ preventScroll: true });
+            } catch {
+                inputRef.current.focus();
+            }
         }
     }, []);
 

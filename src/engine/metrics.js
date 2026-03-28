@@ -264,6 +264,7 @@ export function createTimelinePoint({
             time: Math.max(0, Math.floor(elapsedMs / 1000)),
             wpm: metrics.wpm,
             raw: metrics.rawWpm,
+            accuracy: metrics.accuracy,
             burst,
             errors: metrics.errors
         },

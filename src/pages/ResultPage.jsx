@@ -229,7 +229,7 @@ export function ResultPage() {
             {session.timeline?.wpm?.length ? (
                 <TrendChart
                     copy={copy}
-                    timeline={session.timeline || { labels: [], wpm: [], raw: [], burst: [], errors: [] }}
+                    timeline={session.timeline || { samples: [], labels: [], wpm: [], raw: [], accuracy: [], burst: [], errors: [], pauseMoments: [] }}
                 />
             ) : null}
         </div>

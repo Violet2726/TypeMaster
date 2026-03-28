@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { buildRenderedWords } from '../engine';
 
 function getSessionStatusText(copy, status) {
@@ -44,16 +44,66 @@ export function TypingArea({
     lockTitle,
     lockBody
 }) {
+    const shellRef = useRef(null);
     const wrapperRef = useRef(null);
     const wordRefs = useRef(new Map());
     const charRefs = useRef(new Map());
     const extraRefs = useRef(new Map());
     const [caretStyle, setCaretStyle] = useState({});
+    const [layoutVersion, setLayoutVersion] = useState(0);
 
     const renderedWords = useMemo(
         () => buildRenderedWords(words, typedHistory, currentInput, currentWordIndex),
         [words, typedHistory, currentInput, currentWordIndex]
     );
+
+    useEffect(() => {
+        let frameId = 0;
+
+        const requestLayoutSync = () => {
+            window.cancelAnimationFrame(frameId);
+            frameId = window.requestAnimationFrame(() => {
+                setLayoutVersion((value) => value + 1);
+            });
+        };
+
+        const viewport = window.visualViewport;
+        window.addEventListener('resize', requestLayoutSync);
+        window.addEventListener('orientationchange', requestLayoutSync);
+        viewport?.addEventListener('resize', requestLayoutSync);
+        viewport?.addEventListener('scroll', requestLayoutSync);
+
+        return () => {
+            window.cancelAnimationFrame(frameId);
+            window.removeEventListener('resize', requestLayoutSync);
+            window.removeEventListener('orientationchange', requestLayoutSync);
+            viewport?.removeEventListener('resize', requestLayoutSync);
+            viewport?.removeEventListener('scroll', requestLayoutSync);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!isFocused || isLocked || !words.length || !shellRef.current) {
+            return undefined;
+        }
+
+        const isMobileViewport = window.matchMedia('(max-width: 720px)').matches;
+        if (!isMobileViewport) {
+            return undefined;
+        }
+
+        const timer = window.setTimeout(() => {
+            shellRef.current?.scrollIntoView({
+                block: 'center',
+                inline: 'nearest',
+                behavior: 'smooth'
+            });
+        }, 40);
+
+        return () => {
+            window.clearTimeout(timer);
+        };
+    }, [isFocused, isLocked, words.length]);
 
     useLayoutEffect(() => {
         const currentWordEl = wordRefs.current.get(currentWordIndex);
@@ -123,14 +173,19 @@ export function TypingArea({
         const wrapperRect = wrapperRef.current.getBoundingClientRect();
         const targetRect = targetEl.getBoundingClientRect();
         const fontSize = parseFloat(window.getComputedStyle(targetEl).fontSize) || 24;
+        const caretHeight = fontSize * 1.12;
+        const caretWidth = Math.max(fontSize * 0.075, 2.5);
+        const nextLeft = useRightEdge ? targetRect.right - wrapperRect.left : targetRect.left - wrapperRect.left;
+        const nextTop = targetRect.top - wrapperRect.top + (targetRect.height - caretHeight) / 2;
 
         setCaretStyle({
             opacity: isFocused ? 1 : 0,
-            height: `${fontSize * 1.15}px`,
-            left: `${useRightEdge ? targetRect.right - wrapperRect.left : targetRect.left - wrapperRect.left}px`,
-            top: `${targetRect.top - wrapperRect.top + (targetRect.height - fontSize * 1.15) / 2}px`
+            width: `${caretWidth}px`,
+            height: `${caretHeight}px`,
+            left: `${Math.max(0, nextLeft - caretWidth / 2)}px`,
+            top: `${Math.max(0, nextTop)}px`
         });
-    }, [currentInput, currentWordIndex, isFocused, isLocked, renderedWords, status, words]);
+    }, [currentInput, currentWordIndex, isFocused, isLocked, layoutVersion, renderedWords, status, words]);
 
     return (
         <section className="panel typing-stage">
@@ -164,7 +219,13 @@ export function TypingArea({
                 </div>
             )}
 
-            <div className="words-shell" onClick={onActivate} role="presentation">
+            <div
+                ref={shellRef}
+                className={`words-shell ${isFocused ? 'is-focused' : ''} ${status === 'paused' ? 'is-paused' : ''} ${isLocked ? 'is-locked' : ''}`}
+                onClick={onActivate}
+                onPointerDown={onActivate}
+                role="presentation"
+            >
                 {!isLocked && words.length > 0 && (
                     <input
                         ref={inputRef}
@@ -183,6 +244,7 @@ export function TypingArea({
                         spellCheck={false}
                         inputMode="text"
                         enterKeyHint="done"
+                        lang="en"
                         aria-label={copy.common.startTyping}
                     />
                 )}
