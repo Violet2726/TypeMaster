@@ -195,6 +195,8 @@ npm run build    # 构建前端到 dist/
 npm run preview  # 用 Vite 预览构建结果
 npm run serve    # 用 server.js 提供 dist/ 与 /api/chat
 npm start        # 先构建，再启动本地服务
+npm test         # 运行单元测试
+npm run test:coverage  # 运行单元测试并生成覆盖率报告
 ```
 
 ## 数据与状态约定
@@ -235,7 +237,7 @@ npm start        # 先构建，再启动本地服务
 - 还没有账号系统
 - 还没有跨设备同步
 - `challenge / sync` 仍然只是前端契约占位
-- 还没有自动化测试套件
+- 自动化测试套件处于初始阶段，目前仅覆盖 engine 核心模块
 - 包版本号目前仍停留在 `package.json` 的 `2.0.0`，但当前代码已经是更新后的体验版本
 
 ## 建议阅读顺序
