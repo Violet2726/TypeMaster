@@ -7,7 +7,8 @@ dist
 .vite
 
 
-docs
+docs/*
+!docs/ai-iteration/
 .history
 
 
