@@ -1,5 +1,91 @@
 # 每日迭代记录
 
+## 2026-05-08 - Engine 核心模块单元测试基线
+
+### 实现内容
+
+1. **Vitest 测试框架引入**
+   - 安装 vitest ^2.1.0 和 jsdom (用于 React 测试环境)
+   - 创建 vitest.config.js 配置文件
+   - 在 package.json 中添加 test 和 test:coverage 脚本
+
+2. **metrics.test.js (28 个测试用例)**
+   - calculateMetrics: 基本输入输出验证、空值处理、时间戳包含
+   - calculateConsistency: 边界值处理、稳定度计算
+   - collectErrorBreakdown: 错误字符收集、Top N 限制、空值处理
+   - deriveComparison: 历史对比、基线判断、中英文摘要生成
+
+3. **coach.test.js (11 个测试用例)**
+   - buildLocalCoachAdvice: 返回字段验证、中英文语言支持
+   - 难度调整逻辑、弱点检测、空历史记录处理
+   - nextDrill 配置生成验证
+
+4. **insights.test.js (17 个测试用例)**
+   - buildInsights: 返回结构验证、空值处理
+   - totalSessions、latestSession、bestWpmOverall、avgAccuracyOverall 计算验证
+   - aiShareOverall 计算验证
+   - topErrorChars 聚合和 Top 5 限制验证
+   - daily7/daily30 趋势序列生成验证
+   - 不完整数据处理验证
+
+### 修改文件
+
+| 文件 | 操作 | 说明 |
+|------|------|------|
+| package.json | 修改 | 添加 vitest 依赖和测试脚本 |
+| package-lock.json | 修改 | 依赖锁定文件 |
+| vitest.config.js | 新增 | Vitest 配置文件 |
+| src/engine/__tests__/metrics.test.js | 新增 | metrics 模块测试 |
+| src/engine/__tests__/coach.test.js | 新增 | coach 模块测试 |
+| src/engine/__tests__/insights.test.js | 新增 | insights 模块测试 |
+
+### 验证命令
+
+```bash
+npm install
+npm run build
+npm test
+npm run test:coverage
+```
+
+### 验证结果
+
+| 命令 | 状态 | 说明 |
+|------|------|------|
+| npm install | ✅ 通过 | 新增 vitest 和 jsdom 依赖 |
+| npm run build | ✅ 通过 | 构建产物正常生成 |
+| npm test | ✅ 通过 | 56 个测试全部通过 |
+| npm run test:coverage | ✅ 可用 | 可生成覆盖率报告 |
+
+### 已知风险
+
+1. **测试覆盖范围有限**
+   - 当前仅覆盖 engine 模块的纯函数
+   - UI 组件、异步逻辑、Hooks 未纳入测试范围
+   - 后续可逐步扩展
+
+2. **Vitest 配置**
+   - 使用 jsdom 环境以支持 React 相关测试
+   - 测试文件路径硬编码为 src/engine/__tests__/**/*.test.js
+   - 如需扩展测试目录，需更新配置
+
+### 建议人工检查点
+
+1. **构建验证**
+   - [ ] npm run build 在干净环境中能正常完成
+   - [ ] dist 目录包含正确的构建产物
+
+2. **测试验证**
+   - [ ] npm test 能正常运行
+   - [ ] 新增测试用例理解正确
+
+3. **代码质量**
+   - [ ] 测试用例覆盖核心路径
+   - [ ] 测试命名清晰，便于理解
+   - [ ] 测试文件位置符合项目规范
+
+---
+
 ## 2026-05-07 - 自动化迭代基线初始化
 
 ### 完成工作
