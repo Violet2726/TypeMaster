@@ -195,6 +195,8 @@ npm run build    # Build the frontend into dist/
 npm run preview  # Preview the build with Vite
 npm run serve    # Serve dist/ and expose /api/chat via server.js
 npm start        # Build first, then serve
+npm test         # Run unit tests
+npm run test:coverage  # Run unit tests with coverage report
 ```
 
 ## Data And State Contracts
@@ -235,7 +237,7 @@ Both follow the same payload whitelist so the frontend only forwards safe fields
 - No account system yet
 - No cross-device sync yet
 - `challenge / sync` are still frontend contract stubs
-- No automated test suite yet
+- Automated test suite is in early stages, currently covering only the engine core modules
 - `package.json` still reports version `2.0.0`, even though the app flow has already moved to the refreshed experience
 
 ## Suggested Reading Order

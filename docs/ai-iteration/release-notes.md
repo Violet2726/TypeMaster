@@ -1,4 +1,55 @@
-# 版本发布记录
+# 版本发布记录---
+
+## 版本 2.0.1
+
+### 发布日期
+2026-05-08
+
+### 变更类型
+test
+
+### 用户可见变化
+无直接用户可见变化。本次更新建立了 engine 核心模块的自动化测试基线，为后续迭代提供质量保障，避免修改 engine 时引入回归 bug。
+
+### 技术变化
+
+**测试基础设施**
+- 引入 Vitest ^2.1.0 测试框架
+- 添加 jsdom ^29.1.1 用于 React 测试环境
+- 新增 `vitest.config.js` 配置文件
+
+**新增测试文件**
+- `src/engine/__tests__/metrics.test.js` - metrics 模块 28 个测试用例
+- `src/engine/__tests__/coach.test.js` - coach 模块 11 个测试用例
+- `src/engine/__tests__/insights.test.js` - insights 模块 17 个测试用例
+
+**测试覆盖范围**
+| 模块 | 测试函数 |
+|------|----------|
+| metrics.js | calculateMetrics, calculateConsistency, collectErrorBreakdown, deriveComparison |
+| coach.js | buildLocalCoachAdvice |
+| insights.js | buildInsights |
+
+**package.json 更新**
+- 新增脚本：`npm run test` (vitest run)
+- 新增脚本：`npm run test:coverage` (vitest run --coverage)
+- devDependencies 添加：vitest, jsdom
+
+### 验证结果
+
+| 命令 | 状态 | 说明 |
+|------|------|------|
+| npm install | ✅ 通过 | 成功安装 vitest 和 jsdom |
+| npm run build | ✅ 通过 | 构建产物正常生成 |
+| npm test | ✅ 通过 | 56 个测试全部通过 |
+| npm run test:coverage | ✅ 可用 | 可生成覆盖率报告 |
+
+### 已知问题
+- 当前仅覆盖 engine 模块的纯函数
+- UI 组件、异步逻辑 (services/ai-service.js)、Hooks 未纳入测试范围
+- 后续可逐步扩展测试覆盖范围
+
+---
 
 ## 版本 2.0.0
 
