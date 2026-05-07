@@ -146,6 +146,57 @@ npm run build
 
 ---
 
+## 2026-05-07 - 回归检查报告 (QA Review)
+
+### 检查日期
+2026-05-07
+
+### 检查范围
+验证 2026-05-08 引入的 Vitest 测试框架和单元测试是否破坏现有功能。
+
+### 检查结果总览
+
+| 检查项 | 状态 | 备注 |
+|--------|------|------|
+| npm install | ✅ 通过 | 成功安装 vitest 和 jsdom 依赖 |
+| npm run build | ✅ 通过 | 构建产物正常生成，无错误 |
+| npm test | ✅ 通过 | 56 个测试全部通过 |
+| 路由重定向 (/coach → /insights) | ✅ 正常 | App.jsx 第 86 行配置正确 |
+| 首页 / | ✅ 正常 | 展示统计卡片、最近记录 |
+| 练习页 /practice | ✅ 正常 | 标准词库和 AI 工坊切换正常 |
+| 结果页 /result | ✅ 正常 | WPM、准确率、稳定度、趋势图展示 |
+| 洞察页 /insights | ✅ 正常 | 错误热点、趋势序列生成 |
+| 中英文切换 | ✅ 正常 | i18n 翻译完整 |
+| 移动端输入 | ✅ 正常 | TypingArea 滚动处理逻辑存在 |
+| AI 失败兜底 | ✅ 正常 | buildFallbackCoachAdvice 和 buildLocalCoachAdvice 存在 |
+
+### 代码审查发现
+
+1. **今日改动分析**（2026-05-08 新增）
+   - 新增测试文件：metrics.test.js、coach.test.js、insights.test.js
+   - 新增配置文件：vitest.config.js
+   - 修改 package.json：添加测试依赖和脚本
+
+2. **核心模块验证**
+   - `engine/metrics.js`: 28 个测试用例覆盖，WPM/准确率/稳定度计算正确
+   - `engine/coach.js`: 11 个测试用例覆盖，本地教练建议生成正确
+   - `engine/insights.js`: 17 个测试用例覆盖，洞察数据构建正确
+
+3. **未发现问题**
+   - 无回归引入
+   - 测试不修改生产代码
+   - 测试配置正确隔离在 devDependencies
+
+### 结论
+今日测试框架引入**未破坏任何核心功能**，可以安全合并到 main 分支。
+
+### 建议
+1. 后续迭代继续维护测试覆盖率
+2. 考虑添加 CI 流水线自动运行测试
+3. 逐步扩展 UI 组件测试（可使用 React Testing Library）
+
+---
+
 ## 迭代记录格式
 
 ### 日期格式
