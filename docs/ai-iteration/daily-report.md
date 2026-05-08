@@ -1,6 +1,65 @@
 # 每日迭代记录
 
-## 2026-05-08 - Engine 核心模块单元测试基线
+## 2026-05-08（下午） - CI/CD 流水线建立
+
+### 实现内容
+
+1. **GitHub Actions CI 配置**
+   - 创建 `.github/workflows/ci.yml` 配置文件
+   - 触发条件：push 到 main 分支 + pull request 合并到 main
+   - Pipeline 步骤：npm ci → npm run build → npm test
+   - Node.js 版本：18.x（与 package.json engines 一致）
+   - timeout-minutes: 10（防止超时挂起）
+
+### 修改文件
+
+| 文件 | 操作 | 说明 |
+|------|------|------|
+| .github/workflows/ci.yml | 新增 | GitHub Actions CI 配置文件 |
+
+### 验证命令
+
+```bash
+npm install
+npm run build
+npm test
+```
+
+### 验证结果
+
+| 命令 | 状态 | 说明 |
+|------|------|------|
+| npm install | ✅ 通过 | 安装 180 个包 |
+| npm run build | ✅ 通过 | 构建产物正常生成 (index.html + css + js) |
+| npm test | ✅ 通过 | 56 个测试全部通过 |
+
+### 技术决策
+
+1. **仅引入 CI，不引入 CD**
+   - 初始版本保持手动部署，降低变更风险
+   - 后续可按需添加自动部署步骤
+
+2. **使用 npm ci 而非 npm install**
+   - 基于 package-lock.json 安装确定性依赖
+   - 避免因 package.json 变化导致的不一致
+
+### 已知风险
+
+1. **本地验证局限**
+   - GitHub Actions workflow 语法需在 GitHub 上实际运行才能完全验证
+   - 当前已在本地通过构建和测试验证逻辑正确性
+
+2. **action 版本**
+   - 使用 actions/checkout@v4 和 actions/setup-node@v4（major 版本）
+   - 后续应关注官方更新，及时升级到最新 stable 版本
+
+### 与 backlog 关联
+
+- 更新 backlog.md：CI/CD 流水线从"待规划"状态更新为"今日完成"
+
+---
+
+## 2026-05-08（上午） - Engine 核心模块单元测试基线
 
 ### 实现内容
 

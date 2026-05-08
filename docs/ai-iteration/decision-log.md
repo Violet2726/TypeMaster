@@ -80,6 +80,37 @@
 
 **负责人**: AI 迭代工程师
 
+**状态**: 已完成
+
+---
+
+### 2026-05-08 - CI/CD 流水线选型决策
+
+**决策类型**: 技术/流程
+
+**决策内容**:
+1. 引入 GitHub Actions 作为 CI/CD 流水线工具
+2. 创建 `.github/workflows/ci.yml` 配置文件
+3. 触发条件：push 到 main 分支 + pull request 合并到 main
+4. Pipeline 步骤：npm ci → npm run build → npm test
+5. Node.js 版本使用 18.x（与 package.json engines 一致）
+6. 初始版本不包含部署步骤，保持手动部署
+
+**决策理由**:
+- GitHub Actions 与 GitHub 仓库原生集成，无需额外配置第三方服务
+- 与 2026-05-08 建立的 Vitest 测试基线配套，形成完整自动化验证
+- 简洁配置确保低维护成本，初始版本聚焦构建和测试验证
+- 避免过早引入部署自动化，降低变更风险
+
+**验证结果**:
+- npm install: ✅ 通过
+- npm run build: ✅ 通过
+- npm test: ✅ 56 tests passed
+
+**负责人**: AI 迭代工程师
+
+**状态**: 生效中
+
 ---
 
 ## 决策格式说明
