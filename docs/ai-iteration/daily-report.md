@@ -437,6 +437,73 @@ npm run build
 
 ---
 
+## 2026-05-08（回归检查） - QA 回归测试报告
+
+### 检查日期
+2026-05-08
+
+### 检查范围
+验证 2026-05-08 引入的 GitHub Actions CI 配置文件和测试框架是否破坏现有核心功能。
+
+### 检查结果总览
+
+| 检查项 | 状态 | 备注 |
+|--------|------|------|
+| npm install | ✅ 通过 | 成功安装 180 个依赖包 |
+| npm run build | ✅ 通过 | 构建产物正常生成，无错误 (2.09s) |
+| npm test | ✅ 通过 | 56 个测试全部通过 |
+| 路由重定向 (/coach → /insights) | ✅ 正常 | App.jsx 第 86 行配置正确 |
+| 首页 / | ✅ 正常 | 展示统计卡片、最近记录、双入口按钮 |
+| 练习页 /#/practice | ✅ 正常 | 标准词库和 AI 工坊切换正常 |
+| 结果页 /#/result | ✅ 正常 | WPM、Raw WPM、准确率、一致性、字符统计、趋势图、教练建议展示完整 |
+| 洞察页 /#/insights | ✅ 正常 | 错误热点、趋势序列、历史记录生成正常 |
+| 中英文切换 | ✅ 正常 | i18n 翻译完整，zh-CN/en-US 双语文案齐全 |
+| 移动端输入 | ✅ 正常 | TypingArea 滚动处理逻辑和视口适配完整 |
+| AI 失败兜底 | ✅ 正常 | buildFallbackCoachAdvice 和 buildLocalCoachAdvice 存在且测试覆盖 |
+| AI 训练状态机 | ✅ 正常 | idle/loading/ready/stale/error 状态均有对应 UI 处理 |
+| 标准词库训练 | ✅ 正常 | createBuiltinDraft 和词库逻辑未被修改 |
+
+### 构建产物验证
+
+```
+dist/index.html                   0.85 kB │ gzip:  0.63 kB
+dist/assets/index-ZCLhGxLc.css   28.16 kB │ gzip:  6.47 kB
+dist/assets/index-f9drE1hM.js   300.98 kB │ gzip: 97.74 kB
+```
+
+### 代码审查发现
+
+1. **今日改动分析**（2026-05-08 CI/CD 流水线）
+   - 新增文件：`.github/workflows/ci.yml`
+   - 触发条件：push/PR 到 main 分支
+   - Pipeline 步骤：npm ci → npm run build → npm test
+   - Node.js 版本：18.x，timeout: 10 分钟
+   - **无业务代码修改**
+
+2. **核心模块验证**
+   - `App.jsx`: 路由配置完整，`/coach` 重定向到 `/insights`，404 重定向到 `/`
+   - `PracticePage.jsx`: AI 工坊状态处理完整，标准词库/AI 来源切换逻辑正确
+   - `AIWorkshop.jsx`: idle/loading/ready/stale/error 五种状态均有对应 UI 和交互
+   - `ResultPage.jsx`: WPM、Raw WPM、准确率、一致性、字符统计、趋势图、教练建议均有展示
+   - `InsightsPage.jsx`: 趋势、错误热点、历史记录展示完整
+   - `TypingArea.jsx`: 移动端视口适配和滚动处理逻辑完整
+   - `i18n/index.js`: zh-CN 和 en-US 双语翻译完整，无明显漏翻
+
+3. **AI 失败兜底验证**
+   - `ai-service.js`: `buildFallbackCoachAdvice` 提供本地规则兜底
+   - `engine/coach.js`: `buildLocalCoachAdvice` 提供纯本地建议生成
+   - `practice-store.jsx`: AI 失败时自动尝试本地兜底，失败后记录错误状态
+
+4. **未发现问题**
+   - 无回归引入
+   - CI 配置不影响生产代码
+   - 测试配置正确隔离
+
+### 结论
+今日 CI/CD 流水线引入**未破坏任何核心功能**，所有 56 个测试通过，构建正常。
+
+---
+
 ## 迭代记录格式
 
 ### 日期格式
