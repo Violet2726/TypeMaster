@@ -1,4 +1,44 @@
-# 版本发布记录---
+# 版本发布记录
+
+---
+
+## 版本 2.0.2
+
+### 发布日期
+2026-05-08
+
+### 变更类型
+devops
+
+### 用户可见变化
+无直接用户可见变化。本次更新建立了自动化 CI/CD 流水线，代码提交后将自动运行构建和测试验证，提升代码质量和迭代信心。
+
+### 技术变化
+
+**GitHub Actions CI 流水线**
+- 新增 `.github/workflows/ci.yml` GitHub Actions 配置文件
+- 触发条件：push 到 main 分支 + pull request 合并到 main
+- Pipeline 步骤：npm ci → npm run build → npm test
+- Node.js 版本：18.x（与 package.json engines 一致）
+- timeout-minutes：10（防止超时挂起）
+
+**技术决策**
+- 仅引入 CI，不引入 CD（保持手动部署）
+- 使用 `npm ci` 而非 `npm install`，基于 package-lock.json 确保依赖安装确定性
+
+### 验证结果
+
+| 命令 | 状态 | 说明 |
+|------|------|------|
+| npm install | ✅ 通过 | 安装 180 个包 |
+| npm run build | ✅ 通过 | 构建产物正常生成 (index.html + css + js) |
+| npm test | ✅ 通过 | 56 个测试全部通过 |
+
+### 已知问题
+- GitHub Actions workflow 语法需在 GitHub 上实际运行才能完全验证
+- action 版本使用 major 版本号（actions/checkout@v4、actions/setup-node@v4），后续应关注官方更新
+
+---
 
 ## 版本 2.0.1
 
