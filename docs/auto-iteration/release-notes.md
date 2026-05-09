@@ -2,7 +2,41 @@
 
 ---
 
-## 版本 2.0.3（待发布）
+## 2026-05-09
+
+### 今日主线
+为 `useTypingSession` 核心 Hook 建立自动化测试基线（目标 20-30 个测试用例覆盖核心时序逻辑）。
+
+### 合并分支
+main（当前代码已在 main）
+
+### 用户可见变化
+无直接用户可见变化。本次更新建立了 useTypingSession 的自动化测试基线，为未来更安全的代码迭代奠定基础。
+
+### 工程变化
+- 新增 `src/engine/session-machine.js` - 抽取 useTypingSession 中的纯函数逻辑
+- 新增 `src/engine/__tests__/session-machine.test.js` - 61 个测试用例
+- 修改 `src/hooks/useTypingSession.jsx` - 使用抽取的纯函数
+- 修改 `src/engine/index.js` - 导出新模块
+- 修改 `vitest.config.js` - 扩展测试文件匹配
+
+### 删除的旧逻辑
+无
+
+### 验证结果
+- npm install: ✅ 通过（180 packages）
+- npm run build: ✅ 通过（2.41s）
+- npm test: ✅ 通过（117 tests, 4 files）
+
+### 已知遗留
+无
+
+### main commit
+c53a79f fix(auto): resolve quality gate failures and clean obsolete logic
+
+---
+
+## 版本 2.0.3
 
 ### 发布日期
 待定
