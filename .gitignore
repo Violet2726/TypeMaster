@@ -9,6 +9,7 @@ dist
 
 docs/*
 !docs/ai-iteration/
+!docs/auto-iteration/
 .history
 
 
