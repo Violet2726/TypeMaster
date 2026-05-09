@@ -109,7 +109,7 @@
 **验证结果**:
 - npm install: ✅ 通过
 - npm run build: ✅ 通过
-- npm test: ✅ 56 tests passed
+- npm test: ✅ 56 tests passed (after 2026-05-09 jsdom→node fix)
 
 **负责人**: AI 迭代工程师
 

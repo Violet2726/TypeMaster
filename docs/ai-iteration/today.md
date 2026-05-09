@@ -28,9 +28,9 @@ PR #9 触发 CI 时 `npm test` 失败，所有 56 个测试无法运行。错误
 - 不添加新测试
 
 ### 验收标准
-- [ ] `vitest.config.js` 中环境改为 `node`
-- [ ] `npm test` 全部 56 个测试通过
-- [ ] `npm run build` 通过
+- [x] `vitest.config.js` 中环境改为 `node`
+- [x] `npm test` 全部 56 个测试通过
+- [x] `npm run build` 通过
 
 ### 测试/构建命令
 ```bash
@@ -48,6 +48,11 @@ npm test
 ### 回滚方式
 1. 将 `vitest.config.js` 中 `environment: 'node'` 改回 `'jsdom'`
 2. 降级 jsdom 到兼容版本（如 v24.x）
+
+### 完成结果
+- ✅ npm install 通过
+- ✅ npm run build 通过（1.01s）
+- ✅ npm test 通过（56 tests, 3 files）
 
 ---
 
