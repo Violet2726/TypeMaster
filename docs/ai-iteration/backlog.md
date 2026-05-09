@@ -69,9 +69,14 @@
   - **描述**: Service Worker、离线缓存、manifest
 
 ### P1 - 中优先级
+- [x] 修复 CI 测试失败：jsdom ESM 兼容性问题
+  - **类型**: bug
+  - **状态**: 今日完成 (2026-05-09)
+  - **描述**: jsdom v29.1.1 在 Node 18 CJS 环境下与 @exodus/bytes 不兼容，将 vitest 测试环境从 jsdom 改为 node
+
 - [ ] Hooks 测试覆盖：useTypingSession 单元测试
   - **类型**: test
-  - **状态**: 今日执行 (2026-05-09)
+  - **状态**: 待规划
   - **描述**: useTypingSession 是打字训练核心时序逻辑，负责会话状态、计时、指标计算
 
 - [ ] 代码覆盖率监控

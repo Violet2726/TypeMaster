@@ -63,7 +63,7 @@
 
 **决策内容**:
 1. 引入 Vitest ^2.1.0 作为测试框架（替代 2026-05-07 决策中"不引入测试框架"的决定）
-2. 使用 jsdom ^29.1.1 提供 React 测试环境
+2. 使用 node 环境作为 engine 模块的纯函数测试环境
 3. 测试文件统一放置在 `src/engine/__tests__/` 目录
 4. 测试配置通过 `vitest.config.js` 管理
 
@@ -71,7 +71,11 @@
 - 项目已进入需要质量保障的阶段，engine 模块的纯函数适合建立测试基线
 - Vitest 与 Vite 生态一致，配置简洁，性能优异
 - 56 个测试用例覆盖 metrics、coach、insights 三个核心模块
-- jsdom 环境可支持未来 React 组件测试扩展
+- node 环境无需 DOM，避免 ESM/CJS 兼容性问题
+
+**历史变更**:
+- 2026-05-08 原始决策使用 jsdom ^29.1.1
+- 2026-05-09 修正为 node 环境（jsdom v29.1.1 在 Node 18 CJS 环境下存在 @exodus/bytes ESM 兼容性 bug）
 
 **覆盖范围**:
 - metrics.js: calculateMetrics, calculateConsistency, collectErrorBreakdown, deriveComparison (28 tests)
@@ -80,7 +84,7 @@
 
 **负责人**: AI 迭代工程师
 
-**状态**: 已完成
+**状态**: 生效中
 
 ---
 

@@ -1,5 +1,49 @@
 # 每日迭代记录
 
+## 2026-05-09 - 修复 CI 测试失败（jsdom ESM 兼容性问题）
+
+### 日期
+2026-05-09
+
+### 问题描述
+PR #9 触发 CI 时 `npm test` 失败。`jsdom ^29.1.1` 依赖的 `@exodus/bytes/encoding-lite.js` 是 ESM 模块，但 `html-encoding-sniffer` 在 CJS 环境下 `require()` 它，导致 `ERR_REQUIRE_ESM` 错误。
+
+### 修复方案
+将 `vitest.config.js` 中 `environment: 'jsdom'` 改为 `environment: 'node'`。
+
+**理由**：engine 模块的 56 个测试都是纯 JS 逻辑，完全不涉及 DOM。使用 jsdom 是 2026-05-08 决策中的冗余选择。
+
+### 修改文件
+
+| 文件 | 操作 | 说明 |
+|------|------|------|
+| vitest.config.js | 修改 | `environment: 'jsdom'` → `environment: 'node'` |
+| docs/ai-iteration/today.md | 修改 | 更新今日任务规划 |
+| docs/ai-iteration/backlog.md | 修改 | 标记修复完成 |
+| docs/ai-iteration/decision-log.md | 修改 | 更新测试框架选型决策 |
+
+### 验证命令
+
+```bash
+npm install
+npm run build
+npm test
+```
+
+### 验证结果
+
+| 命令 | 状态 | 输出 |
+|------|------|------|
+| npm install | ✅ 通过 | 180 packages |
+| npm run build | ✅ 通过 | 3 chunks, 1.22s |
+| npm test | ✅ 通过 | 56 tests, 3 passed |
+
+### 与 backlog 关联
+- backlog.md 中新增 P1 bug 项：修复 CI 测试失败（已标记完成）
+- decision-log.md 中修正 2026-05-08 测试框架选型决策：jsdom → node
+
+---
+
 ## 2026-05-08（下午）- 代码复核报告
 
 ### 复核日期
