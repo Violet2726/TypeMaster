@@ -89,6 +89,23 @@ typemaster/
 - `aiPracticeStatus = idle | loading | ready | stale | error`
 - `coachStatus = idle | loading | success | fallback | error`
 
+## 测试体系
+
+### Engine 模块测试
+- 位置: `src/engine/__tests__/`
+- 环境: Vitest node 环境
+- 覆盖: metrics.js, coach.js, insights.js
+- 测试数: 56 个
+
+### Hooks 测试策略
+- 原则: 抽取纯函数到 `src/engine/` 进行测试
+- Hook 本身负责 React 生命周期和状态编排
+- 不直接在 hooks 目录写测试，而是提取可测试的纯逻辑
+
+### Services 测试策略
+- storage.js: 可在 node 环境测试 JSON parse/stringify 和边界情况
+- ai-service.js: mock fetch 或测试错误归类逻辑
+
 ## localStorage 约定
 
 - `settings`: 主题、字号、专注模式、语言
