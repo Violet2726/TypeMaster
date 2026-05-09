@@ -37,6 +37,7 @@ typemaster/
 │  │  ├─ metrics.js            # 统计指标计算
 │  │  ├─ coach.js              # 教练建议逻辑
 │  │  ├─ insights.js           # 成长洞察计算
+│  │  ├─ session-machine.js    # 打字状态机纯函数
 │  │  └─ __tests__/            # 单元测试
 │  ├─ hooks/                     # React Hooks
 │  ├─ i18n/                      # 国际化
@@ -60,6 +61,7 @@ typemaster/
 - `metrics.js`: WPM、准确率、稳定度计算
 - `coach.js`: 教练建议生成（本地规则 + AI）
 - `insights.js`: 成长洞察数据聚合
+- `session-machine.js`: 打字状态机纯函数（状态转换、计时、输入处理）
 
 ### Services 模块
 - `ai-service.js`: AI API 调用，包含兜底逻辑
@@ -94,13 +96,14 @@ typemaster/
 ### Engine 模块测试
 - 位置: `src/engine/__tests__/`
 - 环境: Vitest node 环境
-- 覆盖: metrics.js, coach.js, insights.js
-- 测试数: 56 个
+- 覆盖: metrics.js, coach.js, insights.js, session-machine.js
+- 测试数: 117 个
 
 ### Hooks 测试策略
 - 原则: 抽取纯函数到 `src/engine/` 进行测试
 - Hook 本身负责 React 生命周期和状态编排
 - 不直接在 hooks 目录写测试，而是提取可测试的纯逻辑
+- `useTypingSession`: 核心逻辑已抽取到 `session-machine.js` 进行测试（61 个测试用例）
 
 ### Services 测试策略
 - storage.js: 可在 node 环境测试 JSON parse/stringify 和边界情况

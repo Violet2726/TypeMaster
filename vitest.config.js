@@ -6,6 +6,6 @@ export default defineConfig({
     test: {
         globals: true,
         environment: 'node',
-        include: ['src/engine/__tests__/**/*.test.js']
+        include: ['src/engine/__tests__/**/*.test.js', 'src/hooks/__tests__/**/*.test.jsx']
     }
 });

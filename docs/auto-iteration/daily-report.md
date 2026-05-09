@@ -1,58 +1,76 @@
 # 每日迭代记录
 
-## 2026-05-09 - 自治状态巡检
+## 2026-05-09 - useTypingSession 测试基线建立
 
 ### 日期
 2026-05-09
 
-### 巡检类型
-每日无人值守状态巡检
+### 迭代类型
+功能迭代 - 为 useTypingSession Hook 建立自动化测试基线
 
 ### main 分支状态
 - **commit**: 9ff624bf30de6ba87d75dd5de86def22cbca8807
 - **状态**: 稳定
-- **上次成功合并**: PR #8 - tra e/solo-agent-31yuJ4（jsdom→node 修复）
 
-### 未提交改动
-无
+### 完成内容
+
+#### 新增文件
+- `src/engine/session-machine.js` - 抽取 useTypingSession 中的纯函数逻辑
+- `src/engine/__tests__/session-machine.test.js` - 61 个测试用例
+
+#### 修改文件
+- `src/engine/index.js` - 导出新模块
+- `src/hooks/useTypingSession.jsx` - 使用抽取的纯函数
+- `vitest.config.js` - 扩展测试文件匹配
+
+### 测试覆盖
+| 模块 | 测试数 | 新增 |
+|------|--------|------|
+| session-machine | 61 | +61 |
+| metrics | 28 | 0 |
+| insights | 17 | 0 |
+| coach | 11 | 0 |
+| **总计** | **117** | **+61** |
 
 ### 质量门禁验证
 
 | 门禁 | 状态 | 结果 |
 |------|------|------|
 | npm install | ✅ 通过 | 180 packages |
-| npm run build | ✅ 通过 | 2.04s |
-| npm test | ✅ 通过 | 56 tests, 3 files |
+| npm run build | ✅ 通过 | 2.12s |
+| npm test | ✅ 通过 | 117 tests, 4 files |
 
-### 创建/更新的自治文档
-- `docs/auto-iteration/state.md` - 自治状态
-- `docs/auto-iteration/today.md` - 今日上下文
-- `docs/auto-iteration/architecture.md` - 架构说明
-- `docs/auto-iteration/quality-gate.md` - 质量门禁
-- `docs/auto-iteration/decision-log.md` - 决策记录
-- `docs/auto-iteration/daily-report.md` - 本文件
-- `docs/auto-iteration/backlog.md` - 需求池
-- `docs/auto-iteration/release-notes.md` - 发布记录
-- `docs/auto-iteration/refactor-debt.md` - 技术债
-- `docs/auto-iteration/failure-log.md` - 失败日志
+### 测试覆盖范围
+- ✅ 状态机转换（idle/running/paused/complete）
+- ✅ 指标计算（WPM、准确率）
+- ✅ 边界情况（空输入、单字符词）
+- ✅ 暂停/恢复逻辑
+- ✅ Backspace 处理
+- ✅ 计时器显示计算
+- ✅ 状态转换验证
+
+### 架构改进
+- 将 useTypingSession 中的纯函数逻辑抽取到 engine 模块
+- 保持 node 测试环境一致性
+- 为未来重构奠定测试基础
 
 ### 状态判断
 
-根据状态机规则：
-- ✅ 昨日无未合并分支
-- ✅ 昨日无失败改动（jsdom→node 修复已成功）
-- ✅ main 当前构建成功
-- ✅ main 稳定
+根据质量门禁规则：
+- ✅ 所有门禁通过
+- ✅ 新增测试覆盖核心逻辑
+- ✅ 构建成功
+- ✅ 无回归测试失败
 
-**结论**: main 分支稳定，所有质量门禁通过。等待 04:30 深度规划任务从 backlog 中选取下一个迭代目标。
+**结论**: 任务完成，分支已准备好合并到 main。
 
 ### 建议路径
 1. 性能优化：减少首屏加载时间（P0）
-2. Hooks 测试覆盖：useTypingSession 单元测试（P0）
+2. 代码覆盖率监控集成（P0）
 3. 移动端输入体验优化（P1）
 
-### 巡检时间
-2026-05-09 04:08 UTC
+### 完成时间
+2026-05-09 06:57 UTC
 
 ---
 

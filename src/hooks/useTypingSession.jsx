@@ -1,18 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { calculateMetrics, createTimelinePoint } from '../engine';
-
-function createEmptyTimeline() {
-    return {
-        samples: [],
-        labels: [],
-        wpm: [],
-        raw: [],
-        accuracy: [],
-        burst: [],
-        errors: [],
-        pauseMoments: []
-    };
-}
+import { calculateMetrics, createTimelinePoint, createEmptyTimeline, computeElapsedMs, commitWord, handleBackspace, calculatePauseSecond, shouldAddPauseMoment, computePausedDuration, computeTimerDisplay } from '../engine';
 
 export function useTypingSession({ draft, config, onComplete }) {
     const words = draft?.words || [];
@@ -66,19 +53,7 @@ export function useTypingSession({ draft, config, onComplete }) {
         resetSession();
     }, [draft?.id, resetSession]);
 
-    const elapsedMs = useMemo(() => {
-        if (!startedAt) {
-            return 0;
-        }
-
-        const endReference = status === 'complete'
-            ? completedAt || nowMs
-            : status === 'paused'
-                ? pausedAt || nowMs
-                : nowMs;
-
-        return Math.max(0, endReference - startedAt - pausedDurationMs);
-    }, [completedAt, nowMs, pausedAt, pausedDurationMs, startedAt, status]);
+    const elapsedMs = useMemo(() => computeElapsedMs(startedAt, completedAt, pausedAt, pausedDurationMs, status, nowMs), [completedAt, nowMs, pausedAt, pausedDurationMs, startedAt, status]);
 
     const liveMetrics = useMemo(() => calculateMetrics({
         words,
@@ -192,26 +167,21 @@ export function useTypingSession({ draft, config, onComplete }) {
     ]);
 
     const commitCurrentWord = useCallback((inputOverride = currentInput) => {
-        if (!inputOverride || currentWordIndex >= words.length) {
+        const result = commitWord(inputOverride, currentWordIndex, words, typedHistory);
+        if (!result) {
             return null;
         }
 
-        const nextHistory = [...typedHistory, inputOverride];
-        const nextWordIndex = currentWordIndex + 1;
-
-        setTypedHistory(nextHistory);
-        setCurrentWordIndex(nextWordIndex);
+        setTypedHistory(result.nextHistory);
+        setCurrentWordIndex(result.nextWordIndex);
         setCurrentInput('');
 
         if (inputRef.current) {
             inputRef.current.value = '';
         }
 
-        return {
-            nextHistory,
-            nextWordIndex
-        };
-    }, [currentInput, currentWordIndex, typedHistory, words.length]);
+        return result;
+    }, [currentInput, currentWordIndex, typedHistory, words]);
 
     const startSession = useCallback(() => {
         if (status !== 'idle') {
@@ -234,12 +204,12 @@ export function useTypingSession({ draft, config, onComplete }) {
         }
 
         const pauseTime = Date.now();
-        const pauseSecond = Math.max(0, Math.floor((pauseTime - (startedAt || pauseTime) - pausedDurationMs) / 1000));
+        const pauseSecond = calculatePauseSecond(startedAt, pauseTime, pausedDurationMs);
         setTimeline((previous) => ({
             ...previous,
-            pauseMoments: previous.pauseMoments.includes(pauseSecond)
-                ? previous.pauseMoments
-                : [...previous.pauseMoments, pauseSecond]
+            pauseMoments: shouldAddPauseMoment(previous.pauseMoments, pauseSecond)
+                ? [...previous.pauseMoments, pauseSecond]
+                : previous.pauseMoments
         }));
         setPausedAt(pauseTime);
         setStatus('paused');
@@ -251,7 +221,7 @@ export function useTypingSession({ draft, config, onComplete }) {
         }
 
         const resumedAt = Date.now();
-        setPausedDurationMs((previous) => previous + (resumedAt - (pausedAt || resumedAt)));
+        setPausedDurationMs((previous) => computePausedDuration(previous, pausedAt, resumedAt));
         setPausedAt(null);
         setStatus('running');
         setNowMs(resumedAt);
@@ -419,14 +389,16 @@ export function useTypingSession({ draft, config, onComplete }) {
             return;
         }
 
-        if (event.key === 'Backspace' && currentInput.length === 0 && currentWordIndex > 0) {
+        if (event.key === 'Backspace' && currentInput.length === 0) {
             event.preventDefault();
-            const previousWord = typedHistory[typedHistory.length - 1] || '';
-            setTypedHistory((previous) => previous.slice(0, -1));
-            setCurrentWordIndex((previous) => Math.max(0, previous - 1));
-            setCurrentInput(previousWord);
-            if (inputRef.current) {
-                inputRef.current.value = previousWord;
+            const backspaceResult = handleBackspace(currentWordIndex, typedHistory);
+            if (backspaceResult) {
+                setTypedHistory(backspaceResult.newHistory);
+                setCurrentWordIndex(backspaceResult.newWordIndex);
+                setCurrentInput(backspaceResult.restoredInput);
+                if (inputRef.current) {
+                    inputRef.current.value = backspaceResult.restoredInput;
+                }
             }
             return;
         }
@@ -479,9 +451,7 @@ export function useTypingSession({ draft, config, onComplete }) {
         pauseSession();
     }, [pauseSession]);
 
-    const timerDisplay = config.mode === 'time'
-        ? Math.max(0, Math.ceil(((config.durationSeconds * 1000) - elapsedMs) / 1000))
-        : Math.max(0, Math.floor(elapsedMs / 1000));
+    const timerDisplay = computeTimerDisplay(config, elapsedMs);
 
     return {
         inputRef,

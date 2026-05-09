@@ -11,3 +11,4 @@ export * from './rendering';
 export * from './metrics';
 export * from './coach';
 export * from './insights';
+export * from './session-machine';

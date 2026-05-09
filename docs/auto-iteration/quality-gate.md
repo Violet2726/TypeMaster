@@ -72,3 +72,23 @@ npm run lint
 | npm run build | ✅ PASSED | 2026-05-09 |
 | npm test | ✅ PASSED | 2026-05-09 |
 | npm install | ✅ PASSED | 2026-05-09 |
+
+## 测试统计
+
+| 模块 | 测试数 |
+|------|--------|
+| session-machine | 61 |
+| metrics | 28 |
+| insights | 17 |
+| coach | 11 |
+| **总计** | **117** |
+
+## 门禁历史
+
+| 日期 | 状态 | 说明 |
+|------|------|------|
+| 2026-05-09 | PASSED | useTypingSession 测试基线建立（117 tests） |
+| 2026-05-09 | PASSED | jsdom→node 修复验证 |
+| 2026-05-08 | PASSED | CI/CD 流水线验证 |
+| 2026-05-08 | PASSED | Vitest 测试基线（56 tests） |
+| 2026-05-07 | PASSED | 自动化迭代基线初始化 |
