@@ -6,44 +6,44 @@
 |------|-----|
 | date | 2026-05-09 |
 | main_commit | 9ff624bf30de6ba87d75dd5de86def22cbca8807 |
-| current_phase | DAILY_INSPECTION |
+| current_phase | PLANNED |
 | last_successful_main_commit | 9ff624bf30de6ba87d75dd5de86def22cbca8807 |
 | active_branch | main |
-| current_iteration_goal | Daily inspection - waiting for 04:30 deep planning task |
-| quality_gate_status | PASSED |
-| merge_status | CLEAN |
+| current_iteration_goal | 为 useTypingSession Hook 建立自动化测试基线 |
+| quality_gate_status | PENDING |
+| merge_status | PENDING |
 | rollback_required | false |
 | unresolved_failures | none |
-| next_action | IDLE - main stable, await 04:30 planning task |
+| next_action | SUBMIT_PLAN_AND_WAIT_FOR_IMPLEMENTATION |
 
 ---
 
 ## 状态说明
 
-### current_phase: DAILY_INSPECTION
-每日无人值守巡检任务：
-1. 同步仓库状态 - git fetch / pull
-2. 检查未提交改动 - 无
-3. 创建/更新自治工作目录 - docs/auto-iteration/
-4. 读取项目核心文件
-5. 进行自治状态判断
-6. 运行基础检查（npm install / build / test）
-7. 更新巡检报告
-8. 提交巡检文档
+### current_phase: PLANNED
+今日主线规划完成，等待提交到 main：
+1. 同步仓库状态 - ✅ 完成
+2. 分析问题并选择今日主线 - ✅ 完成
+3. 生成今日计划文档 - ✅ 完成
+4. 更新架构文档 - ✅ 完成
+5. 更新状态文件 - ✅ 完成
+6. 提交规划文档 - ⏳ 待执行
+
+### today.md 今日主线
+为 `useTypingSession` 核心 Hook 建立自动化测试基线（目标 20-30 个测试用例覆盖核心时序逻辑）。
 
 ### last_successful_main_commit: 9ff624bf
 - PR #8: tra e/solo-agent-31yuJ4
 - 包含 2026-05-09 的 jsdom→node 修复
 
-### quality_gate_status: PASSED
-- npm install: ✅ 180 packages
-- npm run build: ✅ 2.04s
-- npm test: ✅ 56 tests passed (3 files)
+### quality_gate_status: PENDING
+待实现后验证：
+- npm install: 待验证
+- npm run build: 待验证
+- npm test: 待验证（预计 56+20=76+ 测试）
 
-### merge_status: CLEAN
-- 无未提交改动
-- 无未合并分支
-- main 与 origin/main 同步
+### merge_status: PENDING
+- 规划文档已生成，待提交分支并合并
 
 ---
 
