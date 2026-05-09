@@ -35,12 +35,118 @@ npm test
 | 命令 | 状态 | 输出 |
 |------|------|------|
 | npm install | ✅ 通过 | 180 packages |
-| npm run build | ✅ 通过 | 3 chunks, 1.22s |
+| npm run build | ✅ 通过 | 3 chunks, 1.01s |
 | npm test | ✅ 通过 | 56 tests, 3 passed |
 
 ### 与 backlog 关联
 - backlog.md 中新增 P1 bug 项：修复 CI 测试失败（已标记完成）
 - decision-log.md 中修正 2026-05-08 测试框架选型决策：jsdom → node
+
+---
+
+## 2026-05-08（第二次初始化） - 自动化迭代基线复核与分支创建
+
+### 复核日期
+2026-05-08
+
+### 复核范围
+验证 TypeMaster 项目当前迭代基础设施的完整性，并为后续自动化迭代建立分支基线。
+
+---
+
+### 1. 项目结构熟悉 ✅
+
+已完整阅读以下文件：
+- README.md / README_EN.md：项目定位、技术栈、AI 配置说明
+- package.json：依赖、npm 脚本、Vitest 配置
+- src/App.jsx：路由结构（HashRouter）、页面组织
+- src/store/practice-store.jsx：全局状态管理、AI 状态机
+- src/pages/PracticePage.jsx：练习页交互逻辑
+- src/hooks/useTypingSession.jsx：打字时序控制
+- src/engine/：练习引擎（draft, metrics, coach, insights）
+- src/services/ai-service.js：AI 服务层、错误处理、兜底逻辑
+- server.js / api/chat.js：本地代理与 Serverless 代理
+
+**产品闭环理解**：
+- 标准词库训练（不依赖 AI）
+- AI 训练工坊（主题+难度生成练习文本）
+- 练习过程（WPM、准确率、稳定度实时计算）
+- 结果页（趋势图、AI 教练建议）
+- 成长洞察（长期统计、错误热点）
+- 本地持久化（settings、sessions、coachAdvices）
+- 双语界面（zh-CN / en-US）
+
+---
+
+### 2. 迭代文档目录检查 ✅
+
+docs/ai-iteration/ 已存在并包含完整文档：
+- [backlog.md](docs/ai-iteration/backlog.md)：长期需求池（P0/P1/P2 分级）
+- [today.md](docs/ai-iteration/today.md)：每日执行任务（今日：CI/CD 流水线）
+- [daily-report.md](docs/ai-iteration/daily-report.md)：每日迭代记录（多版本历史）
+- [qa-checklist.md](docs/ai-iteration/qa-checklist.md)：回归测试清单（人工+自动化）
+- [decision-log.md](docs/ai-iteration/decision-log.md)：技术/产品决策记录
+- [release-notes.md](docs/ai-iteration/release-notes.md)：版本发布记录
+
+---
+
+### 3. 质量门禁验证 ✅
+
+| npm 脚本 | 状态 | 说明 |
+|---------|------|------|
+| npm install | ✅ 通过 | 安装 180 个包 |
+| npm run build | ✅ 通过 | 构建产物正常（1.02s） |
+| npm test | ✅ 通过 | 56 个测试全部通过 |
+
+**测试框架现状**：
+- 已引入 Vitest ^2.1.0（2026-05-08 上午）
+- 已覆盖 engine 核心模块：metrics (28 tests)、coach (11 tests)、insights (17 tests)
+- GitHub Actions CI 已配置（push + PR 到 main 触发）
+
+**无需额外引入测试框架**，当前测试体系已满足轻量要求。
+
+---
+
+### 4. 安全约束验证 ✅
+
+| 检查项 | 状态 | 说明 |
+|--------|------|------|
+| config.js 在 .gitignore | ✅ | 不会被提交 |
+| AI_API_KEY 未硬编码 | ✅ | 仅在错误消息中引用名称 |
+| Hash Router 保持不变 | ✅ | App.jsx 使用 createHashRouter |
+| localStorage 兼容性 | ✅ | settings、sessions、coachAdvices 未改动 |
+| 中英文支持 | ✅ | i18n/index.js 完整 |
+
+---
+
+### 5. 分支与提交
+
+**操作**：
+1. 创建分支：`solo/init-ai-iteration-baseline`
+2. 更新 daily-report.md（本次记录）
+3. 提交并推送到远程
+4. 创建 PR（如果平台支持）
+
+**提交信息**：
+```
+docs: 记录自动化迭代基线复核与分支创建
+
+- 确认项目结构和产品闭环
+- 验证 docs/ai-iteration/ 文档完整性
+- 验证 npm install / build / test 通过
+- 确认安全约束（config.js、HashRouter、localStorage）
+- 创建 solo/init-ai-iteration-baseline 分支
+```
+
+---
+
+### 6. 后续建议
+
+1. **持续维护文档**：每次迭代后更新 daily-report.md
+2. **CI 流水线监控**：确保 GitHub Actions workflow 正常运行
+3. **测试覆盖率提升**：可逐步扩展到 services 层和 hooks 层
+4. **backlog 清理**：定期回顾需求池，移除已完成项
+5. **版本号更新**：当前仍为 2.0.0，建议按实际变更更新
 
 ---
 
