@@ -69,6 +69,11 @@
   - **描述**: Service Worker、离线缓存、manifest
 
 ### P1 - 中优先级
+- [ ] Hooks 测试覆盖：useTypingSession 单元测试
+  - **类型**: test
+  - **状态**: 今日执行 (2026-05-09)
+  - **描述**: useTypingSession 是打字训练核心时序逻辑，负责会话状态、计时、指标计算
+
 - [ ] 代码覆盖率监控
   - **类型**: test
   - **状态**: 待规划
