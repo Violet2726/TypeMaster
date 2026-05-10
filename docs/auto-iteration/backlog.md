@@ -37,15 +37,25 @@
 ## 技术改进
 
 ### P0 - 高优先级
+- [x] Hooks 测试覆盖：useTypingSession 单元测试
+  - **类型**: test
+  - **状态**: 已完成（2026-05-09）
+  - **描述**: useTypingSession 核心逻辑已抽取到 session-machine.js，61 个测试用例
+
+- [ ] services 测试基线：storage.js 单元测试
+  - **类型**: test
+  - **状态**: 下周规划
+  - **描述**: localStorage 边界情况保护，防止无人值守场景下静默失败
+
+- [ ] services 测试基线：ai-service.js 错误处理测试
+  - **类型**: test
+  - **状态**: 下周规划
+  - **描述**: AI 服务错误归类逻辑测试，防止异常蔓延到 UI 层
+
 - [ ] 性能优化：减少首屏加载时间
   - **类型**: refactor
   - **状态**: 待规划
   - **描述**: 分析并优化 bundle 大小和加载策略
-
-- [ ] Hooks 测试覆盖：useTypingSession 单元测试
-  - **类型**: test
-  - **状态**: 待规划
-  - **描述**: useTypingSession 是打字训练核心时序逻辑
 
 - [ ] 代码覆盖率监控
   - **类型**: test
