@@ -69,9 +69,9 @@ npm run lint
 
 | 门禁 | 状态 | 最后检查时间 |
 |------|------|-------------|
-| npm run build | ✅ PASSED | 2026-05-09 |
-| npm test | ✅ PASSED | 2026-05-09 |
-| npm install | ✅ PASSED | 2026-05-09 |
+| npm run build | ✅ PASSED | 2026-05-10 |
+| npm test | ✅ PASSED | 2026-05-10 |
+| npm install | ✅ PASSED | 2026-05-10 |
 
 ## 测试统计
 
@@ -87,6 +87,7 @@ npm run lint
 
 | 日期 | 状态 | 说明 |
 |------|------|------|
+| 2026-05-10 | PASSED | 每日状态巡检（117 tests） |
 | 2026-05-09 | PASSED | useTypingSession 测试基线建立（117 tests） |
 | 2026-05-09 | PASSED | jsdom→node 修复验证 |
 | 2026-05-08 | PASSED | CI/CD 流水线验证 |
