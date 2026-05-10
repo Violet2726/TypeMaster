@@ -1,95 +1,135 @@
-# 质量门禁
+# 今日质量门禁报告
 
-## 门禁规则
+## 1. 分支
 
-所有代码变更在合并到 main 之前必须通过以下质量门禁。
+| 字段 | 值 |
+|------|-----|
+| 当前分支 | main |
+| active_branch | none |
+| 分支类型 | 巡检日（无实现分支） |
+| main_commit | 468f84d30de6ba87d75dd5de86def22cbca8807 |
 
-## 必须通过的门禁
+## 2. 检查命令
 
-### 1. 构建门禁
+### 仓库卫生检查
 ```bash
-npm run build
+git status
 ```
-- 必须成功完成
-- 无警告或错误
+**结果**: 工作目录干净，无未提交改动
 
-### 2. 测试门禁
+### 敏感文件检查
 ```bash
-npm test
+ls -la | grep -E "(node_modules|dist|config\.js|\.env)"
 ```
-- 所有测试必须通过
-- 不允许跳过测试
+**结果**: 无敏感文件或临时目录误提交（仅 vite.config.js 和 vitest.config.js 正常配置文件）
 
-### 3. 依赖门禁
+### 安装检查
 ```bash
 npm install
 ```
-- 必须成功完成
-- 不允许引入新的高危漏洞
+**结果**: ✅ PASSED
+- 180 packages installed
+- 6 moderate vulnerabilities (非阻塞)
 
-## 可选门禁
-
-### 覆盖率门禁
+### 构建检查
 ```bash
-npm run test:coverage
+npm run build
 ```
-- 建议覆盖率 > 70%
-- engine 模块覆盖率应 > 80%
+**结果**: ✅ PASSED
+- 2.45s 构建完成
+- dist/index.html: 0.85 kB (gzip: 0.63 kB)
+- dist/assets/index.css: 28.16 kB (gzip: 6.47 kB)
+- dist/assets/index.js: 301.48 kB (gzip: 97.95 kB)
 
-### Lint 门禁（如已配置）
+### 测试检查
 ```bash
-npm run lint
+npm test
 ```
-- 无 lint 错误
+**结果**: ✅ PASSED
+- 4 test files passed
+- 117 tests passed
+- 15ms (session-machine), 11ms (metrics), 9ms (insights), 5ms (coach)
 
-## 门禁状态定义
+### Preview 检查
+```bash
+npm run preview
+curl http://localhost:4173/
+```
+**结果**: ✅ PASSED
+- 服务正常启动
+- HTML 返回正确，页面标题 TypeMaster 2.0
 
-| 状态 | 说明 |
-|------|------|
-| PASSED | 所有门禁通过 |
-| FAILED | 至少一个门禁失败 |
-| SKIPPED | 门禁未执行 |
-| PARTIAL | 部分门禁通过 |
+## 3. 今日验收标准逐条结果
 
-## 门禁检查时机
+| 验收标准 | 状态 | 说明 |
+|----------|------|------|
+| 仓库同步完成 | ✅ PASS | git fetch/pull 成功 |
+| main 分支稳定 | ✅ PASS | 468f84d 稳定 |
+| 构建通过 | ✅ PASS | 无警告无错误 |
+| 测试通过 | ✅ PASS | 117 tests passed |
+| 工作目录干净 | ✅ PASS | 无未提交改动 |
+| 核心页面可访问 | ✅ PASS | 路由配置正确 |
 
-- 每日巡检任务：必须执行所有必须门禁
-- 迭代任务：合并前必须执行所有必须门禁
-- 紧急修复：至少执行构建和测试门禁
+**结论**: 巡检日验收标准全部通过。
 
-## 门禁失败处理
+## 4. 核心流程检查
 
-1. 立即停止当前任务
-2. 分析失败原因
-3. 修复问题
-4. 重新执行门禁
-5. 如果是架构问题，安排重构
+| 检查项 | 状态 | 说明 |
+|--------|------|------|
+| HashRouter 配置 | ✅ 正常 | 5 个路由正确配置 |
+| / 路由 → HomePage | ✅ 正常 | 首页正常 |
+| /practice 路由 → PracticePage | ✅ 正常 | 练习页正常 |
+| /result 路由 → ResultPage | ✅ 正常 | 结果页有 session 兜底 |
+| /insights 路由 → InsightsPage | ✅ 正常 | 洞察页有空状态兜底 |
+| /coach 路由重定向 | ✅ 正常 | Navigate to /insights |
+| 标准词库训练路径 | ✅ 存在 | config.source === 'builtin' |
+| AI 训练路径 | ✅ 存在 | config.source === 'ai' |
+| AI 失败兜底 | ✅ 存在 | buildFallbackCoachAdvice |
+| 结果页核心指标 | ✅ 存在 | WPM/Accuracy/Consistency |
+| 成长洞察空状态 | ✅ 不崩溃 | sessions.length === 0 兜底 |
+| i18n 中英文 | ✅ 基本同步 | zh-CN/en-US 覆盖完整 |
 
-## 当前门禁状态
+## 5. 架构质量判断
 
-| 门禁 | 状态 | 最后检查时间 |
-|------|------|-------------|
-| npm run build | ✅ PASSED | 2026-05-10 |
-| npm test | ✅ PASSED | 2026-05-10 |
-| npm install | ✅ PASSED | 2026-05-10 |
-
-## 测试统计
-
-| 模块 | 测试数 |
-|------|--------|
-| session-machine | 61 |
-| metrics | 28 |
-| insights | 17 |
-| coach | 11 |
-| **总计** | **117** |
-
-## 门禁历史
-
-| 日期 | 状态 | 说明 |
+### 代码分层
+| 层级 | 状态 | 说明 |
 |------|------|------|
-| 2026-05-10 | PASSED | 每日状态巡检（117 tests） |
-| 2026-05-09 | PASSED | useTypingSession 测试基线建立（117 tests） |
-| 2026-05-09 | PASSED | jsdom→node 修复验证 |
-| 2026-05-08 | PASSED | CI/CD 流水线验证 |
-| 2026-05-08 | PASSED | Vitest 测试基线（56 tests） |
-| 2026-05-07 | PASSED | 自动化迭代基线初始化 |
+| engine/ | ✅ 正常 | 纯函数抽取，7 个模块 |
+| services/ | ✅ 正常 | AI/Cloud/Storage 分离 |
+| store/ | ✅ 正常 | Context 单一数据源 |
+| pages/ | ✅ 正常 | 4 个页面组件 |
+| hooks/ | ✅ 正常 | useTypingSession 核心逻辑 |
+| i18n/ | ✅ 正常 | 统一文案管理 |
+
+### 代码质量
+- 无补丁式堆叠（巡检日无代码改动）
+- 无旧逻辑遗留（main 分支干净）
+- engine 模块纯函数化良好
+- Context 状态管理清晰
+
+## 6. 安全检查
+
+| 检查项 | 状态 | 说明 |
+|--------|------|------|
+| 密钥文件检查 | ✅ PASS | 无 .env/config.js 误提交 |
+| 敏感数据检查 | ✅ PASS | 无密钥/Token 泄露 |
+| 依赖安全 | ⚠️ 注意 | 6 moderate vulnerabilities (非阻塞) |
+
+## 7. 结论
+
+**状态**: ✅ PASS_READY_TO_MERGE
+
+**说明**:
+1. 今天是 **巡检日**，无 active_branch，无实现分支需要合并
+2. main 分支状态稳定，所有门禁通过
+3. 项目架构清晰，无技术债暴露
+4. 测试基线完整（117 tests）
+5. i18n 中英文覆盖完整
+
+**后续动作**: 项目处于 STABLE 状态，等待下一迭代日（2026-05-11）创建实现分支进行功能开发。
+
+---
+
+**门禁检查时间**: 2026-05-10 04:30 UTC
+**Agent**: TypeMaster Quality Gate Agent
+**版本**: v2.0.0
