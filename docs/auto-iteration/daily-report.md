@@ -1,5 +1,87 @@
 # 每日迭代记录
 
+## 2026-05-11 - storage.js 单元测试基线建立
+
+### 日期
+2026-05-11
+
+### 迭代类型
+测试基线建立 - 为 storage.js 建立完整的单元测试基线
+
+### main 分支状态
+- **commit**: 468f84d30de6ba87d75dd5de86def22cbca8807
+- **状态**: 稳定
+
+### 完成内容
+
+#### 新增文件
+- `src/services/__tests__/storage.test.js` - 38 个测试用例
+
+#### 修改文件
+- `src/services/storage.js` - 修复 readJson 边界情况 bug（处理 JSON.parse('null')）
+- `vitest.config.js` - 扩展测试文件匹配包含 services 测试
+
+#### 删除的旧逻辑
+无
+
+#### 保留的兼容逻辑及原因
+无
+
+### 测试覆盖
+
+| 模块 | 测试数 | 新增 |
+|------|--------|------|
+| storage | 38 | +38 |
+| session-machine | 61 | 0 |
+| metrics | 28 | 0 |
+| insights | 17 | 0 |
+| coach | 11 | 0 |
+| **总计** | **155** | **+38** |
+
+### 测试覆盖范围
+- ✅ 基础读写测试（loadSettings/saveSettings）
+- ✅ JSON 解析边界测试（无效 JSON、null/undefined）
+- ✅ QuotaExceededError 异常处理
+- ✅ 会话管理测试（appendSession/updateSession）
+- ✅ 教练建议管理测试（appendCoachAdvice/getCoachAdviceBySessionId）
+- ✅ 50 条记录裁剪逻辑
+
+### 发现的 Bug 修复
+1. **readJson null 处理 bug**: 当 localStorage 存储字符串 "null" 时，JSON.parse('null') 返回 null，但原代码没有处理这种情况，会将 null 作为有效值返回。已修复。
+
+### 质量门禁验证
+
+| 门禁 | 状态 | 结果 |
+|------|------|------|
+| npm install | ✅ 通过 | 180 packages |
+| npm run build | ✅ 通过 | 2.18s, 301.51 kB |
+| npm test | ✅ 通过 | 155 tests, 5 files |
+
+### 运行命令
+```bash
+npm install
+npm run build
+npm test
+```
+
+### 通过/失败结果
+- ✅ npm install - 通过
+- ✅ npm run build - 通过
+- ✅ npm test - 155 tests passed (38 new + 117 existing)
+
+### 已知风险
+无
+
+### 下一步
+1. 为 ai-service.js 建立单元测试基线（services 层第二个模块）
+2. 集成 Vitest 覆盖率报告到 CI/CD
+3. 性能优化：减少首屏加载时间
+
+### 完成时间
+2026-05-11 00:36 UTC
+
+---
+
 ## 2026-05-10 - Agent 无人值守巡检
 
 ### 日期

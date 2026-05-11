@@ -22,7 +22,9 @@ const SESSION_LIMIT = 50;
 function readJson(key, fallback) {
     try {
         const raw = window.localStorage.getItem(key);
-        return raw ? JSON.parse(raw) : fallback;
+        if (!raw) return fallback;
+        const parsed = JSON.parse(raw);
+        return parsed === null ? fallback : parsed;
     } catch (error) {
         console.warn(`Failed to read ${key}`, error);
         return fallback;
