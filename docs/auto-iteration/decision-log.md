@@ -13,6 +13,25 @@
 
 ## 决策列表
 
+### 2026-05-12 - storage.js 测试策略决策
+
+**决策类型**: 技术/流程
+
+**决策内容**:
+1. storage.js 在 node 环境测试，使用 vi.spyOn 模拟 window.localStorage
+2. 测试文件统一放置在 `src/services/__tests__/` 目录
+3. vitest.config.js 扩展 include 规则包含 services/__tests__/
+4. 测试覆盖：基础读写、JSON 边界、会话管理、教练建议、异常处理
+
+**决策理由**:
+- storage.js 是纯函数模块，不需要 DOM 环境
+- 45 个测试用例覆盖了 localStorage 的所有边界情况
+- 与 engine 模块测试策略保持一致
+
+**状态**: 生效中
+
+---
+
 ### 2026-05-09 - jsdom→node 测试环境修复
 
 **决策类型**: 技术/bugfix

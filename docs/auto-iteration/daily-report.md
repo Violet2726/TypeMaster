@@ -1,5 +1,93 @@
 # 每日迭代记录
 
+## 2026-05-12 - storage.js 测试基线建立
+
+### 日期
+2026-05-12
+
+### 迭代类型
+功能迭代 - 为 storage.js 建立完整的单元测试基线
+
+### main 分支状态
+- **commit**: 468f84d30de6ba87d75dd5de86def22cbca8807
+- **状态**: 稳定
+
+### 分支信息
+- **分支**: auto/implement-20260512
+- **目标**: 建立 storage.js 测试基线，覆盖 localStorage 边界情况
+
+### 完成内容
+
+#### 新增文件
+- `src/services/__tests__/storage.test.js` - 45 个测试用例
+
+#### 修改文件
+- `vitest.config.js` - 扩展测试文件匹配规则，包含 services/__tests__/
+
+### 测试覆盖
+
+| 模块 | 测试数 | 新增 |
+|------|--------|------|
+| storage | 45 | +45 |
+| session-machine | 61 | 0 |
+| metrics | 28 | 0 |
+| insights | 17 | 0 |
+| coach | 11 | 0 |
+| **总计** | **162** | **+45** |
+
+### 测试覆盖范围
+
+#### 基础读写测试
+- loadSettings()：读取默认值、读取已保存值、合并缺失字段
+- saveSettings()：写入成功、写入失败（吞掉异常）
+
+#### JSON 解析边界测试
+- localStorage 中存了无效 JSON 时回退默认值
+- localStorage 中存了 null/undefined 时回退默认值
+- localStorage 中存了空字符串时回退默认值
+
+#### 会话管理测试
+- appendSession()：追加记录、裁剪到 50 条
+- updateSession()：更新指定 session
+- loadSessions()/saveSessions()：读写列表、边界裁剪
+
+#### 教练建议管理测试
+- appendCoachAdvice()：追加记录、裁剪到 50 条
+- getCoachAdviceBySessionId()：查询指定记录、查不到返回 null
+
+#### 边界情况测试
+- localStorage.getItem 抛出 SecurityError
+- localStorage.setItem 抛出 QuotaExceededError
+- 环形引用导致 JSON.stringify 抛出
+- 数字、布尔值等非对象 JSON 数据
+
+### 质量门禁验证
+
+| 门禁 | 状态 | 结果 |
+|------|------|------|
+| npm install | ✅ 通过 | 181 packages |
+| npm run build | ✅ 通过 | 1.11s, 301.48 kB |
+| npm test | ✅ 通过 | 162 tests, 5 files |
+
+### 删除的旧逻辑
+无（旧逻辑保留，因为是新增测试而非重构）
+
+### 保留的兼容逻辑
+无（无兼容逻辑变更）
+
+### 已知风险
+无
+
+### 下一步
+1. 考虑为 ai-service.js 建立类似的测试基线
+2. 集成代码覆盖率监控到 CI/CD
+3. 继续优化 bundle 大小
+
+### 完成时间
+2026-05-12 00:35 UTC
+
+---
+
 ## 2026-05-10 - Agent 无人值守巡检
 
 ### 日期

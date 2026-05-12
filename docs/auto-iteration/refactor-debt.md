@@ -20,7 +20,7 @@
 - **问题**: localStorage 边界情况（QuotaExceededError、类型解析错误）无测试保护
 - **影响**: 无人值守场景下静默失败
 - **建议**: 建立单元测试基线，mock localStorage
-- **状态**: 下周规划（主题 A）
+- **状态**: ✅ 已关闭（2026-05-12 完成，45 个测试用例）
 
 #### 3. ai-service.js 错误处理测试缺失
 - **问题**: 错误归类逻辑（normalizeThrownError/throwResponseError）无测试
