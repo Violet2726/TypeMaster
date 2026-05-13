@@ -1,5 +1,64 @@
 # 每日迭代记录
 
+## 2026-05-13 - storage.js 测试基线建立
+
+### 日期
+2026-05-13
+
+### 迭代类型
+功能迭代 - 为 storage.js 服务建立完整的单元测试基线
+
+### 今日实现内容
+- 新增 src/services/__tests__/ 目录
+- 新增 storage.test.js，包含 21 个测试用例，覆盖：
+  - 基础读写（loadSettings, saveSettings）
+  - localStorage 边界情况（无效 JSON、null 值、写入错误）
+  - 会话管理（loadSessions, saveSessions, appendSession, updateSession）
+  - 教练建议管理（loadCoachAdvices, saveCoachAdvices, appendCoachAdvice, getCoachAdviceBySessionId）
+  - createInitialDraft 验证
+- 更新 vitest.config.js，新增 src/services/__tests__/**/*.test.js 到测试匹配规则
+
+### 修改文件
+- src/services/__tests__/storage.test.js（新增）
+- vitest.config.js（修改）
+
+### 删除的旧逻辑
+无（仅新增测试文件，无旧逻辑删除）
+
+### 保留的兼容逻辑及原因
+无兼容逻辑（所有代码保持向后兼容）
+
+### 运行命令
+```
+npm install
+npm run build
+npm test
+```
+
+### 运行结果
+- npm install: ✅ 通过（180 packages）
+- npm run build: ✅ 通过（dist 构建成功，301.48 kB）
+- npm test: ✅ 通过（5 个测试文件，138 个测试用例全部通过）
+
+### 测试覆盖范围
+| 模块 | 测试数 | 新增 |
+|------|--------|------|
+| session-machine | 61 | 0 |
+| metrics | 28 | 0 |
+| insights | 17 | 0 |
+| coach | 11 | 0 |
+| storage | 21 | +21 |
+| **总计** | **138** | **+21** |
+
+### 已知风险
+- 无已知风险，所有测试通过，无回归
+
+### 下一步
+- 下一迭代可规划 ai-service.js 错误处理测试
+- 继续推进性能优化和代码覆盖率监控集成
+
+---
+
 ## 2026-05-12 - Agent 无人值守巡检（常规巡检日）
 
 ### 日期
