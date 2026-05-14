@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState, lazy } from 'react';
 import {
     Navigate,
     Outlet,
@@ -10,11 +10,12 @@ import {
 } from 'react-router-dom';
 import { Header } from './components/Header';
 import { SettingsDrawer } from './components/SettingsDrawer';
-import { HomePage } from './pages/HomePage';
-import { InsightsPage } from './pages/InsightsPage';
-import { PracticePage } from './pages/PracticePage';
-import { ResultPage } from './pages/ResultPage';
 import { PracticeProvider, usePracticeStore } from './store/practice-store';
+
+const HomePage = lazy(() => import('./pages/HomePage'));
+const InsightsPage = lazy(() => import('./pages/InsightsPage'));
+const PracticePage = lazy(() => import('./pages/PracticePage'));
+const ResultPage = lazy(() => import('./pages/ResultPage'));
 
 function AppFrame() {
     const location = useLocation();
@@ -48,7 +49,9 @@ function AppFrame() {
 
             <main className="app-main">
                 <div className="container">
-                    <Outlet />
+                    <Suspense fallback={<div className="loading">Loading...</div>}>
+                        <Outlet />
+                    </Suspense>
                 </div>
             </main>
 
