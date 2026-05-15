@@ -91,6 +91,18 @@ typemaster/
 - `aiPracticeStatus = idle | loading | ready | stale | error`
 - `coachStatus = idle | loading | success | fallback | error`
 
+## 性能优化
+
+### 2026-05-15 性能优化
+- **构建配置优化**: 在 vite.config.js 中添加了性能优化配置
+- **代码分割**: 启用了 manualChunks，将 React 和路由库分离为独立的 vendor bundle
+- **压缩优化**: 使用 esbuild 压缩，生产环境移除 console 和 debugger
+- **Sourcemap**: 禁用了生产环境 sourcemap，减小包体积
+- **分割效果**: 
+  - react-vendor: React 核心库
+  - router-vendor: React Router 库
+  - 主 bundle: 业务代码
+
 ## 测试体系
 
 ### Engine 模块测试
