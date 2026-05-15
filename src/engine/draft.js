@@ -1,6 +1,18 @@
 import { commonWords } from '../data/words';
 
 /**
+ * Generate a unique ID compatible with both browser and Node environments.
+ * In Node.js 18, crypto.randomUUID() is not globally available.
+ */
+function generateId() {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        return crypto.randomUUID();
+    }
+    // Fallback for Node.js environments without global crypto
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
+}
+
+/**
  * 与练习文本草稿相关的工具函数。
  *
  * 这里负责：
@@ -100,7 +112,7 @@ export function createDraftFromWords(words, config, meta = {}) {
     const text = safeWords.join(' ').trim();
 
     return {
-        id: crypto.randomUUID(),
+        id: generateId(),
         text,
         words: safeWords,
         configSnapshot: {
