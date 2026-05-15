@@ -9,6 +9,32 @@
 ## 失败记录
 
 ### 日期
+2026-05-15
+
+### 问题描述
+CI / Build and Test (push) 在 GitHub Actions 中失败。actions/checkout@v4 无法正确初始化仓库。
+
+### 影响范围
+- CI/CD 流水线
+- 所有 push 到 main 的提交
+
+### 根本原因
+- TypeMaster/ 目录在 git index 中以 gitlink（模式 160000）存在
+- 没有对应的 .gitmodules 文件定义
+- 这是一个无效的子模块引用，导致 checkout 步骤失败
+
+### 修复方案
+1. 使用 `git rm --cached TypeMaster` 从 index 中移除 gitlink 条目
+2. 删除空的 TypeMaster/ 目录
+3. 提交并推送修复
+
+### 教训
+- Agent 在操作仓库时应避免创建不完整的 submodule 引用
+- CI 失败时应优先检查 git index 的完整性
+
+---
+
+### 日期
 2026-05-12
 
 ### 问题描述
