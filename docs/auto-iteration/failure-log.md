@@ -63,6 +63,35 @@ Agent 无人值守质量门禁执行时发现 active_branch = none。无今日�
 
 ---
 
+### 日期
+2026-05-15（第二轮 Agent 执行）
+
+### 问题描述
+Agent 无人值守质量门禁第二轮复查。确认 main 分支状态正常，所有基础检查通过。
+
+### 影响范围
+- 无人值守质量门禁状态同步
+- state.md 状态更新
+
+### 根本原因
+- 第一次 Agent 执行时 state.md 状态不正确（quality_gate_status = failed）
+- 实际 main 分支稳定，所有门禁通过
+- 无 active_branch 存在
+
+### 修复方案
+1. 确认 npm install、npm run build、npm test 全部通过
+2. 更新 state.md 状态：
+   - quality_gate_status: failed → passed
+   - merge_status: blocked → clean
+   - current_phase: verification_failed → stable
+3. 在 daily-report.md 添加执行记录
+
+### 教训
+- Agent 应在执行时正确判断 main 分支状态并更新文档
+- 无 active_branch 时，如果 main 分支稳定，应设置 quality_gate_status = passed
+
+---
+
 ## 失败分析模板
 
 如果发生失败，按以下格式记录：
