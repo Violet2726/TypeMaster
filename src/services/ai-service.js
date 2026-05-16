@@ -354,3 +354,14 @@ export function buildFallbackCoachAdvice(payload) {
     return buildLocalCoachAdvice(payload);
 }
 
+// Export internal functions for testing
+export {
+    cleanJsonText,
+    extractMessageContent,
+    normalizeThrownError,
+    normalizeCoachAdvicePayload,
+    throwResponseError,
+    streamTextResponse,
+    withTimeout
+};
+
