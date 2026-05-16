@@ -11,7 +11,7 @@
 | active_branch | none |
 | current_iteration_goal | 性能优化：减少首屏加载时间，提升用户体验 |
 | quality_gate_status | passed |
-| merge_status | clean |
+| merge_status | blocked |
 | rollback_required | false |
 | unresolved_failures | none |
 | next_action | implement_required |
