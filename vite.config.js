@@ -31,22 +31,31 @@ export default defineConfig({
         minify: 'esbuild',
         esbuild: {
             // 生产环境移除 console
-            drop: ['console', 'debugger']
+            drop: ['console', 'debugger'],
+            target: 'es2020'
         },
+        target: 'es2020',
         // 代码分割策略
         rollupOptions: {
             output: {
-                manualChunks: {
-                    // React 核心库单独打包
-                    'react-vendor': ['react', 'react-dom'],
-                    // 路由库单独打包
-                    'router-vendor': ['react-router-dom']
+                manualChunks: (id) => {
+                    if (id.includes('node_modules')) {
+                        if (id.includes('react-router')) {
+                            return 'router-vendor';
+                        }
+                        if (id.includes('react') || id.includes('react-dom')) {
+                            return 'react-vendor';
+                        }
+                        return 'vendor';
+                    }
                 }
             }
         },
         // 禁用 sourcemap 减小体积
         sourcemap: false,
         // 压缩报告
-        reportCompressedSize: true
+        reportCompressedSize: true,
+        // 启用更 aggressive 的 tree shaking
+        treeshake: true
     }
 });

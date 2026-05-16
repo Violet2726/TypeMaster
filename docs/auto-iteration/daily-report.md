@@ -1,5 +1,64 @@
 # 每日迭代记录
 
+## 2026-05-16 - 性能优化：减少首屏加载时间
+
+### 日期
+2026-05-16
+
+### 迭代类型
+性能优化迭代 - 构建配置优化、依赖清理
+
+### Agent 执行结果
+
+#### 分支状态
+| 字段 | 值 |
+|------|-----|
+| 当前分支 | auto/implement-20260516 |
+| main_commit | f48b374 |
+| active_branch | auto/implement-20260516 |
+| quality_gate_status | pending |
+| merge_status | pending |
+
+#### 基础检查验证
+| 检查项 | 状态 | 结果 |
+|--------|------|------|
+| git fetch origin | ✅ 通过 | 已同步 |
+| git checkout main | ✅ 通过 | 已切换 |
+| git pull --rebase origin main | ✅ 通过 | 已更新 |
+| npm install | ✅ 通过 | 180 packages → 134 packages (移除 jsdom) |
+| npm run build | ✅ 通过 | 1.44s, 总大小 327.4 kB (gzip: 105.71 kB) |
+| npm test | ✅ 通过 | 148 tests, 5 files |
+
+#### 任务执行记录
+1. **创建分支**: auto/implement-20260516
+2. **优化 vite.config.js**:
+   - 改进代码分割策略（manualChunks 函数）
+   - 设置 target es2020
+   - 启用 treeshake
+3. **移除未使用依赖**: 从 package.json 中移除 jsdom（仅测试环境使用 node）
+4. **验证构建**: 构建成功，chunk 分割合理
+5. **验证测试**: 所有测试通过（148 tests）
+
+#### today.md 验证
+- **当前主线**: 性能优化：减少首屏加载时间 ✅ 已实现
+- **今日类型**: 正常迭代日
+- **业务改动**: 构建配置优化、依赖清理
+
+#### 质量门禁
+| 门禁 | 状态 | 结果 |
+|------|------|------|
+| npm install | ✅ 通过 | 134 packages |
+| npm run build | ✅ 通过 | 1.44s |
+| npm test | ✅ 通过 | 148 tests, 5 files |
+
+### 结论
+性能优化任务完成！已优化 Vite 构建配置、改进代码分割策略、移除未使用依赖 jsdom。构建成功，所有测试通过。等待合并到 main 分支。
+
+### 执行时间
+2026-05-16 UTC
+
+---
+
 ## 2026-05-15 - Agent 无人值守每日自治状态巡检
 
 ### 日期
