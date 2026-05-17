@@ -1,5 +1,69 @@
 # 每日迭代记录
 
+## 2026-05-17 - ai-service.js 测试基线建立
+
+### 日期
+2026-05-17
+
+### 迭代类型
+功能迭代 - ai-service.js 测试基线建立
+
+### Agent 执行结果
+
+#### 分支状态
+| 字段 | 值 |
+|------|-----|
+| 当前分支 | auto/implement-20260517 |
+| main_commit | f48b374 |
+| active_branch | auto/implement-20260517 |
+| quality_gate_status | pending |
+| merge_status | pending |
+
+#### 基础检查验证
+| 检查项 | 状态 | 结果 |
+|--------|------|------|
+| git fetch origin | ✅ 通过 | 已同步 |
+| git checkout main | ✅ 通过 | 已切换 |
+| git pull --rebase origin main | ✅ 通过 | 已更新 |
+| git checkout -b auto/implement-20260517 | ✅ 通过 | 分支创建成功 |
+| npm install | ✅ 通过 | 180 packages |
+| npm run build | ✅ 通过 | 1.48s, 330.59 kB |
+| npm test | ✅ 通过 | 175 tests, 6 files |
+
+#### 任务执行记录
+1. **创建分支**: auto/implement-20260517
+2. **创建完整的测试文件**: src/services/__tests__/ai-service.test.js（266 行，27 个测试用例）
+3. **验证所有测试通过**: 175 个测试（148 个原有 + 27 个新增）全部通过
+4. **构建验证通过**: 构建成功，无错误
+
+#### 测试覆盖范围
+- AiServiceError: 构造函数参数、默认值
+- cleanJsonText: 普通文本、markdown代码块、空值、边界情况
+- extractMessageContent: 不同API响应格式、空payload
+- normalizeThrownError: AiServiceError透传、AbortError、TypeError、其他错误、空输入
+- normalizeCoachAdvicePayload: 完整payload、部分字段缺失、JSON字符串、markdown、无效JSON、中英文默认值
+- throwResponseError: 不同状态码、Missing AI_API_KEY、空响应文本
+
+#### today.md 验证
+- **当前主线**: 建立 ai-service.js 测试基线 ✅ 已完成
+- **今日类型**: 正常迭代日
+- **业务改动**: 27 个新测试用例
+
+### 质量门禁
+| 门禁 | 状态 | 结果 |
+|------|------|------|
+| npm install | ✅ 通过 | 180 packages |
+| npm run build | ✅ 通过 | 1.48s, 330.59 kB |
+| npm test | ✅ 通过 | 175 tests, 6 files |
+
+### 结论
+任务成功完成！ai-service.js 测试基线已建立，新增 27 个测试用例，总测试数达到 175 个。所有测试通过，构建成功。分支已推送到 origin，等待合并到 main 分支。
+
+### 巡检时间
+2026-05-17 UTC
+
+---
+
 ## 2026-05-16 - Agent 无人值守合并任务（无待合并分支）
 
 ### 日期

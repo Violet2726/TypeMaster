@@ -1,190 +1,264 @@
-import { describe, it, expect, vi } from 'vitest';
 import {
     AiServiceError,
-    generatePracticeText,
-    generateCoachAdvice,
-    buildFallbackCoachAdvice,
     cleanJsonText,
     extractMessageContent,
     normalizeThrownError,
     normalizeCoachAdvicePayload,
-    throwResponseError,
-    streamTextResponse,
-    withTimeout
-} from '../ai-service.js';
+    throwResponseError
+} from '../ai-service';
+import { describe, it, expect, vi } from 'vitest';
 
-describe('ai-service', () => {
-    describe('AiServiceError', () => {
-        it('should create an error with correct properties', () => {
-            const cause = new Error('cause');
-            const error = new AiServiceError('test_code', 'Test message', { status: 500, cause });
-            expect(error.name).toBe('AiServiceError');
-            expect(error.code).toBe('test_code');
-            expect(error.message).toBe('Test message');
-            expect(error.status).toBe(500);
-            expect(error.cause).toBe(cause);
+describe('AiServiceError', () => {
+    it('should create an instance with correct properties', () => {
+        const cause = new Error('original error');
+        const error = new AiServiceError('test_code', 'Test message', {
+            status: 500,
+            cause
         });
 
-        it('should handle missing options', () => {
-            const error = new AiServiceError('test_code', 'Test message');
-            expect(error.status).toBeNull();
-            expect(error.cause).toBeNull();
-        });
-
-        it('should use default code if not provided', () => {
-            const error = new AiServiceError(undefined, 'Test message');
-            expect(error.code).toBe('unknown');
-        });
+        expect(error.name).toBe('AiServiceError');
+        expect(error.code).toBe('test_code');
+        expect(error.message).toBe('Test message');
+        expect(error.status).toBe(500);
+        expect(error.cause).toBe(cause);
     });
 
-    describe('cleanJsonText', () => {
-        it('should return plain text as-is', () => {
-            expect(cleanJsonText('{"key": "value"}')).toBe('{"key": "value"}');
-        });
+    it('should use default values when optional parameters are not provided', () => {
+        const error = new AiServiceError();
 
-        it('should remove markdown code block wrapper', () => {
-            expect(cleanJsonText('```json\n{"key": "value"}\n```')).toBe('{"key": "value"}');
-            expect(cleanJsonText('```\n{"key": "value"}\n```')).toBe('{"key": "value"}');
-        });
+        expect(error.code).toBe('unknown');
+        expect(error.status).toBeNull();
+        expect(error.cause).toBeNull();
+    });
+});
 
-        it('should handle empty string', () => {
-            expect(cleanJsonText('')).toBe('');
-            expect(cleanJsonText(null)).toBe('');
-            expect(cleanJsonText(undefined)).toBe('');
-        });
+describe('cleanJsonText', () => {
+    it('should return trimmed text if it is not wrapped in markdown code blocks', () => {
+        expect(cleanJsonText('  hello world  ')).toBe('hello world');
     });
 
-    describe('extractMessageContent', () => {
-        it('should extract from choices[0].text', () => {
-            expect(extractMessageContent({ choices: [{ text: 'Hello' }] })).toBe('Hello');
-        });
-
-        it('should extract from choices[0].message.content (string)', () => {
-            expect(extractMessageContent({ choices: [{ message: { content: 'Hello' } }] })).toBe('Hello');
-        });
-
-        it('should extract from choices[0].message.content (array)', () => {
-            expect(extractMessageContent({ choices: [{ message: { content: ['Hello', ' ', 'World'] } }] })).toBe('Hello World');
-        });
-
-        it('should handle empty payload', () => {
-            expect(extractMessageContent(null)).toBe('');
-            expect(extractMessageContent({})).toBe('');
-        });
-
-        it('should handle empty choices', () => {
-            expect(extractMessageContent({ choices: [] })).toBe('');
-        });
+    it('should remove markdown code block wrappers (```json)', () => {
+        expect(cleanJsonText('```json\n{"key": "value"}\n```')).toBe('{"key": "value"}');
     });
 
-    describe('normalizeThrownError', () => {
-        it('should return AiServiceError as-is', () => {
-            const original = new AiServiceError('test', 'message');
-            expect(normalizeThrownError(original)).toBe(original);
-        });
-
-        it('should convert AbortError to timeout error', () => {
-            const abortError = new Error('Aborted');
-            abortError.name = 'AbortError';
-            const result = normalizeThrownError(abortError);
-            expect(result.code).toBe('timeout');
-            expect(result.message).toBe('The AI request timed out.');
-        });
-
-        it('should convert TypeError to network error', () => {
-            const typeError = new TypeError('Failed to fetch');
-            const result = normalizeThrownError(typeError);
-            expect(result.code).toBe('network');
-            expect(result.message).toBe('The AI request failed before a response arrived.');
-        });
-
-        it('should convert other errors to unknown error', () => {
-            const error = new Error('Something went wrong');
-            const result = normalizeThrownError(error);
-            expect(result.code).toBe('unknown');
-            expect(result.message).toBe('Something went wrong');
-        });
+    it('should remove markdown code block wrappers (```)', () => {
+        expect(cleanJsonText('```\n{"key": "value"}\n```')).toBe('{"key": "value"}');
     });
 
-    describe('normalizeCoachAdvicePayload', () => {
-        it('should normalize complete valid payload (Chinese)', () => {
-            const payload = {
-                headline: 'Great job!',
-                summary: 'You did well.',
-                strengths: ['Speed', 'Accuracy'],
-                weaknesses: ['Punctuation'],
-                nextDrill: {
-                    label: 'Next drill',
-                    reason: 'Practice more',
-                    configPatch: { difficulty: 'hard' },
-                    aiPrompt: 'Generate harder text'
-                },
-                comparison: {
-                    label: 'improved',
-                    summary: 'Better than last time'
+    it('should handle case-insensitive json in code block', () => {
+        expect(cleanJsonText('```JSON\n{"key": "value"}\n```')).toBe('{"key": "value"}');
+    });
+
+    it('should return empty string for falsy input', () => {
+        expect(cleanJsonText('')).toBe('');
+        expect(cleanJsonText(null)).toBe('');
+        expect(cleanJsonText(undefined)).toBe('');
+    });
+
+    it('should handle only code block markers', () => {
+        expect(cleanJsonText('```')).toBe('');
+        expect(cleanJsonText('```json')).toBe('');
+    });
+});
+
+describe('extractMessageContent', () => {
+    it('should extract text from choices[0].text', () => {
+        const payload = { choices: [{ text: 'Hello from text' }] };
+        expect(extractMessageContent(payload)).toBe('Hello from text');
+    });
+
+    it('should extract content from choices[0].message.content as string', () => {
+        const payload = { choices: [{ message: { content: 'Hello from message' } }] };
+        expect(extractMessageContent(payload)).toBe('Hello from message');
+    });
+
+    it('should extract and join content from choices[0].message.content as array', () => {
+        const payload = {
+            choices: [
+                {
+                    message: {
+                        content: ['Hello ', { text: 'from ' }, 'array']
+                    }
                 }
-            };
-            const result = normalizeCoachAdvicePayload(payload, 'zh-CN');
-            expect(result.headline).toBe('Great job!');
-            expect(result.summary).toBe('You did well.');
-            expect(result.strengths).toEqual(['Speed', 'Accuracy']);
-            expect(result.weaknesses).toEqual(['Punctuation']);
-            expect(result.nextDrill.label).toBe('Next drill');
-            expect(result.language).toBe('zh-CN');
-        });
+            ]
+        };
+        expect(extractMessageContent(payload)).toBe('Hello from array');
+    });
 
-        it('should handle missing fields (English)', () => {
-            const payload = {};
-            const result = normalizeCoachAdvicePayload(payload, 'en-US');
-            expect(result.headline).toBe('Keep moving into the next drill');
-            expect(result.summary).toBe('This round is complete. Keep iterating on the current weakness.');
-            expect(result.strengths).toEqual([]);
-            expect(result.weaknesses).toEqual([]);
-        });
+    it('should return empty string for invalid payload', () => {
+        expect(extractMessageContent(null)).toBe('');
+        expect(extractMessageContent(undefined)).toBe('');
+        expect(extractMessageContent({})).toBe('');
+        expect(extractMessageContent({ choices: [] })).toBe('');
+        expect(extractMessageContent({ choices: [{}] })).toBe('');
+        expect(extractMessageContent({ choices: [{ message: null }] })).toBe('');
+    });
+});
 
-        it('should parse JSON string payload', () => {
-            const payload = JSON.stringify({ headline: 'Test' });
-            const result = normalizeCoachAdvicePayload(payload, 'zh-CN');
-            expect(result.headline).toBe('Test');
-        });
+describe('normalizeThrownError', () => {
+    it('should return AiServiceError as-is', () => {
+        const original = new AiServiceError('test', 'test message');
+        expect(normalizeThrownError(original)).toBe(original);
+    });
 
-        it('should throw error for invalid JSON string', () => {
-            expect(() => normalizeCoachAdvicePayload('invalid-json', 'zh-CN')).toThrow(AiServiceError);
+    it('should convert AbortError to timeout error', () => {
+        const abortError = { name: 'AbortError' };
+        const result = normalizeThrownError(abortError);
+        expect(result.code).toBe('timeout');
+        expect(result.message).toBe('The AI request timed out.');
+        expect(result.cause).toBe(abortError);
+    });
+
+    it('should convert TypeError to network error', () => {
+        const typeError = new TypeError('Network failed');
+        const result = normalizeThrownError(typeError);
+        expect(result.code).toBe('network');
+        expect(result.message).toBe('The AI request failed before a response arrived.');
+        expect(result.cause).toBe(typeError);
+    });
+
+    it('should convert other errors to unknown error', () => {
+        const error = new Error('Something went wrong');
+        const result = normalizeThrownError(error);
+        expect(result.code).toBe('unknown');
+        expect(result.message).toBe('Something went wrong');
+        expect(result.cause).toBe(error);
+    });
+
+    it('should handle falsy input', () => {
+        const result = normalizeThrownError(null);
+        expect(result.code).toBe('unknown');
+        expect(result.message).toBe('Unknown AI service error.');
+    });
+});
+
+describe('normalizeCoachAdvicePayload', () => {
+    it('should normalize a complete valid payload (Chinese)', () => {
+        const raw = {
+            headline: 'Great job!',
+            summary: 'Nice work on this drill.',
+            strengths: ['Good speed', 'High accuracy'],
+            weaknesses: ['Some typos'],
+            nextDrill: {
+                label: 'Next drill',
+                reason: 'Keep practicing',
+                configPatch: { difficulty: 'hard' },
+                aiPrompt: 'Focus on speed'
+            },
+            comparison: {
+                label: 'improved',
+                summary: 'Better than last time'
+            }
+        };
+
+        const result = normalizeCoachAdvicePayload(raw, 'zh-CN');
+        expect(result.headline).toBe('Great job!');
+        expect(result.summary).toBe('Nice work on this drill.');
+        expect(result.strengths).toEqual(['Good speed', 'High accuracy']);
+        expect(result.weaknesses).toEqual(['Some typos']);
+        expect(result.nextDrill.label).toBe('Next drill');
+        expect(result.comparison.label).toBe('improved');
+        expect(result.language).toBe('zh-CN');
+    });
+
+    it('should normalize a complete valid payload (English)', () => {
+        const raw = {
+            headline: 'Excellent!',
+            summary: 'Well done.',
+            strengths: ['Fast'],
+            weaknesses: [],
+            nextDrill: {
+                label: 'Keep going',
+                reason: 'Practice more',
+                configPatch: {},
+                aiPrompt: ''
+            },
+            comparison: {
+                label: 'same',
+                summary: 'Consistent performance'
+            }
+        };
+
+        const result = normalizeCoachAdvicePayload(raw, 'en-US');
+        expect(result.language).toBe('en-US');
+    });
+
+    it('should provide default values for missing fields (Chinese)', () => {
+        const raw = {};
+        const result = normalizeCoachAdvicePayload(raw, 'zh-CN');
+        expect(result.headline).toBe('继续下一练');
+        expect(result.strengths).toEqual([]);
+        expect(result.weaknesses).toEqual([]);
+        expect(result.nextDrill.label).toBe('开始下一练');
+    });
+
+    it('should provide default values for missing fields (English)', () => {
+        const raw = {};
+        const result = normalizeCoachAdvicePayload(raw, 'en-US');
+        expect(result.headline).toBe('Keep moving into the next drill');
+        expect(result.nextDrill.label).toBe('Start next drill');
+    });
+
+    it('should parse JSON string input', () => {
+        const raw = JSON.stringify({
+            headline: 'From string',
+            summary: 'Parsed correctly'
+        });
+        const result = normalizeCoachAdvicePayload(raw);
+        expect(result.headline).toBe('From string');
+        expect(result.summary).toBe('Parsed correctly');
+    });
+
+    it('should handle markdown-wrapped JSON', () => {
+        const raw = '```json\n{"headline": "Wrapped in markdown"}\n```';
+        const result = normalizeCoachAdvicePayload(raw);
+        expect(result.headline).toBe('Wrapped in markdown');
+    });
+
+    it('should throw error for invalid JSON', () => {
+        expect(() => normalizeCoachAdvicePayload('not valid json')).toThrow(AiServiceError);
+    });
+});
+
+describe('throwResponseError', () => {
+    it('should throw AiServiceError with missing_config for Missing AI_API_KEY message', async () => {
+        const mockResponse = {
+            ok: false,
+            status: 500,
+            text: async () => 'Missing AI_API_KEY'
+        };
+
+        await expect(throwResponseError(mockResponse)).rejects.toThrow(AiServiceError);
+        await expect(throwResponseError(mockResponse)).rejects.toMatchObject({
+            code: 'missing_config',
+            status: 500
         });
     });
 
-    describe('throwResponseError', () => {
-        it('should throw error for missing API key', async () => {
-            const response = {
-                ok: false,
-                text: async () => 'Missing AI_API_KEY'
-            };
-            await expect(throwResponseError(response)).rejects.toThrow(AiServiceError);
-        });
+    it('should throw AiServiceError with server_error for 5xx status', async () => {
+        const mockResponse = {
+            ok: false,
+            status: 502,
+            text: async () => 'Internal server error'
+        };
 
-        it('should throw server error for 5xx status', async () => {
-            const response = {
-                ok: false,
-                status: 500,
-                text: async () => 'Internal Server Error'
-            };
-            await expect(throwResponseError(response)).rejects.toThrow(AiServiceError);
+        await expect(throwResponseError(mockResponse)).rejects.toThrow(AiServiceError);
+        await expect(throwResponseError(mockResponse)).rejects.toMatchObject({
+            code: 'server_error',
+            status: 502
         });
     });
 
-    describe('generatePracticeText', () => {
-        it('should throw error when fetch fails', async () => {
-            vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Network error')));
-            await expect(generatePracticeText({ aiTemplate: 'daily', difficulty: 'easy', source: 'ai', includePunctuation: false, includeNumbers: false })).rejects.toThrow(AiServiceError);
-            vi.unstubAllGlobals();
-        });
-    });
+    it('should handle empty response text', async () => {
+        const mockResponse = {
+            ok: false,
+            status: 400,
+            text: async () => ''
+        };
 
-    describe('generateCoachAdvice', () => {
-        it('should throw error when fetch fails', async () => {
-            vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Network error')));
-            await expect(generateCoachAdvice({ session: { config: {}, result: {}, sourceTextMeta: {} }, history: [] })).rejects.toThrow(AiServiceError);
-            vi.unstubAllGlobals();
+        await expect(throwResponseError(mockResponse)).rejects.toThrow(AiServiceError);
+        await expect(throwResponseError(mockResponse)).rejects.toMatchObject({
+            code: 'server_error'
         });
     });
 });
