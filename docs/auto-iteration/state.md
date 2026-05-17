@@ -6,37 +6,30 @@
 |------|-----|
 | date | 2026-05-17 |
 | main_commit | c032b13 |
-| current_phase | stable |
+| current_phase | planned |
 | last_successful_main_commit | c032b13 |
-| active_branch | none |
-| current_iteration_goal | 性能优化：减少首屏加载时间，提升用户体验 |
-| quality_gate_status | passed |
-| merge_status | merged |
+| active_branch | auto/plan-20260517 |
+| current_iteration_goal | 集成 Vitest 代码覆盖率报告，配置覆盖率阈值，更新 CI/CD 流程以生成覆盖率报告 |
+| quality_gate_status | pending |
+| merge_status | pending |
 | rollback_required | false |
 | unresolved_failures | none |
-| next_action | implement_required |
+| next_action | implement |
 
 ---
 
 ## 状态说明
 
-### current_phase: stable
-main 分支稳定，无活跃分支待处理。
+### current_phase: planned
+今日迭代计划已创建，准备进入实现阶段。
 
 ### today.md 今日主线
-性能优化：减少首屏加载时间，提升用户体验。
+集成 Vitest 代码覆盖率报告，配置覆盖率阈值，更新 CI/CD 流程以生成覆盖率报告。
 
 ### last_successful_main_commit: c032b13
 - ai-service.js 测试基线建立完成（新增 23 个测试）
 - 总测试数达到 171 个
 - main 分支稳定，所有门禁通过
-
-### Agent 执行结果（2026-05-17 12:32 UTC）
-- active_branch: none（已合并）
-- 质量门禁状态：PASSED
-- 合并状态：已合并（无待合并分支）
-- 判定结果：无 active_branch，无需合并
-- main 分支最新 commit: c032b13
 
 ---
 
@@ -66,20 +59,20 @@ main 分支稳定，无活跃分支待处理。
 ## 待规划任务
 
 ### P0
-- 性能优化：减少首屏加载时间
-- 代码覆盖率监控集成
+- [x] 性能优化：减少首屏加载时间
+- [ ] 代码覆盖率监控集成
 
 ### P1
-- 移动端输入体验优化
-- 响应式布局完善
-- 统一错误处理模式
-- 类型定义补充
+- [ ] 移动端输入体验优化
+- [ ] 响应式布局完善
+- [ ] 统一错误处理模式
+- [ ] 类型定义补充
 
 ### P2
-- 自定义词库功能
-- 键盘布局选择
-- 打字音效
-- 成就系统
+- [ ] 自定义词库功能
+- [ ] 键盘布局选择
+- [ ] 打字音效
+- [ ] 成就系统
 
 ---
 
