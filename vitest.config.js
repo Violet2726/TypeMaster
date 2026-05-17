@@ -6,6 +6,25 @@ export default defineConfig({
     test: {
         globals: true,
         environment: 'node',
-        include: ['src/engine/__tests__/**/*.test.js', 'src/hooks/__tests__/**/*.test.jsx', 'src/services/__tests__/**/*.test.js']
+        include: ['src/engine/__tests__/**/*.test.js', 'src/hooks/__tests__/**/*.test.jsx', 'src/services/__tests__/**/*.test.js'],
+        coverage: {
+            provider: 'v8',
+            reporter: ['text', 'json', 'html'],
+            reportsDirectory: 'coverage',
+            include: ['src/**/*.{js,jsx}'],
+            exclude: [
+                'node_modules/',
+                'dist/',
+                'docs/',
+                'src/**/*.test.{js,jsx}',
+                'src/**/__tests__/'
+            ],
+            thresholds: {
+                lines: 60,
+                functions: 60,
+                branches: 50,
+                statements: 60
+            }
+        }
     }
 });

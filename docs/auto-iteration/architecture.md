@@ -120,6 +120,14 @@ typemaster/
 ### Services 测试策略
 - storage.js: 可在 node 环境测试 JSON parse/stringify 和边界情况
 - ai-service.js: mock fetch 或测试错误归类逻辑
+- 测试数: 54 个 (storage: 31, ai-service: 23)
+
+### 代码覆盖率
+- 使用 Vitest + @vitest/coverage-v8 生成覆盖率报告
+- 报告格式: text, json, html
+- 覆盖率阈值（初期）: lines 60%, functions 60%, branches 50%, statements 60%
+- CI/CD 自动生成并上传覆盖率报告作为 artifact
+- 当前总覆盖率: ~25% (主要覆盖 engine 和 services 模块)
 
 ## localStorage 约定
 
