@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, lazy, Suspense } from 'react';
 import {
     Navigate,
     Outlet,
@@ -10,10 +10,10 @@ import {
 } from 'react-router-dom';
 import { Header } from './components/Header';
 import { SettingsDrawer } from './components/SettingsDrawer';
-import { HomePage } from './pages/HomePage';
-import { InsightsPage } from './pages/InsightsPage';
-import { PracticePage } from './pages/PracticePage';
-import { ResultPage } from './pages/ResultPage';
+const HomePage = lazy(() => import('./pages/HomePage'));
+const InsightsPage = lazy(() => import('./pages/InsightsPage'));
+const PracticePage = lazy(() => import('./pages/PracticePage'));
+const ResultPage = lazy(() => import('./pages/ResultPage'));
 import { PracticeProvider, usePracticeStore } from './store/practice-store';
 
 function AppFrame() {
@@ -79,10 +79,38 @@ function AppShell() {
 
 const router = createHashRouter(createRoutesFromElements(
     <Route element={<AppShell />}>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/practice" element={<PracticePage />} />
-        <Route path="/result" element={<ResultPage />} />
-        <Route path="/insights" element={<InsightsPage />} />
+        <Route
+            path="/"
+            element={
+                <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>}>
+                    <HomePage />
+                </Suspense>
+            }
+        />
+        <Route
+            path="/practice"
+            element={
+                <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>}>
+                    <PracticePage />
+                </Suspense>
+            }
+        />
+        <Route
+            path="/result"
+            element={
+                <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>}>
+                    <ResultPage />
+                </Suspense>
+            }
+        />
+        <Route
+            path="/insights"
+            element={
+                <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>}>
+                    <InsightsPage />
+                </Suspense>
+            }
+        />
         <Route path="/coach" element={<Navigate to="/insights" replace />} />
         <Route path="*" element={<Navigate to="/" replace />} />
     </Route>
