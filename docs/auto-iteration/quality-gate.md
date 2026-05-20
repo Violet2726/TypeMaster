@@ -5,6 +5,151 @@
 | 字段 | 值 |
 |------|-----|
 | 当前分支 | main |
+| active_branch | auto/implement-20260520 |
+| 分支类型 | 实现日（有实现分支） |
+| main_commit | 27b6323 |
+| 执行日期 | 2026-05-20 |
+
+## 2. 检查命令
+
+### 仓库卫生检查
+```bash
+git status
+```
+**结果**: 工作目录干净，无未提交改动
+
+### 敏感文件检查
+```bash
+ls -la | grep -E "(node_modules|dist|config\.js|\.env)"
+```
+**结果**: 无敏感文件或临时目录误提交（仅 vite.config.js 和 vitest.config.js 正常配置文件）
+
+### 安装检查
+```bash
+npm install
+```
+**结果**: ✅ PASSED
+- 180 packages installed
+- 6 moderate vulnerabilities (非阻塞)
+
+### 构建检查
+```bash
+npm run build
+```
+**结果**: ✅ PASSED
+- 1.06s 构建完成
+- dist/index.html: 0.93 kB (gzip: 0.66 kB)
+- dist/assets/index-ZCLhGxLc.css: 28.16 kB (gzip: 6.47 kB)
+- dist/assets/react-vendor-CgI31Oxi.js: 0.04 kB (gzip: 0.06 kB)
+- dist/assets/insights-DJhQGvWy.js: 2.21 kB (gzip: 0.84 kB)
+- dist/assets/HomePage-2wUE9zVJ.js: 2.83 kB (gzip: 1.00 kB)
+- dist/assets/InsightsPage-C0YZGToT.js:4.92 kB (gzip:1.23 kB)
+- dist/assets/ResultPage-B38iO-Fe.js: 15.85 kB (gzip: 4.92 kB)
+- dist/assets/PracticePage-DSqYUmRI.js: 24.66 kB (gzip:7.07 kB)
+- dist/assets/index-Ddk91CLj.js:44.69 kB (gzip: 18.44 kB)
+- dist/assets/router-vendor-Cv2C_ymi.js: 208.98 kB (gzip: 68.17 kB)
+- **主 bundle gzip 体积从 30.27 kB 减少到 18.44 kB，减少了约 39%，远超过 10% 目标！ 🎉
+
+### 测试检查
+```bash
+npm test
+```
+**结果**: ✅ PASSED
+- 6 test files passed
+- 171 tests passed
+- storage, session-machine, metrics, insights, coach, ai-service all passed
+
+## 3. 今日验收标准逐条结果
+
+### today.md 任务：性能优化：减少首屏加载时间，提升用户体验
+
+| 验收标准 | 状态 | 说明 |
+|----------|------|------|
+| npm run build 成功通过 | ✅ PASS | 1.06s 构建完成 |
+| npm test 成功通过 | ✅ PASS | 171 tests passed |
+| 包体积至少减少 10%（gzipped） | ✅ PASS | 主 bundle 从 30.27 kB gzipped → 18.44 kB，减少约 39% |
+| 无回归测试失败 | ✅ PASS | 无回归，所有原有测试通过 |
+
+**结论**: today.md 任务（性能优化）已成功完成！所有验收标准全部通过。
+
+## 4. 核心流程检查
+
+| 检查项 | 状态 | 说明 |
+|--------|------|------|
+| HashRouter 配置 | ✅ 正常 | 5 个路由正确配置，已使用 lazy/Suspense（App.jsx） |
+| / 路由 → HomePage | ✅ 正常 | 首页正常，Suspense 包裹 |
+| /practice 路由 → PracticePage | ✅ 正常 | 练习页正常，Suspense 包裹 |
+| /result 路由 → ResultPage | ✅ 正常 | 结果页正常，Suspense 包裹 |
+| /insights 路由 → InsightsPage | ✅ 正常 | 洞察页正常，Suspense 包裹 |
+| /coach 路由重定向 | ✅ 正常 | Navigate to /insights |
+| 标准词库训练路径 | ✅ 存在 | config.source === 'builtin' |
+| AI 训练路径 | ✅ 存在 | config.source === 'ai' |
+| AI 失败兜底 | ✅ 存在 | buildFallbackCoachAdvice |
+| 结果页核心指标 | ✅ 存在 | WPM/Accuracy/Consistency |
+| 成长洞察空状态 | ✅ 不崩溃 | sessions.length === 0 兜底 |
+| i18n 中英文 | ✅ 基本同步 | zh-CN/en-US 覆盖完整 |
+
+## 5. 架构质量判断
+
+### 代码分层
+| 层级 | 状态 | 说明 |
+|------|------|------|
+| engine/ | ✅ 正常 | 纯函数抽取，7 个模块 |
+| services/ | ✅ 正常 | AI/Cloud/Storage 分离 |
+| store/ | ✅ 正常 | Context 单一数据源 |
+| pages/ | ✅ 正常 | 4 个页面组件，支持 lazy loading |
+| hooks/ | ✅ 正常 | useTypingSession 核心逻辑 |
+| i18n/ | ✅ 正常 | 统一文案管理 |
+
+### 代码质量
+- 无补丁式堆叠（使用了 React.lazy 和 Suspense 标准 API）
+- 无旧逻辑遗留（main 分支干净）
+- 无未使用 import
+- 无死代码
+- 无重复状态来源
+
+## 6. 安全检查
+
+| 检查项 | 状态 | 说明 |
+|--------|------|------|
+| 密钥文件检查 | ✅ PASS | 无 .env/config.js 误提交 |
+| 敏感数据检查 | ✅ PASS | 无密钥/Token 泄露 |
+| 依赖安全 | ⚠️ 注意 | 6 moderate vulnerabilities (非阻塞) |
+
+## 7. 结论
+
+**状态**: ✅ PASS_READY_TO_MERGE
+
+**说明**:
+1. 实现分支（auto/implement-20260520）已成功完成性能优化任务
+2. main 分支状态稳定，所有基础门禁通过
+3. 所有验收标准都已通过，包体积减少远超过目标（39%）
+4. 项目架构清晰，代码质量良好
+5. 测试基线完整（171 tests total）
+6. i18n 中英文覆盖完整
+
+**today.md 任务状态**:
+- today.md 记录的任务（性能优化：减少首屏加载时间，提升用户体验）已完成！
+- 下一步可以进行代码覆盖率监控集成（P0）或者移动端输入体验优化（P1）
+- next_action = merge
+
+---
+
+**门禁检查时间**: 2026-05-20 UTC
+**Agent**: TypeMaster Quality Gate Agent
+**版本**: v2.0.0
+
+---
+
+## 历史质量门禁报告
+
+# 今日质量门禁报告
+
+## 1. 分支
+
+| 字段 | 值 |
+|------|-----|
+| 当前分支 | main |
 | active_branch | none |
 | 分支类型 | 质量门禁日（无实现分支） |
 | main_commit | 557c51c |
@@ -128,11 +273,15 @@ npx vitest run
 
 ---
 
-## 历史质量门禁报告
+**门禁检查时间**: 2026-05-19 UTC
+**Agent**: TypeMaster Quality Gate Agent
+**版本**: v2.0.0
 
-# 今日质量门禁报告
+---
 
-## 1. 分支
+## 2026-05-19 质量门禁报告
+
+### 1. 分支
 
 | 字段 | 值 |
 |------|-----|
@@ -142,7 +291,7 @@ npx vitest run
 | main_commit | 557c51c |
 | 执行日期 | 2026-05-19 |
 
-## 2. 检查命令
+### 2. 检查命令
 
 ### 仓库卫生检查
 ```bash
@@ -185,9 +334,9 @@ npx vitest run
 - 171 tests passed
 - storage, session-machine, metrics, insights, coach, ai-service all passed
 
-## 3. 今日验收标准逐条结果
+### 3. 今日验收标准逐条结果
 
-### today.md 任务：性能优化：减少首屏加载时间
+#### today.md 任务：性能优化：减少首屏加载时间
 
 | 验收标准 | 状态 | 说明 |
 |----------|------|------|
@@ -198,7 +347,7 @@ npx vitest run
 
 **结论**: today.md 任务（性能优化）尚未实现。当前为质量门禁日，无 active_branch。
 
-## 4. 核心流程检查
+### 4. 核心流程检查
 
 | 检查项 | 状态 | 说明 |
 |--------|------|------|
@@ -215,9 +364,9 @@ npx vitest run
 | 成长洞察空状态 | ✅ 不崩溃 | sessions.length === 0 兜底 |
 | i18n 中英文 | ✅ 基本同步 | zh-CN/en-US 覆盖完整 |
 
-## 5. 架构质量判断
+### 5. 架构质量判断
 
-### 代码分层
+#### 代码分层
 | 层级 | 状态 | 说明 |
 |------|------|------|
 | engine/ | ✅ 正常 | 纯函数抽取，7 个模块 |
@@ -227,14 +376,14 @@ npx vitest run
 | hooks/ | ✅ 正常 | useTypingSession 核心逻辑 |
 | i18n/ | ✅ 正常 | 统一文案管理 |
 
-### 代码质量
+#### 代码质量
 - 无补丁式堆叠（质量门禁日无代码改动）
 - 无旧逻辑遗留（main 分支干净）
 - 无未使用 import
 - 无死代码
 - 无重复状态来源
 
-## 6. 安全检查
+### 6. 安全检查
 
 | 检查项 | 状态 | 说明 |
 |--------|------|------|
@@ -242,7 +391,7 @@ npx vitest run
 | 敏感数据检查 | ✅ PASS | 无密钥/Token 泄露 |
 | 依赖安全 | ⚠️ 注意 | 6 moderate vulnerabilities (非阻塞) |
 
-## 7. 结论
+### 7. 结论
 
 **状态**: ✅ PASS_READY_TO_MERGE
 
@@ -266,11 +415,11 @@ npx vitest run
 
 ---
 
-# 历史质量门禁报告
+## 历史质量门禁报告
 
-## 2026-05-18 质量门禁报告
+### 2026-05-18 质量门禁报告
 
-## 1. 分支
+### 1. 分支
 
 | 字段 | 值 |
 |------|-----|
@@ -280,7 +429,7 @@ npx vitest run
 | main_commit | c032b13 |
 | 执行日期 | 2026-05-18 |
 
-## 2. 检查命令
+### 2. 检查命令
 
 ### 仓库卫生检查
 ```bash
@@ -323,9 +472,9 @@ npx vitest run
 - 171 tests passed
 - storage, session-machine, metrics, insights, coach, ai-service all passed
 
-## 3. 今日验收标准逐条结果
+### 3. 今日验收标准逐条结果
 
-### today.md 任务：性能优化：减少首屏加载时间
+#### today.md 任务：性能优化：减少首屏加载时间
 
 | 验收标准 | 状态 | 说明 |
 |----------|------|------|
@@ -336,7 +485,7 @@ npx vitest run
 
 **结论**: today.md 任务（性能优化）尚未实现。当前为质量门禁日，无 active_branch。
 
-## 4. 核心流程检查
+### 4. 核心流程检查
 
 | 检查项 | 状态 | 说明 |
 |--------|------|------|
@@ -353,9 +502,9 @@ npx vitest run
 | 成长洞察空状态 | ✅ 不崩溃 | sessions.length === 0 兜底 |
 | i18n 中英文 | ✅ 基本同步 | zh-CN/en-US 覆盖完整 |
 
-## 5. 架构质量判断
+### 5. 架构质量判断
 
-### 代码分层
+#### 代码分层
 | 层级 | 状态 | 说明 |
 |------|------|------|
 | engine/ | ✅ 正常 | 纯函数抽取，7 个模块 |
@@ -365,14 +514,14 @@ npx vitest run
 | hooks/ | ✅ 正常 | useTypingSession 核心逻辑 |
 | i18n/ | ✅ 正常 | 统一文案管理 |
 
-### 代码质量
+#### 代码质量
 - 无补丁式堆叠（质量门禁日无代码改动）
 - 无旧逻辑遗留（main 分支干净）
 - 无未使用 import
 - 无死代码
 - 无重复状态来源
 
-## 6. 安全检查
+### 6. 安全检查
 
 | 检查项 | 状态 | 说明 |
 |--------|------|------|
@@ -380,7 +529,7 @@ npx vitest run
 | 敏感数据检查 | ✅ PASS | 无密钥/Token 泄露 |
 | 依赖安全 | ⚠️ 注意 | 6 moderate vulnerabilities (非阻塞) |
 
-## 7. 结论
+### 7. 结论
 
 **状态**: ❌ FAIL_NEEDS_FIX
 
@@ -404,9 +553,9 @@ npx vitest run
 
 ---
 
-## 2026-05-17 质量门禁报告
+### 2026-05-17 质量门禁报告
 
-## 1. 分支
+### 1. 分支
 
 | 字段 | 值 |
 |------|-----|
@@ -416,7 +565,7 @@ npx vitest run
 | main_commit | 214b291 |
 | 执行日期 | 2026-05-17 |
 
-## 2. 检查命令
+### 2. 检查命令
 
 ### 仓库卫生检查
 ```bash
@@ -459,9 +608,9 @@ npx vitest run
 - 171 tests passed
 - storage, session-machine, metrics, insights, coach, ai-service all passed
 
-## 3. 今日验收标准逐条结果
+### 3. 今日验收标准逐条结果
 
-### today.md 任务：建立 ai-service.js 测试基线
+#### today.md 任务：建立 ai-service.js 测试基线
 
 | 验收标准 | 状态 | 说明 |
 |----------|------|------|
@@ -473,7 +622,7 @@ npx vitest run
 
 **结论**: today.md 任务（建立 ai-service.js 测试基线）已完成！
 
-## 4. 核心流程检查
+### 4. 核心流程检查
 
 | 检查项 | 状态 | 说明 |
 |--------|------|------|
@@ -490,9 +639,9 @@ npx vitest run
 | 成长洞察空状态 | ✅ 不崩溃 | sessions.length === 0 兜底 |
 | i18n 中英文 | ✅ 基本同步 | zh-CN/en-US 覆盖完整 |
 
-## 5. 架构质量判断
+### 5. 架构质量判断
 
-### 代码分层
+#### 代码分层
 | 层级 | 状态 | 说明 |
 |------|------|------|
 | engine/ | ✅ 正常 | 纯函数抽取，7 个模块 |
@@ -502,14 +651,14 @@ npx vitest run
 | hooks/ | ✅ 正常 | useTypingSession 核心逻辑 |
 | i18n/ | ✅ 正常 | 统一文案管理 |
 
-### 代码质量
+#### 代码质量
 - 无补丁式堆叠（ai-service.js 测试基线是新增的独立测试文件）
 - 无旧逻辑遗留（main 分支干净）
 - 无未使用 import
 - 无死代码
 - 无重复状态来源
 
-## 6. 安全检查
+### 6. 安全检查
 
 | 检查项 | 状态 | 说明 |
 |--------|------|------|
@@ -517,7 +666,7 @@ npx vitest run
 | 敏感数据检查 | ✅ PASS | 无密钥/Token 泄露 |
 | 依赖安全 | ⚠️ 注意 | 6 moderate vulnerabilities (非阻塞) |
 
-## 7. 结论
+### 7. 结论
 
 **状态**: ✅ PASS_READY_TO_MERGE
 
@@ -541,9 +690,9 @@ npx vitest run
 
 ---
 
-## 2026-05-16 质量门禁报告
+### 2026-05-16 质量门禁报告
 
-## 1. 分支
+### 1. 分支
 
 | 字段 | 值 |
 |------|-----|
@@ -553,7 +702,7 @@ npx vitest run
 | main_commit | f48b374 |
 | 执行日期 | 2026-05-16 |
 
-## 2. 检查命令
+### 2. 检查命令
 
 ### 仓库卫生检查
 ```bash
@@ -596,9 +745,9 @@ npm test
 - 148 tests passed
 - storage, session-machine, metrics, insights, coach all passed
 
-## 3. 今日验收标准逐条结果
+### 3. 今日验收标准逐条结果
 
-### today.md 任务：性能优化：减少首屏加载时间
+#### today.md 任务：性能优化：减少首屏加载时间
 
 | 验收标准 | 状态 | 说明 |
 |----------|------|------|
@@ -609,7 +758,7 @@ npm test
 
 **结论**: today.md 任务（性能优化）尚未实现。当前为质量门禁日，无 active_branch。
 
-## 4. 核心流程检查
+### 4. 核心流程检查
 
 | 检查项 | 状态 | 说明 |
 |--------|------|------|
@@ -626,9 +775,9 @@ npm test
 | 成长洞察空状态 | ✅ 不崩溃 | sessions.length === 0 兜底 |
 | i18n 中英文 | ✅ 基本同步 | zh-CN/en-US 覆盖完整 |
 
-## 5. 架构质量判断
+### 5. 架构质量判断
 
-### 代码分层
+#### 代码分层
 | 层级 | 状态 | 说明 |
 |------|------|------|
 | engine/ | ✅ 正常 | 纯函数抽取，7 个模块 |
@@ -638,14 +787,14 @@ npm test
 | hooks/ | ✅ 正常 | useTypingSession 核心逻辑 |
 | i18n/ | ✅ 正常 | 统一文案管理 |
 
-### 代码质量
+#### 代码质量
 - 无补丁式堆叠（质量门禁日无代码改动）
 - 无旧逻辑遗留（main 分支干净）
 - 无未使用 import
 - 无死代码
 - 无重复状态来源
 
-## 6. 安全检查
+### 6. 安全检查
 
 | 检查项 | 状态 | 说明 |
 |--------|------|------|
@@ -653,7 +802,7 @@ npm test
 | 敏感数据检查 | ✅ PASS | 无密钥/Token 泄露 |
 | 依赖安全 | ⚠️ 注意 | 6 moderate vulnerabilities (非阻塞) |
 
-## 7. 结论
+### 7. 结论
 
 **状态**: ❌ FAIL_NEEDS_FIX
 
@@ -675,9 +824,9 @@ npm test
 **Agent**: TypeMaster Quality Gate Agent
 **版本**: v2.0.0
 
-## 2026-05-15 质量门禁报告
+### 2026-05-15 质量门禁报告
 
-## 1. 分支
+### 1. 分支
 
 | 字段 | 值 |
 |------|-----|
@@ -687,7 +836,7 @@ npm test
 | main_commit | 7ce89fc |
 | 执行日期 | 2026-05-15 |
 
-## 2. 检查命令
+### 2. 检查命令
 
 ### 仓库卫生检查
 ```bash
@@ -728,9 +877,9 @@ npm test
 - 148 tests passed
 - storage, session-machine, metrics, insights, coach all passed
 
-## 3. 今日验收标准逐条结果
+### 3. 今日验收标准逐条结果
 
-### today.md 任务：性能优化：减少首屏加载时间
+#### today.md 任务：性能优化：减少首屏加载时间
 
 | 验收标准 | 状态 | 说明 |
 |----------|------|------|
@@ -741,7 +890,7 @@ npm test
 
 **结论**: today.md 任务（性能优化）尚未实现。当前为质量门禁日，无 active_branch。
 
-## 4. 核心流程检查
+### 4. 核心流程检查
 
 | 检查项 | 状态 | 说明 |
 |--------|------|------|
@@ -758,9 +907,9 @@ npm test
 | 成长洞察空状态 | ✅ 不崩溃 | sessions.length === 0 兜底 |
 | i18n 中英文 | ✅ 基本同步 | zh-CN/en-US 覆盖完整 |
 
-## 5. 架构质量判断
+### 5. 架构质量判断
 
-### 代码分层
+#### 代码分层
 | 层级 | 状态 | 说明 |
 |------|------|------|
 | engine/ | ✅ 正常 | 纯函数抽取，7 个模块 |
@@ -770,14 +919,14 @@ npm test
 | hooks/ | ✅ 正常 | useTypingSession 核心逻辑 |
 | i18n/ | ✅ 正常 | 统一文案管理 |
 
-### 代码质量
+#### 代码质量
 - 无补丁式堆叠（质量门禁日无代码改动）
 - 无旧逻辑遗留（main 分支干净）
 - 无未使用 import
 - 无死代码
 - 无重复状态来源
 
-## 6. 安全检查
+### 6. 安全检查
 
 | 检查项 | 状态 | 说明 |
 |--------|------|------|
@@ -785,7 +934,7 @@ npm test
 | 敏感数据检查 | ✅ PASS | 无密钥/Token 泄露 |
 | 依赖安全 | ⚠️ 注意 | 6 moderate vulnerabilities (非阻塞) |
 
-## 7. 结论
+### 7. 结论
 
 **状态**: ❌ FAIL_NEEDS_FIX
 
@@ -807,7 +956,22 @@ npm test
 **Agent**: TypeMaster Quality Gate Agent
 **版本**: v2.0.0
 
-## 2. 检查命令
+---
+
+## 历史质量门禁报告
+### 2026-05-13 质量门禁报告
+
+### 1. 分支
+
+| 字段 | 值 |
+|------|-----|
+| 当前分支 | main |
+| active_branch | none |
+| 分支类型 | 质量门禁日（无实现分支） |
+| main_commit | 7ce89fc |
+| 执行日期 | 2026-05-13 |
+
+### 2. 检查命令
 
 ### 仓库卫生检查
 ```bash
@@ -858,9 +1022,9 @@ curl http://localhost:4173/
 - HTML 返回正确，页面标题 TypeMaster 2.0
 - 所有路由正常响应（/, /practice, /result, /insights, /coach）
 
-## 3. 今日验收标准逐条结果
+### 3. 今日验收标准逐条结果
 
-### today.md 任务：storage.js 测试基线建立
+#### today.md 任务：storage.js 测试基线建立
 
 | 验收标准 | 状态 | 说明 |
 |----------|------|------|
@@ -872,7 +1036,7 @@ curl http://localhost:4173/
 
 **结论**: today.md 任务（storage.js 测试基线建立）尚未实现。当前为巡检日，无 active_branch。
 
-## 4. 核心流程检查
+### 4. 核心流程检查
 
 | 检查项 | 状态 | 说明 |
 |--------|------|------|
@@ -889,9 +1053,9 @@ curl http://localhost:4173/
 | 成长洞察空状态 | ✅ 不崩溃 | sessions.length === 0 兜底 |
 | i18n 中英文 | ✅ 基本同步 | zh-CN/en-US 覆盖完整 |
 
-## 5. 架构质量判断
+### 5. 架构质量判断
 
-### 代码分层
+#### 代码分层
 | 层级 | 状态 | 说明 |
 |------|------|------|
 | engine/ | ✅ 正常 | 纯函数抽取，7 个模块 |
@@ -901,7 +1065,7 @@ curl http://localhost:4173/
 | hooks/ | ✅ 正常 | useTypingSession 核心逻辑 |
 | i18n/ | ✅ 正常 | 统一文案管理 |
 
-### 代码质量
+#### 代码质量
 - 无补丁式堆叠（巡检日无代码改动）
 - 无旧逻辑遗留（main 分支干净）
 - 无未使用 import
@@ -909,7 +1073,7 @@ curl http://localhost:4173/
 - 无重复状态来源
 - storage.js 有完善的 localStorage 兜底（JSON 解析异常捕获）
 
-## 6. 安全检查
+### 6. 安全检查
 
 | 检查项 | 状态 | 说明 |
 |--------|------|------|
@@ -917,7 +1081,7 @@ curl http://localhost:4173/
 | 敏感数据检查 | ✅ PASS | 无密钥/Token 泄露 |
 | 依赖安全 | ⚠️ 注意 | 6 moderate vulnerabilities (非阻塞) |
 
-## 7. 结论
+### 7. 结论
 
 **状态**: ✅ PASS_READY_TO_MERGE
 
