@@ -9,7 +9,7 @@
 | current_phase | stable |
 | last_successful_main_commit | 46c874c |
 | active_branch | none |
-| current_iteration_goal | 性能优化：减少首屏加载时间，提升用户体验 |
+| current_iteration_goal | 代码覆盖率监控集成 |
 | quality_gate_status | passed |
 | merge_status | blocked |
 | rollback_required | false |
@@ -21,10 +21,10 @@
 ## 状态说明
 
 ### current_phase: stable
-main 分支稳定，所有门禁通过，今日迭代任务待规划。
+main 分支稳定，所有门禁通过，今日为质量门禁日。
 
 ### today.md 今日主线
-性能优化：减少首屏加载时间，提升用户体验。任务待执行（无实现分支）。
+性能优化任务已完成（2026-05-20），下一任务为代码覆盖率监控集成（待规划）。
 
 ### last_successful_main_commit: 46c874c
 - main 分支稳定，所有门禁通过
@@ -35,7 +35,7 @@ main 分支稳定，所有门禁通过，今日迭代任务待规划。
 - active_branch: none（无实现分支）
 - 质量门禁状态：passed
 - 合并状态：blocked
-- 判定结果：无实现分支，等待人工创建
+- 判定结果：main 分支稳定，无需修复，等待人工创建实现分支执行代码覆盖率监控集成
 - main 分支最新 commit: 46c874c
 
 ---
@@ -44,7 +44,7 @@ main 分支稳定，所有门禁通过，今日迭代任务待规划。
 
 | 日期 | 状态 | 说明 |
 |------|------|------|
-| 2026-05-21 | PASSED | 质量门禁检查（无 active_branch，main 稳定），171 tests passed |
+| 2026-05-21 | PASSED | 质量门禁检查（无 active_branch，main 稳定），171 tests passed | 主 bundle 18.44 kB gzip |
 | 2026-05-20 | PASSED | 性能优化完成并合并（lazy loading，bundle 减少 39%），171 tests passed |
 | 2026-05-19 | FAILED | Agent 无人值守质量门禁（无 active_branch，需 implement_required） |
 | 2026-05-18 | FAILED | Agent 无人值守质量门禁（无 active_branch，需 implement_required） |
