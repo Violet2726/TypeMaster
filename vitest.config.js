@@ -6,6 +6,13 @@ export default defineConfig({
     test: {
         globals: true,
         environment: 'node',
-        include: ['src/engine/__tests__/**/*.test.js', 'src/hooks/__tests__/**/*.test.jsx', 'src/services/__tests__/**/*.test.js']
+        include: ['src/engine/__tests__/**/*.test.js', 'src/hooks/__tests__/**/*.test.jsx', 'src/services/__tests__/**/*.test.js'],
+        coverage: {
+            provider: 'v8',
+            reporter: ['text', 'json', 'html'],
+            reportsDirectory: 'coverage',
+            include: ['src/engine/**', 'src/hooks/**', 'src/services/**'],
+            exclude: ['**/__tests__/**', '**/node_modules/**']
+        }
     }
 });
