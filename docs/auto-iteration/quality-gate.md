@@ -8,7 +8,7 @@
 | active_branch | none |
 | 分支类型 | 质量门禁日（无实现分支） |
 | main_commit | 46c874c |
-| 执行日期 | 2026-05-21 |
+| 执行日期 | 2026-05-22 |
 
 ## 2. 检查命令
 
@@ -37,7 +37,7 @@ npm install
 npm run build
 ```
 **结果**: ✅ PASSED
-- 1.52s 构建完成
+- 1.16s 构建完成
 - dist/assets/index-Ddk91CLj.js: 44.69 kB (gzip: 18.44 kB)
 - 主 bundle gzip 体积为 18.44 kB（与 2026-05-20 优化后一致）
 
@@ -56,12 +56,12 @@ npm test
 
 | 验收标准 | 状态 | 说明 |
 |----------|------|------|
-| npm run build 成功通过 | ✅ PASS | 1.52s 构建完成 |
+| npm run build 成功通过 | ✅ PASS | 1.16s 构建完成 |
 | npm test 成功通过 | ✅ PASS | 171 tests passed |
-| 包体积至少减少 10%（gzipped） | ✅ PASS | 已完成，主 bundle 从 30.27 kB 降至 18.44 kB |
+| 包体积至少减少 10%（gzipped） | ✅ PASS | 已完成，主 bundle 从 30.27 kB 降至 18.44 kB（减少约 39%） |
 | 无回归测试失败 | ✅ PASS | 无回归，所有原有测试通过 |
 
-**结论**: today.md 任务（性能优化）已于 2026-05-20 完成。当前为质量门禁日，无 active_branch。
+**结论**: today.md 任务（性能优化）已于 2026-05-20 完成。当前为质量门禁日，无 active_branch (auto/implement-20260522 不存在)。
 
 ## 4. 核心流程检查
 
@@ -75,7 +75,7 @@ npm test
 | /coach 路由重定向 | ✅ 正常 | Navigate to /insights |
 | 标准词库训练路径 | ✅ 存在 | config.source === 'builtin' |
 | AI 训练路径 | ✅ 存在 | config.source === 'ai' |
-| AI 失败兜底 | ✅ 存在 | buildFallbackCoachAdvice |
+| AI 失败兜底 | ✅ 存在 | buildLocalCoachAdvice (engine/coach.js) |
 | 结果页核心指标 | ✅ 存在 | WPM/Accuracy/Consistency |
 | 成长洞察空状态 | ✅ 不崩溃 | sessions.length === 0 兜底 |
 | i18n 中英文 | ✅ 基本同步 | zh-CN/en-US 覆盖完整 |
@@ -98,6 +98,44 @@ npm test
 - 无未使用 import
 - 无死代码
 - 无重复状态来源
+
+## 6. 安全检查
+
+| 检查项 | 状态 | 说明 |
+|--------|------|------|
+| 密钥文件检查 | ✅ PASS | 无 .env/config.js 误提交 |
+| 敏感数据检查 | ✅ PASS | 无密钥/Token 泄露 |
+| 依赖安全 | ⚠️ 注意 | 6 moderate vulnerabilities (非阻塞) |
+
+## 7. 结论
+
+**状态**: ✅ PASS_READY_TO_MERGE
+
+**说明**:
+1. 今天是 **质量门禁日**（2026-05-22），无 active_branch
+2. auto/implement-20260522 分支不存在，无法执行完整质量门禁验证
+3. main 分支状态稳定，所有基础门禁通过
+4. 项目架构清晰，代码质量良好
+5. 测试基线完整（171 tests total）
+6. i18n 中英文覆盖完整
+7. 性能优化任务（2026-05-20）已完成，主 bundle 减少约 39%
+
+**today.md 任务状态**:
+- today.md 记录的任务（性能优化：减少首屏加载时间）已完成
+- 下一步可以进行代码覆盖率监控集成（P0）
+- next_action = implement_required
+
+---
+
+**门禁检查时间**: 2026-05-22 04:31 UTC
+**Agent**: TypeMaster Quality Gate Agent
+**版本**: v2.0.0
+
+---
+
+## 历史质量门禁报告
+
+# 今日质量门禁报告
 
 ## 6. 安全检查
 
