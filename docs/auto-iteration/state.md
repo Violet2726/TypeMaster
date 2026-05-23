@@ -5,9 +5,9 @@
 | 字段 | 值 |
 |------|-----|
 | date | 2026-05-23 |
-| main_commit | 0d615c7 |
+| main_commit | fe4a843 |
 | current_phase | stable |
-| last_successful_main_commit | 0d615c7 |
+| last_successful_main_commit | fe4a843 |
 | active_branch | none |
 | current_iteration_goal | 代码覆盖率监控集成 |
 | quality_gate_status | passed |
