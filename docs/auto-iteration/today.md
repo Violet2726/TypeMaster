@@ -1,61 +1,81 @@
 # 今日自治迭代计划
 
 ## 1. 今日主线
-性能优化：减少首屏加载时间，提升用户体验
+代码覆盖率监控集成：为 Vitest 添加覆盖率报告功能，并集成到 CI/CD 流程中
 
 ## 2. 问题背景
-当前项目 bundle 大小约为 330 kB (gzipped: 105.58 kB)，首屏加载时间有优化空间。
+当前项目已有 171 个测试用例，但缺少代码覆盖率监控。无法发现测试遗漏，无人值守合并时缺少覆盖率验证环节。
 
 ## 3. 根因判断
-- 依赖包没有有效拆分（已初步拆分为 react-vendor、router-vendor 和 main）
-- 可以进一步优化代码分割和懒加载
-- 检查是否有未使用的依赖或代码
+- 技术债：覆盖率监控未集成到 CI/CD 中
+- 缺少覆盖率阈值配置
+- 测试覆盖率未知，无法评估测试完整性
 
 ## 4. 目标用户价值
-- 更快的首屏加载速度
-- 更好的用户体验
+- 间接提升代码质量，减少潜在 bug
+- 为未来迭代提供测试覆盖保障
 
 ## 5. 工程价值
-- 提升性能指标
-- 优化用户体验
-- 符合现代前端最佳实践
+- 建立覆盖率基线，监控测试覆盖变化
+- 无人值守合并时有覆盖率验证环节
+- 提升项目可维护性和可靠性
 
 ## 6. 涉及模块
-- vite.config.js（代码分割配置）
-- src/App.jsx（路由懒加载）
-- 其他可能的优化点
+- `vitest.config.js`（覆盖率配置）
+- `package.json`（添加覆盖率脚本）
+- `.github/workflows/ci.yml`（CI 中集成覆盖率报告）
+- 可能需要更新 `.gitignore`（忽略覆盖率报告目录）
 
 ## 7. 非目标
-- 不重构现有业务逻辑
-- 不实现新功能
+- 不新增测试用例
+- 不重构现有测试逻辑
+- 不强制要求 100% 覆盖率
+- 不上传覆盖率到外部服务（如 Coveralls）
 
 ## 8. 设计方案
-### 优化方向
-1. **路由懒加载**：使用 React.lazy() 和 Suspense 懒加载页面组件
-2. **代码分割优化**：调整 vite.config.js 的 chunking 策略
-3. **依赖分析**：检查是否有未使用的依赖
+### 方案概述
+使用 Vitest 内置的覆盖率报告功能（基于 c8），配置合理的覆盖率阈值，集成到 CI 中。
+
+### 具体实施
+1. **配置 Vitest 覆盖率**
+   - 在 `vitest.config.js` 中启用 `coverage` 配置
+   - 配置覆盖率报告格式：`text-summary`（控制台）和 `html`（本地查看）
+   - 配置合理的覆盖率阈值（如 70% 作为初始基线）
+
+2. **添加 npm 脚本**
+   - `npm run test:coverage`：生成覆盖率报告
+
+3. **集成到 CI**
+   - 在 `.github/workflows/ci.yml` 中添加覆盖率步骤
+   - 确保 CI 失败时阻止合并（如果覆盖率低于阈值）
+
+4. **更新 .gitignore**
+   - 添加 `coverage/` 目录到 `.gitignore`
 
 ## 9. 验收标准
-- npm run build 成功通过
-- npm test 成功通过
-- 包体积至少减少 10%（gzipped）
-- 无回归测试失败
+- `npm run build` 成功通过
+- `npm test` 成功通过
+- `npm run test:coverage` 成功生成覆盖率报告
+- 配置的覆盖率阈值合理（根据实际情况设置）
+- CI 流程已集成覆盖率检查
+- 工作目录干净，无未提交改动
 
 ## 10. 质量门禁
 列出今天必须执行的命令：
-1. npm install（确保依赖完整）
-2. npm run build（确保构建正常）
-3. npm test（确保所有测试通过）
+1. `npm install`（确保依赖完整）
+2. `npm run build`（确保构建正常）
+3. `npm test`（确保所有测试通过）
+4. `npm run test:coverage`（确保覆盖率报告生成成功）
 
 ## 11. 回滚策略
 如果失败：
-1. 使用 git reset --hard 回退到 main 分支当前状态
-2. 更新 failure-log.md 记录失败原因
-3. 更新 state.md 标记 rollback_required 为 true
+1. 使用 `git reset --hard` 回退到 main 分支当前状态
+2. 更新 `failure-log.md` 记录失败原因
+3. 更新 `state.md` 标记 `rollback_required` 为 true
 
 ## 12. 自动合并条件
 必须写清楚：
-- npm run build 必须通过
-- npm test 必须通过
+- `npm run build` 必须通过
+- `npm test` 必须通过
 - 工作目录必须干净（无未提交改动）
 - 必须删除临时文件（如果有）
