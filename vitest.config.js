@@ -7,5 +7,17 @@ export default defineConfig({
         globals: true,
         environment: 'node',
         include: ['src/engine/__tests__/**/*.test.js', 'src/hooks/__tests__/**/*.test.jsx', 'src/services/__tests__/**/*.test.js']
+    },
+    coverage: {
+        provider: 'v8',
+        reporter: ['text-summary', 'html'],
+        include: ['src/engine/**/*.js', 'src/hooks/**/*.jsx', 'src/services/**/*.js'],
+        exclude: ['src/**/__tests__/**', 'src/**/*.test.js', 'src/**/*.test.jsx'],
+        thresholds: {
+            lines: 70,
+            functions: 70,
+            branches: 50,
+            statements: 70
+        }
     }
 });
