@@ -5,12 +5,13 @@ config.js
 node_modules
 dist
 .vite
-coverage
+
+# Coverage reports
+coverage/
 
 docs/*
 !docs/ai-iteration/
 !docs/auto-iteration/
 .history
-
 
 !src/engine/config.js
