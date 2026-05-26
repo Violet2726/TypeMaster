@@ -5,7 +5,7 @@ config.js
 node_modules
 dist
 .vite
-
+coverage
 
 docs/*
 !docs/ai-iteration/
