@@ -5,26 +5,31 @@
 | 字段 | 值 |
 |------|-----|
 | date | 2026-05-26 |
-| main_commit | fe4a843 |
-| current_phase | planned |
-| last_successful_main_commit | fe4a843 |
-| active_branch | none |
+| main_commit | d3ba154 |
+| current_phase | implemented |
+| last_successful_main_commit | d3ba154 |
+| active_branch | auto/implement-20260526-no-ci |
 | current_iteration_goal | 代码覆盖率监控集成 |
 | quality_gate_status | passed |
-| merge_status | blocked |
+| merge_status | ready |
 | rollback_required | false |
 | unresolved_failures | none |
-| next_action | implement_required |
+| next_action | merge |
 
 ---
 
 ## 状态说明
 
-### current_phase: planned
-今日计划已制定，等待实现分支的创建和执行。
+### current_phase: implemented
+代码覆盖率监控集成已完成实现，待合并。
 
 ### today.md 今日主线
-代码覆盖率监控集成：为 Vitest 添加覆盖率报告功能，并集成到 CI/CD 流程中
+代码覆盖率监控集成 ✅ 已完成：
+- 安装 @vitest/coverage-v8@2.1.9
+- 配置 vitest.config.js 开启覆盖率 (v8 引擎, 阈值 70%)
+- 添加 coverage/ 到 .gitignore
+- 所有测试通过，覆盖率报告生成成功
+- CI workflow 集成需要手动审批（workflow scope 限制）
 
 ---
 
@@ -32,7 +37,7 @@
 
 | 日期 | 状态 | 说明 |
 |------|------|------|
-| 2026-05-26 | PASSED | 质量门禁检查，main 稳定，无 active_branch，需 implement_required |
+| 2026-05-26 | IMPLEMENTED | 代码覆盖率监控集成已完成实现，PR #9 已创建，待合并 |
 | 2026-05-25 | PASSED | 质量门禁检查，main 稳定，无 active_branch，需 implement_required |
 | 2026-05-24 | PASSED | 质量门禁检查，main 稳定，171 tests passed, 主 bundle 18.44 kB gzip |
 | 2026-05-23 | PASSED | 质量门禁检查，main 稳定，171 tests passed, 主 bundle 18.44 kB gzip |
@@ -62,7 +67,7 @@
 ## 待规划任务
 
 ### P0
-- [ ] 代码覆盖率监控集成
+- [x] 代码覆盖率监控集成 ✅ 已完成（PR #9 待合并）
 
 ### P1
 - [ ] 移动端输入体验优化
@@ -82,6 +87,7 @@
 
 | 日期 | 决策 | 状态 |
 |------|------|------|
+| 2026-05-26 | 代码覆盖率监控集成：使用 @vitest/coverage-v8, 阈值 70% (lines/functions/statements), 50% (branches), CI 集成待手动审批 | 已实现（PR #9） |
 | 2026-05-20 | 性能优化：实现路由懒加载（React.lazy + Suspense） | 已完成 |
 | 2026-05-17 | ai-service.js 测试基线建立（23 个新测试） | 生效中 |
 | 2026-05-14 | Agent 巡检：无 active_branch，main 稳定 | 待规划 |
