@@ -1,81 +1,54 @@
 # 今日自治迭代计划
 
 ## 1. 今日主线
-代码覆盖率监控集成：为 Vitest 添加覆盖率报告功能，并集成到 CI/CD 流程中
+代码覆盖率监控集成
 
 ## 2. 问题背景
-当前项目已有 171 个测试用例，但缺少代码覆盖率监控。无法发现测试遗漏，无人值守合并时缺少覆盖率验证环节。
+当前项目已有 171 个测试用例，但无覆盖率报告，无法发现测试遗漏。新增代码可能缺少测试覆盖，无人值守合并时无法验证。
 
 ## 3. 根因判断
-- 技术债：覆盖率监控未集成到 CI/CD 中
-- 缺少覆盖率阈值配置
-- 测试覆盖率未知，无法评估测试完整性
+技术缺口 - 缺少 Vitest 覆盖率工具集成
 
 ## 4. 目标用户价值
-- 间接提升代码质量，减少潜在 bug
-- 为未来迭代提供测试覆盖保障
+间接提升产品质量，通过覆盖率发现测试缺失，降低未来回归风险
 
 ## 5. 工程价值
-- 建立覆盖率基线，监控测试覆盖变化
-- 无人值守合并时有覆盖率验证环节
-- 提升项目可维护性和可靠性
+为无人值守合并提供更严格的质量保障，建立测试覆盖基线
 
 ## 6. 涉及模块
-- `vitest.config.js`（覆盖率配置）
-- `package.json`（添加覆盖率脚本）
-- `.github/workflows/ci.yml`（CI 中集成覆盖率报告）
-- 可能需要更新 `.gitignore`（忽略覆盖率报告目录）
+- vitest.config.js - 覆盖率配置
+- package.json - 依赖与脚本
+- .gitignore - 忽略覆盖率目录
 
 ## 7. 非目标
-- 不新增测试用例
-- 不重构现有测试逻辑
-- 不强制要求 100% 覆盖率
-- 不上传覆盖率到外部服务（如 Coveralls）
+- 不提升覆盖率到 100%，仅建立基础设施
+- 不修改现有测试
+- 不修改业务代码
 
 ## 8. 设计方案
-### 方案概述
-使用 Vitest 内置的覆盖率报告功能（基于 c8），配置合理的覆盖率阈值，集成到 CI 中。
-
-### 具体实施
-1. **配置 Vitest 覆盖率**
-   - 在 `vitest.config.js` 中启用 `coverage` 配置
-   - 配置覆盖率报告格式：`text-summary`（控制台）和 `html`（本地查看）
-   - 配置合理的覆盖率阈值（如 70% 作为初始基线）
-
-2. **添加 npm 脚本**
-   - `npm run test:coverage`：生成覆盖率报告
-
-3. **集成到 CI**
-   - 在 `.github/workflows/ci.yml` 中添加覆盖率步骤
-   - 确保 CI 失败时阻止合并（如果覆盖率低于阈值）
-
-4. **更新 .gitignore**
-   - 添加 `coverage/` 目录到 `.gitignore`
+- 使用 @vitest/coverage-v8 作为覆盖率工具
+- 配置阈值: 70% (statements/lines/functions), 50% (branches)
+- 覆盖范围: src/engine, src/hooks, src/services
+- 添加 coverage/ 到 .gitignore
 
 ## 9. 验收标准
-- `npm run build` 成功通过
-- `npm test` 成功通过
-- `npm run test:coverage` 成功生成覆盖率报告
-- 配置的覆盖率阈值合理（根据实际情况设置）
-- CI 流程已集成覆盖率检查
-- 工作目录干净，无未提交改动
+- npm run build 成功通过
+- npm test 成功通过
+- npm run test:coverage 成功生成覆盖率报告
+- vitest.config.js 包含 coverage 配置
+- .gitignore 包含 coverage/
+- package.json 包含 @vitest/coverage-v8 依赖
 
 ## 10. 质量门禁
-列出今天必须执行的命令：
-1. `npm install`（确保依赖完整）
-2. `npm run build`（确保构建正常）
-3. `npm test`（确保所有测试通过）
-4. `npm run test:coverage`（确保覆盖率报告生成成功）
+- npm install
+- npm run build
+- npm test
+- npm run test:coverage
 
 ## 11. 回滚策略
-如果失败：
-1. 使用 `git reset --hard` 回退到 main 分支当前状态
-2. 更新 `failure-log.md` 记录失败原因
-3. 更新 `state.md` 标记 `rollback_required` 为 true
+如失败，执行 git reset --hard origin/main 即可
 
 ## 12. 自动合并条件
-必须写清楚：
-- `npm run build` 必须通过
-- `npm test` 必须通过
-- 工作目录必须干净（无未提交改动）
-- 必须删除临时文件（如果有）
+- 所有质量门禁通过
+- 无未提交改动
+- 验收标准全部满足
