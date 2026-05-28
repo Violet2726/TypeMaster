@@ -5,24 +5,24 @@
 | 字段 | 值 |
 |------|-----|
 | date | 2026-05-28 |
-| main_commit | 066a069 |
-| current_phase | implement |
-| last_successful_main_commit | 066a069 |
-| active_branch | auto/implement-20260528 |
-| current_iteration_goal | 提升代码覆盖率至 70% 以上，补充缺失模块测试 |
+| main_commit | 93f273a |
+| current_phase | stable |
+| last_successful_main_commit | 93f273a |
+| active_branch | none |
+| current_iteration_goal | 待规划 |
 | quality_gate_status | passed |
-| merge_status | pending |
-| next_action | implement |
+| merge_status | merged |
+| next_action | implement_required |
 
 ---
 
 ## 状态说明
 
-### current_phase: implement
-正在实现今日主线任务：补充缺失模块测试以提升代码覆盖率
+### current_phase: stable
+代码覆盖率已提升至 70.1%，相关测试已合并到 main 分支
 
 ### today.md 今日主线
-提升代码覆盖率至 70% 以上，补充缺失模块测试
+提升代码覆盖率至 70% 以上，补充缺失模块测试（已完成）
 
 ---
 
