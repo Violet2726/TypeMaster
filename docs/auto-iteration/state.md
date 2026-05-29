@@ -4,10 +4,10 @@
 
 | 字段 | 值 |
 |------|-----|
-| date | 2026-05-28 |
-| main_commit | 93f273a |
+| date | 2026-05-29 |
+| main_commit | 2af25f1 |
 | current_phase | stable |
-| last_successful_main_commit | 93f273a |
+| last_successful_main_commit | 2af25f1 |
 | active_branch | none |
 | current_iteration_goal | 待规划 |
 | quality_gate_status | passed |
@@ -19,10 +19,12 @@
 ## 状态说明
 
 ### current_phase: stable
-代码覆盖率已提升至 70.1%，相关测试已合并到 main 分支
+代码覆盖率已提升至 70.1%，相关测试已合并到 main 分支（2026-05-28）
 
 ### today.md 今日主线
-提升代码覆盖率至 70% 以上，补充缺失模块测试（已完成）
+提升代码覆盖率至 70% 以上，补充缺失模块测试 ✅ 已完成（2026-05-28）
+- 新增测试文件：config.test.js, draft.test.js, rendering.test.js, cloud-contracts.test.js
+- 代码覆盖率：70.1% (statements/lines), 87.99% (branches), 95.06% (functions)
 
 ---
 
