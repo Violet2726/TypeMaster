@@ -2,6 +2,7 @@ import {
     buildChallengeTrend,
     compareChallengeScores,
     createChallengeEntryPreview,
+    getChallengeTrendState,
     getChallengeLevelLeaderboard,
     getChallengeSessions,
     getLatestChallengeSession,
@@ -170,5 +171,13 @@ describe('challenge helpers', () => {
         expect(trend.deltaWpm).toBe(8);
         expect(trend.deltaAccuracy).toBe(1);
         expect(trend.best?.id).toBe('session-2');
+    });
+
+    test('derives the correct challenge trend state', () => {
+        expect(getChallengeTrendState({ attempts: 0 })).toBe('idle');
+        expect(getChallengeTrendState({ attempts: 1 })).toBe('warm');
+        expect(getChallengeTrendState({ attempts: 2, deltaWpm: 6, deltaAccuracy: 0 })).toBe('improving');
+        expect(getChallengeTrendState({ attempts: 2, deltaWpm: -6, deltaAccuracy: -1 })).toBe('cooling');
+        expect(getChallengeTrendState({ attempts: 3, deltaWpm: 2, deltaAccuracy: 0 })).toBe('steady');
     });
 });

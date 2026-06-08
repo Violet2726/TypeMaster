@@ -6,57 +6,57 @@
 - **完成状态**: ✅ 已完成
 
 ## 1. 今日主线
-把 ChallengePage 的挑战表现从“列表”升级成“趋势图”，让用户更直观看见今天是越打越好还是开始回落。
+把挑战趋势结论继续前置到首页，让用户在首页就知道“现在是否值得再来一轮”。
 
 ## 2. 问题背景
-上一轮已经能看到今日挑战历史列表，但仍需要靠读数字理解表现变化。用户很难一眼判断今天几次挑战是持续进步、开始回落，还是整体稳定。
+上一轮已经做出挑战趋势图，但用户仍然需要点进 ChallengePage 才知道今天更适合继续冲榜还是先稳节奏。首页挑战卡还缺少真正的“下一步建议”。
 
 ## 3. 根因判断
-- ChallengePage 没有可视化趋势反馈
-- 只有表格记录，缺少“首次 vs 最新”的差异表达
-- 现有 helper 已支持历史数据，但还没有聚合成趋势模型
+- 首页挑战卡虽然有名次和最佳信息，但没有动作建议
+- 挑战趋势状态还停留在 ChallengePage 内部，没有前置到入口层
+- 当前缺少“继续冲榜 / 先稳准确率 / 继续扩大样本”这类明确决策语言
 
 ## 4. 目标用户价值
-让用户打开 ChallengePage 时，一眼看出今天几次挑战是提速了、掉速了，还是整体平稳，从而更快决定是否继续挑战。
+让用户不进挑战页也能从首页直接知道今天的挑战状态和下一步建议，降低决策成本，提升回访后的启动速度。
 
 ## 5. 工程价值
-把 challenge helper 从“记录过滤”扩展到“趋势建模”，让图表、首页结论和后续建议都能复用同一套数据基础。
+把趋势状态抽成可复用 helper，让首页建议、挑战页趋势图和后续教练结论共享同一套规则。
 
 ## 6. 涉及模块
-- src/components/ChallengeTrendChart.jsx → 新增挑战趋势图组件 ✅
-- src/pages/ChallengePage.jsx → 接入趋势图并保留回放列表 ✅
-- src/engine/challenge.js → 新增 challenge trend 建模 helper ✅
-- src/engine/__tests__/challenge.test.js → 新增趋势 helper 测试 ✅
-- src/training/copy.js → 新增趋势图文案 ✅
-- src/pages/__tests__/ChallengePage.test.jsx → 覆盖趋势图渲染 ✅
-- e2e/app.spec.js → 覆盖 ChallengePage 趋势图路径 ✅
+- src/pages/HomePage.jsx → 首页挑战卡新增“下一步建议” ✅
+- src/engine/challenge.js → 新增 challenge trend state helper ✅
+- src/engine/__tests__/challenge.test.js → 新增趋势状态测试 ✅
+- src/training/copy.js → 新增建议化文案 ✅
+- index.css → 新增首页建议区样式 ✅
+- src/pages/__tests__/HomePage.test.jsx → 覆盖建议化提示 ✅
+- e2e/app.spec.js → 覆盖首页建议提示路径 ✅
 
 ## 7. 非目标
-- 今日不做跨天趋势
-- 不做更复杂的交互式拖拽图表
+- 今日不新增新的挑战模式
+- 不做跨天建议逻辑
 - 不改 challenge API 协议
 
 ## 8. 设计方案
-1. 新增今日挑战趋势图，展示 WPM 与准确率两条曲线
-2. 趋势图摘要直接展示首次、最新、速度变化、准确率变化
-3. 根据今日变化自动给出“继续提速 / 先稳节奏 / 整体平稳”的趋势结论
-4. 当前趋势只基于今日当前 challengeId 的记录
+1. 基于今日 challenge trend state 推导首页建议
+2. 建议状态分为：`idle / warm / improving / cooling / steady`
+3. 首页挑战卡直接展示“下一步建议”文案
+4. 保持建议口径与 ChallengePage 趋势图一致
 
 ## 9. 验收标准
-- [x] ChallengePage 可见今日挑战趋势图
-- [x] 趋势图可见速度与准确率变化摘要
-- [x] 单测与 e2e 覆盖趋势图路径
+- [x] 首页挑战卡可见明确的下一步建议
+- [x] 建议会随今日挑战状态变化
+- [x] 单测与 e2e 覆盖建议提示路径
 - [x] 构建与全量测试通过
 
 ## 10. 质量门禁
 - [x] npm run build ✅
-- [x] npm test ✅ (247 passed)
+- [x] npm test ✅ (248 passed)
 - [x] npm run test:e2e ✅ (8 passed, 4 skipped)
 
 ## 11. 回滚策略
-若趋势图表达引发理解成本，优先回退 ChallengeTrendChart 与 ChallengePage 中的趋势接入，不动已有历史列表与榜单逻辑。
+若首页建议造成认知噪音，优先回退 HomePage 中的建议区和趋势状态文案，不动已有挑战趋势图与历史回放。
 
 ## 12. 下一轮候选
-- 首页挑战卡加入“是否值得再来一轮”的建议化提示
 - ChallengePage 趋势图增加更细的焦点态说明
+- 首页挑战卡加入“推荐何时停止继续冲榜”的边界提示
 - 继续拆分 practice-store，减少挑战与计划状态耦合

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { buildInsights, getChallengePersonalBest, getChallengeSessions, getChallengeStanding, getLatestChallengeSession } from '../engine';
+import { buildChallengeTrend, buildInsights, getChallengePersonalBest, getChallengeSessions, getChallengeStanding, getChallengeTrendState, getLatestChallengeSession } from '../engine';
 import { formatDateTime } from '../i18n';
 import { usePracticeStore } from '../store/practice-store';
 import { getTrainingCopy } from '../training/copy';
@@ -71,6 +71,28 @@ function getChallengePerformanceText(copy, challengeSession, challengeStanding, 
     return trainingCopy.challenge.homeIdleNote;
 }
 
+function getChallengeStrategyText(trainingCopy, challengeTrend) {
+    const state = getChallengeTrendState(challengeTrend);
+
+    if (state === 'idle') {
+        return trainingCopy.challenge.strategyIdle;
+    }
+
+    if (state === 'warm') {
+        return trainingCopy.challenge.strategyWarm;
+    }
+
+    if (state === 'improving') {
+        return trainingCopy.challenge.strategyImproving;
+    }
+
+    if (state === 'cooling') {
+        return trainingCopy.challenge.strategyCooling;
+    }
+
+    return trainingCopy.challenge.strategySteady;
+}
+
 export function HomePage() {
     const navigate = useNavigate();
     const [isLaunchingChallenge, setIsLaunchingChallenge] = useState(false);
@@ -121,6 +143,10 @@ export function HomePage() {
         () => getChallengeSessions(sessions, dailyChallenge?.id),
         [dailyChallenge?.id, sessions]
     );
+    const challengeTrend = useMemo(
+        () => buildChallengeTrend(challengeSessions),
+        [challengeSessions]
+    );
     const challengeStanding = useMemo(
         () => getChallengeStanding(dailyChallenge?.leaderboard || [], latestChallengeSession?.id),
         [dailyChallenge?.leaderboard, latestChallengeSession?.id]
@@ -132,6 +158,10 @@ export function HomePage() {
     const challengePerformanceText = useMemo(
         () => getChallengePerformanceText(copy, latestChallengeSession, challengeStanding, challengePersonalBest, trainingCopy),
         [challengePersonalBest, challengeStanding, copy, latestChallengeSession, trainingCopy]
+    );
+    const challengeStrategyText = useMemo(
+        () => getChallengeStrategyText(trainingCopy, challengeTrend),
+        [challengeTrend, trainingCopy]
     );
 
     const handleFreePractice = () => {
@@ -242,6 +272,10 @@ export function HomePage() {
                                 ))}
                             </div>
                             <p className="muted-text">{challengePerformanceText}</p>
+                            <div className="home-action-card__strategy">
+                                <span className="summary-label">{trainingCopy.challenge.strategyTitle}</span>
+                                <p className="lead-text">{challengeStrategyText}</p>
+                            </div>
                         </div>
 
                         <div className="home-action-card__footer">

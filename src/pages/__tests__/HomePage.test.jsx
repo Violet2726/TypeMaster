@@ -42,6 +42,19 @@ describe('HomePage', () => {
                 },
                 'typemaster:v2:sessions': [
                     {
+                        id: 'session-0',
+                        trainingMeta: {
+                            type: 'challenge',
+                            stepId: challengeId,
+                            title: 'Daily challenge'
+                        },
+                        result: {
+                            wpm: 80,
+                            accuracy: 97,
+                            completedAt: '2026-06-08T07:00:00.000Z'
+                        }
+                    },
+                    {
                         id: 'session-1',
                         trainingMeta: {
                             type: 'challenge',
@@ -109,7 +122,8 @@ describe('HomePage', () => {
         expect(screen.getAllByText('Builder').length).toBeGreaterThan(0);
         expect(screen.getByRole('button', { name: 'Continue today\'s task' })).toBeInTheDocument();
         expect(screen.getByRole('heading', { name: 'Free practice' })).toBeInTheDocument();
-        expect(screen.getByText('Your first challenge result today is already on the board.')).toBeInTheDocument();
+        expect(screen.getByText('New best today')).toBeInTheDocument();
+        expect(screen.getByText('Keep pushing the board. Today\'s speed curve is still moving upward.')).toBeInTheDocument();
         expect(screen.getByText('Current rank')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'View leaderboard' })).toBeInTheDocument();
     });

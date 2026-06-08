@@ -52,15 +52,21 @@ function formatSigned(value, suffix = '') {
 }
 
 function getTrendNote(trainingCopy, trend) {
-    if (trend.attempts < 2) {
+    const state = getChallengeTrendState(trend);
+
+    if (state === 'idle') {
         return trainingCopy.challenge.trendEmpty;
     }
 
-    if (trend.deltaWpm >= 5 && trend.deltaAccuracy >= -1) {
+    if (state === 'warm') {
+        return trainingCopy.challenge.trendWarm;
+    }
+
+    if (state === 'improving') {
         return trainingCopy.challenge.trendImproving;
     }
 
-    if (trend.deltaWpm <= -5 || trend.deltaAccuracy <= -3) {
+    if (state === 'cooling') {
         return trainingCopy.challenge.trendCooling;
     }
 
@@ -215,3 +221,4 @@ export function ChallengeTrendChart({ copy, trainingCopy, trend }) {
         </div>
     );
 }
+import { getChallengeTrendState } from '../engine';

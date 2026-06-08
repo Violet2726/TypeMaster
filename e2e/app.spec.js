@@ -106,6 +106,19 @@ test('opens the challenge page from the home leaderboard shortcut', async ({ pag
         },
         'typemaster:v2:sessions': [
             {
+                id: 'session-0',
+                trainingMeta: {
+                    type: 'challenge',
+                    stepId: challengeId,
+                    title: 'Daily challenge'
+                },
+                result: {
+                    wpm: 80,
+                    accuracy: 97,
+                    completedAt: '2026-06-08T07:00:00.000Z'
+                }
+            },
+            {
                 id: 'session-1',
                 trainingMeta: {
                     type: 'challenge',
@@ -169,6 +182,7 @@ test('opens the challenge page from the home leaderboard shortcut', async ({ pag
     });
 
     await page.goto('/#/');
+    await expect(page.getByText('Keep pushing the board. Today\'s speed curve is still moving upward.')).toBeVisible();
     await page.getByRole('button', { name: 'View leaderboard' }).click();
 
     await expect(page).toHaveURL(/#\/challenge/);

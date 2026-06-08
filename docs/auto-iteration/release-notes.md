@@ -246,6 +246,42 @@ main（当前代码已在 main）
 
 ---
 
+## 2026-06-08（迭代 8）
+
+### 今日主线
+把挑战趋势结论前置到首页，形成明确的下一步建议。
+
+### 合并分支
+main（当前代码已在 main）
+
+### 用户可见变化
+- 首页挑战卡新增“下一步建议”
+- 建议会基于今日挑战状态变化为继续冲榜、先稳准确率或扩大样本
+- 用户不进入 ChallengePage 也能直接知道今天是否值得再来一轮
+
+### 工程变化
+- 扩展 `src/engine/challenge.js` 趋势状态 helper
+- 更新 `src/pages/HomePage.jsx`
+- 更新 `src/training/copy.js`
+- 更新 `index.css`
+- 更新 `src/engine/__tests__/challenge.test.js`
+- 更新 `src/pages/__tests__/HomePage.test.jsx`
+- 更新 `e2e/app.spec.js`
+
+### 删除的旧逻辑
+- 无删除业务能力，本次为首页建议层增强
+
+### 验证结果
+- npm test: ✅ 通过（248 tests passed）
+- npm run build: ✅ 通过
+- npm run test:e2e: ✅ 通过（8 passed, 4 skipped）
+
+### 已知遗留
+- ChallengePage 趋势图仍缺少更细的焦点态说明
+- 首页挑战卡还没有提示“什么时候不建议继续冲榜”
+
+---
+
 ## 2026-05-10
 
 ### 今日主线

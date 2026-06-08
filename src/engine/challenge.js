@@ -173,3 +173,23 @@ export function buildChallengeTrend(challengeSessions = []) {
         spanWpm: maxWpm - minWpm
     };
 }
+
+export function getChallengeTrendState(trend) {
+    if (!trend?.attempts) {
+        return 'idle';
+    }
+
+    if (trend.attempts === 1) {
+        return 'warm';
+    }
+
+    if (trend.deltaWpm >= 5 && trend.deltaAccuracy >= -1) {
+        return 'improving';
+    }
+
+    if (trend.deltaWpm <= -5 || trend.deltaAccuracy <= -3) {
+        return 'cooling';
+    }
+
+    return 'steady';
+}
