@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { buildInsights } from '../engine';
 import { formatDateTime } from '../i18n';
@@ -21,8 +21,27 @@ function getSourceLabel(copy, trainingCopy, source) {
     return copy.practice.sourceBuiltin;
 }
 
+function getChallengeFacts(copy, challengeConfig) {
+    if (!challengeConfig) {
+        return [];
+    }
+
+    const facts = [getModeLabel(copy, challengeConfig)];
+
+    if (challengeConfig.includeNumbers) {
+        facts.push(copy.common.numbers);
+    }
+
+    if (challengeConfig.includePunctuation) {
+        facts.push(copy.common.punctuation);
+    }
+
+    return facts;
+}
+
 export function HomePage() {
     const navigate = useNavigate();
+    const [isLaunchingChallenge, setIsLaunchingChallenge] = useState(false);
     const {
         copy,
         language,
@@ -34,10 +53,11 @@ export function HomePage() {
         diagnosticJourney,
         trainingPlanProgress,
         sessionStreak,
-        weeklySessions,
         weeklyGoal,
         achievements,
-        startRecommendedSession
+        dailyChallenge,
+        startRecommendedSession,
+        startDailyChallenge
     } = usePracticeStore();
 
     const trainingCopy = getTrainingCopy(language);
@@ -53,6 +73,14 @@ export function HomePage() {
     const currentWeakness = skillProfile?.weakZones?.[0]?.label || trainingCopy.home.noWeakness;
     const planPercent = trainingPlanProgress?.percent || 0;
     const hasDiagnosticInFlight = diagnosticJourney?.status === 'active';
+    const recommendedTitle = trainingPlan?.title || trainingCopy.home.diagnosticTitle;
+    const recommendedBody = trainingPlan?.summary
+        || (skillProfile ? trainingCopy.home.dashboardBody : trainingCopy.home.diagnosticBody);
+    const challengeFacts = useMemo(
+        () => getChallengeFacts(copy, dailyChallenge?.config),
+        [copy, dailyChallenge?.config]
+    );
+    const challengeLeaderboardCount = dailyChallenge?.leaderboard?.length || 0;
 
     const handleFreePractice = () => {
         resetPracticeToBuiltin();
@@ -69,6 +97,17 @@ export function HomePage() {
         navigate('/practice');
     };
 
+    const handleStartChallenge = async () => {
+        setIsLaunchingChallenge(true);
+
+        try {
+            await startDailyChallenge();
+            navigate('/practice');
+        } catch {
+            setIsLaunchingChallenge(false);
+        }
+    };
+
     return (
         <div className="page-stack page-stack--home">
             <section className="home-launch">
@@ -77,18 +116,6 @@ export function HomePage() {
                 <p className="hero-body">
                     {skillProfile ? trainingCopy.home.dashboardBody : trainingCopy.home.diagnosticBody}
                 </p>
-                <div className="hero-actions">
-                    <button type="button" className="action-btn primary" onClick={handlePrimaryAction}>
-                        {skillProfile
-                            ? trainingCopy.home.continuePlan
-                            : hasDiagnosticInFlight
-                                ? trainingCopy.home.diagnosticResume
-                                : trainingCopy.home.diagnosticCta}
-                    </button>
-                    <button type="button" className="action-btn" onClick={handleFreePractice}>
-                        {trainingCopy.home.freePractice}
-                    </button>
-                </div>
             </section>
 
             <section className="home-stats-strip" aria-label={copy.home.statsTitle}>
@@ -110,11 +137,105 @@ export function HomePage() {
                 </div>
             </section>
 
+            <section className="home-action-section" aria-label={trainingCopy.home.todayFlowTitle}>
+                <div className="panel-head home-action-section__head">
+                    <div>
+                        <p className="panel-kicker">{trainingCopy.home.todayKicker}</p>
+                        <h2>{trainingCopy.home.todayFlowTitle}</h2>
+                    </div>
+                    <p className="muted-text home-action-section__body">{trainingCopy.home.todayFlowBody}</p>
+                </div>
+
+                <div className="home-action-grid">
+                    <article className="panel home-action-card home-action-card--primary">
+                        <div className="home-action-card__body">
+                            <p className="panel-kicker">{trainingCopy.home.todayKicker}</p>
+                            <h2>{recommendedTitle}</h2>
+                            <p className="lead-text">{recommendedBody}</p>
+                            <div className="home-action-card__meta">
+                                <span className={`panel-badge badge-${skillProfile ? 'ready' : hasDiagnosticInFlight ? 'stale' : 'idle'}`}>
+                                    {skillProfile
+                                        ? `${trainingCopy.home.planLabel} ${trainingPlan ? `${planPercent}%` : copy.common.emptyValue}`
+                                        : hasDiagnosticInFlight
+                                            ? trainingCopy.home.diagnosticResume
+                                            : trainingCopy.home.diagnosticCta}
+                                </span>
+                                <span className="home-action-chip">{currentWeakness}</span>
+                            </div>
+                        </div>
+
+                        <div className="home-action-card__footer">
+                            <div className="home-action-card__summary">
+                                <span>{trainingCopy.home.levelLabel}</span>
+                                <strong>{skillProfile?.level?.label || copy.common.emptyValue}</strong>
+                            </div>
+                            <button type="button" className="action-btn primary" onClick={handlePrimaryAction}>
+                                {skillProfile
+                                    ? trainingCopy.home.continuePlan
+                                    : hasDiagnosticInFlight
+                                        ? trainingCopy.home.diagnosticResume
+                                        : trainingCopy.home.diagnosticCta}
+                            </button>
+                        </div>
+                    </article>
+
+                    <article className="panel home-action-card home-action-card--challenge">
+                        <div className="home-action-card__body">
+                            <p className="panel-kicker">{trainingCopy.challenge.kicker}</p>
+                            <h2>{dailyChallenge?.title || trainingCopy.challenge.title}</h2>
+                            <p className="lead-text">{dailyChallenge?.summary || trainingCopy.challenge.body}</p>
+                            <div className="home-action-card__meta">
+                                {challengeFacts.map((fact) => (
+                                    <span key={fact} className="home-action-chip">{fact}</span>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="home-action-card__footer">
+                            <div className="home-action-card__summary">
+                                <span>{trainingCopy.challenge.leaderboard}</span>
+                                <strong>{challengeLeaderboardCount}</strong>
+                            </div>
+                            <button
+                                type="button"
+                                className="action-btn"
+                                onClick={handleStartChallenge}
+                                disabled={isLaunchingChallenge}
+                            >
+                                {isLaunchingChallenge ? copy.common.loading : trainingCopy.challenge.cta}
+                            </button>
+                        </div>
+                    </article>
+
+                    <article className="panel home-action-card home-action-card--free">
+                        <div className="home-action-card__body">
+                            <p className="panel-kicker">{trainingCopy.home.freePracticeKicker}</p>
+                            <h2>{trainingCopy.home.freePractice}</h2>
+                            <p className="lead-text">{trainingCopy.home.freePracticeBody}</p>
+                            <div className="home-action-card__meta">
+                                <span className="home-action-chip">{latestModeLabel}</span>
+                                <span className="home-action-chip">{insights.recent7.avgWpm} {copy.common.wpm}</span>
+                            </div>
+                        </div>
+
+                        <div className="home-action-card__footer">
+                            <div className="home-action-card__summary">
+                                <span>{copy.common.sessions}</span>
+                                <strong>{insights.totalSessions || copy.common.emptyValue}</strong>
+                            </div>
+                            <button type="button" className="action-btn" onClick={handleFreePractice}>
+                                {trainingCopy.home.freePractice}
+                            </button>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
             <section className="insights-overview-grid">
                 <div className="panel insights-latest-card">
-                    <p className="panel-kicker">{trainingCopy.home.todayKicker}</p>
-                    <h2>{trainingPlan?.title || trainingCopy.home.diagnosticTitle}</h2>
-                    <p className="lead-text">{trainingPlan?.summary || trainingCopy.home.diagnosticBody}</p>
+                    <p className="panel-kicker">{trainingCopy.insights.radarTitle}</p>
+                    <h2>{skillProfile?.level?.label || recommendedTitle}</h2>
+                    <p className="lead-text">{skillProfile?.summary || recommendedBody}</p>
                     <p className="muted-text">{currentWeakness}</p>
                     {trainingPlan && (
                         <div className="results-actions">

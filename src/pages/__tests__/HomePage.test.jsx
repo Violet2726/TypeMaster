@@ -4,7 +4,7 @@ import HomePage from '../HomePage';
 import { renderWithProvider } from '../../test/render-with-provider';
 
 describe('HomePage', () => {
-    test('shows the training dashboard when skill profile and plan exist', () => {
+    test('shows the training dashboard when skill profile and plan exist', async () => {
         renderWithProvider(<HomePage />, {
             localStorageState: {
                 'typemaster:v2:settings': {
@@ -41,8 +41,11 @@ describe('HomePage', () => {
             }
         });
 
+        expect(await screen.findByRole('button', { name: 'Start challenge' })).toBeInTheDocument();
         expect(screen.getByText('What to train today')).toBeInTheDocument();
-        expect(screen.getByText('Continue today\'s task')).toBeInTheDocument();
-        expect(screen.getByText('Builder')).toBeInTheDocument();
+        expect(screen.getByText('Start from one of these lanes')).toBeInTheDocument();
+        expect(screen.getAllByText('Builder').length).toBeGreaterThan(0);
+        expect(screen.getByRole('button', { name: 'Continue today\'s task' })).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'Free practice' })).toBeInTheDocument();
     });
 });

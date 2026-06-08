@@ -77,6 +77,17 @@ test('falls back to local coach advice when AI coach request fails', async ({ pa
     await expect(page.getByText('Local advice')).toBeVisible();
 });
 
+test('starts the daily challenge directly from the home action hub', async ({ page }) => {
+    await seedEnglishState(page);
+
+    await page.goto('/#/');
+    await page.getByRole('button', { name: 'Start challenge' }).click();
+
+    await expect(page).toHaveURL(/#\/practice/);
+    await expect(page.locator('.panel').first().getByRole('heading', { name: 'Daily challenge' })).toBeVisible();
+    await expect(page.getByText('Challenge round')).toBeVisible();
+});
+
 test('mobile plan flow continues into practice with sticky controls visible', async ({ page, isMobile }) => {
     test.skip(!isMobile, 'mobile flow only');
     await seedEnglishState(page, {

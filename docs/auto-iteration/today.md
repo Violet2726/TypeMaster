@@ -2,51 +2,60 @@
 
 ## 状态
 - **current_phase**: implemented
-- **执行日期**: 2026-05-28
+- **执行日期**: 2026-06-08
 - **完成状态**: ✅ 已完成
 
 ## 1. 今日主线
-提升代码覆盖率至 70% 以上，补充缺失模块测试
+把首页重构为“今日行动区”，将推荐训练、每日挑战、自由练习放到同一屏完成决策。
 
 ## 2. 问题背景
-当前代码覆盖率为 61.63%，未达 70% 阈值，多个核心模块缺少测试覆盖
+当前产品已有训练计划、挑战和自由练习，但入口分散，首页更像状态页，缺少主流产品常见的“下一步动作”组织方式。
 
 ## 3. 根因判断
-部分 engine 和 services 模块（如 config.js, draft.js, rendering.js, cloud-contracts.js）缺少测试文件
+- 今日任务没有被产品化为一级入口
+- 每日挑战藏在独立页面，社交与留存价值没有被前置
+- 自由练习与计划训练关系不清晰，用户需要自己判断下一步
 
 ## 4. 目标用户价值
-提升代码质量，减少回归风险，为后续开发提供更可靠的测试基础
+让用户打开首页就能直接开始最值得做的一轮，降低决策成本，增强日常回访和挑战参与。
 
 ## 5. 工程价值
-建立更完整的测试基线，使自动化迭代过程更可靠
+在不推倒现有训练引擎的前提下，先把首页信息架构调整为可持续扩展的行动中枢。
 
 ## 6. 涉及模块
-- src/engine/config.js → 新增 src/engine/__tests__/config.test.js ✅
-- src/engine/draft.js → 新增 src/engine/__tests__/draft.test.js ✅
-- src/engine/rendering.js → 新增 src/engine/__tests__/rendering.test.js ✅
-- src/services/cloud-contracts.js → 新增 src/services/__tests__/cloud-contracts.test.js ✅
+- src/pages/HomePage.jsx → 重构首页结构，新增今日行动区 ✅
+- src/training/copy.js → 补充中英文产品文案 ✅
+- index.css → 新增首页行动卡片样式 ✅
+- src/pages/__tests__/HomePage.test.jsx → 更新首页断言 ✅
+- e2e/app.spec.js → 新增首页直达每日挑战 e2e ✅
 
 ## 7. 非目标
-今日不做业务功能变更、不重构现有代码、不修改 UI
+- 今日不调整打字引擎
+- 不改 AI 文本生成链路
+- 不做账户或云同步功能扩展
 
 ## 8. 设计方案
-为每个缺少测试的模块创建对应的 __tests__ 文件，覆盖核心功能和边界情况
+1. 首页 Hero 保留产品定位
+2. 在首屏下方加入三张行动卡片：推荐训练、每日挑战、自由练习
+3. 推荐训练承载计划进度与短板信息
+4. 每日挑战支持从首页一键进入练习页
+5. 自由练习保留快速热身入口
 
 ## 9. 验收标准
-- [x] npm run build 通过 ✅ (1.07s, 主 bundle 18.44 kB gzip)
-- [x] npm test 所有测试通过 ✅ (220 tests passed)
-- [x] npm run test:coverage 覆盖率 ≥ 70% ✅ (70.1% statements/lines)
+- [x] 首页可以直接看到推荐训练 / 每日挑战 / 自由练习三条入口
+- [x] 可以从首页直接进入每日挑战练习页
+- [x] 中英文文案齐全
+- [x] 单测与 e2e 覆盖新增体验
 
 ## 10. 质量门禁
-- [x] npm install ✅
 - [x] npm run build ✅
-- [x] npm test ✅
-- [x] npm run test:coverage ✅
+- [x] npm test ✅ (236 passed)
+- [x] npm run test:e2e ✅ (5 passed, 3 skipped)
 
 ## 11. 回滚策略
-若出现问题，通过 git reset 回到最新 main 分支
+若首页入口造成转化歧义，优先回退 HomePage 与首页样式改动，不动训练引擎与存储结构。
 
-## 12. 自动合并条件
-- [x] 所有质量门禁检查通过 ✅
-- [x] 代码覆盖率达标 ✅ (70.1% >= 70%)
-- [x] 无新增业务逻辑变更 ✅
+## 12. 下一轮候选
+- 首页增加挑战战绩预览与个人名次
+- 将训练计划完成后的“新计划生成”显式化
+- 继续拆分 practice-store，降低页面状态耦合
