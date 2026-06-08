@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { buildChallengeTrend, buildInsights, getChallengePersonalBest, getChallengeSessions, getChallengeStanding, getChallengeStrategyState, getLatestChallengeSession } from '../engine';
 import { formatDateTime } from '../i18n';
 import { usePracticeStore } from '../store/practice-store';
+import { buildChallengeActionModel } from '../training/challenge-focus';
 import { getTrainingCopy } from '../training/copy';
 
 function getModeLabel(copy, config) {
@@ -194,19 +195,24 @@ export function HomePage() {
         }
     };
 
-    const challengePrimaryLabel = challengeStrategyState === 'recover'
-        ? (trainingPlan ? trainingCopy.challenge.recoverPlanCta : trainingCopy.challenge.recoverFreeCta)
-        : latestChallengeSession
-            ? trainingCopy.challenge.retryCta
-            : trainingCopy.challenge.cta;
+    const challengeActionModel = useMemo(
+        () => buildChallengeActionModel(trainingCopy, {
+            shouldRecover: challengeStrategyState === 'recover',
+            hasActiveTrainingStep: Boolean(trainingPlan),
+            hasPriorChallenge: Boolean(latestChallengeSession),
+            isLoading: isLaunchingChallenge,
+            loadingLabel: copy.common.loading
+        }),
+        [challengeStrategyState, copy.common.loading, isLaunchingChallenge, latestChallengeSession, trainingCopy, trainingPlan]
+    );
 
     const handleChallengePrimaryAction = () => {
-        if (challengeStrategyState === 'recover') {
-            if (trainingPlan) {
-                handlePrimaryAction();
-                return;
-            }
+        if (challengeActionModel.primaryAction === 'plan') {
+            handlePrimaryAction();
+            return;
+        }
 
+        if (challengeActionModel.primaryAction === 'free') {
             handleFreePractice();
             return;
         }
@@ -328,9 +334,7 @@ export function HomePage() {
                                     onClick={handleChallengePrimaryAction}
                                     disabled={isLaunchingChallenge}
                                 >
-                                    {isLaunchingChallenge && challengeStrategyState !== 'recover'
-                                        ? copy.common.loading
-                                        : challengePrimaryLabel}
+                                    {challengeActionModel.primaryLabel}
                                 </button>
                                 <button type="button" className="action-btn" onClick={() => navigate('/challenge')}>
                                     {trainingCopy.challenge.viewBoard}

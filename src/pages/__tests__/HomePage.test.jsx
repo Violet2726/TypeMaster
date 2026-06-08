@@ -1,9 +1,26 @@
 /** @vitest-environment jsdom */
-import { screen } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { vi } from 'vitest';
 import HomePage from '../HomePage';
 import { renderWithProvider } from '../../test/render-with-provider';
 
+const { mockNavigate } = vi.hoisted(() => ({
+    mockNavigate: vi.fn()
+}));
+
+vi.mock('react-router-dom', async (importOriginal) => {
+    const actual = await importOriginal();
+    return {
+        ...actual,
+        useNavigate: () => mockNavigate
+    };
+});
+
 describe('HomePage', () => {
+    beforeEach(() => {
+        mockNavigate.mockReset();
+    });
+
     test('shows the training dashboard when skill profile and plan exist', async () => {
         const challengeId = `daily-${new Date().toISOString().slice(0, 10)}`;
 
@@ -220,7 +237,20 @@ describe('HomePage', () => {
             }
         });
 
-        expect(await screen.findByRole('button', { name: 'Back to plan' })).toBeInTheDocument();
+        const recoverButton = await screen.findByRole('button', { name: 'Back to plan' });
+        expect(recoverButton).toBeInTheDocument();
         expect(screen.getByText('The leaderboard push is flattening out. Step away from challenge mode and return to plan work.')).toBeInTheDocument();
+
+        fireEvent.click(recoverButton);
+
+        await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/practice'));
+        await waitFor(() => {
+            const context = JSON.parse(window.localStorage.getItem('typemaster:v4:active-session-context'));
+            expect(context).toMatchObject({
+                type: 'plan',
+                planId: 'plan-1',
+                stepId: 'step-1'
+            });
+        });
     });
 });

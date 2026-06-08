@@ -19,10 +19,11 @@ export function getChallengeFocusNote(trainingCopy, state) {
     return trainingCopy?.challenge?.[key] || '';
 }
 
-export function buildChallengeFocusModel(trainingCopy, state, options = {}) {
+export function buildChallengeActionModel(trainingCopy, options = {}) {
     const challengeCopy = trainingCopy?.challenge || {};
-    const shouldRecover = isChallengeFocusRecoveryState(state);
+    const shouldRecover = Boolean(options.shouldRecover);
     const hasActiveTrainingStep = Boolean(options.hasActiveTrainingStep);
+    const hasPriorChallenge = options.hasPriorChallenge !== false;
     const isLoading = Boolean(options.isLoading);
     const loadingLabel = options.loadingLabel || '';
     const primaryAction = shouldRecover
@@ -34,13 +35,26 @@ export function buildChallengeFocusModel(trainingCopy, state, options = {}) {
             : challengeCopy.recoverFreeCta
         : isLoading
             ? loadingLabel
-            : challengeCopy.retryCta;
+            : hasPriorChallenge
+                ? challengeCopy.retryCta
+                : challengeCopy.cta;
+
+    return {
+        shouldRecover,
+        primaryAction,
+        primaryLabel
+    };
+}
+
+export function buildChallengeFocusModel(trainingCopy, state, options = {}) {
+    const actionModel = buildChallengeActionModel(trainingCopy, {
+        ...options,
+        shouldRecover: isChallengeFocusRecoveryState(state)
+    });
 
     return {
         state: state || 'empty',
         note: getChallengeFocusNote(trainingCopy, state),
-        shouldRecover,
-        primaryAction,
-        primaryLabel
+        ...actionModel
     };
 }

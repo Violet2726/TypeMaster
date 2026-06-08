@@ -1,4 +1,5 @@
 import {
+    buildChallengeActionModel,
     buildChallengeFocusModel,
     getChallengeFocusNote,
     isChallengeFocusRecoveryState
@@ -43,6 +44,39 @@ describe('challenge focus model', () => {
 
         expect(model.primaryAction).toBe('challenge');
         expect(model.primaryLabel).toBe('Loading');
+    });
+
+    test('builds first challenge and retry action labels', () => {
+        const firstModel = buildChallengeActionModel(trainingCopy, {
+            hasPriorChallenge: false
+        });
+        const retryModel = buildChallengeActionModel(trainingCopy, {
+            hasPriorChallenge: true
+        });
+
+        expect(firstModel).toMatchObject({
+            primaryAction: 'challenge',
+            primaryLabel: trainingCopy.challenge.cta
+        });
+        expect(retryModel).toMatchObject({
+            primaryAction: 'challenge',
+            primaryLabel: trainingCopy.challenge.retryCta
+        });
+    });
+
+    test('keeps recovery labels ahead of loading labels', () => {
+        const model = buildChallengeActionModel(trainingCopy, {
+            shouldRecover: true,
+            hasActiveTrainingStep: true,
+            isLoading: true,
+            loadingLabel: 'Loading'
+        });
+
+        expect(model).toMatchObject({
+            shouldRecover: true,
+            primaryAction: 'plan',
+            primaryLabel: trainingCopy.challenge.recoverPlanCta
+        });
     });
 
     test('builds recovery action models for plan and free practice', () => {

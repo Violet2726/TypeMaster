@@ -2,6 +2,47 @@
 
 ---
 
+## 2026-06-08（迭代 15）
+
+### 今日主线
+把首页挑战卡主 CTA 接入共享挑战动作模型，让首页和结果页复用同一套 challenge / plan / free 动作定义。
+
+### 合并分支
+main（当前代码已在 main）
+
+### 用户可见变化
+- 首页挑战卡健康状态仍可直接再挑战
+- 首页挑战卡恢复状态仍会显示 Back to plan 或 Free practice
+- 点击恢复按钮后会真正进入计划训练上下文，而不是只改变按钮文案
+
+### 工程变化
+- 新增 `buildChallengeActionModel`
+- `buildChallengeFocusModel` 复用共享 action model
+- HomePage 挑战 CTA 改为消费 `primaryAction` 和 `primaryLabel`
+- HomePage 测试补充恢复按钮点击后的 plan context 断言
+- challenge-focus 测试补充首挑战、再挑战与恢复优先级覆盖
+
+### 删除的旧逻辑
+- 删除 HomePage 页面内重复的挑战恢复 CTA 标签拼接
+- 删除 HomePage 页面内基于 `challengeStrategyState` 的恢复动作分派分支
+
+### 验证结果
+- `npm test -- --run src/training/__tests__/challenge-focus.test.js`: 通过，7 tests passed
+- `npm test -- --run src/pages/__tests__/HomePage.test.jsx`: 通过，2 tests passed
+- `npm test -- --run src/pages/__tests__/ResultPage.test.jsx`: 通过，2 tests passed
+- `npm test`: 通过，259 tests passed
+- `npm run build`: 通过
+- `npm run test:e2e`: 通过，9 passed, 5 skipped
+- `git diff --check`: 通过，仅有仓库 CRLF 提示
+- in-app browser: 当前会话没有可用浏览器实例，已使用 Playwright e2e 覆盖核心路径
+
+### 已知遗留
+- 首页挑战策略文案仍在 HomePage 中映射，后续可继续抽成共享 strategy model
+- 结果页风险状态的完整 UI 路径目前由单测覆盖，后续可补 e2e
+- release notes 顶部存在重复的迭代 10 记录，后续可单独清理
+
+---
+
 ## 2026-06-08（迭代 14）
 
 ### 今日主线
