@@ -91,6 +91,10 @@ function normalizeAiIssue(error) {
     };
 }
 
+function shouldLogAiIssue(issue) {
+    return issue?.code !== 'missing_config';
+}
+
 function relabelDraft(draft, language) {
     if (!draft) return draft;
 
@@ -614,8 +618,11 @@ export function PracticeProvider({ children }) {
             setAiPracticeStatus('ready');
             return draft;
         } catch (error) {
-            console.error('Failed to generate AI practice', error);
-            setPracticeError(normalizeAiIssue(error));
+            const issue = normalizeAiIssue(error);
+            if (shouldLogAiIssue(issue)) {
+                console.error('Failed to generate AI practice', error);
+            }
+            setPracticeError(issue);
             setAiPracticeStatus('error');
             throw error;
         }
@@ -815,8 +822,10 @@ export function PracticeProvider({ children }) {
             }));
             return record;
         } catch (error) {
-            console.error('Failed to generate AI coach advice', error);
             const issue = normalizeAiIssue(error);
+            if (shouldLogAiIssue(issue)) {
+                console.error('Failed to generate AI coach advice', error);
+            }
 
             try {
                 const fallback = buildFallbackCoachAdvice({

@@ -95,6 +95,12 @@ If you want to enable the `AI workshop` or `AI coaching`, provide:
 
 - `AI_API_KEY`
 - `AI_API_URL`
+- `VITE_TYPEMASTER_AI_PROXY=1`
+
+Notes:
+
+- keep `AI_API_KEY` and `AI_API_URL` only in the Node/Vercel server environment; do not expose them to the frontend
+- `VITE_TYPEMASTER_AI_PROXY=1` is only a frontend switch and contains no secret; when it is not set, AI features quietly fall back to local rules instead of repeatedly calling an unavailable `/api/chat`
 
 You can configure them in either of these ways:
 
@@ -119,6 +125,7 @@ Notes:
 ```bash
 AI_API_KEY=your_key_here
 AI_API_URL=your_url_here
+VITE_TYPEMASTER_AI_PROXY=1
 ```
 
 ## Local Development

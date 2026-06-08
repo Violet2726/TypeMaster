@@ -8,12 +8,23 @@ import {
     extractMessageContent,
     normalizeThrownError,
     normalizeCoachAdvicePayload,
+    shouldUseAiProxy,
     throwResponseError,
     streamTextResponse,
     withTimeout
 } from '../ai-service.js';
 
 describe('ai-service', () => {
+    beforeEach(() => {
+        vi.unstubAllEnvs();
+        vi.unstubAllGlobals();
+    });
+
+    afterEach(() => {
+        vi.unstubAllEnvs();
+        vi.unstubAllGlobals();
+    });
+
     describe('AiServiceError', () => {
         it('should create an error with correct properties', () => {
             const cause = new Error('cause');
@@ -172,19 +183,39 @@ describe('ai-service', () => {
         });
     });
 
+    describe('AI proxy availability', () => {
+        it('should keep AI proxy disabled by default', async () => {
+            const fetchMock = vi.fn();
+            vi.stubGlobal('fetch', fetchMock);
+
+            expect(shouldUseAiProxy()).toBe(false);
+            await expect(generateCoachAdvice({
+                session: { config: {}, result: {}, sourceTextMeta: {} },
+                history: []
+            })).rejects.toMatchObject({ code: 'missing_config' });
+            expect(fetchMock).not.toHaveBeenCalled();
+        });
+
+        it('should enable AI proxy when the env flag is explicit', () => {
+            vi.stubEnv('VITE_TYPEMASTER_AI_PROXY', '1');
+
+            expect(shouldUseAiProxy()).toBe(true);
+        });
+    });
+
     describe('generatePracticeText', () => {
         it('should throw error when fetch fails', async () => {
+            vi.stubEnv('VITE_TYPEMASTER_AI_PROXY', '1');
             vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Network error')));
             await expect(generatePracticeText({ aiTemplate: 'daily', difficulty: 'easy', source: 'ai', includePunctuation: false, includeNumbers: false })).rejects.toThrow(AiServiceError);
-            vi.unstubAllGlobals();
         });
     });
 
     describe('generateCoachAdvice', () => {
         it('should throw error when fetch fails', async () => {
+            vi.stubEnv('VITE_TYPEMASTER_AI_PROXY', '1');
             vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Network error')));
             await expect(generateCoachAdvice({ session: { config: {}, result: {}, sourceTextMeta: {} }, history: [] })).rejects.toThrow(AiServiceError);
-            vi.unstubAllGlobals();
         });
     });
 });

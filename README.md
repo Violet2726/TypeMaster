@@ -95,6 +95,12 @@ typemaster/
 
 - `AI_API_KEY`
 - `AI_API_URL`
+- `VITE_TYPEMASTER_AI_PROXY=1`
+
+说明：
+
+- `AI_API_KEY` 和 `AI_API_URL` 只放在 Node/Vercel 服务端环境，不要暴露到前端
+- `VITE_TYPEMASTER_AI_PROXY=1` 只是前端开关，不包含密钥；未设置时，AI 功能会安静降级到本地规则，避免开发环境反复请求不可用的 `/api/chat`
 
 支持两种方式：
 
@@ -119,6 +125,7 @@ module.exports = {
 ```bash
 AI_API_KEY=your_key_here
 AI_API_URL=your_url_here
+VITE_TYPEMASTER_AI_PROXY=1
 ```
 
 ## 本地开发

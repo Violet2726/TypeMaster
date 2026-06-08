@@ -18,6 +18,7 @@ import {
 } from '../engine';
 
 const AI_API_URL = '/api/chat';
+const AI_PROXY_FLAG = '1';
 
 export class AiServiceError extends Error {
     constructor(code, message, options = {}) {
@@ -37,6 +38,19 @@ function withTimeout(timeoutMs = 15000) {
         controller,
         cleanup: () => clearTimeout(timer)
     };
+}
+
+function shouldUseAiProxy() {
+    return import.meta.env?.VITE_TYPEMASTER_AI_PROXY === AI_PROXY_FLAG;
+}
+
+function assertAiProxyEnabled() {
+    if (!shouldUseAiProxy()) {
+        throw new AiServiceError(
+            'missing_config',
+            'AI proxy is disabled. Set VITE_TYPEMASTER_AI_PROXY=1 before requesting AI features.'
+        );
+    }
 }
 
 function cleanJsonText(text) {
@@ -192,6 +206,8 @@ function normalizeCoachAdvicePayload(rawAdvice, language = 'zh-CN') {
 }
 
 export async function generatePracticeText(config, promptOverride = '', options = {}) {
+    assertAiProxyEnabled();
+
     const language = options.language || 'zh-CN';
     const template = getTemplateMeta(config.aiTemplate);
     const difficulty = getDifficultyMeta(config.difficulty);
@@ -260,6 +276,8 @@ export async function generatePracticeText(config, promptOverride = '', options 
 }
 
 export async function generateCoachAdvice({ session, history, language = 'zh-CN' }) {
+    assertAiProxyEnabled();
+
     const { config, result, sourceTextMeta } = session;
     const template = getTemplateMeta(config.aiTemplate);
     const recentHistory = history.slice(0, 5).map((item) => ({
@@ -360,6 +378,7 @@ export {
     extractMessageContent,
     normalizeThrownError,
     normalizeCoachAdvicePayload,
+    shouldUseAiProxy,
     throwResponseError,
     streamTextResponse,
     withTimeout
