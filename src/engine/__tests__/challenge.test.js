@@ -2,6 +2,7 @@ import {
     buildChallengeTrend,
     compareChallengeScores,
     createChallengeEntryPreview,
+    getChallengePointFocusState,
     getChallengeStrategyState,
     getChallengeTrendState,
     getChallengeLevelLeaderboard,
@@ -184,6 +185,16 @@ describe('challenge helpers', () => {
         expect(getChallengeTrendState({ attempts: 2, deltaWpm: 6, deltaAccuracy: 0 })).toBe('improving');
         expect(getChallengeTrendState({ attempts: 2, deltaWpm: -6, deltaAccuracy: -1 })).toBe('cooling');
         expect(getChallengeTrendState({ attempts: 3, deltaWpm: 2, deltaAccuracy: 0 })).toBe('steady');
+    });
+
+    test('derives coaching focus state for an individual challenge point', () => {
+        expect(getChallengePointFocusState(null)).toBe('empty');
+        expect(getChallengePointFocusState({ attempt: 1, deltaWpm: 0, deltaAccuracy: 0 })).toBe('baseline');
+        expect(getChallengePointFocusState({ attempt: 2, deltaWpm: 6, deltaAccuracy: 0 })).toBe('breakthrough');
+        expect(getChallengePointFocusState({ attempt: 2, deltaWpm: 3, deltaAccuracy: -4 })).toBe('accuracy-risk');
+        expect(getChallengePointFocusState({ attempt: 2, deltaWpm: -6, deltaAccuracy: 0 })).toBe('speed-drop');
+        expect(getChallengePointFocusState({ attempt: 2, deltaWpm: 1, deltaAccuracy: 1 })).toBe('stable');
+        expect(getChallengePointFocusState({ attempt: 2, deltaWpm: 4, deltaAccuracy: -2 })).toBe('mixed');
     });
 
     test('derives a recover strategy state when the challenge push is fading', () => {

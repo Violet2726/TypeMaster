@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { getChallengeTrendState } from '../engine';
+import { getChallengePointFocusState, getChallengeTrendState } from '../engine';
 
 function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
@@ -92,6 +92,30 @@ function getAttemptLabel(trainingCopy, point, index, total) {
     return fillTemplate(trainingCopy.challenge.trendRunLabel, String(point.attempt));
 }
 
+function getPointFocusNote(trainingCopy, state) {
+    if (state === 'baseline') {
+        return trainingCopy.challenge.trendFocusBaseline;
+    }
+
+    if (state === 'breakthrough') {
+        return trainingCopy.challenge.trendFocusBreakthrough;
+    }
+
+    if (state === 'accuracy-risk') {
+        return trainingCopy.challenge.trendFocusAccuracyRisk;
+    }
+
+    if (state === 'speed-drop') {
+        return trainingCopy.challenge.trendFocusSpeedDrop;
+    }
+
+    if (state === 'stable') {
+        return trainingCopy.challenge.trendFocusStable;
+    }
+
+    return trainingCopy.challenge.trendFocusMixed;
+}
+
 export function ChallengeTrendChart({ copy, trainingCopy, trend }) {
     const width = 760;
     const height = 300;
@@ -122,6 +146,14 @@ export function ChallengeTrendChart({ copy, trainingCopy, trend }) {
     const activePointLabel = useMemo(
         () => getAttemptLabel(trainingCopy, activePoint, activeIndex, trend.points.length),
         [activeIndex, activePoint, trainingCopy, trend.points.length]
+    );
+    const activeFocusState = useMemo(
+        () => getChallengePointFocusState(activePoint),
+        [activePoint]
+    );
+    const activeFocusNote = useMemo(
+        () => getPointFocusNote(trainingCopy, activeFocusState),
+        [activeFocusState, trainingCopy]
     );
     const activeStatuses = [
         activeIndex === trend.points.length - 1 ? trainingCopy.challenge.latestBadge : null,
@@ -201,6 +233,9 @@ export function ChallengeTrendChart({ copy, trainingCopy, trend }) {
                                     ))}
                                 </div>
                             )}
+                            <p className={`replay-inspect__state replay-inspect__state--${activeFocusState}`}>
+                                {activeFocusNote}
+                            </p>
                         </div>
                         <div className="replay-inspect__grid">
                             <div className="replay-inspect__metric">

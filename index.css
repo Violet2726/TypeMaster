@@ -1370,8 +1370,27 @@ body[data-theme='serika-light'] .words-shell::after {
 }
 
 .replay-inspect__state {
+    margin: 0;
+    padding: 0.68rem 0.76rem;
+    border-radius: 16px;
     color: var(--main-color);
+    background: var(--main-soft);
+    border: 1px solid rgba(105, 201, 255, 0.14);
     font-size: 0.85rem;
+}
+
+.replay-inspect__state--breakthrough,
+.replay-inspect__state--stable {
+    color: var(--success-color);
+    background: var(--success-soft);
+    border-color: rgba(135, 215, 168, 0.16);
+}
+
+.replay-inspect__state--accuracy-risk,
+.replay-inspect__state--speed-drop {
+    color: var(--warning-color);
+    background: var(--warning-soft);
+    border-color: rgba(244, 197, 107, 0.16);
 }
 
 .replay-inspect__grid {

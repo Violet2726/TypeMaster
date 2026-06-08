@@ -150,14 +150,14 @@ export function buildChallengeTrend(challengeSessions = []) {
             const previous = all[index - 1];
 
             return ({
-            id: session.id,
-            attempt: index + 1,
-            completedAt: session?.result?.completedAt || null,
-            wpm: toNumber(session?.result?.wpm),
-            accuracy: toNumber(session?.result?.accuracy),
-            deltaWpm: previous ? toNumber(session?.result?.wpm) - toNumber(previous?.result?.wpm) : 0,
-            deltaAccuracy: previous ? toNumber(session?.result?.accuracy) - toNumber(previous?.result?.accuracy) : 0
-        });
+                id: session.id,
+                attempt: index + 1,
+                completedAt: session?.result?.completedAt || null,
+                wpm: toNumber(session?.result?.wpm),
+                accuracy: toNumber(session?.result?.accuracy),
+                deltaWpm: previous ? toNumber(session?.result?.wpm) - toNumber(previous?.result?.wpm) : 0,
+                deltaAccuracy: previous ? toNumber(session?.result?.accuracy) - toNumber(previous?.result?.accuracy) : 0
+            });
         });
 
     const first = points[0] || null;
@@ -199,6 +199,37 @@ export function getChallengeTrendState(trend) {
     }
 
     return 'steady';
+}
+
+export function getChallengePointFocusState(point) {
+    if (!point) {
+        return 'empty';
+    }
+
+    if (Number(point.attempt || 0) <= 1) {
+        return 'baseline';
+    }
+
+    const deltaWpm = toNumber(point.deltaWpm);
+    const deltaAccuracy = toNumber(point.deltaAccuracy);
+
+    if (deltaWpm >= 5 && deltaAccuracy >= -1) {
+        return 'breakthrough';
+    }
+
+    if (deltaAccuracy <= -3) {
+        return 'accuracy-risk';
+    }
+
+    if (deltaWpm <= -5) {
+        return 'speed-drop';
+    }
+
+    if (Math.abs(deltaWpm) <= 2 && Math.abs(deltaAccuracy) <= 1) {
+        return 'stable';
+    }
+
+    return 'mixed';
 }
 
 export function getChallengeStrategyState(trend, personalBest) {

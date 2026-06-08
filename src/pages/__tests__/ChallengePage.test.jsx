@@ -35,6 +35,19 @@ describe('ChallengePage', () => {
                             accuracy: 98,
                             completedAt: '2026-06-08T08:00:00.000Z'
                         }
+                    },
+                    {
+                        id: 'session-2',
+                        trainingMeta: {
+                            type: 'challenge',
+                            stepId: challengeId,
+                            title: 'Daily challenge'
+                        },
+                        result: {
+                            wpm: 96,
+                            accuracy: 98,
+                            completedAt: '2026-06-08T09:00:00.000Z'
+                        }
                     }
                 ],
                 'typemaster:v4:skill-profile': {
@@ -85,6 +98,16 @@ describe('ChallengePage', () => {
                                     wpm: 88,
                                     accuracy: 98,
                                     createdAt: '2026-06-08T08:00:00.000Z'
+                                },
+                                {
+                                    id: 'entry-2',
+                                    sessionId: 'session-2',
+                                    displayName: 'Alice',
+                                    userId: 'user-1',
+                                    levelId: 'builder',
+                                    wpm: 96,
+                                    accuracy: 98,
+                                    createdAt: '2026-06-08T09:00:00.000Z'
                                 }
                             ]
                         }
@@ -101,8 +124,9 @@ describe('ChallengePage', () => {
         expect(screen.getByText('Speed change')).toBeInTheDocument();
         expect(screen.getByText('Run focus')).toBeInTheDocument();
         expect(screen.getByText('Vs previous')).toBeInTheDocument();
+        expect(screen.getByText('This run gained speed without giving up accuracy. Keep the challenge pressure on.')).toBeInTheDocument();
         expect(screen.getByRole('heading', { name: 'Today\'s replay' })).toBeInTheDocument();
-        expect(screen.getByText('Best run')).toBeInTheDocument();
+        expect(screen.getAllByText('Best run').length).toBeGreaterThan(0);
         expect(screen.getByRole('heading', { name: 'Leaderboard' })).toBeInTheDocument();
     });
 });
