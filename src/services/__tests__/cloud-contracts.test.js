@@ -4,6 +4,7 @@ import {
     planSyncGateway,
     sessionSyncGateway
 } from '../cloud-contracts';
+import { vi } from 'vitest';
 
 describe('cloud-contracts', () => {
     const mockLocalStorage = {
@@ -23,10 +24,27 @@ describe('cloud-contracts', () => {
     };
 
     beforeEach(() => {
+        vi.unstubAllGlobals();
         mockLocalStorage.clear();
         global.window = {
             localStorage: mockLocalStorage
         };
+    });
+
+    afterEach(() => {
+        vi.unstubAllGlobals();
+    });
+
+    test('uses local cloud contracts without network by default', async () => {
+        const fetchMock = vi.fn();
+        vi.stubGlobal('fetch', fetchMock);
+
+        const currentUser = await authGateway.getCurrentUser();
+        const challenge = await challengeGateway.getDailyChallenge('en-US');
+
+        expect(currentUser).toBeNull();
+        expect(challenge.id).toMatch(/^daily-/);
+        expect(fetchMock).not.toHaveBeenCalled();
     });
 
     test('auth gateway signs in and restores current user', async () => {

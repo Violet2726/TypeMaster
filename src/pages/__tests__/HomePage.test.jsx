@@ -21,6 +21,30 @@ describe('HomePage', () => {
         mockNavigate.mockReset();
     });
 
+    test('shows an intentional achievement empty state and clean latest mode label', async () => {
+        renderWithProvider(<HomePage />, {
+            localStorageState: {
+                'typemaster:v2:settings': {
+                    language: 'en-US',
+                    lastConfig: {
+                        source: 'builtin',
+                        mode: 'time',
+                        durationSeconds: 30,
+                        wordCount: 25,
+                        includePunctuation: false,
+                        includeNumbers: false,
+                        aiTemplate: 'daily',
+                        difficulty: 'medium'
+                    }
+                }
+            }
+        });
+
+        expect(await screen.findByText('Make the training relationship visible, not just the raw numbers.')).toBeInTheDocument();
+        expect(screen.getAllByText('Built-in · Time 30s').length).toBeGreaterThan(0);
+        expect(screen.getAllByRole('button', { name: 'Start assessment' }).length).toBeGreaterThan(0);
+    });
+
     test('shows the training dashboard when skill profile and plan exist', async () => {
         const challengeId = `daily-${new Date().toISOString().slice(0, 10)}`;
 

@@ -2,19 +2,23 @@
 
 # TypeMaster
 
-TypeMaster is an English typing trainer built around an `AI Training Studio` flow. The current codebase already includes the refreshed `Home / Practice / Result / Insights` experience, with a focus on a clearer training loop, more reliable coaching feedback, and smoother desktop and mobile interactions.
+TypeMaster is an English typing trainer built around an `AI Training Studio` flow. The current app has moved beyond a single practice surface into a full `Assessment / Plan / Challenge / Free practice / Result review / Insights` loop, with one core goal: reduce decision cost so users always know what to train next.
 
-It supports two main practice paths:
+It supports four training paths:
 
-- `Built-in word practice`: available without AI
-- `AI workshop`: choose a template and difficulty, generate English text, then start the drill
+- `Skill assessment`: three short rounds that create a profile and 7-day starter plan
+- `Planned training`: the next drill is selected from current weaknesses
+- `Daily challenge`: one locked text and setup for comparable speed, accuracy, and stability
+- `Free practice`: built-in text, custom word banks, or AI-generated practice text
 
 ## What The Current App Includes
 
 ### Product features
 
-- `Dual-entry home page`: jump into AI practice or a quick built-in drill, while surfacing the latest advice, recent 7-session summary, and recent sessions
-- `Practice workspace`: the practice page is split into config controls, an AI workshop, and the typing area, with a clear 3-step AI flow
+- `Today training home`: organizes assessment, plan continuation, challenge status, and free practice into one action hub
+- `Assessment and 7-day plan`: turns a short skill sample into a level, weak spots, and a starter training plan
+- `Daily challenge`: supports shared text, personal best, peer comparison, trend review, and leaderboard navigation
+- `Practice workspace`: the practice page is split into config controls, custom word banks, an AI workshop, and the typing area
 - `AI practice state management`: supports `idle / loading / ready / stale / error`, and requires regeneration after config changes
 - `Result feedback`: shows WPM, raw WPM, accuracy, consistency, character breakdown, trend charts, and coaching advice
 - `Coaching fallback`: if AI advice fails, the result page falls back to deterministic local guidance with an explicit status
@@ -35,7 +39,10 @@ It supports two main practice paths:
 
 ### Pages
 
-- `Home /`: dual-entry landing page and recent overview
+- `Home /`: today action hub, plan continuation, challenge status, free practice, and recent overview
+- `Assessment /diagnostic`: three-round assessment entry and progress
+- `Plan /plan`: active training plan, progress, and next-step entry
+- `Challenge /challenge`: daily board, trend, peer comparison, and challenge replay
 - `Practice /practice`: config panel, AI workshop, typing area
 - `Result /result`: summary, issues, strengths, next drill, trend chart
 - `Insights /insights`: long-term performance and error hotspots
@@ -65,7 +72,7 @@ typemaster/
 │  ├─ engine/                    # Config, draft generation, metrics, insights, local coach rules
 │  ├─ hooks/                     # Typing session timing and input control
 │  ├─ i18n/                      # Chinese / English copy and format helpers
-│  ├─ pages/                     # Home / Practice / Result / Insights
+│  ├─ pages/                     # Home / Diagnostic / Plan / Challenge / Practice / Result / Insights
 │  ├─ services/                  # AI calls, storage, cloud contract stubs
 │  ├─ store/                     # Global business orchestration
 │  ├─ App.jsx                    # App shell and routing
@@ -153,6 +160,7 @@ http://localhost:5173/#/
 Notes:
 
 - during development, Vite proxies `/api` to `http://localhost:8080`
+- cloud account, sync, and challenge contracts use browser-local storage by default and do not call `/api/cloud`; to test the Node placeholder API, start `npm run api` and set `VITE_TYPEMASTER_REMOTE_CLOUD=1`
 - the app uses hash-based routing, so URLs appear as `#/...`
 
 ## Build And Run

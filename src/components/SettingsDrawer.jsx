@@ -119,7 +119,7 @@ export function SettingsDrawer({
                     </label>
                 </div>
 
-                <section className="panel" style={{ marginTop: '1rem' }}>
+                <section className="panel settings-section">
                     <div className="panel-head">
                         <div>
                             <p className="panel-kicker">{trainingCopy.account.title}</p>
@@ -132,7 +132,7 @@ export function SettingsDrawer({
                     <p className="muted-text">{trainingCopy.account.body}</p>
 
                     {!account && (
-                        <div className="workshop-grid" style={{ marginTop: '1rem' }}>
+                        <div className="workshop-grid settings-section__form">
                             <label className="field">
                                 <span>{trainingCopy.account.nameLabel}</span>
                                 <input
@@ -154,7 +154,7 @@ export function SettingsDrawer({
                     )}
 
                     {account && (
-                        <div className="results-actions" style={{ marginTop: '1rem' }}>
+                        <div className="results-actions settings-section__actions">
                             <button type="button" className="action-btn" onClick={onSignOut}>
                                 {trainingCopy.account.signOut}
                             </button>
@@ -162,7 +162,7 @@ export function SettingsDrawer({
                     )}
                 </section>
 
-                <section className="panel" style={{ marginTop: '1rem' }}>
+                <section className="panel settings-section">
                     <div className="panel-head">
                         <div>
                             <p className="panel-kicker">{trainingCopy.account.export}</p>
@@ -179,7 +179,7 @@ export function SettingsDrawer({
                         </button>
                     </div>
 
-                    <label className="field" style={{ marginTop: '1rem' }}>
+                    <label className="field settings-section__import">
                         <span>{trainingCopy.account.importLabel}</span>
                         <textarea
                             value={importPayload}

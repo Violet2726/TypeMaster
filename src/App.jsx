@@ -27,6 +27,7 @@ function AppFrame() {
         copy,
         account,
         accountStatus,
+        trainingPlan,
         signInToCloud,
         signOutFromCloud,
         exportTrainingData,
@@ -55,6 +56,7 @@ function AppFrame() {
             <Header
                 settings={settings}
                 copy={copy}
+                hasTrainingPlan={Boolean(trainingPlan)}
                 onToggleTheme={() => updateSettings({ theme: settings.theme === 'serika-dark' ? 'serika-light' : 'serika-dark' })}
                 onOpenSettings={() => setSettingsOpen(true)}
             />
@@ -96,63 +98,51 @@ function AppShell() {
     );
 }
 
+function PageLoadingFallback() {
+    return (
+        <div className="page-loading-state" role="status">
+            Loading...
+        </div>
+    );
+}
+
+function withPageSuspense(page) {
+    return (
+        <Suspense fallback={<PageLoadingFallback />}>
+            {page}
+        </Suspense>
+    );
+}
+
 const router = createHashRouter(createRoutesFromElements(
     <Route element={<AppShell />}>
         <Route
             path="/"
-            element={
-                <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>}>
-                    <HomePage />
-                </Suspense>
-            }
+            element={withPageSuspense(<HomePage />)}
         />
         <Route
             path="/diagnostic"
-            element={
-                <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>}>
-                    <DiagnosticPage />
-                </Suspense>
-            }
+            element={withPageSuspense(<DiagnosticPage />)}
         />
         <Route
             path="/challenge"
-            element={
-                <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>}>
-                    <ChallengePage />
-                </Suspense>
-            }
+            element={withPageSuspense(<ChallengePage />)}
         />
         <Route
             path="/plan"
-            element={
-                <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>}>
-                    <TrainingPlanPage />
-                </Suspense>
-            }
+            element={withPageSuspense(<TrainingPlanPage />)}
         />
         <Route
             path="/practice"
-            element={
-                <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>}>
-                    <PracticePage />
-                </Suspense>
-            }
+            element={withPageSuspense(<PracticePage />)}
         />
         <Route
             path="/result"
-            element={
-                <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>}>
-                    <ResultPage />
-                </Suspense>
-            }
+            element={withPageSuspense(<ResultPage />)}
         />
         <Route
             path="/insights"
-            element={
-                <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>}>
-                    <InsightsPage />
-                </Suspense>
-            }
+            element={withPageSuspense(<InsightsPage />)}
         />
         <Route path="/coach" element={<Navigate to="/insights" replace />} />
         <Route path="*" element={<Navigate to="/" replace />} />

@@ -2,7 +2,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { getLanguageMeta } from '../i18n';
 import { getTrainingCopy } from '../training/copy';
 
-export function Header({ settings, copy, onToggleTheme, onOpenSettings }) {
+export function Header({ settings, copy, hasTrainingPlan = false, onToggleTheme, onOpenSettings }) {
     const location = useLocation();
     const compact = settings.focusMode && location.pathname === '/practice';
     const languageMeta = getLanguageMeta(settings.language);
@@ -23,6 +23,7 @@ export function Header({ settings, copy, onToggleTheme, onOpenSettings }) {
                     <nav className="nav-links" aria-label="Primary">
                         <NavLink to="/" className="nav-link">{copy.nav.home}</NavLink>
                         <NavLink to="/practice" className="nav-link">{copy.nav.practice}</NavLink>
+                        {hasTrainingPlan && <NavLink to="/plan" className="nav-link">{trainingCopy.nav.plan}</NavLink>}
                         <NavLink to="/challenge" className="nav-link">{trainingCopy.nav.challenge}</NavLink>
                         <NavLink to="/insights" className="nav-link">{copy.nav.insights}</NavLink>
                     </nav>

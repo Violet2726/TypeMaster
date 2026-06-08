@@ -40,10 +40,26 @@ async function finishRound(page) {
     const input = page.locator('.typing-capture-input');
     await input.click({ force: true });
 
-    for (const word of words) {
+    for (const [index, word] of words.entries()) {
+        if (index === words.length - 1) {
+            await input.evaluate((element, value) => {
+                const valueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+                valueSetter?.call(element, value);
+                element.dispatchEvent(new InputEvent('input', {
+                    bubbles: true,
+                    data: value,
+                    inputType: 'insertText'
+                }));
+            }, word);
+            break;
+        }
+
         await input.type(word, { delay: 5 });
         await input.press('Space');
+        await expect(input).toHaveValue('');
     }
+
+    await page.waitForURL(/#\/result/, { timeout: 10000 });
 }
 
 test('completes a practice round and reaches the result page', async ({ page, isMobile }) => {

@@ -53,6 +53,7 @@ const TRAINING_COPY = {
             planCompleteBody: '这一轮已经把当前起步计划收尾，可以回首页查看新的成长建议。'
         },
         nav: {
+            plan: '计划',
             challenge: '挑战'
         },
         account: {
@@ -190,6 +191,7 @@ const TRAINING_COPY = {
             planCompleteBody: 'This starter plan is finished. Head back home to review the next growth recommendation.'
         },
         nav: {
+            plan: 'Plan',
             challenge: 'Challenge'
         },
         account: {

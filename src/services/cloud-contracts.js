@@ -1,5 +1,6 @@
 const CLOUD_STATE_KEY = 'typemaster:v4:cloud-store';
 const CLOUD_API_BASE = '/api/cloud';
+const REMOTE_CLOUD_FLAG = '1';
 const CHALLENGE_TEXT_BY_LANGUAGE = {
     'zh-CN': 'steady focus clear rhythm numbers 2048 calm punctuation smooth control steady finish daily challenge mode active',
     'en-US': 'steady focus clear rhythm numbers 2048 calm punctuation smooth control steady finish daily challenge mode active'
@@ -123,7 +124,15 @@ function getUserHeader() {
     return record?.id || '';
 }
 
+function shouldUseRemoteCloudApi() {
+    return import.meta.env?.VITE_TYPEMASTER_REMOTE_CLOUD === REMOTE_CLOUD_FLAG;
+}
+
 async function requestJson(pathname, options = {}) {
+    if (!shouldUseRemoteCloudApi()) {
+        throw new Error('remote cloud api disabled');
+    }
+
     if (typeof fetch !== 'function') {
         throw new Error('fetch unavailable');
     }

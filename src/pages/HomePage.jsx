@@ -101,8 +101,8 @@ export function HomePage() {
         : 0;
     const latestSession = sessions[0] || null;
     const latestModeLabel = latestSession
-        ? `${getSourceLabel(copy, trainingCopy, latestSession.config?.source)} 路 ${getModeLabel(copy, latestSession.config)}`
-        : `${getSourceLabel(copy, trainingCopy, config.source)} 路 ${getModeLabel(copy, config)}`;
+        ? `${getSourceLabel(copy, trainingCopy, latestSession.config?.source)} · ${getModeLabel(copy, latestSession.config)}`
+        : `${getSourceLabel(copy, trainingCopy, config.source)} · ${getModeLabel(copy, config)}`;
     const currentWeakness = skillProfile?.weakZones?.[0]?.label || trainingCopy.home.noWeakness;
     const planPercent = trainingPlanProgress?.percent || 0;
     const hasDiagnosticInFlight = diagnosticJourney?.status === 'active';
@@ -150,6 +150,10 @@ export function HomePage() {
             loadingLabel: copy.common.loading
         }),
         [challengeStrategyState, copy.common.loading, isLaunchingChallenge, latestChallengeSession, trainingCopy, trainingPlan]
+    );
+    const unlockedAchievements = useMemo(
+        () => achievements.filter((item) => item.unlocked).slice(0, 4),
+        [achievements]
     );
 
     const handleFreePractice = () => {
@@ -410,18 +414,27 @@ export function HomePage() {
                 )}
             </section>
 
-            <section className="panel">
+            <section className="panel home-achievements-panel">
                 <div className="panel-head">
                     <div>
                         <p className="panel-kicker">{trainingCopy.insights.achievementsTitle}</p>
                         <h2>{trainingCopy.insights.achievementsTitle}</h2>
                     </div>
                 </div>
-                <div className="tag-list">
-                    {achievements.filter((item) => item.unlocked).slice(0, 4).map((achievement) => (
-                        <span key={achievement.id} className="tag-pill">{achievement.title}</span>
-                    ))}
-                </div>
+                {unlockedAchievements.length ? (
+                    <div className="tag-list">
+                        {unlockedAchievements.map((achievement) => (
+                            <span key={achievement.id} className="tag-pill">{achievement.title}</span>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="empty-panel empty-panel--compact">
+                        <p className="muted-text">{trainingCopy.insights.achievementsBody}</p>
+                        <button type="button" className="action-btn" onClick={handlePrimaryAction}>
+                            {skillProfile ? trainingCopy.home.continuePlan : trainingCopy.home.diagnosticCta}
+                        </button>
+                    </div>
+                )}
             </section>
         </div>
     );
