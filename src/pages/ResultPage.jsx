@@ -15,6 +15,7 @@ import { getErrorMessage } from '../i18n';
 import { usePracticeStore } from '../store/practice-store';
 import { buildChallengeFocusModel, buildChallengeStrategyModel } from '../training/challenge-focus';
 import { getTrainingCopy } from '../training/copy';
+import { buildResultDecisionModel, pickChallengeDecisionModel } from '../training/decision-models';
 
 function getCoachBadgeLabel(copy, status) {
     if (status === 'success') return copy.common.coachReady;
@@ -71,156 +72,6 @@ function isSameChallengeStandingModel(left, right) {
         && left?.standing?.beatPercent === right?.standing?.beatPercent
         && left?.bestValue === right?.bestValue
         && left?.note === right?.note;
-}
-
-function uniqueActions(actions) {
-    const seen = new Set();
-    return actions.filter((action) => {
-        if (!action?.action || seen.has(action.action)) {
-            return false;
-        }
-
-        seen.add(action.action);
-        return true;
-    });
-}
-
-function getChallengeDecisionTitle(trainingCopy, primaryAction) {
-    if (primaryAction === 'plan') {
-        return trainingCopy.result.challengePlanTitle;
-    }
-
-    if (primaryAction === 'free') {
-        return trainingCopy.result.challengeFreeTitle;
-    }
-
-    return trainingCopy.result.challengePushTitle;
-}
-
-function getChallengeDecisionBody(trainingCopy, primaryAction) {
-    if (primaryAction === 'plan') {
-        return trainingCopy.result.challengePlanBody;
-    }
-
-    if (primaryAction === 'free') {
-        return trainingCopy.result.challengeFreeBody;
-    }
-
-    return trainingCopy.result.challengePushBody;
-}
-
-function getChallengeDecisionSignal(trainingCopy, primaryAction) {
-    if (primaryAction === 'plan') {
-        return trainingCopy.result.challengePlanSignal;
-    }
-
-    if (primaryAction === 'free') {
-        return trainingCopy.result.challengeFreeSignal;
-    }
-
-    return trainingCopy.result.challengePushSignal;
-}
-
-function buildResultDecisionModel({
-    copy,
-    trainingCopy,
-    session,
-    advice,
-    coachRecord,
-    activeTrainingStep,
-    activeDiagnosticStep,
-    trainingPlan,
-    isChallengeSession,
-    challengeDecisionModel,
-    nextDrillState
-}) {
-    if (isChallengeSession) {
-        const primaryAction = challengeDecisionModel?.primaryAction || 'challenge';
-        const secondaryActions = uniqueActions([
-            { action: 'leaderboard', label: copy.result.challengeViewLeaderboard },
-            primaryAction !== 'free'
-                ? { action: 'free', label: trainingCopy.result.freePracticeAction }
-                : null,
-            { action: 'insights', label: copy.common.viewInsights }
-        ]);
-
-        return {
-            badge: trainingCopy.result.decisionBadge,
-            headline: getChallengeDecisionTitle(trainingCopy, primaryAction),
-            body: getChallengeDecisionBody(trainingCopy, primaryAction),
-            signalLabel: trainingCopy.result.signalLabel,
-            signal: getChallengeDecisionSignal(trainingCopy, primaryAction),
-            primaryAction,
-            primaryLabel: challengeDecisionModel?.primaryLabel || trainingCopy.challenge.retryCta,
-            isLoading: primaryAction === 'challenge' && challengeDecisionModel?.primaryLabel === copy.common.loading,
-            secondaryActions
-        };
-    }
-
-    if (session?.trainingMeta?.type === 'diagnostic' && activeDiagnosticStep) {
-        return {
-            badge: trainingCopy.result.decisionBadge,
-            headline: trainingCopy.result.diagnosticDecisionTitle,
-            body: activeDiagnosticStep.summary || trainingCopy.result.diagnosticDecisionBody,
-            signalLabel: trainingCopy.result.signalLabel,
-            signal: activeDiagnosticStep.title,
-            primaryAction: 'diagnostic',
-            primaryLabel: trainingCopy.result.continueDiagnostic,
-            isLoading: false,
-            secondaryActions: uniqueActions([
-                { action: 'free', label: trainingCopy.result.freePracticeAction },
-                { action: 'insights', label: copy.common.viewInsights }
-            ])
-        };
-    }
-
-    if (activeTrainingStep) {
-        return {
-            badge: trainingCopy.result.decisionBadge,
-            headline: trainingCopy.result.planDecisionTitle,
-            body: activeTrainingStep.summary || trainingCopy.result.planBody,
-            signalLabel: trainingCopy.result.signalLabel,
-            signal: activeTrainingStep.title,
-            primaryAction: 'plan',
-            primaryLabel: trainingCopy.result.continuePlan,
-            isLoading: false,
-            secondaryActions: uniqueActions([
-                { action: 'free', label: trainingCopy.result.freePracticeAction },
-                { action: 'insights', label: copy.common.viewInsights }
-            ])
-        };
-    }
-
-    if (session?.trainingMeta?.type === 'plan' && trainingPlan?.status === 'complete') {
-        return {
-            badge: trainingCopy.result.decisionBadge,
-            headline: trainingCopy.result.completeDecisionTitle,
-            body: trainingCopy.result.planCompleteBody,
-            signalLabel: trainingCopy.result.signalLabel,
-            signal: trainingCopy.result.planComplete,
-            primaryAction: 'home',
-            primaryLabel: trainingCopy.result.homeAction,
-            isLoading: false,
-            secondaryActions: uniqueActions([
-                { action: 'insights', label: copy.common.viewInsights },
-                { action: 'free', label: trainingCopy.result.freePracticeAction }
-            ])
-        };
-    }
-
-    return {
-        badge: trainingCopy.result.decisionBadge,
-        headline: coachRecord?.nextDrill?.label || trainingCopy.result.coachDecisionTitle,
-        body: coachRecord?.nextDrill?.reason || advice.body || trainingCopy.result.coachDecisionBody,
-        signalLabel: trainingCopy.result.signalLabel,
-        signal: advice.headline,
-        primaryAction: 'nextDrill',
-        primaryLabel: nextDrillState === 'error' ? copy.common.nextDrillRetry : copy.result.primaryAction,
-        isLoading: nextDrillState === 'loading',
-        secondaryActions: uniqueActions([
-            { action: 'insights', label: copy.common.viewInsights }
-        ])
-    };
 }
 
 function buildChallengeStandingModel(copy, sessions, session, leaderboard) {
@@ -353,21 +204,12 @@ export function ResultPage() {
             : null,
         [activeTrainingStep, challengeActionState, challengeStrategyState, copy.common.loading, isChallengeSession, trainingCopy]
     );
-    const challengeDecisionModel = useMemo(() => {
-        if (!isChallengeSession) {
-            return null;
-        }
-
-        if (challengeStrategyModel?.shouldRecover) {
-            return challengeStrategyModel;
-        }
-
-        if (challengeFocusModel?.shouldRecover) {
-            return challengeFocusModel;
-        }
-
-        return challengeStrategyModel || challengeFocusModel;
-    }, [challengeFocusModel, challengeStrategyModel, isChallengeSession]);
+    const challengeDecisionModel = useMemo(
+        () => isChallengeSession
+            ? pickChallengeDecisionModel(challengeStrategyModel, challengeFocusModel)
+            : null,
+        [challengeFocusModel, challengeStrategyModel, isChallengeSession]
+    );
     const challengeFocusNote = challengeFocusModel?.note || '';
     const challengeFocusDelta = challengeFocusPoint && challengeFocusPoint.attempt > 1
         ? `${trainingCopy.challenge.trendPrevDeltaLabel}: ${formatSigned(challengeFocusPoint.deltaWpm, ` ${copy.common.wpm}`)} / ${formatSigned(challengeFocusPoint.deltaAccuracy, '%')}`
@@ -636,7 +478,7 @@ export function ResultPage() {
                         <p className="panel-kicker">{trainingCopy.result.planTitle}</p>
                         <h2 id="result-decision-title">{resultDecision.headline}</h2>
                     </div>
-                    <span className="panel-badge badge-ready">{resultDecision.badge}</span>
+                    <span className={`panel-badge badge-${resultDecision.badgeTone || 'ready'}`}>{resultDecision.badge}</span>
                 </div>
 
                 <div className="result-decision-panel__body">

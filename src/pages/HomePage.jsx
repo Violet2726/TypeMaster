@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { buildChallengeTrend, buildInsights, getChallengePersonalBest, getChallengeSessions, getChallengeStanding, getChallengeStrategyState, getLatestChallengeSession } from '../engine';
+import { buildChallengeTrend, buildInsights, getChallengePersonalBest, getChallengePointFocusState, getChallengeSessions, getChallengeStanding, getChallengeStrategyState, getLatestChallengeSession } from '../engine';
 import { formatDateTime } from '../i18n';
 import { usePracticeStore } from '../store/practice-store';
-import { buildChallengeStrategyModel } from '../training/challenge-focus';
+import { buildChallengeFocusModel, buildChallengeStrategyModel } from '../training/challenge-focus';
 import { getTrainingCopy } from '../training/copy';
+import { buildHomeDecisionModel, pickChallengeDecisionModel } from '../training/decision-models';
 
 function getModeLabel(copy, config) {
     if (!config) {
@@ -84,12 +85,15 @@ export function HomePage() {
         skillProfile,
         trainingPlan,
         diagnosticJourney,
+        activeTrainingStep,
+        activeDiagnosticStep,
         trainingPlanProgress,
         sessionStreak,
         weeklyGoal,
         achievements,
         dailyChallenge,
-        startRecommendedSession,
+        startDiagnosticJourney,
+        startTrainingPlanStep,
         startDailyChallenge
     } = usePracticeStore();
 
@@ -106,9 +110,6 @@ export function HomePage() {
     const currentWeakness = skillProfile?.weakZones?.[0]?.label || trainingCopy.home.noWeakness;
     const planPercent = trainingPlanProgress?.percent || 0;
     const hasDiagnosticInFlight = diagnosticJourney?.status === 'active';
-    const recommendedTitle = trainingPlan?.title || trainingCopy.home.diagnosticTitle;
-    const recommendedBody = trainingPlan?.summary
-        || (skillProfile ? trainingCopy.home.dashboardBody : trainingCopy.home.diagnosticBody);
     const challengeFacts = useMemo(
         () => getChallengeFacts(copy, dailyChallenge?.config),
         [copy, dailyChallenge?.config]
@@ -125,6 +126,14 @@ export function HomePage() {
     const challengeTrend = useMemo(
         () => buildChallengeTrend(challengeSessions),
         [challengeSessions]
+    );
+    const challengeFocusPoint = useMemo(
+        () => challengeTrend?.points.find((point) => point.id === latestChallengeSession?.id) || null,
+        [challengeTrend, latestChallengeSession?.id]
+    );
+    const challengeFocusState = useMemo(
+        () => getChallengePointFocusState(challengeFocusPoint || (latestChallengeSession ? { attempt: 1 } : null)),
+        [challengeFocusPoint, latestChallengeSession]
     );
     const challengeStanding = useMemo(
         () => getChallengeStanding(dailyChallenge?.leaderboard || [], latestChallengeSession?.id),
@@ -144,30 +153,50 @@ export function HomePage() {
     );
     const challengeStrategyModel = useMemo(
         () => buildChallengeStrategyModel(trainingCopy, challengeStrategyState, {
-            hasActiveTrainingStep: Boolean(trainingPlan),
+            hasActiveTrainingStep: Boolean(activeTrainingStep),
             hasPriorChallenge: Boolean(latestChallengeSession),
             isLoading: isLaunchingChallenge,
             loadingLabel: copy.common.loading
         }),
-        [challengeStrategyState, copy.common.loading, isLaunchingChallenge, latestChallengeSession, trainingCopy, trainingPlan]
+        [activeTrainingStep, challengeStrategyState, copy.common.loading, isLaunchingChallenge, latestChallengeSession, trainingCopy]
+    );
+    const challengeFocusModel = useMemo(
+        () => latestChallengeSession
+            ? buildChallengeFocusModel(trainingCopy, challengeFocusState, {
+                hasActiveTrainingStep: Boolean(activeTrainingStep),
+                isLoading: isLaunchingChallenge,
+                loadingLabel: copy.common.loading
+            })
+            : null,
+        [activeTrainingStep, challengeFocusState, copy.common.loading, isLaunchingChallenge, latestChallengeSession, trainingCopy]
+    );
+    const challengeDecisionModel = useMemo(
+        () => pickChallengeDecisionModel(challengeStrategyModel, challengeFocusModel),
+        [challengeFocusModel, challengeStrategyModel]
     );
     const unlockedAchievements = useMemo(
         () => achievements.filter((item) => item.unlocked).slice(0, 4),
         [achievements]
     );
+    const homeDecision = useMemo(
+        () => buildHomeDecisionModel({
+            copy,
+            trainingCopy,
+            skillProfile,
+            activeTrainingStep,
+            activeDiagnosticStep,
+            hasDiagnosticInFlight,
+            latestSession,
+            dailyChallengeId: dailyChallenge?.id,
+            challengeDecisionModel,
+            trainingPlan
+        }),
+        [activeDiagnosticStep, activeTrainingStep, challengeDecisionModel, copy, dailyChallenge?.id, hasDiagnosticInFlight, latestSession, skillProfile, trainingCopy, trainingPlan]
+    );
+    const challengeIsPrimaryDecision = homeDecision.context === 'challenge';
 
     const handleFreePractice = () => {
         resetPracticeToBuiltin();
-        navigate('/practice');
-    };
-
-    const handlePrimaryAction = () => {
-        if (!skillProfile || hasDiagnosticInFlight) {
-            navigate('/diagnostic');
-            return;
-        }
-
-        startRecommendedSession();
         navigate('/practice');
     };
 
@@ -182,18 +211,45 @@ export function HomePage() {
         }
     };
 
-    const handleChallengePrimaryAction = () => {
-        if (challengeStrategyModel.primaryAction === 'plan') {
-            handlePrimaryAction();
+    const handleDecisionAction = async (action) => {
+        if (action === 'diagnostic') {
+            startDiagnosticJourney();
+            navigate('/practice');
             return;
         }
 
-        if (challengeStrategyModel.primaryAction === 'free') {
+        if (action === 'plan') {
+            startTrainingPlanStep();
+            navigate('/practice');
+            return;
+        }
+
+        if (action === 'free') {
             handleFreePractice();
             return;
         }
 
-        handleStartChallenge();
+        if (action === 'challenge') {
+            await handleStartChallenge();
+            return;
+        }
+
+        if (action === 'planRoute') {
+            navigate('/plan');
+            return;
+        }
+
+        if (action === 'leaderboard') {
+            navigate('/challenge');
+            return;
+        }
+
+        if (action === 'insights') {
+            navigate('/insights');
+            return;
+        }
+
+        navigate('/practice');
     };
 
     return (
@@ -238,17 +294,18 @@ export function HomePage() {
                     <article className="panel home-action-card home-action-card--primary">
                         <div className="home-action-card__body">
                             <p className="panel-kicker">{trainingCopy.home.todayKicker}</p>
-                            <h2>{recommendedTitle}</h2>
-                            <p className="lead-text">{recommendedBody}</p>
+                            <h2>{homeDecision.headline}</h2>
+                            <p className="lead-text">{homeDecision.body}</p>
                             <div className="home-action-card__meta">
-                                <span className={`panel-badge badge-${skillProfile ? 'ready' : hasDiagnosticInFlight ? 'stale' : 'idle'}`}>
-                                    {skillProfile
-                                        ? `${trainingCopy.home.planLabel} ${trainingPlan ? `${planPercent}%` : copy.common.emptyValue}`
-                                        : hasDiagnosticInFlight
-                                            ? trainingCopy.home.diagnosticResume
-                                            : trainingCopy.home.diagnosticCta}
+                                <span className={`panel-badge badge-${homeDecision.badgeTone || 'ready'}`}>
+                                    {homeDecision.badge}
                                 </span>
+                                {trainingPlan && <span className="home-action-chip">{trainingCopy.home.planLabel} {planPercent}%</span>}
                                 <span className="home-action-chip">{currentWeakness}</span>
+                            </div>
+                            <div className="home-action-card__strategy">
+                                <span className="summary-label">{homeDecision.signalLabel}</span>
+                                <p className="lead-text">{homeDecision.signal}</p>
                             </div>
                         </div>
 
@@ -257,12 +314,15 @@ export function HomePage() {
                                 <span>{trainingCopy.home.levelLabel}</span>
                                 <strong>{skillProfile?.level?.label || copy.common.emptyValue}</strong>
                             </div>
-                            <button type="button" className="action-btn primary" onClick={handlePrimaryAction}>
-                                {skillProfile
-                                    ? trainingCopy.home.continuePlan
-                                    : hasDiagnosticInFlight
-                                        ? trainingCopy.home.diagnosticResume
-                                        : trainingCopy.home.diagnosticCta}
+                            <button
+                                type="button"
+                                className="action-btn primary"
+                                onClick={() => handleDecisionAction(homeDecision.primaryAction)}
+                                disabled={isLaunchingChallenge && homeDecision.primaryAction === 'challenge'}
+                            >
+                                {homeDecision.primaryAction === 'challenge' && isLaunchingChallenge
+                                    ? copy.common.loading
+                                    : homeDecision.primaryLabel}
                             </button>
                         </div>
                     </article>
@@ -304,15 +364,19 @@ export function HomePage() {
                                 </div>
                             </div>
                             <div className="results-actions home-action-card__actions">
-                                <button
-                                    type="button"
-                                    className="action-btn primary"
-                                    onClick={handleChallengePrimaryAction}
-                                    disabled={isLaunchingChallenge}
-                                >
-                                    {challengeStrategyModel.primaryLabel}
-                                </button>
-                                <button type="button" className="action-btn" onClick={() => navigate('/challenge')}>
+                                {!challengeIsPrimaryDecision && (
+                                    <button
+                                        type="button"
+                                        className="action-btn primary"
+                                        onClick={() => handleDecisionAction(challengeDecisionModel?.primaryAction || challengeStrategyModel.primaryAction)}
+                                        disabled={isLaunchingChallenge && (challengeDecisionModel?.primaryAction || challengeStrategyModel.primaryAction) === 'challenge'}
+                                    >
+                                        {(challengeDecisionModel?.primaryAction || challengeStrategyModel.primaryAction) === 'challenge' && isLaunchingChallenge
+                                            ? copy.common.loading
+                                            : challengeDecisionModel?.primaryLabel || challengeStrategyModel.primaryLabel}
+                                    </button>
+                                )}
+                                <button type="button" className="action-btn" onClick={() => handleDecisionAction('leaderboard')}>
                                     {trainingCopy.challenge.viewBoard}
                                 </button>
                             </div>
@@ -346,12 +410,12 @@ export function HomePage() {
             <section className="insights-overview-grid">
                 <div className="panel insights-latest-card">
                     <p className="panel-kicker">{trainingCopy.insights.radarTitle}</p>
-                    <h2>{skillProfile?.level?.label || recommendedTitle}</h2>
-                    <p className="lead-text">{skillProfile?.summary || recommendedBody}</p>
+                    <h2>{skillProfile?.level?.label || homeDecision.headline}</h2>
+                    <p className="lead-text">{skillProfile?.summary || homeDecision.body}</p>
                     <p className="muted-text">{currentWeakness}</p>
                     {trainingPlan && (
                         <div className="results-actions">
-                            <button type="button" className="action-btn" onClick={() => navigate('/plan')}>
+                            <button type="button" className="action-btn" onClick={() => handleDecisionAction('planRoute')}>
                                 {trainingCopy.home.planLabel}
                             </button>
                         </div>
@@ -430,8 +494,8 @@ export function HomePage() {
                 ) : (
                     <div className="empty-panel empty-panel--compact">
                         <p className="muted-text">{trainingCopy.insights.achievementsBody}</p>
-                        <button type="button" className="action-btn" onClick={handlePrimaryAction}>
-                            {skillProfile ? trainingCopy.home.continuePlan : trainingCopy.home.diagnosticCta}
+                        <button type="button" className="action-btn" onClick={() => handleDecisionAction(homeDecision.primaryAction)}>
+                            {homeDecision.primaryLabel}
                         </button>
                     </div>
                 )}

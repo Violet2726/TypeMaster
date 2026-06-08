@@ -157,14 +157,15 @@ describe('HomePage', () => {
             }
         });
 
-        expect(await screen.findByRole('button', { name: 'Retry challenge' })).toBeInTheDocument();
+        expect(await screen.findByRole('heading', { name: 'Push the board again' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Retry challenge' })).toBeInTheDocument();
         expect(screen.getByText('What to train today')).toBeInTheDocument();
         expect(screen.getByText('Start from one of these lanes')).toBeInTheDocument();
         expect(screen.getAllByText('Builder').length).toBeGreaterThan(0);
-        expect(screen.getByRole('button', { name: 'Continue today\'s task' })).toBeInTheDocument();
         expect(screen.getByRole('heading', { name: 'Free practice' })).toBeInTheDocument();
         expect(screen.getByText('New best today')).toBeInTheDocument();
         expect(screen.getByText('Keep pushing the board. Today\'s speed curve is still moving upward.')).toBeInTheDocument();
+        expect(screen.getByText('Today\'s challenge trend is still worth one more push.')).toBeInTheDocument();
         expect(screen.getByText('Current rank')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'View leaderboard' })).toBeInTheDocument();
     });
@@ -261,7 +262,9 @@ describe('HomePage', () => {
             }
         });
 
-        const recoverButton = await screen.findByRole('button', { name: 'Back to plan' });
+        expect(await screen.findByRole('heading', { name: 'Return to the plan now' })).toBeInTheDocument();
+        expect(screen.getByText('Leaderboard pressure is starting to reduce training quality.')).toBeInTheDocument();
+        const recoverButton = screen.getByRole('button', { name: 'Back to plan' });
         expect(recoverButton).toBeInTheDocument();
         expect(screen.getByText('The leaderboard push is flattening out. Step away from challenge mode and return to plan work.')).toBeInTheDocument();
 
