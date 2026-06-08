@@ -97,6 +97,8 @@ describe('ChallengePage', () => {
         expect(screen.getAllByRole('button', { name: /challenge/i }).length).toBeGreaterThan(0);
         expect(screen.getByText('Your challenge status')).toBeInTheDocument();
         expect(screen.getByText('Peer group')).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'Today\'s replay' })).toBeInTheDocument();
+        expect(screen.getByText('Best run')).toBeInTheDocument();
         expect(screen.getByRole('heading', { name: 'Leaderboard' })).toBeInTheDocument();
     });
 });

@@ -109,6 +109,7 @@ describe('HomePage', () => {
         expect(screen.getAllByText('Builder').length).toBeGreaterThan(0);
         expect(screen.getByRole('button', { name: 'Continue today\'s task' })).toBeInTheDocument();
         expect(screen.getByRole('heading', { name: 'Free practice' })).toBeInTheDocument();
+        expect(screen.getByText('Your first challenge result today is already on the board.')).toBeInTheDocument();
         expect(screen.getByText('Current rank')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'View leaderboard' })).toBeInTheDocument();
     });

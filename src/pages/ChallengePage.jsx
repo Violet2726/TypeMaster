@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getChallengeLevelLeaderboard, getChallengePersonalBest, getChallengeStanding, getLatestChallengeSession } from '../engine';
+import { getChallengeLevelLeaderboard, getChallengePersonalBest, getChallengeSessions, getChallengeStanding, getLatestChallengeSession } from '../engine';
 import { usePracticeStore } from '../store/practice-store';
 import { getTrainingCopy } from '../training/copy';
 
@@ -44,6 +44,10 @@ export function ChallengePage() {
     const trainingCopy = getTrainingCopy(language);
     const [leaderboard, setLeaderboard] = useState(() => dailyChallenge?.leaderboard || []);
     const peerLevelId = skillProfile?.level?.id || null;
+    const challengeSessions = useMemo(
+        () => getChallengeSessions(sessions, dailyChallenge?.id),
+        [dailyChallenge?.id, sessions]
+    );
     const latestChallengeSession = useMemo(
         () => getLatestChallengeSession(sessions, dailyChallenge?.id),
         [dailyChallenge?.id, sessions]
@@ -68,6 +72,25 @@ export function ChallengePage() {
         () => buildPersonalNote(copy, trainingCopy, latestChallengeSession, personalBest),
         [copy, latestChallengeSession, personalBest, trainingCopy]
     );
+    const latestGapValue = useMemo(() => {
+        if (!latestChallengeSession) {
+            return copy.common.emptyValue;
+        }
+
+        if ((personalBest?.attempts || 0) <= 1 || personalBest?.isPersonalBest) {
+            return `0 ${copy.common.wpm}`;
+        }
+
+        if (personalBest?.gapWpm > 0) {
+            return `-${personalBest.gapWpm} ${copy.common.wpm}`;
+        }
+
+        if (personalBest?.gapAccuracy > 0) {
+            return `-${personalBest.gapAccuracy}%`;
+        }
+
+        return copy.common.emptyValue;
+    }, [copy.common.emptyValue, copy.common.wpm, latestChallengeSession, personalBest]);
 
     useEffect(() => {
         let active = true;
@@ -178,6 +201,51 @@ export function ChallengePage() {
                         <p className="muted-text">{trainingCopy.challenge.peerEmpty}</p>
                     )}
                 </div>
+            </section>
+
+            <section className="panel">
+                <div className="panel-head">
+                    <div>
+                        <p className="panel-kicker">{trainingCopy.challenge.historyTitle}</p>
+                        <h2>{trainingCopy.challenge.historyTitle}</h2>
+                    </div>
+                </div>
+                <p className="lead-text">{trainingCopy.challenge.historyBody}</p>
+                <div className="result-metrics-strip" aria-label={trainingCopy.challenge.historyTitle}>
+                    <div className="result-item">
+                        <span className="result-item-label">{trainingCopy.challenge.attemptsLabel}</span>
+                        <span className="result-item-value">{challengeSessions.length}</span>
+                    </div>
+                    <div className="result-item">
+                        <span className="result-item-label">{trainingCopy.challenge.bestRunLabel}</span>
+                        <span className="result-item-value">{personalBest?.bestSession?.result?.wpm ? `${personalBest.bestSession.result.wpm} ${copy.common.wpm}` : copy.common.emptyValue}</span>
+                    </div>
+                    <div className="result-item">
+                        <span className="result-item-label">{trainingCopy.challenge.latestDeltaLabel}</span>
+                        <span className="result-item-value">{latestGapValue}</span>
+                    </div>
+                </div>
+                {challengeSessions.length ? (
+                    <div className="history-table">
+                        {challengeSessions.slice(0, 5).map((session, index) => (
+                            <div key={session.id} className="history-row">
+                                <div className="history-row__meta">
+                                    <strong>{index === 0 ? trainingCopy.challenge.latestBadge : `${trainingCopy.challenge.attemptsLabel} #${challengeSessions.length - index}`}</strong>
+                                    <p className="muted-text">{new Date(session.result.completedAt).toLocaleString(language)}</p>
+                                </div>
+                                <div className="history-metrics">
+                                    {personalBest?.bestSession?.id === session.id && (
+                                        <span className="panel-badge badge-success">{trainingCopy.challenge.bestBadge}</span>
+                                    )}
+                                    <span>{session.result.wpm} {copy.common.wpm}</span>
+                                    <span>{session.result.accuracy}%</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="muted-text">{trainingCopy.challenge.statusEmpty}</p>
+                )}
             </section>
 
             <section className="panel">

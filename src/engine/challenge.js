@@ -109,10 +109,7 @@ export function getLatestChallengeSession(sessions = [], challengeId) {
         return null;
     }
 
-    return sessions.find((session) => (
-        session?.trainingMeta?.type === 'challenge'
-        && session?.trainingMeta?.stepId === challengeId
-    )) || null;
+    return getChallengeSessions(sessions, challengeId)[0] || null;
 }
 
 export function getChallengeLevelLeaderboard(leaderboard = [], levelId) {
@@ -121,4 +118,26 @@ export function getChallengeLevelLeaderboard(leaderboard = [], levelId) {
     }
 
     return leaderboard.filter((entry) => entry?.levelId === levelId);
+}
+
+export function getChallengeSessions(sessions = [], challengeId) {
+    if (!challengeId) {
+        return [];
+    }
+
+    return [...sessions]
+        .filter((session) => (
+            session?.trainingMeta?.type === 'challenge'
+            && session?.trainingMeta?.stepId === challengeId
+        ))
+        .sort((left, right) => {
+            const leftTime = Date.parse(left?.result?.completedAt || 0);
+            const rightTime = Date.parse(right?.result?.completedAt || 0);
+
+            if (Number.isFinite(leftTime) && Number.isFinite(rightTime) && leftTime !== rightTime) {
+                return rightTime - leftTime;
+            }
+
+            return 0;
+        });
 }

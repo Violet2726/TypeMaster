@@ -140,6 +140,41 @@ main（当前代码已在 main）
 
 ---
 
+## 2026-06-08（迭代 5）
+
+### 今日主线
+补强挑战回访动力，加入更强的个人最佳提示与今日挑战回放。
+
+### 合并分支
+main（当前代码已在 main）
+
+### 用户可见变化
+- 首页挑战卡更明确地展示“今天第一条成绩 / 已刷新最佳 / 距最佳差距”
+- ChallengePage 新增“今日挑战回放”模块
+- ChallengePage 可查看今日尝试次数、最佳速度、距最佳差距与最近几次记录
+
+### 工程变化
+- 扩展 `src/engine/challenge.js` 历史 helper
+- 更新 `src/pages/HomePage.jsx`、`src/pages/ChallengePage.jsx`
+- 更新 `src/training/copy.js`
+- 更新 `src/engine/__tests__/challenge.test.js`
+- 更新 `src/pages/__tests__/HomePage.test.jsx`、`src/pages/__tests__/ChallengePage.test.jsx`
+- 更新 `e2e/app.spec.js`
+
+### 删除的旧逻辑
+- 无删除业务能力，本次为挑战反馈增强
+
+### 验证结果
+- npm test: ✅ 通过（246 tests passed）
+- npm run build: ✅ 通过
+- npm run test:e2e: ✅ 通过（8 passed, 4 skipped）
+
+### 已知遗留
+- ChallengePage 仍未提供更图形化的成绩波动趋势
+- 首页挑战卡还没有给出“是否值得再来一轮”的策略提示
+
+---
+
 ## 2026-05-10
 
 ### 今日主线

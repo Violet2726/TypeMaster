@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { buildInsights, getChallengePersonalBest, getChallengeStanding, getLatestChallengeSession } from '../engine';
+import { buildInsights, getChallengePersonalBest, getChallengeSessions, getChallengeStanding, getLatestChallengeSession } from '../engine';
 import { formatDateTime } from '../i18n';
 import { usePracticeStore } from '../store/practice-store';
 import { getTrainingCopy } from '../training/copy';
@@ -46,6 +46,10 @@ function fillTemplate(template, value) {
 function getChallengePerformanceText(copy, challengeSession, challengeStanding, challengePersonalBest, trainingCopy) {
     if (!challengeSession) {
         return trainingCopy.challenge.homeIdleNote;
+    }
+
+    if ((challengePersonalBest?.attempts || 0) <= 1) {
+        return copy.result.challengeBestFirst;
     }
 
     if (challengePersonalBest?.isPersonalBest) {
@@ -111,6 +115,10 @@ export function HomePage() {
     const challengeLeaderboardCount = dailyChallenge?.leaderboard?.length || 0;
     const latestChallengeSession = useMemo(
         () => getLatestChallengeSession(sessions, dailyChallenge?.id),
+        [dailyChallenge?.id, sessions]
+    );
+    const challengeSessions = useMemo(
+        () => getChallengeSessions(sessions, dailyChallenge?.id),
         [dailyChallenge?.id, sessions]
     );
     const challengeStanding = useMemo(
@@ -243,8 +251,16 @@ export function HomePage() {
                                     <strong>{challengeStanding ? `#${challengeStanding.rank}` : copy.common.emptyValue}</strong>
                                 </div>
                                 <div className="home-action-card__summary">
+                                    <span>{copy.result.challengeBestLabel}</span>
+                                    <strong>{challengePersonalBest?.bestSession?.result?.wpm ? `${challengePersonalBest.bestSession.result.wpm} ${copy.common.wpm}` : copy.common.emptyValue}</strong>
+                                </div>
+                                <div className="home-action-card__summary">
                                     <span>{trainingCopy.challenge.leaderboard}</span>
                                     <strong>{challengeLeaderboardCount}</strong>
+                                </div>
+                                <div className="home-action-card__summary">
+                                    <span>{trainingCopy.challenge.attemptsLabel}</span>
+                                    <strong>{challengeSessions.length || copy.common.emptyValue}</strong>
                                 </div>
                             </div>
                             <div className="results-actions home-action-card__actions">

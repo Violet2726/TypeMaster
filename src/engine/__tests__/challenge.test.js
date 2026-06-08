@@ -2,6 +2,7 @@ import {
     compareChallengeScores,
     createChallengeEntryPreview,
     getChallengeLevelLeaderboard,
+    getChallengeSessions,
     getLatestChallengeSession,
     getChallengePersonalBest,
     getChallengeStanding,
@@ -98,12 +99,25 @@ describe('challenge helpers', () => {
 
     test('returns the latest session for the current challenge id', () => {
         const latest = getLatestChallengeSession([
-            { id: 'session-3', trainingMeta: { type: 'challenge', stepId: 'daily-2' } },
-            { id: 'session-2', trainingMeta: { type: 'challenge', stepId: 'daily-1' } },
+            {
+                id: 'session-3',
+                trainingMeta: { type: 'challenge', stepId: 'daily-2' },
+                result: { completedAt: '2026-06-08T09:00:00.000Z' }
+            },
+            {
+                id: 'session-2',
+                trainingMeta: { type: 'challenge', stepId: 'daily-1' },
+                result: { completedAt: '2026-06-08T08:00:00.000Z' }
+            },
+            {
+                id: 'session-4',
+                trainingMeta: { type: 'challenge', stepId: 'daily-1' },
+                result: { completedAt: '2026-06-08T10:00:00.000Z' }
+            },
             { id: 'session-1', trainingMeta: { type: 'free', stepId: null } }
         ], 'daily-1');
 
-        expect(latest?.id).toBe('session-2');
+        expect(latest?.id).toBe('session-4');
     });
 
     test('filters leaderboard to the same level when a level id exists', () => {
@@ -115,5 +129,27 @@ describe('challenge helpers', () => {
 
         expect(cohort).toHaveLength(2);
         expect(cohort.every((entry) => entry.levelId === 'builder')).toBe(true);
+    });
+
+    test('returns challenge sessions ordered by latest completion time', () => {
+        const ordered = getChallengeSessions([
+            {
+                id: 'session-1',
+                trainingMeta: { type: 'challenge', stepId: 'daily-1' },
+                result: { completedAt: '2026-06-08T08:00:00.000Z' }
+            },
+            {
+                id: 'session-2',
+                trainingMeta: { type: 'challenge', stepId: 'daily-1' },
+                result: { completedAt: '2026-06-08T09:00:00.000Z' }
+            },
+            {
+                id: 'session-3',
+                trainingMeta: { type: 'challenge', stepId: 'daily-2' },
+                result: { completedAt: '2026-06-08T10:00:00.000Z' }
+            }
+        ], 'daily-1');
+
+        expect(ordered.map((session) => session.id)).toEqual(['session-2', 'session-1']);
     });
 });
