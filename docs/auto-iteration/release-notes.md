@@ -36,6 +36,40 @@ main（当前代码已在 main）
 
 ---
 
+## 2026-06-08（迭代 10）
+
+### 今日主线
+给首页挑战卡补上“什么时候不建议继续冲榜”的边界提示，并把用户直接带回训练主线。
+
+### 合并分支
+main（当前代码已在 main）
+
+### 用户可见变化
+- 首页挑战卡新增 recovery 边界建议
+- 当今日挑战状态明显回落时，首页会建议先回计划或先去热身
+- 用户可以直接从挑战卡切回训练主线，而不是继续无效冲榜
+
+### 工程变化
+- 扩展 `src/engine/challenge.js` strategy state helper
+- 更新 `src/pages/HomePage.jsx`
+- 更新 `src/training/copy.js`
+- 更新 `src/pages/__tests__/HomePage.test.jsx`
+- 更新 `e2e/app.spec.js`
+
+### 删除的旧逻辑
+- 无删除业务能力，本次为首页建议边界增强
+
+### 验证结果
+- npm test: ✅ 通过（249 tests passed）
+- npm run build: ✅ 通过
+- npm run test:e2e: ✅ 通过（9 passed, 4 skipped）
+
+### 已知遗留
+- ChallengePage 趋势图仍缺少更细的焦点态说明
+- 首页挑战卡还没有“建议何时停止继续冲榜”的更细边界层级
+
+---
+
 ## 2026-06-08
 
 ### 今日主线
