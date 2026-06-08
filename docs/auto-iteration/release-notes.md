@@ -2,6 +2,42 @@
 
 ---
 
+## 2026-06-08（迭代 17）
+
+### 今日主线
+把结果页挑战风险状态的 Back to plan 路径纳入 e2e 守护，验证用户从风险解释直接回到训练计划。
+
+### 合并分支
+main（当前代码已在 main）
+
+### 用户可见变化
+- 用户可见体验保持不变
+- 结果页准确率风险提示、Back to plan 按钮和计划练习落点现在有真实浏览器路径保护
+- 挑战教练从“敢提示风险”进一步补强为“风险动作可被持续验证”
+
+### 工程变化
+- 新增结果页 challenge risk e2e 场景
+- e2e seed 构造同一 daily challenge 的准确率风险趋势
+- 断言结果页 Run focus 文案、delta、Back to plan 跳转、计划任务标题和 active session context
+
+### 删除的旧逻辑
+- 无删除产品逻辑，本次为质量守护增强
+
+### 验证结果
+- `npm run test:e2e -- --grep "result-page challenge risk"`: 通过，1 passed, 1 skipped
+- `npm test`: 通过，261 tests passed
+- `npm run build`: 通过
+- `npm run test:e2e`: 通过，10 passed, 6 skipped
+- `git diff --check`: 通过，仅有仓库 CRLF 提示
+- in-app browser: 当前会话没有可用浏览器实例，已使用 Playwright e2e 覆盖核心路径
+
+### 已知遗留
+- release notes 顶部存在重复的迭代 10 记录，后续可单独清理
+- 如果挑战模型继续扩张，可再评估是否重命名 `challenge-focus.js`
+- ResultPage 风险恢复卡未来可以增加更强的视觉解释层
+
+---
+
 ## 2026-06-08（迭代 16）
 
 ### 今日主线

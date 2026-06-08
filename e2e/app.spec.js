@@ -352,6 +352,143 @@ test('shows challenge standing after completing a home-started daily challenge',
     await expect(page.getByRole('button', { name: 'View leaderboard' })).toBeVisible();
 });
 
+test('routes result-page challenge risk advice back into the plan', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'desktop flow only');
+    const challengeId = `daily-${new Date().toISOString().slice(0, 10)}`;
+    await seedEnglishState(page, {
+        'typemaster:v4:skill-profile': {
+            createdAt: '2026-06-08T00:00:00.000Z',
+            level: { id: 'builder', label: 'Builder' },
+            summary: 'Keep pushing challenge consistency.',
+            primaryFocus: 'accuracy',
+            weakZones: [{ id: 'accuracy', label: 'accuracy', score: 92 }],
+            metrics: { avgAccuracy: 92, avgConsistency: 84 }
+        },
+        'typemaster:v4:training-plan': {
+            id: 'plan-1',
+            title: '7-day starter plan',
+            summary: 'Stabilize the clearest weakness first, then add pressure.',
+            status: 'active',
+            currentStepIndex: 0,
+            steps: [
+                {
+                    id: 'starter-day-1',
+                    order: 1,
+                    title: 'Reset accuracy',
+                    summary: 'Use a mid-length round to bring hit rate back under control.',
+                    status: 'pending',
+                    config: {
+                        source: 'builtin',
+                        mode: 'time',
+                        durationSeconds: 45,
+                        wordCount: 25,
+                        includeNumbers: false,
+                        includePunctuation: false,
+                        aiTemplate: 'daily',
+                        difficulty: 'medium'
+                    }
+                }
+            ]
+        },
+        'typemaster:v4:active-session-context': {
+            type: 'plan',
+            planId: 'plan-1',
+            stepId: 'starter-day-1'
+        },
+        'typemaster:v2:sessions': [
+            {
+                id: 'session-1',
+                trainingMeta: { type: 'challenge', stepId: challengeId, title: 'Daily challenge' },
+                sourceTextMeta: { source: 'builtin', label: 'Daily challenge' },
+                result: {
+                    wpm: 80,
+                    rawWpm: 86,
+                    accuracy: 92,
+                    consistency: 88,
+                    durationSeconds: 45,
+                    correctChars: 45,
+                    incorrectChars: 4,
+                    extraChars: 1,
+                    missedChars: 0,
+                    completedAt: '2026-06-08T09:00:00.000Z'
+                },
+                timeline: { labels: [], wpm: [], raw: [], accuracy: [], burst: [], errors: [], samples: [], pauseMoments: [] }
+            },
+            {
+                id: 'session-0',
+                trainingMeta: { type: 'challenge', stepId: challengeId, title: 'Daily challenge' },
+                sourceTextMeta: { source: 'builtin', label: 'Daily challenge' },
+                result: {
+                    wpm: 74,
+                    rawWpm: 82,
+                    accuracy: 98,
+                    consistency: 92,
+                    durationSeconds: 45,
+                    correctChars: 49,
+                    incorrectChars: 1,
+                    extraChars: 0,
+                    missedChars: 0,
+                    completedAt: '2026-06-08T08:00:00.000Z'
+                },
+                timeline: { labels: [], wpm: [], raw: [], accuracy: [], burst: [], errors: [], samples: [], pauseMoments: [] }
+            }
+        ],
+        'typemaster:v4:cloud-store': {
+            currentUserId: 'user-1',
+            users: {
+                'user-1': {
+                    id: 'user-1',
+                    displayName: 'Alice',
+                    createdAt: '2026-06-08T00:00:00.000Z',
+                    sessions: [],
+                    trainingPlan: null,
+                    skillProfile: { level: { id: 'builder', label: 'Builder' } },
+                    challengeResults: {},
+                    achievements: [],
+                    streakState: null
+                }
+            },
+            challenges: {
+                [challengeId]: {
+                    id: challengeId,
+                    dateKey: new Date().toISOString().slice(0, 10),
+                    title: 'Daily challenge',
+                    summary: 'Use one shared text to compare stability and accuracy.',
+                    text: 'steady focus clear rhythm',
+                    config: {
+                        source: 'builtin',
+                        mode: 'words',
+                        durationSeconds: 45,
+                        wordCount: 10,
+                        includeNumbers: false,
+                        includePunctuation: false,
+                        aiTemplate: 'daily',
+                        difficulty: 'medium'
+                    },
+                    leaderboard: [
+                        { id: 'entry-self', sessionId: 'session-1', displayName: 'Alice', userId: 'user-1', levelId: 'builder', wpm: 80, accuracy: 92, createdAt: '2026-06-08T09:00:00.000Z' }
+                    ]
+                }
+            }
+        }
+    });
+
+    await page.goto('/#/result?session=session-1');
+
+    await expect(page.getByRole('heading', { name: 'Daily challenge standing' })).toBeVisible();
+    await expect(page.getByText('Speed may be coming from accuracy leakage. Slow the next run down slightly.')).toBeVisible();
+    await expect(page.getByText('Vs previous: +6 WPM / -6%')).toBeVisible();
+    await page.getByRole('button', { name: 'Back to plan' }).click();
+
+    await expect(page).toHaveURL(/#\/practice/);
+    await expect(page.locator('.panel').first().getByRole('heading', { name: 'Reset accuracy' })).toBeVisible();
+    await expect.poll(async () => page.evaluate(() => JSON.parse(window.localStorage.getItem('typemaster:v4:active-session-context')))).toMatchObject({
+        type: 'plan',
+        planId: 'plan-1',
+        stepId: 'starter-day-1'
+    });
+});
+
 test('mobile plan flow continues into practice with sticky controls visible', async ({ page, isMobile }) => {
     test.skip(!isMobile, 'mobile flow only');
     await seedEnglishState(page, {
