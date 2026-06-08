@@ -37,8 +37,13 @@ async function configureWordsRound(page) {
 
 async function finishRound(page) {
     const words = await page.locator('.word').evaluateAll((nodes) => nodes.slice(0, 10).map((node) => node.textContent.trim()));
-    await page.locator('.typing-capture-input').click({ force: true });
-    await page.locator('.typing-capture-input').type(`${words.join(' ')} `, { delay: 5 });
+    const input = page.locator('.typing-capture-input');
+    await input.click({ force: true });
+
+    for (const word of words) {
+        await input.type(word, { delay: 5 });
+        await input.press('Space');
+    }
 }
 
 test('completes a practice round and reaches the result page', async ({ page, isMobile }) => {
@@ -86,6 +91,60 @@ test('starts the daily challenge directly from the home action hub', async ({ pa
     await expect(page).toHaveURL(/#\/practice/);
     await expect(page.locator('.panel').first().getByRole('heading', { name: 'Daily challenge' })).toBeVisible();
     await expect(page.getByText('Challenge round')).toBeVisible();
+});
+
+test('shows challenge standing after completing a home-started daily challenge', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'desktop flow only');
+    await seedEnglishState(page, {
+        'typemaster:v4:cloud-store': {
+            currentUserId: 'user-1',
+            users: {
+                'user-1': {
+                    id: 'user-1',
+                    displayName: 'Alice',
+                    createdAt: '2026-06-08T00:00:00.000Z',
+                    sessions: [],
+                    trainingPlan: null,
+                    skillProfile: null,
+                    challengeResults: {},
+                    achievements: [],
+                    streakState: null
+                }
+            },
+            challenges: {
+                [`daily-${new Date().toISOString().slice(0, 10)}`]: {
+                    id: `daily-${new Date().toISOString().slice(0, 10)}`,
+                    dateKey: new Date().toISOString().slice(0, 10),
+                    title: 'Daily challenge',
+                    summary: 'Use one shared text to compare stability and accuracy.',
+                    text: 'steady focus clear rhythm sharp control calm output daily sprint',
+                    config: {
+                        source: 'builtin',
+                        mode: 'words',
+                        durationSeconds: 45,
+                        wordCount: 10,
+                        includeNumbers: false,
+                        includePunctuation: false,
+                        aiTemplate: 'daily',
+                        difficulty: 'medium'
+                    },
+                    leaderboard: []
+                }
+            }
+        }
+    });
+
+    await page.goto('/#/');
+    await page.getByRole('button', { name: 'Start challenge' }).click();
+    await expect(page).toHaveURL(/#\/practice/);
+    await expect(page.locator('.panel').first().getByRole('heading', { name: 'Daily challenge' })).toBeVisible();
+    await finishRound(page);
+
+    await expect(page).toHaveURL(/#\/result/);
+    await expect(page.getByRole('heading', { name: 'Daily challenge standing' })).toBeVisible();
+    await expect(page.getByText('Current rank')).toBeVisible();
+    await expect(page.getByText('Personal best')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'View leaderboard' })).toBeVisible();
 });
 
 test('mobile plan flow continues into practice with sticky controls visible', async ({ page, isMobile }) => {

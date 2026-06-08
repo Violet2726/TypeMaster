@@ -36,6 +36,42 @@ main（当前代码已在 main）
 
 ---
 
+## 2026-06-08（迭代 2）
+
+### 今日主线
+补齐每日挑战结果闭环，让结果页直接展示挑战战绩。
+
+### 合并分支
+main（当前代码已在 main）
+
+### 用户可见变化
+- 挑战完成后，结果页新增“每日挑战战绩”卡片
+- 卡片展示当前名次、参与人数、超过选手比例和个人最佳状态
+- 结果页新增“查看挑战榜单”入口
+
+### 工程变化
+- 新增 `src/engine/challenge.js` 纯逻辑模块
+- 新增 `src/engine/__tests__/challenge.test.js`
+- 更新 `src/store/practice-store.jsx`，在挑战完成后乐观更新榜单
+- 更新 `src/pages/ResultPage.jsx` 和 `src/pages/__tests__/ResultPage.test.jsx`
+- 新增 `src/hooks/__tests__/useTypingSession.test.jsx`，修复最后一词双提交问题
+- 更新 `src/i18n/index.js` 挑战结果文案
+- 更新 `e2e/app.spec.js` 挑战结果闭环用例
+
+### 删除的旧逻辑
+- 无删除业务能力，本次为挑战链路增强
+
+### 验证结果
+- npm test: ✅ 通过（243 tests passed）
+- npm run build: ✅ 通过
+- npm run test:e2e: ✅ 通过（6 passed, 4 skipped）
+
+### 已知遗留
+- 当前个人最佳仍基于本地 session 样本，不是跨设备汇总
+- challenge API 未启动时，排行榜仍走本地 fallback
+
+---
+
 ## 2026-05-10
 
 ### 今日主线

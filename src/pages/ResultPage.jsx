@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TrendChart } from '../components/TrendChart';
-import { deriveComparison } from '../engine';
+import { deriveComparison, getChallengePersonalBest, getChallengeStanding, mergeChallengeLeaderboardEntries } from '../engine';
 import { getErrorMessage } from '../i18n';
 import { usePracticeStore } from '../store/practice-store';
 import { getTrainingCopy } from '../training/copy';
@@ -45,6 +45,55 @@ function buildAdviceModel(copy, language, status, issue, coachRecord) {
     };
 }
 
+function fillTemplate(template, value) {
+    return String(template || '').replace('{value}', value);
+}
+
+function buildChallengeStandingModel(copy, sessions, session, leaderboard) {
+    const challengeId = session?.trainingMeta?.stepId;
+    const standing = getChallengeStanding(leaderboard, session?.id);
+    const personalBest = getChallengePersonalBest(sessions, challengeId, session?.id);
+
+    if (!standing) {
+        return {
+            standing: null,
+            personalBest,
+            bestValue: personalBest.attempts > 0
+                ? personalBest.isPersonalBest
+                    ? copy.result.challengeBestFresh
+                    : personalBest.gapWpm > 0
+                        ? fillTemplate(copy.result.challengeBestGapWpm, personalBest.gapWpm)
+                        : fillTemplate(copy.result.challengeBestGapAccuracy, personalBest.gapAccuracy)
+                : copy.common.emptyValue
+        };
+    }
+
+    let note = copy.result.challengeStandingBody;
+
+    if (personalBest.attempts <= 1) {
+        note = copy.result.challengeBestFirst;
+    } else if (personalBest.isPersonalBest) {
+        note = copy.result.challengeBestFresh;
+    } else if (personalBest.gapWpm > 0) {
+        note = fillTemplate(copy.result.challengeBestGapWpm, personalBest.gapWpm);
+    } else if (personalBest.gapAccuracy > 0) {
+        note = fillTemplate(copy.result.challengeBestGapAccuracy, personalBest.gapAccuracy);
+    }
+
+    return {
+        standing,
+        personalBest,
+        bestValue: personalBest.isPersonalBest
+            ? copy.result.challengeBestFresh
+            : personalBest.gapWpm > 0
+                ? `-${personalBest.gapWpm} ${copy.common.wpm}`
+                : personalBest.gapAccuracy > 0
+                    ? `-${personalBest.gapAccuracy}%`
+                    : copy.common.emptyValue,
+        note
+    };
+}
+
 export function ResultPage() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
@@ -60,7 +109,9 @@ export function ResultPage() {
         launchNextDrill,
         activeTrainingStep,
         trainingPlan,
-        startTrainingPlanStep
+        startTrainingPlanStep,
+        dailyChallenge,
+        challengeGateway
     } = usePracticeStore();
     const trainingCopy = getTrainingCopy(language);
 
@@ -73,9 +124,13 @@ export function ResultPage() {
     const [coachRecord, setCoachRecord] = useState(() => (session ? getAdviceForSession(session.id) : null));
     const [nextDrillState, setNextDrillState] = useState('idle');
     const [nextDrillError, setNextDrillError] = useState(null);
+    const [challengeState, setChallengeState] = useState('idle');
+    const [challengeStanding, setChallengeStanding] = useState(null);
 
     const coachStatus = session ? getCoachStatusForSession(session.id) : 'idle';
     const coachIssue = session ? getCoachIssueForSession(session.id) : null;
+    const isChallengeSession = session?.trainingMeta?.type === 'challenge';
+    const challengeId = isChallengeSession ? session?.trainingMeta?.stepId : null;
 
     useEffect(() => {
         if (!session) {
@@ -101,6 +156,79 @@ export function ResultPage() {
             active = false;
         };
     }, [generateCoachForSession, getAdviceForSession, session]);
+
+    useEffect(() => {
+        if (!session || !challengeId) {
+            setChallengeState('idle');
+            setChallengeStanding(null);
+            return undefined;
+        }
+
+        let active = true;
+        let retryTimer = 0;
+
+        const applyStanding = (leaderboard) => {
+            if (!active) {
+                return false;
+            }
+
+            const model = buildChallengeStandingModel(copy, sessions, session, leaderboard);
+            setChallengeStanding(model);
+
+            if (model.standing) {
+                setChallengeState('success');
+                return true;
+            }
+
+            return false;
+        };
+
+        const mergedSeed = mergeChallengeLeaderboardEntries(
+            dailyChallenge?.id === challengeId ? (dailyChallenge.leaderboard || []) : [],
+            null
+        );
+
+        if (applyStanding(mergedSeed)) {
+            return undefined;
+        }
+
+        setChallengeState('loading');
+
+        const load = async (attempt = 0) => {
+            try {
+                const leaderboard = await challengeGateway.getChallengeLeaderboard(challengeId, language);
+                if (applyStanding(leaderboard)) {
+                    return;
+                }
+
+                if (attempt === 0) {
+                    retryTimer = window.setTimeout(() => {
+                        load(1).catch(() => {});
+                    }, 240);
+                    return;
+                }
+
+                if (active) {
+                    setChallengeState('pending');
+                }
+            } catch {
+                if (active) {
+                    setChallengeState('error');
+                }
+            }
+        };
+
+        load().catch(() => {
+            if (active) {
+                setChallengeState('error');
+            }
+        });
+
+        return () => {
+            active = false;
+            window.clearTimeout(retryTimer);
+        };
+    }, [challengeGateway, challengeId, copy, dailyChallenge, language, session, sessions]);
 
     if (!session) {
         return (
@@ -190,6 +318,73 @@ export function ResultPage() {
                     </span>
                 </div>
             </section>
+
+            {isChallengeSession && (
+                <section className="panel result-advice-panel">
+                    <div className="panel-head">
+                        <div>
+                            <p className="panel-kicker">{session.trainingMeta?.title || trainingCopy.challenge.kicker}</p>
+                            <h2>{copy.result.challengeStandingTitle}</h2>
+                        </div>
+                        <span className={`panel-badge badge-${challengeState === 'success' ? 'ready' : challengeState === 'error' ? 'error' : 'loading'}`}>
+                            {challengeState === 'success' && challengeStanding?.standing
+                                ? `#${challengeStanding.standing.rank}/${challengeStanding.standing.total}`
+                                : trainingCopy.challenge.leaderboard}
+                        </span>
+                    </div>
+
+                    {challengeState === 'loading' && (
+                        <div className="feedback-card feedback-info">
+                            <strong>{copy.result.challengeStandingSyncTitle}</strong>
+                            <p>{copy.result.challengeStandingBody}</p>
+                        </div>
+                    )}
+
+                    {challengeState === 'pending' && (
+                        <div className="feedback-card feedback-info">
+                            <strong>{copy.result.challengeStandingSyncTitle}</strong>
+                            <p>{copy.result.challengeStandingSyncBody}</p>
+                        </div>
+                    )}
+
+                    {challengeState === 'error' && (
+                        <div className="feedback-card feedback-error">
+                            <strong>{copy.result.challengeStandingErrorTitle}</strong>
+                            <p>{copy.result.challengeStandingErrorBody}</p>
+                        </div>
+                    )}
+
+                    {challengeState === 'success' && challengeStanding?.standing && (
+                        <>
+                            <div className="result-metrics-strip" aria-label={copy.result.challengeStandingTitle}>
+                                <div className="result-item">
+                                    <span className="result-item-label">{copy.result.challengeRankLabel}</span>
+                                    <span className="result-item-value">#{challengeStanding.standing.rank}</span>
+                                </div>
+                                <div className="result-item">
+                                    <span className="result-item-label">{copy.result.challengeEntriesLabel}</span>
+                                    <span className="result-item-value">{challengeStanding.standing.total}</span>
+                                </div>
+                                <div className="result-item">
+                                    <span className="result-item-label">{copy.result.challengeBeatLabel}</span>
+                                    <span className="result-item-value">{challengeStanding.standing.beatPercent}%</span>
+                                </div>
+                                <div className="result-item">
+                                    <span className="result-item-label">{copy.result.challengeBestLabel}</span>
+                                    <span className="result-item-value">{challengeStanding.bestValue}</span>
+                                </div>
+                            </div>
+                            <p className="lead-text">{challengeStanding.note}</p>
+                        </>
+                    )}
+
+                    <div className="results-actions">
+                        <button type="button" className="action-btn" onClick={() => navigate('/challenge')}>
+                            {copy.result.challengeViewLeaderboard}
+                        </button>
+                    </div>
+                </section>
+            )}
 
             <section className="panel result-advice-panel">
                 <div className="panel-head">

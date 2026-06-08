@@ -18,6 +18,7 @@ import {
     buildSkillProfile,
     calculateSessionStreak,
     calculateWeeklySessions,
+    createChallengeEntryPreview,
     createBuiltinDraft,
     createCustomDraft,
     createDiagnosticJourney,
@@ -28,7 +29,8 @@ import {
     doesDraftMatchConfig,
     getActiveJourneyStep,
     getActiveTrainingStep,
-    getTrainingPlanProgress
+    getTrainingPlanProgress,
+    mergeChallengeLeaderboardEntries
 } from '../engine';
 import { getCopy } from '../i18n';
 import { buildFallbackCoachAdvice, generateCoachAdvice, generatePracticeText } from '../services/ai-service';
@@ -695,10 +697,33 @@ export function PracticeProvider({ children }) {
             setTrainingPlan(updatedPlan);
             setActiveSessionContext(null);
         } else if (activeSessionContext?.type === 'challenge') {
+            const previewEntry = createChallengeEntryPreview({
+                account,
+                skillProfile,
+                sessionId: session.id,
+                result
+            });
+            setDailyChallenge((previous) => (
+                previous && previous.id === activeSessionContext.challengeId
+                    ? {
+                        ...previous,
+                        leaderboard: mergeChallengeLeaderboardEntries(previous.leaderboard || [], previewEntry)
+                    }
+                    : previous
+            ));
             challengeGateway.submitChallengeResult({
                 challengeId: activeSessionContext.challengeId,
                 sessionId: session.id,
                 result
+            }).then((entry) => {
+                setDailyChallenge((previous) => (
+                    previous && previous.id === activeSessionContext.challengeId
+                        ? {
+                            ...previous,
+                            leaderboard: mergeChallengeLeaderboardEntries(previous.leaderboard || [], entry)
+                        }
+                        : previous
+                ));
             }).catch(() => {});
             setActiveSessionContext(null);
         } else {

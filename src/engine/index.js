@@ -14,3 +14,4 @@ export * from './insights';
 export * from './session-machine';
 export * from './training';
 export * from './achievements';
+export * from './challenge';

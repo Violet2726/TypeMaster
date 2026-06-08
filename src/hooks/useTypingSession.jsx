@@ -422,6 +422,15 @@ export function useTypingSession({ draft, config, soundEffects = false, onComple
                 return;
             }
 
+            const currentWord = words[currentWordIndex] || '';
+            if (
+                config.mode === 'words'
+                && currentWordIndex === words.length - 1
+                && currentInput === currentWord
+            ) {
+                return;
+            }
+
             const committed = commitCurrentWord(currentInput);
             if (!committed) {
                 return;
