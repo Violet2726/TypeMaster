@@ -194,6 +194,109 @@ test('opens the challenge page from the home leaderboard shortcut', async ({ pag
     await expect(page.locator('.result-item-value').filter({ hasText: '#1' })).toHaveCount(2);
 });
 
+test('routes challenge recovery advice back into the plan', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'desktop flow only');
+    const challengeId = `daily-${new Date().toISOString().slice(0, 10)}`;
+    await seedEnglishState(page, {
+        'typemaster:v4:skill-profile': {
+            createdAt: '2026-06-08T00:00:00.000Z',
+            level: { id: 'builder', label: 'Builder' },
+            summary: 'Keep pushing challenge consistency.',
+            primaryFocus: 'accuracy',
+            weakZones: [{ id: 'accuracy', label: 'accuracy', score: 92 }],
+            metrics: { avgAccuracy: 92, avgConsistency: 84 }
+        },
+        'typemaster:v4:training-plan': {
+            id: 'plan-1',
+            title: '7-day starter plan',
+            summary: 'Stabilize the clearest weakness first, then add pressure.',
+            status: 'active',
+            currentStepIndex: 0,
+            steps: [
+                {
+                    id: 'starter-day-1',
+                    order: 1,
+                    title: 'Reset accuracy',
+                    summary: 'Use a mid-length round to bring hit rate back under control.',
+                    status: 'pending',
+                    config: {
+                        source: 'builtin',
+                        mode: 'time',
+                        durationSeconds: 45,
+                        wordCount: 25,
+                        includeNumbers: false,
+                        includePunctuation: false,
+                        aiTemplate: 'daily',
+                        difficulty: 'medium'
+                    }
+                }
+            ]
+        },
+        'typemaster:v2:sessions': [
+            {
+                id: 'session-0',
+                trainingMeta: { type: 'challenge', stepId: challengeId, title: 'Daily challenge' },
+                result: { wpm: 96, accuracy: 98, completedAt: '2026-06-08T07:00:00.000Z' }
+            },
+            {
+                id: 'session-1',
+                trainingMeta: { type: 'challenge', stepId: challengeId, title: 'Daily challenge' },
+                result: { wpm: 88, accuracy: 97, completedAt: '2026-06-08T08:00:00.000Z' }
+            },
+            {
+                id: 'session-2',
+                trainingMeta: { type: 'challenge', stepId: challengeId, title: 'Daily challenge' },
+                result: { wpm: 82, accuracy: 95, completedAt: '2026-06-08T09:00:00.000Z' }
+            }
+        ],
+        'typemaster:v4:cloud-store': {
+            currentUserId: 'user-1',
+            users: {
+                'user-1': {
+                    id: 'user-1',
+                    displayName: 'Alice',
+                    createdAt: '2026-06-08T00:00:00.000Z',
+                    sessions: [],
+                    trainingPlan: null,
+                    skillProfile: { level: { id: 'builder', label: 'Builder' } },
+                    challengeResults: {},
+                    achievements: [],
+                    streakState: null
+                }
+            },
+            challenges: {
+                [challengeId]: {
+                    id: challengeId,
+                    dateKey: new Date().toISOString().slice(0, 10),
+                    title: 'Daily challenge',
+                    summary: 'Use one shared text to compare stability and accuracy.',
+                    text: 'steady focus clear rhythm',
+                    config: {
+                        source: 'builtin',
+                        mode: 'words',
+                        durationSeconds: 45,
+                        wordCount: 10,
+                        includeNumbers: false,
+                        includePunctuation: false,
+                        aiTemplate: 'daily',
+                        difficulty: 'medium'
+                    },
+                    leaderboard: [
+                        { id: 'entry-2', sessionId: 'session-2', displayName: 'Alice', userId: 'user-1', levelId: 'builder', wpm: 82, accuracy: 95, createdAt: '2026-06-08T09:00:00.000Z' }
+                    ]
+                }
+            }
+        }
+    });
+
+    await page.goto('/#/');
+    await expect(page.getByText('The leaderboard push is flattening out. Step away from challenge mode and return to plan work.')).toBeVisible();
+    await page.getByRole('button', { name: 'Back to plan' }).click();
+
+    await expect(page).toHaveURL(/#\/practice/);
+    await expect(page.locator('.panel').first().getByRole('heading', { name: 'Reset accuracy' })).toBeVisible();
+});
+
 test('shows challenge standing after completing a home-started daily challenge', async ({ page, isMobile }) => {
     test.skip(isMobile, 'desktop flow only');
     await seedEnglishState(page, {

@@ -200,3 +200,27 @@ export function getChallengeTrendState(trend) {
 
     return 'steady';
 }
+
+export function getChallengeStrategyState(trend, personalBest) {
+    const baseState = getChallengeTrendState(trend);
+    const attempts = Number(trend?.attempts || 0);
+    const gapWpm = Number(personalBest?.gapWpm || 0);
+    const gapAccuracy = Number(personalBest?.gapAccuracy || 0);
+
+    if (
+        attempts >= 3
+        && (
+            gapWpm >= 10
+            || gapAccuracy >= 2
+            || baseState === 'cooling'
+        )
+    ) {
+        return 'recover';
+    }
+
+    if (baseState === 'improving') {
+        return 'push';
+    }
+
+    return baseState;
+}

@@ -2,6 +2,7 @@ import {
     buildChallengeTrend,
     compareChallengeScores,
     createChallengeEntryPreview,
+    getChallengeStrategyState,
     getChallengeTrendState,
     getChallengeLevelLeaderboard,
     getChallengeSessions,
@@ -183,5 +184,17 @@ describe('challenge helpers', () => {
         expect(getChallengeTrendState({ attempts: 2, deltaWpm: 6, deltaAccuracy: 0 })).toBe('improving');
         expect(getChallengeTrendState({ attempts: 2, deltaWpm: -6, deltaAccuracy: -1 })).toBe('cooling');
         expect(getChallengeTrendState({ attempts: 3, deltaWpm: 2, deltaAccuracy: 0 })).toBe('steady');
+    });
+
+    test('derives a recover strategy state when the challenge push is fading', () => {
+        expect(getChallengeStrategyState(
+            { attempts: 4, deltaWpm: -7, deltaAccuracy: -2 },
+            { gapWpm: 12, gapAccuracy: 0 }
+        )).toBe('recover');
+
+        expect(getChallengeStrategyState(
+            { attempts: 2, deltaWpm: 7, deltaAccuracy: 1 },
+            { gapWpm: 0, gapAccuracy: 0 }
+        )).toBe('push');
     });
 });

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { buildChallengeTrend, buildInsights, getChallengePersonalBest, getChallengeSessions, getChallengeStanding, getChallengeTrendState, getLatestChallengeSession } from '../engine';
+import { buildChallengeTrend, buildInsights, getChallengePersonalBest, getChallengeSessions, getChallengeStanding, getChallengeStrategyState, getLatestChallengeSession } from '../engine';
 import { formatDateTime } from '../i18n';
 import { usePracticeStore } from '../store/practice-store';
 import { getTrainingCopy } from '../training/copy';
@@ -71,28 +71,6 @@ function getChallengePerformanceText(copy, challengeSession, challengeStanding, 
     return trainingCopy.challenge.homeIdleNote;
 }
 
-function getChallengeStrategyText(trainingCopy, challengeTrend) {
-    const state = getChallengeTrendState(challengeTrend);
-
-    if (state === 'idle') {
-        return trainingCopy.challenge.strategyIdle;
-    }
-
-    if (state === 'warm') {
-        return trainingCopy.challenge.strategyWarm;
-    }
-
-    if (state === 'improving') {
-        return trainingCopy.challenge.strategyImproving;
-    }
-
-    if (state === 'cooling') {
-        return trainingCopy.challenge.strategyCooling;
-    }
-
-    return trainingCopy.challenge.strategySteady;
-}
-
 export function HomePage() {
     const navigate = useNavigate();
     const [isLaunchingChallenge, setIsLaunchingChallenge] = useState(false);
@@ -159,9 +137,35 @@ export function HomePage() {
         () => getChallengePerformanceText(copy, latestChallengeSession, challengeStanding, challengePersonalBest, trainingCopy),
         [challengePersonalBest, challengeStanding, copy, latestChallengeSession, trainingCopy]
     );
+    const challengeStrategyState = useMemo(
+        () => getChallengeStrategyState(challengeTrend, challengePersonalBest),
+        [challengePersonalBest, challengeTrend]
+    );
     const challengeStrategyText = useMemo(
-        () => getChallengeStrategyText(trainingCopy, challengeTrend),
-        [challengeTrend, trainingCopy]
+        () => {
+            if (challengeStrategyState === 'recover') {
+                return trainingCopy.challenge.strategyRecover;
+            }
+
+            if (challengeStrategyState === 'push') {
+                return trainingCopy.challenge.strategyImproving;
+            }
+
+            if (challengeStrategyState === 'cooling') {
+                return trainingCopy.challenge.strategyCooling;
+            }
+
+            if (challengeStrategyState === 'warm') {
+                return trainingCopy.challenge.strategyWarm;
+            }
+
+            if (challengeStrategyState === 'idle') {
+                return trainingCopy.challenge.strategyIdle;
+            }
+
+            return trainingCopy.challenge.strategySteady;
+        },
+        [challengeStrategyState, trainingCopy]
     );
 
     const handleFreePractice = () => {
@@ -188,6 +192,26 @@ export function HomePage() {
         } catch {
             setIsLaunchingChallenge(false);
         }
+    };
+
+    const challengePrimaryLabel = challengeStrategyState === 'recover'
+        ? (trainingPlan ? trainingCopy.challenge.recoverPlanCta : trainingCopy.challenge.recoverFreeCta)
+        : latestChallengeSession
+            ? trainingCopy.challenge.retryCta
+            : trainingCopy.challenge.cta;
+
+    const handleChallengePrimaryAction = () => {
+        if (challengeStrategyState === 'recover') {
+            if (trainingPlan) {
+                handlePrimaryAction();
+                return;
+            }
+
+            handleFreePractice();
+            return;
+        }
+
+        handleStartChallenge();
     };
 
     return (
@@ -301,14 +325,12 @@ export function HomePage() {
                                 <button
                                     type="button"
                                     className="action-btn primary"
-                                    onClick={handleStartChallenge}
+                                    onClick={handleChallengePrimaryAction}
                                     disabled={isLaunchingChallenge}
                                 >
-                                    {isLaunchingChallenge
+                                    {isLaunchingChallenge && challengeStrategyState !== 'recover'
                                         ? copy.common.loading
-                                        : latestChallengeSession
-                                            ? trainingCopy.challenge.retryCta
-                                            : trainingCopy.challenge.cta}
+                                        : challengePrimaryLabel}
                                 </button>
                                 <button type="button" className="action-btn" onClick={() => navigate('/challenge')}>
                                     {trainingCopy.challenge.viewBoard}
