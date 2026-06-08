@@ -148,6 +148,8 @@ export function ResultPage() {
         activeTrainingStep,
         trainingPlan,
         startTrainingPlanStep,
+        resetPracticeToBuiltin,
+        startDailyChallenge,
         dailyChallenge,
         challengeGateway
     } = usePracticeStore();
@@ -164,6 +166,7 @@ export function ResultPage() {
     const [nextDrillError, setNextDrillError] = useState(null);
     const [challengeState, setChallengeState] = useState('idle');
     const [challengeStanding, setChallengeStanding] = useState(null);
+    const [challengeActionState, setChallengeActionState] = useState('idle');
 
     const coachStatus = session ? getCoachStatusForSession(session.id) : 'idle';
     const coachIssue = session ? getCoachIssueForSession(session.id) : null;
@@ -188,6 +191,14 @@ export function ResultPage() {
     const challengeFocusDelta = challengeFocusPoint && challengeFocusPoint.attempt > 1
         ? `${trainingCopy.challenge.trendPrevDeltaLabel}: ${formatSigned(challengeFocusPoint.deltaWpm, ` ${copy.common.wpm}`)} / ${formatSigned(challengeFocusPoint.deltaAccuracy, '%')}`
         : '';
+    const shouldRecoverFromChallenge = challengeFocusState === 'accuracy-risk' || challengeFocusState === 'speed-drop';
+    const challengePrimaryLabel = shouldRecoverFromChallenge
+        ? activeTrainingStep
+            ? trainingCopy.challenge.recoverPlanCta
+            : trainingCopy.challenge.recoverFreeCta
+        : challengeActionState === 'loading'
+            ? copy.common.loading
+            : trainingCopy.challenge.retryCta;
 
     useEffect(() => {
         if (!session) {
@@ -332,6 +343,28 @@ export function ResultPage() {
         }
     };
 
+    const handleChallengePrimaryAction = async () => {
+        if (shouldRecoverFromChallenge) {
+            if (activeTrainingStep) {
+                startTrainingPlanStep();
+            } else {
+                resetPracticeToBuiltin();
+            }
+
+            navigate('/practice');
+            return;
+        }
+
+        setChallengeActionState('loading');
+
+        try {
+            await startDailyChallenge();
+            navigate('/practice');
+        } catch {
+            setChallengeActionState('idle');
+        }
+    };
+
     return (
         <div className="page-stack">
             <section className="panel result-summary">
@@ -442,6 +475,14 @@ export function ResultPage() {
                     )}
 
                     <div className="results-actions">
+                        <button
+                            type="button"
+                            className="action-btn primary"
+                            onClick={handleChallengePrimaryAction}
+                            disabled={challengeActionState === 'loading'}
+                        >
+                            {challengePrimaryLabel}
+                        </button>
                         <button type="button" className="action-btn" onClick={() => navigate('/challenge')}>
                             {copy.result.challengeViewLeaderboard}
                         </button>

@@ -2,6 +2,42 @@
 
 ---
 
+## 2026-06-08（迭代 13）
+
+### 今日主线
+把挑战结果页的 Run focus 升级为“解释 + 下一步动作”，让用户完成挑战后直接进入再挑战、回计划或自由热身。
+
+### 合并分支
+main（当前代码已在 main）
+
+### 用户可见变化
+- 挑战结果页新增主 CTA，会根据本轮焦点状态自动切换
+- 突破、稳定或混合状态下，用户可以直接“再挑战一次”
+- 准确率风险或速度回落时，结果页会优先引导用户回训练计划；没有计划时引导自由热身
+- “查看榜单”继续保留为次级动作
+
+### 工程变化
+- ResultPage 新增挑战主动作状态与处理函数
+- 复用已有 challenge focus state，不新增结果页专属风险规则
+- 扩展 ResultPage 页面测试，覆盖再挑战和风险回计划路径
+
+### 删除的旧逻辑
+- 无删除业务能力，本次为结果页挑战闭环增强
+
+### 验证结果
+- `npm test -- --run src/pages/__tests__/ResultPage.test.jsx`: 通过，2 tests passed
+- `npm test`: 通过，252 tests passed
+- `npm run build`: 通过
+- `npm run test:e2e`: 通过，9 passed, 5 skipped
+- in-app browser: 当前会话没有可用浏览器实例，已使用 Playwright e2e 覆盖核心路径
+
+### 已知遗留
+- ResultPage 与 ChallengeTrendChart 暂时各自维护 focus 文案映射，后续可抽共享 helper
+- 结果页风险状态的完整 UI 路径目前由单测覆盖，后续可补 e2e
+- release notes 顶部存在重复的迭代 10 记录，后续可单独清理
+
+---
+
 ## 2026-06-08（迭代 12）
 
 ### 今日主线
