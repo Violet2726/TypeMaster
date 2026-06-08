@@ -346,6 +346,7 @@ test('shows challenge standing after completing a home-started daily challenge',
 
     await expect(page).toHaveURL(/#\/result/);
     await expect(page.getByRole('heading', { name: 'Daily challenge standing' })).toBeVisible();
+    await expect(page.getByText('Run focus')).toBeVisible();
     await expect(page.getByText('Current rank')).toBeVisible();
     await expect(page.getByText('Personal best')).toBeVisible();
     await expect(page.getByRole('button', { name: 'View leaderboard' })).toBeVisible();

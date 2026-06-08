@@ -2,6 +2,39 @@
 
 ---
 
+## 2026-06-08（迭代 12）
+
+### 今日主线
+把挑战单次教练判断前置到 ResultPage，让用户刚完成每日挑战后直接看到这轮表现的训练意义。
+
+### 合并分支
+main（当前代码已在 main）
+
+### 用户可见变化
+- 挑战结果页新增 Run focus / 本次细看反馈块
+- 结果页会显示当前挑战相对上次的 WPM / accuracy 变化
+- 即使用户不进入 ChallengePage，也能知道下一轮适合继续加压还是先稳住
+
+### 工程变化
+- ResultPage 复用 `getChallengePointFocusState` 和当日挑战趋势 helper
+- 新增结果页挑战焦点块样式
+- 扩展 ResultPage 页面测试，覆盖突破型焦点判断
+
+### 删除的旧逻辑
+- 无删除业务能力，本次为结果页挑战反馈增强
+
+### 验证结果
+- `npm test`: 通过，251 tests passed
+- `npm run build`: 通过
+- `npm run test:e2e`: 通过，9 passed, 5 skipped
+- in-app browser: 当前会话没有可用浏览器实例，已使用 Playwright e2e 覆盖核心路径
+
+### 已知遗留
+- ResultPage 与 ChallengeTrendChart 暂时各自维护 focus 文案映射，后续可抽共享 helper
+- release notes 顶部存在重复的迭代 10 记录，后续可单独清理
+
+---
+
 ## 2026-06-08（迭代 11）
 
 ### 今日主线

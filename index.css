@@ -751,6 +751,27 @@ body[data-language='zh-CN'] .control-label {
     border-color: rgba(255, 134, 152, 0.2);
 }
 
+.result-challenge-focus {
+    display: grid;
+    gap: 0.35rem;
+}
+
+.result-challenge-focus p {
+    margin: 0;
+}
+
+.result-challenge-focus--breakthrough,
+.result-challenge-focus--stable {
+    background: var(--success-soft);
+    border-color: rgba(135, 215, 168, 0.18);
+}
+
+.result-challenge-focus--accuracy-risk,
+.result-challenge-focus--speed-drop {
+    background: var(--warning-soft);
+    border-color: rgba(244, 197, 107, 0.18);
+}
+
 .typing-stage__head {
     align-items: flex-start;
 }

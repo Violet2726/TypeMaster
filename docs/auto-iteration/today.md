@@ -6,62 +6,62 @@
 - **完成状态**: 已完成
 
 ## 1. 今日主线
-把 ChallengePage 的“今日挑战趋势”从数值回放升级为可行动的单次教练判断。用户点选某一次挑战时，不只看到 WPM 和准确率变化，还能看到这次表现适合继续冲榜、稳住节奏、保护准确率，还是需要警惕回落。
+把挑战单次教练判断前置到 ResultPage。用户刚完成每日挑战后，不必先跳到 ChallengePage 才能理解这轮表现，结果页会直接告诉他这次是提速突破、准确率风险、速度回落、稳定还是混合变化。
 
 ## 2. 问题背景
-上一轮已经补上首页的挑战边界建议，避免用户在明显回落时继续无效冲榜。但 ChallengePage 的趋势图仍偏“数据展示”：用户能看到某次比上次快了多少、准了多少，却还要自己翻译成下一步动作。
+上一轮已经让 ChallengePage 趋势图支持单次细看，但用户完成挑战后的第一触点其实是 ResultPage。此时页面已有榜单战绩卡，不过它主要围绕排名同步；当榜单还在刷新或用户只想快速复盘时，缺少“这轮本身说明什么”的即时反馈。
 
 ## 3. 根因判断
-- 趋势图已有点选能力，但焦点态只展示原始指标
-- 首页已有策略建议，挑战页缺少同等粒度的“本次解释”
-- 单次挑战回放没有把速度变化和准确率风险合并成清晰判断
+- 单次焦点判断规则已经存在，但只在 ChallengePage 使用
+- ResultPage 的挑战卡偏榜单结果，没有承接本地挑战趋势解释
+- 用户刚完成一轮时最需要即时反馈，而不是等待榜单或再点进挑战页
 
 ## 4. 目标用户价值
-用户复盘今日挑战时，可以直接理解每一次尝试的意义：哪一次是真正突破，哪一次是靠牺牲准确率换速度，哪一次已经开始掉速。这样挑战页会更像训练教练，而不是只像排行榜附属页。
+挑战结束后，用户能立刻知道下一轮该怎么做：继续保持压力、稍微放慢保护准确率，还是注意速度回落。这让结果页更像训练闭环的终点，而不是只展示分数。
 
 ## 5. 工程价值
-把单次焦点判断抽到 `src/engine/challenge.js`，让组件展示和测试都依赖同一套规则，后续可以继续复用到首页、结果页或更完整的教练系统。
+复用 `getChallengePointFocusState` 和当日挑战 session helper，不新增规则分叉。结果页、挑战页共享同一套单次焦点判断，后续可以继续沉淀成统一的挑战教练模型。
 
 ## 6. 涉及模块
-- `src/engine/challenge.js`：新增 `getChallengePointFocusState`
-- `src/components/ChallengeTrendChart.jsx`：焦点面板展示本次教练判断
-- `src/training/copy.js`：新增中英文焦点判断文案
-- `index.css`：新增焦点判断视觉状态
-- `src/engine/__tests__/challenge.test.js`：覆盖单次焦点状态判断
-- `src/pages/__tests__/ChallengePage.test.jsx`：覆盖挑战页可见教练判断
+- `src/pages/ResultPage.jsx`：挑战战绩卡新增即时 Run focus 判断
+- `index.css`：新增结果页挑战焦点块样式
+- `src/pages/__tests__/ResultPage.test.jsx`：覆盖结果页显示单次教练判断和相对上次变化
+- `docs/auto-iteration/today.md`：记录本轮需求、设计和验收
+- `docs/auto-iteration/release-notes.md`：追加发布记录
+- `docs/auto-iteration/decision-log.md`：追加决策记录
 
 ## 7. 非目标
-- 不新增新的挑战模式
-- 不改变排行榜排序规则
-- 不改变云端 challenge API
-- 不做跨天趋势分析
+- 不改变榜单同步逻辑
+- 不改变 challenge API
+- 不新增结果页跳转路径
+- 不做跨天挑战解释
 
 ## 8. 设计方案
-1. 第一次挑战作为今日基线，不做过度判断
-2. 后续挑战按相对上次的 WPM 和准确率变化归类
-3. 明显提速且准确率未明显掉落时标记为 breakthrough
-4. 准确率明显下滑优先提示 accuracy-risk
-5. 速度明显回落提示 speed-drop
-6. 小幅波动提示 stable，复杂波动提示 mixed
-7. ChallengeTrendChart 默认聚焦最新一次挑战，直接展示对应教练文案
+1. ResultPage 识别当前 session 是否为 challenge
+2. 从本地 sessions 中取同一 challengeId 的今日挑战历史
+3. 用 `buildChallengeTrend` 找到当前 session 对应的趋势点
+4. 用 `getChallengePointFocusState` 得到焦点状态
+5. 在挑战战绩卡顶部展示 Run focus 文案
+6. 如果存在上一轮样本，同步显示 WPM / accuracy 的相对变化
+7. 榜单名次同步、pending、error 状态保持原逻辑
 
 ## 9. 验收标准
-- [x] 趋势图点选某次挑战时展示可行动的教练判断
-- [x] 最新一次挑战默认显示焦点说明
-- [x] 引擎 helper 覆盖 baseline / breakthrough / accuracy-risk / speed-drop / stable / mixed
-- [x] 页面测试能验证 ChallengePage 出现焦点判断文案
+- [x] 挑战结果页可见 Run focus / 本次细看
+- [x] 当前挑战相对上次提速且准确率稳定时，显示突破型文案
+- [x] 当前挑战有上一轮样本时，结果页显示相对上次 WPM / accuracy 变化
+- [x] 原有挑战榜单战绩卡仍正常显示排名和查看榜单入口
 - [x] 构建、全量单测、e2e 通过
 
 ## 10. 质量门禁
 - [x] `npm test` 通过，251 tests passed
 - [x] `npm run build` 通过
 - [x] `npm run test:e2e` 通过，9 passed, 5 skipped
-- [x] 本轮尝试 in-app browser 加载检查，但当前会话没有可用浏览器实例；已由 Playwright e2e 覆盖核心用户路径
+- [x] 已尝试 in-app browser 检查；当前会话没有可用浏览器实例，已由 Playwright e2e 覆盖核心用户路径
 
 ## 11. 回滚策略
-如果焦点判断文案过于主观，可以先回滚 `ChallengeTrendChart` 的展示和文案，保留 `getChallengePointFocusState` helper 作为后续策略实验入口。
+如果结果页信息密度过高，可回滚 ResultPage 中的 `result-challenge-focus` 展示块和样式，不影响 ChallengePage 已有趋势图与榜单逻辑。
 
 ## 12. 下一轮候选
-- 把单次焦点判断同步到结果页，让刚完成挑战的用户立刻看到本次意义
-- 修复 release notes 顶部重复的迭代 10 记录
-- 继续拆分 `practice-store`，减少挑战、计划、云同步之间的状态耦合
+- 清理 release notes 顶部重复的迭代 10 记录
+- 抽出共享的 challenge focus 文案映射，减少 ResultPage 与 ChallengeTrendChart 的重复
+- 继续拆分 `practice-store`，减少挑战、计划、云同步状态耦合

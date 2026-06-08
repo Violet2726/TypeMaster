@@ -1,7 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TrendChart } from '../components/TrendChart';
-import { deriveComparison, getChallengePersonalBest, getChallengeStanding, mergeChallengeLeaderboardEntries } from '../engine';
+import {
+    buildChallengeTrend,
+    deriveComparison,
+    getChallengePersonalBest,
+    getChallengePointFocusState,
+    getChallengeSessions,
+    getChallengeStanding,
+    mergeChallengeLeaderboardEntries
+} from '../engine';
 import { getErrorMessage } from '../i18n';
 import { usePracticeStore } from '../store/practice-store';
 import { getTrainingCopy } from '../training/copy';
@@ -47,6 +55,36 @@ function buildAdviceModel(copy, language, status, issue, coachRecord) {
 
 function fillTemplate(template, value) {
     return String(template || '').replace('{value}', value);
+}
+
+function formatSigned(value, suffix = '') {
+    const safe = Number(value || 0);
+    const sign = safe > 0 ? '+' : '';
+    return `${sign}${safe}${suffix}`;
+}
+
+function getChallengeFocusNote(trainingCopy, state) {
+    if (state === 'baseline') {
+        return trainingCopy.challenge.trendFocusBaseline;
+    }
+
+    if (state === 'breakthrough') {
+        return trainingCopy.challenge.trendFocusBreakthrough;
+    }
+
+    if (state === 'accuracy-risk') {
+        return trainingCopy.challenge.trendFocusAccuracyRisk;
+    }
+
+    if (state === 'speed-drop') {
+        return trainingCopy.challenge.trendFocusSpeedDrop;
+    }
+
+    if (state === 'stable') {
+        return trainingCopy.challenge.trendFocusStable;
+    }
+
+    return trainingCopy.challenge.trendFocusMixed;
 }
 
 function buildChallengeStandingModel(copy, sessions, session, leaderboard) {
@@ -131,6 +169,25 @@ export function ResultPage() {
     const coachIssue = session ? getCoachIssueForSession(session.id) : null;
     const isChallengeSession = session?.trainingMeta?.type === 'challenge';
     const challengeId = isChallengeSession ? session?.trainingMeta?.stepId : null;
+    const challengeTrend = useMemo(
+        () => challengeId ? buildChallengeTrend(getChallengeSessions(sessions, challengeId)) : null,
+        [challengeId, sessions]
+    );
+    const challengeFocusPoint = useMemo(
+        () => challengeTrend?.points.find((point) => point.id === session?.id) || null,
+        [challengeTrend, session?.id]
+    );
+    const challengeFocusState = useMemo(
+        () => getChallengePointFocusState(challengeFocusPoint || (isChallengeSession ? { attempt: 1 } : null)),
+        [challengeFocusPoint, isChallengeSession]
+    );
+    const challengeFocusNote = useMemo(
+        () => isChallengeSession ? getChallengeFocusNote(trainingCopy, challengeFocusState) : '',
+        [challengeFocusState, isChallengeSession, trainingCopy]
+    );
+    const challengeFocusDelta = challengeFocusPoint && challengeFocusPoint.attempt > 1
+        ? `${trainingCopy.challenge.trendPrevDeltaLabel}: ${formatSigned(challengeFocusPoint.deltaWpm, ` ${copy.common.wpm}`)} / ${formatSigned(challengeFocusPoint.deltaAccuracy, '%')}`
+        : '';
 
     useEffect(() => {
         if (!session) {
@@ -331,6 +388,12 @@ export function ResultPage() {
                                 ? `#${challengeStanding.standing.rank}/${challengeStanding.standing.total}`
                                 : trainingCopy.challenge.leaderboard}
                         </span>
+                    </div>
+
+                    <div className={`feedback-card feedback-info result-challenge-focus result-challenge-focus--${challengeFocusState}`}>
+                        <strong>{trainingCopy.challenge.trendFocusTitle}</strong>
+                        <p>{challengeFocusNote}</p>
+                        {challengeFocusDelta && <p className="muted-text">{challengeFocusDelta}</p>}
                     </div>
 
                     {challengeState === 'loading' && (

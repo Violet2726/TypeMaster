@@ -63,10 +63,50 @@ const challengeSession = {
     }
 };
 
+const previousChallengeSession = {
+    id: 'session-previous',
+    config: {
+        source: 'builtin',
+        mode: 'words',
+        wordCount: 10
+    },
+    result: {
+        wpm: 74,
+        rawWpm: 80,
+        accuracy: 98,
+        consistency: 92,
+        durationSeconds: 12,
+        correctChars: 47,
+        incorrectChars: 1,
+        extraChars: 0,
+        missedChars: 0,
+        completedAt: '2026-06-08T07:30:00.000Z'
+    },
+    timeline: {
+        labels: [],
+        wpm: [],
+        raw: [],
+        accuracy: [],
+        burst: [],
+        errors: [],
+        samples: [],
+        pauseMoments: []
+    },
+    sourceTextMeta: {
+        label: 'Daily challenge',
+        source: 'builtin'
+    },
+    trainingMeta: {
+        type: 'challenge',
+        stepId: 'daily-test',
+        title: 'Daily challenge'
+    }
+};
+
 const baseStore = {
     copy: getCopy('en-US'),
     language: 'en-US',
-    sessions: [challengeSession],
+    sessions: [challengeSession, previousChallengeSession],
     lastCompletedSession: challengeSession,
     getAdviceForSession: () => ({
         headline: 'Hold this pace',
@@ -125,6 +165,9 @@ describe('ResultPage', () => {
         expect(await screen.findByRole('heading', { name: 'Daily challenge standing' })).toBeInTheDocument();
         expect(screen.getByText('#2')).toBeInTheDocument();
         expect(screen.getByText('Current rank')).toBeInTheDocument();
+        expect(screen.getByText('Run focus')).toBeInTheDocument();
+        expect(screen.getByText('This run gained speed without giving up accuracy. Keep the challenge pressure on.')).toBeInTheDocument();
+        expect(screen.getByText('Vs previous: +8 WPM / 0%')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'View leaderboard' })).toBeInTheDocument();
         expect(mockGetChallengeLeaderboard).not.toHaveBeenCalled();
     });
