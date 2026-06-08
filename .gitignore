@@ -8,6 +8,9 @@ dist
 
 # Coverage reports
 coverage
+test-results
+playwright-report
+data
 
 docs/*
 !docs/ai-iteration/

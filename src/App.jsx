@@ -11,14 +11,27 @@ import {
 import { Header } from './components/Header';
 import { SettingsDrawer } from './components/SettingsDrawer';
 const HomePage = lazy(() => import('./pages/HomePage'));
+const DiagnosticPage = lazy(() => import('./pages/DiagnosticPage'));
+const ChallengePage = lazy(() => import('./pages/ChallengePage'));
 const InsightsPage = lazy(() => import('./pages/InsightsPage'));
 const PracticePage = lazy(() => import('./pages/PracticePage'));
 const ResultPage = lazy(() => import('./pages/ResultPage'));
+const TrainingPlanPage = lazy(() => import('./pages/TrainingPlanPage'));
 import { PracticeProvider, usePracticeStore } from './store/practice-store';
 
 function AppFrame() {
     const location = useLocation();
-    const { settings, updateSettings, copy } = usePracticeStore();
+    const {
+        settings,
+        updateSettings,
+        copy,
+        account,
+        accountStatus,
+        signInToCloud,
+        signOutFromCloud,
+        exportTrainingData,
+        importTrainingData
+    } = usePracticeStore();
     const [settingsOpen, setSettingsOpen] = useState(false);
 
     useEffect(() => {
@@ -62,8 +75,14 @@ function AppFrame() {
                 isOpen={settingsOpen}
                 settings={settings}
                 copy={copy}
+                account={account}
+                accountStatus={accountStatus}
                 onClose={() => setSettingsOpen(false)}
                 onChange={updateSettings}
+                onSignIn={signInToCloud}
+                onSignOut={signOutFromCloud}
+                onExportData={exportTrainingData}
+                onImportData={importTrainingData}
             />
         </div>
     );
@@ -84,6 +103,30 @@ const router = createHashRouter(createRoutesFromElements(
             element={
                 <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>}>
                     <HomePage />
+                </Suspense>
+            }
+        />
+        <Route
+            path="/diagnostic"
+            element={
+                <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>}>
+                    <DiagnosticPage />
+                </Suspense>
+            }
+        />
+        <Route
+            path="/challenge"
+            element={
+                <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>}>
+                    <ChallengePage />
+                </Suspense>
+            }
+        />
+        <Route
+            path="/plan"
+            element={
+                <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>}>
+                    <TrainingPlanPage />
                 </Suspense>
             }
         />

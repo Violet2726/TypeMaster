@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { calculateMetrics, createTimelinePoint, createEmptyTimeline, computeElapsedMs, commitWord, handleBackspace, calculatePauseSecond, shouldAddPauseMoment, computePausedDuration, computeTimerDisplay } from '../engine';
+import { playTypingSound } from '../services/sound';
 
-export function useTypingSession({ draft, config, onComplete }) {
+export function useTypingSession({ draft, config, soundEffects = false, onComplete }) {
     const words = draft?.words || [];
     const inputRef = useRef(null);
 
@@ -180,8 +181,12 @@ export function useTypingSession({ draft, config, onComplete }) {
             inputRef.current.value = '';
         }
 
+        if (soundEffects) {
+            playTypingSound('confirm');
+        }
+
         return result;
-    }, [currentInput, currentWordIndex, typedHistory, words]);
+    }, [currentInput, currentWordIndex, soundEffects, typedHistory, words]);
 
     const startSession = useCallback(() => {
         if (status !== 'idle') {
@@ -349,11 +354,15 @@ export function useTypingSession({ draft, config, onComplete }) {
                 if (correctDelta > 0) {
                     setCorrectKeystrokes((previous) => previous + correctDelta);
                 }
+
+                if (soundEffects) {
+                    playTypingSound(correctDelta === addedChars.length ? 'key' : 'error');
+                }
             }
         }
 
         setCurrentInput(nextValue);
-    }, [currentInput.length, currentWordIndex, startSession, status, words]);
+    }, [currentInput.length, currentWordIndex, soundEffects, startSession, status, words]);
 
     const handleInputChange = useCallback((event) => {
         if (event.nativeEvent?.isComposing || isComposingRef.current) {
@@ -399,6 +408,9 @@ export function useTypingSession({ draft, config, onComplete }) {
                 if (inputRef.current) {
                     inputRef.current.value = backspaceResult.restoredInput;
                 }
+                if (soundEffects) {
+                    playTypingSound('backspace');
+                }
             }
             return;
         }
@@ -426,6 +438,7 @@ export function useTypingSession({ draft, config, onComplete }) {
         currentWordIndex,
         finishSession,
         resetSession,
+        soundEffects,
         status,
         typedHistory
     ]);

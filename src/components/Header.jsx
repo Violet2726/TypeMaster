@@ -1,10 +1,12 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { getLanguageMeta } from '../i18n';
+import { getTrainingCopy } from '../training/copy';
 
 export function Header({ settings, copy, onToggleTheme, onOpenSettings }) {
     const location = useLocation();
     const compact = settings.focusMode && location.pathname === '/practice';
     const languageMeta = getLanguageMeta(settings.language);
+    const trainingCopy = getTrainingCopy(settings.language);
 
     return (
         <header className={`app-header ${compact ? 'is-compact' : ''}`}>
@@ -21,6 +23,7 @@ export function Header({ settings, copy, onToggleTheme, onOpenSettings }) {
                     <nav className="nav-links" aria-label="Primary">
                         <NavLink to="/" className="nav-link">{copy.nav.home}</NavLink>
                         <NavLink to="/practice" className="nav-link">{copy.nav.practice}</NavLink>
+                        <NavLink to="/challenge" className="nav-link">{trainingCopy.nav.challenge}</NavLink>
                         <NavLink to="/insights" className="nav-link">{copy.nav.insights}</NavLink>
                     </nav>
                 )}

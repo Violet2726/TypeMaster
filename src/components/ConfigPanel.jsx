@@ -1,3 +1,5 @@
+import { getTrainingCopy } from '../training/copy';
+
 const timeOptions = [15, 30, 60, 120];
 const wordOptions = [10, 25, 50, 100];
 
@@ -13,7 +15,9 @@ function SegmentedButton({ active, children, onClick }) {
     );
 }
 
-export function ConfigPanel({ copy, config, onConfigChange, showAdvanced, onToggleAdvanced }) {
+export function ConfigPanel({ copy, language, config, onConfigChange, showAdvanced, onToggleAdvanced }) {
+    const trainingCopy = getTrainingCopy(language);
+
     return (
         <div className="config-strip">
             <div className="config-strip__main">
@@ -24,6 +28,9 @@ export function ConfigPanel({ copy, config, onConfigChange, showAdvanced, onTogg
                     <div className="segmented-group">
                         <SegmentedButton active={config.source === 'builtin'} onClick={() => onConfigChange({ source: 'builtin' }, { risky: true, intent: 'config' })}>
                             {copy.practice.sourceBuiltin}
+                        </SegmentedButton>
+                        <SegmentedButton active={config.source === 'custom'} onClick={() => onConfigChange({ source: 'custom' }, { risky: true, intent: 'config' })}>
+                            {trainingCopy.practice.customSource}
                         </SegmentedButton>
                         <SegmentedButton active={config.source === 'ai'} onClick={() => onConfigChange({ source: 'ai' }, { risky: true, intent: 'config' })}>
                             {copy.practice.sourceAi}

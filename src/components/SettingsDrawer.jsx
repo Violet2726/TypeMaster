@@ -1,9 +1,47 @@
-import { SUPPORTED_LANGUAGES } from '../engine/config';
+import { useState } from 'react';
+import { SUPPORTED_KEYBOARD_LAYOUTS, SUPPORTED_LANGUAGES, getKeyboardLayoutLabel } from '../engine/config';
+import { getTrainingCopy } from '../training/copy';
 
-export function SettingsDrawer({ isOpen, settings, copy, onClose, onChange }) {
+export function SettingsDrawer({
+    isOpen,
+    settings,
+    copy,
+    account,
+    accountStatus,
+    onClose,
+    onChange,
+    onSignIn,
+    onSignOut,
+    onExportData,
+    onImportData
+}) {
+    const [displayName, setDisplayName] = useState('');
+    const [importPayload, setImportPayload] = useState('');
+    const [importNotice, setImportNotice] = useState('');
+    const trainingCopy = getTrainingCopy(settings.language);
+
     if (!isOpen) {
         return null;
     }
+
+    const handleExport = async () => {
+        const payload = await onExportData();
+        setImportPayload(payload);
+        setImportNotice('');
+    };
+
+    const handleImport = async () => {
+        if (!importPayload.trim()) {
+            return;
+        }
+
+        try {
+            await onImportData(importPayload);
+            setImportNotice(trainingCopy.account.importSuccess);
+        } catch (error) {
+            setImportNotice(error?.message || 'Import failed.');
+        }
+    };
 
     return (
         <div className="settings-overlay" role="presentation" onClick={onClose}>
@@ -60,16 +98,103 @@ export function SettingsDrawer({ isOpen, settings, copy, onClose, onChange }) {
                         </button>
                     </label>
 
-                    <div className="toggle-field disabled-card">
+                    <label className="field">
+                        <span>{trainingCopy.practice.layoutLabel}</span>
+                        <select value={settings.keyboardLayout} onChange={(event) => onChange({ keyboardLayout: event.target.value })}>
+                            {SUPPORTED_KEYBOARD_LAYOUTS.map((layout) => (
+                                <option key={layout.id} value={layout.id}>{getKeyboardLayoutLabel(layout.id, settings.language)}</option>
+                            ))}
+                        </select>
+                    </label>
+
+                    <label className="toggle-field">
                         <span>{copy.settings.sound}</span>
-                        <button type="button" className="toggle-btn" disabled>
-                            {copy.common.comingSoon}
+                        <button
+                            type="button"
+                            className={`toggle-btn ${settings.soundEffects ? 'active' : ''}`}
+                            onClick={() => onChange({ soundEffects: !settings.soundEffects })}
+                        >
+                            {settings.soundEffects ? copy.settings.focusOn : copy.settings.focusOff}
                         </button>
-                        <p className="muted-text">{copy.settings.soundComingSoon}</p>
-                    </div>
+                    </label>
                 </div>
+
+                <section className="panel" style={{ marginTop: '1rem' }}>
+                    <div className="panel-head">
+                        <div>
+                            <p className="panel-kicker">{trainingCopy.account.title}</p>
+                            <h2>{account?.displayName || trainingCopy.account.idle}</h2>
+                        </div>
+                        <span className={`panel-badge badge-${account ? 'success' : accountStatus === 'loading' ? 'loading' : 'idle'}`}>
+                            {trainingCopy.account[accountStatus] || trainingCopy.account.idle}
+                        </span>
+                    </div>
+                    <p className="muted-text">{trainingCopy.account.body}</p>
+
+                    {!account && (
+                        <div className="workshop-grid" style={{ marginTop: '1rem' }}>
+                            <label className="field">
+                                <span>{trainingCopy.account.nameLabel}</span>
+                                <input
+                                    type="text"
+                                    value={displayName}
+                                    placeholder={trainingCopy.account.namePlaceholder}
+                                    onChange={(event) => setDisplayName(event.target.value)}
+                                />
+                            </label>
+                            <button
+                                type="button"
+                                className="action-btn primary"
+                                onClick={() => onSignIn(displayName).then(() => setDisplayName('')).catch(() => {})}
+                                disabled={!displayName.trim() || accountStatus === 'loading'}
+                            >
+                                {trainingCopy.account.signIn}
+                            </button>
+                        </div>
+                    )}
+
+                    {account && (
+                        <div className="results-actions" style={{ marginTop: '1rem' }}>
+                            <button type="button" className="action-btn" onClick={onSignOut}>
+                                {trainingCopy.account.signOut}
+                            </button>
+                        </div>
+                    )}
+                </section>
+
+                <section className="panel" style={{ marginTop: '1rem' }}>
+                    <div className="panel-head">
+                        <div>
+                            <p className="panel-kicker">{trainingCopy.account.export}</p>
+                            <h2>{trainingCopy.account.importLabel}</h2>
+                        </div>
+                    </div>
+
+                    <div className="results-actions">
+                        <button type="button" className="action-btn" onClick={handleExport}>
+                            {trainingCopy.account.export}
+                        </button>
+                        <button type="button" className="action-btn primary" onClick={handleImport}>
+                            {trainingCopy.account.import}
+                        </button>
+                    </div>
+
+                    <label className="field" style={{ marginTop: '1rem' }}>
+                        <span>{trainingCopy.account.importLabel}</span>
+                        <textarea
+                            value={importPayload}
+                            placeholder={trainingCopy.account.importPlaceholder}
+                            onChange={(event) => {
+                                setImportPayload(event.target.value);
+                                setImportNotice('');
+                            }}
+                            rows={8}
+                        />
+                    </label>
+
+                    {importNotice && <p className="muted-text">{importNotice}</p>}
+                </section>
             </aside>
         </div>
     );
 }
-

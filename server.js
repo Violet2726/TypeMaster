@@ -13,6 +13,13 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const { URL } = require('url');
+const {
+    getDailyChallenge,
+    getUser,
+    normalizeUser,
+    submitChallengeResult,
+    updateUser
+} = require('./cloud-store');
 
 /**
  * 优先读取环境变量，随后尝试读取本地 config.js。
@@ -141,6 +148,144 @@ function handleApiProxy(clientReq, clientRes) {
     });
 }
 
+function readRequestBody(req) {
+    return new Promise((resolve, reject) => {
+        let body = '';
+        req.on('data', (chunk) => {
+            body += chunk.toString();
+        });
+        req.on('end', () => resolve(body));
+        req.on('error', reject);
+    });
+}
+
+function sendJson(res, statusCode, payload) {
+    res.writeHead(statusCode, {
+        'Content-Type': 'application/json; charset=utf-8'
+    });
+    res.end(JSON.stringify(payload));
+}
+
+async function handleCloudApi(req, res) {
+    const requestUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+    const pathname = requestUrl.pathname;
+    const userId = req.headers['x-typemaster-user'];
+
+    if (pathname === '/api/cloud/auth/current' && req.method === 'GET') {
+        sendJson(res, 200, { user: getUser(userId) });
+        return;
+    }
+
+    if (pathname === '/api/cloud/auth/sign-in' && req.method === 'POST') {
+        try {
+            const body = JSON.parse(await readRequestBody(req) || '{}');
+            const user = normalizeUser(body.displayName);
+            sendJson(res, 200, { user });
+        } catch (error) {
+            sendJson(res, 400, { error: error.message || 'Invalid request' });
+        }
+        return;
+    }
+
+    if (pathname === '/api/cloud/sessions' && req.method === 'GET') {
+        sendJson(res, 200, { sessions: getUser(userId)?.sessions || [] });
+        return;
+    }
+
+    if (pathname === '/api/cloud/sessions' && req.method === 'POST') {
+        try {
+            const body = JSON.parse(await readRequestBody(req) || '{}');
+            const user = updateUser(userId, (current) => ({
+                ...current,
+                sessions: [body.session, ...(current.sessions || []).filter((item) => item.id !== body.session.id)].slice(0, 200),
+                lastSyncedAt: new Date().toISOString()
+            }));
+            sendJson(res, 200, { sessions: user?.sessions || [] });
+        } catch (error) {
+            sendJson(res, 400, { error: error.message || 'Invalid request' });
+        }
+        return;
+    }
+
+    if (pathname === '/api/cloud/plan' && req.method === 'GET') {
+        sendJson(res, 200, { trainingPlan: getUser(userId)?.trainingPlan || null });
+        return;
+    }
+
+    if (pathname === '/api/cloud/plan' && req.method === 'POST') {
+        try {
+            const body = JSON.parse(await readRequestBody(req) || '{}');
+            const user = updateUser(userId, (current) => ({
+                ...current,
+                trainingPlan: body.trainingPlan || null,
+                lastSyncedAt: new Date().toISOString()
+            }));
+            sendJson(res, 200, { trainingPlan: user?.trainingPlan || null });
+        } catch (error) {
+            sendJson(res, 400, { error: error.message || 'Invalid request' });
+        }
+        return;
+    }
+
+    if (pathname === '/api/cloud/profile' && req.method === 'GET') {
+        sendJson(res, 200, { skillProfile: getUser(userId)?.skillProfile || null });
+        return;
+    }
+
+    if (pathname === '/api/cloud/profile' && req.method === 'POST') {
+        try {
+            const body = JSON.parse(await readRequestBody(req) || '{}');
+            const user = updateUser(userId, (current) => ({
+                ...current,
+                skillProfile: body.skillProfile || null,
+                achievements: body.achievements || current.achievements || [],
+                streakState: body.streakState || current.streakState || null,
+                lastSyncedAt: new Date().toISOString()
+            }));
+            sendJson(res, 200, {
+                skillProfile: user?.skillProfile || null,
+                achievements: user?.achievements || [],
+                streakState: user?.streakState || null
+            });
+        } catch (error) {
+            sendJson(res, 400, { error: error.message || 'Invalid request' });
+        }
+        return;
+    }
+
+    if (pathname === '/api/cloud/challenge/daily' && req.method === 'GET') {
+        const language = requestUrl.searchParams.get('language') || 'en-US';
+        sendJson(res, 200, { challenge: getDailyChallenge(language) });
+        return;
+    }
+
+    if (pathname === '/api/cloud/challenge/result' && req.method === 'POST') {
+        try {
+            const body = JSON.parse(await readRequestBody(req) || '{}');
+            const entry = submitChallengeResult({
+                challengeId: body.challengeId,
+                userId,
+                displayName: getUser(userId)?.displayName || body.displayName,
+                sessionId: body.sessionId,
+                result: body.result
+            });
+            sendJson(res, 200, { entry });
+        } catch (error) {
+            sendJson(res, 400, { error: error.message || 'Invalid request' });
+        }
+        return;
+    }
+
+    if (pathname === '/api/cloud/challenge/leaderboard' && req.method === 'GET') {
+        const challengeId = requestUrl.searchParams.get('challengeId');
+        const challenge = challengeId ? (getDailyChallenge().id === challengeId ? getDailyChallenge() : getDailyChallenge()) : getDailyChallenge();
+        sendJson(res, 200, { leaderboard: challenge.leaderboard || [] });
+        return;
+    }
+
+    sendJson(res, 404, { error: 'Not found' });
+}
+
 /**
  * 当用户还没执行构建时，首页返回明确提示，而不是晦涩的 404。
  */
@@ -230,6 +375,11 @@ function handleStaticFiles(req, res) {
  * 创建 HTTP 服务。
  */
 const server = http.createServer((req, res) => {
+    if (req.url.startsWith('/api/cloud')) {
+        handleCloudApi(req, res);
+        return;
+    }
+
     if (req.url.startsWith('/api/chat') && req.method === 'POST') {
         handleApiProxy(req, res);
         return;

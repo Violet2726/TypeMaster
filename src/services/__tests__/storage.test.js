@@ -9,7 +9,15 @@ import {
     saveCoachAdvices,
     appendCoachAdvice,
     getCoachAdviceBySessionId,
-    createInitialDraft
+    createInitialDraft,
+    loadSkillProfile,
+    saveSkillProfile,
+    loadTrainingPlan,
+    saveTrainingPlan,
+    loadDiagnosticJourney,
+    saveDiagnosticJourney,
+    loadActiveSessionContext,
+    saveActiveSessionContext
 } from '../storage';
 import { DEFAULT_CONFIG, DEFAULT_SETTINGS } from '../../engine';
 
@@ -376,6 +384,53 @@ describe('storage', () => {
         });
     });
 
+    describe('v4 training state', () => {
+        it('should save and load skill profile', () => {
+            const profile = {
+                id: 'skill-1',
+                primaryFocus: 'accuracy'
+            };
+
+            saveSkillProfile(profile);
+
+            expect(loadSkillProfile()).toEqual(profile);
+        });
+
+        it('should save and load training plan', () => {
+            const plan = {
+                id: 'plan-1',
+                status: 'active',
+                steps: [{ id: 'step-1' }]
+            };
+
+            saveTrainingPlan(plan);
+
+            expect(loadTrainingPlan()).toEqual(plan);
+        });
+
+        it('should save and load diagnostic journey', () => {
+            const journey = {
+                id: 'diagnostic-1',
+                status: 'active'
+            };
+
+            saveDiagnosticJourney(journey);
+
+            expect(loadDiagnosticJourney()).toEqual(journey);
+        });
+
+        it('should save and load active session context', () => {
+            const context = {
+                type: 'plan',
+                stepId: 'step-1'
+            };
+
+            saveActiveSessionContext(context);
+
+            expect(loadActiveSessionContext()).toEqual(context);
+        });
+    });
+
     describe('localStorage error handling', () => {
         it('should handle QuotaExceededError when saving', () => {
             const originalSetItem = window.localStorage.setItem;
@@ -386,6 +441,10 @@ describe('storage', () => {
             expect(() => saveSettings({ ...DEFAULT_SETTINGS })).not.toThrow();
             expect(() => saveSessions([])).not.toThrow();
             expect(() => saveCoachAdvices([])).not.toThrow();
+            expect(() => saveSkillProfile({ id: 'skill-1' })).not.toThrow();
+            expect(() => saveTrainingPlan({ id: 'plan-1' })).not.toThrow();
+            expect(() => saveDiagnosticJourney({ id: 'diagnostic-1' })).not.toThrow();
+            expect(() => saveActiveSessionContext({ type: 'plan' })).not.toThrow();
             
             window.localStorage.setItem = originalSetItem;
         });

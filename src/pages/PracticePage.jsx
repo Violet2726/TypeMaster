@@ -3,9 +3,11 @@ import { useBeforeUnload, useBlocker, useNavigate } from 'react-router-dom';
 import { AIWorkshop } from '../components/AIWorkshop';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { ConfigPanel } from '../components/ConfigPanel';
+import { CustomTextWorkshop } from '../components/CustomTextWorkshop';
 import { TypingArea } from '../components/TypingArea';
 import { useTypingSession } from '../hooks/useTypingSession';
 import { usePracticeStore } from '../store/practice-store';
+import { getTrainingCopy } from '../training/copy';
 
 function getPrimaryActionLabel(copy, config, aiPracticeStatus, status) {
     if (config.source === 'ai') {
@@ -30,6 +32,7 @@ export function PracticePage() {
     const {
         copy,
         language,
+        settings,
         config,
         updateConfig,
         currentDraft,
@@ -38,10 +41,13 @@ export function PracticePage() {
         generateAiPractice,
         resetPracticeToBuiltin,
         restoreAiDraftConfig,
-        completePractice
+        completePractice,
+        currentTrainingTask,
+        applyCustomWordBank
     } = usePracticeStore();
     const [confirmState, setConfirmState] = useState(null);
     const [controlsOpen, setControlsOpen] = useState(() => config.source === 'ai');
+    const [customText, setCustomText] = useState(() => settings.customWordBankText || '');
     const bypassBlockerRef = useRef(false);
     const isDirtyRef = useRef(false);
 
@@ -52,6 +58,7 @@ export function PracticePage() {
     const typingSession = useTypingSession({
         draft: displayDraft,
         config,
+        soundEffects: settings.soundEffects,
         onComplete: ({ result, timeline }) => {
             bypassBlockerRef.current = true;
             const session = completePractice({ result, timeline });
@@ -97,6 +104,10 @@ export function PracticePage() {
             setControlsOpen(true);
         }
     }, [config.source]);
+
+    useEffect(() => {
+        setCustomText(settings.customWordBankText || '');
+    }, [settings.customWordBankText]);
 
     useEffect(() => {
         if ((config.source === 'builtin' || aiPracticeStatus === 'ready') && displayDraft?.id) {
@@ -166,6 +177,19 @@ export function PracticePage() {
         });
     };
 
+    const handleApplyCustomText = () => {
+        requestRiskyAction({
+            title: copy.practice.confirmConfigTitle,
+            body: copy.practice.confirmConfigBody,
+            confirmLabel: copy.confirm.apply,
+            cancelLabel: copy.confirm.stay,
+            action: () => {
+                typingSession.resetSession();
+                applyCustomWordBank(customText);
+            }
+        });
+    };
+
     const handleReset = () => {
         if (!isDirty) {
             typingSession.resetSession();
@@ -187,16 +211,55 @@ export function PracticePage() {
             return;
         }
 
+        if (config.source === 'custom' && !(displayDraft?.words?.length > 0)) {
+            setControlsOpen(true);
+            return;
+        }
+
         typingSession.focusInput();
     };
 
-    const lockTitle = config.source === 'ai' ? copy.practice.wordsLockedTitle : '';
-    const lockBody = config.source === 'ai' ? copy.practice.wordsLockedBody : '';
+    const trainingCopy = getTrainingCopy(language);
+    const isCustomEmpty = config.source === 'custom' && !(displayDraft?.words?.length > 0);
+    const lockTitle = config.source === 'ai'
+        ? copy.practice.wordsLockedTitle
+        : isCustomEmpty
+            ? trainingCopy.practice.customSource
+            : '';
+    const lockBody = config.source === 'ai'
+        ? copy.practice.wordsLockedBody
+        : isCustomEmpty
+            ? trainingCopy.practice.customBody
+            : '';
     const sourceLabel = displayDraft?.sourceTextMeta?.label
-        || (config.source === 'ai' ? copy.practice.sourceAi : copy.practice.sourceBuiltin);
+        || (config.source === 'ai'
+            ? copy.practice.sourceAi
+            : config.source === 'custom'
+                ? trainingCopy.practice.customSource
+                : copy.practice.sourceBuiltin);
 
     return (
         <div className="page-stack practice-page">
+            {currentTrainingTask && (
+                <section className="panel">
+                    <div className="panel-head">
+                        <div>
+                            <p className="panel-kicker">{trainingCopy.practice.taskKicker}</p>
+                            <h2>{currentTrainingTask.title}</h2>
+                        </div>
+                        <span className="panel-badge badge-ready">
+                            {currentTrainingTask.id.startsWith('daily-')
+                                ? trainingCopy.practice.challengeBadge
+                                : currentTrainingTask.order <= 3 && currentTrainingTask.id.startsWith('diagnostic')
+                                ? trainingCopy.practice.diagnosticBadge
+                                : trainingCopy.practice.planBadge}
+                        </span>
+                    </div>
+                    <p className="muted-text">{currentTrainingTask.summary}</p>
+                    <p className="muted-text">{trainingCopy.practice.layoutLabel}: {settings.keyboardLayout.toUpperCase()}</p>
+                </section>
+            )}
+
             <section className="panel practice-toolbar">
                 <div className="practice-toolbar__row">
                     <div>
@@ -210,6 +273,7 @@ export function PracticePage() {
 
                 <ConfigPanel
                     copy={copy}
+                    language={language}
                     config={config}
                     onConfigChange={handleConfigChange}
                     showAdvanced={controlsOpen}
@@ -234,6 +298,15 @@ export function PracticePage() {
                 {controlsOpen && config.source === 'builtin' && (
                     <p className="muted-text practice-toolbar__hint">{copy.practice.builtInReady}</p>
                 )}
+
+                {controlsOpen && config.source === 'custom' && (
+                    <CustomTextWorkshop
+                        language={language}
+                        value={customText}
+                        onChange={setCustomText}
+                        onApply={handleApplyCustomText}
+                    />
+                )}
             </section>
 
             <TypingArea
@@ -257,7 +330,7 @@ export function PracticePage() {
                 onBlur={typingSession.handleBlur}
                 onActivate={typingSession.focusInput}
                 onReset={handleReset}
-                isLocked={config.source === 'ai' && aiPracticeStatus !== 'ready'}
+                isLocked={(config.source === 'ai' && aiPracticeStatus !== 'ready') || isCustomEmpty}
                 lockTitle={lockTitle}
                 lockBody={lockBody}
             />
@@ -303,3 +376,5 @@ export function PracticePage() {
         </div>
     );
 }
+
+export default PracticePage;

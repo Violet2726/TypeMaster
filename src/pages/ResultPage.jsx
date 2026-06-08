@@ -4,6 +4,7 @@ import { TrendChart } from '../components/TrendChart';
 import { deriveComparison } from '../engine';
 import { getErrorMessage } from '../i18n';
 import { usePracticeStore } from '../store/practice-store';
+import { getTrainingCopy } from '../training/copy';
 
 function getCoachBadgeLabel(copy, status) {
     if (status === 'success') return copy.common.coachReady;
@@ -56,8 +57,12 @@ export function ResultPage() {
         getCoachStatusForSession,
         getCoachIssueForSession,
         generateCoachForSession,
-        launchNextDrill
+        launchNextDrill,
+        activeTrainingStep,
+        trainingPlan,
+        startTrainingPlanStep
     } = usePracticeStore();
+    const trainingCopy = getTrainingCopy(language);
 
     const sessionId = searchParams.get('session');
     const session = useMemo(
@@ -118,6 +123,12 @@ export function ResultPage() {
     };
 
     const handleNextDrill = async () => {
+        if (activeTrainingStep) {
+            startTrainingPlanStep();
+            navigate('/practice');
+            return;
+        }
+
         if (!coachRecord?.nextDrill) {
             navigate('/practice');
             return;
@@ -213,7 +224,11 @@ export function ResultPage() {
                         onClick={handleNextDrill}
                         disabled={nextDrillState === 'loading'}
                     >
-                        {nextDrillState === 'error' ? copy.common.nextDrillRetry : copy.result.primaryAction}
+                        {activeTrainingStep
+                            ? trainingCopy.result.continuePlan
+                            : nextDrillState === 'error'
+                                ? copy.common.nextDrillRetry
+                                : copy.result.primaryAction}
                     </button>
                     <button type="button" className="action-btn" onClick={() => navigate('/insights')}>
                         {copy.common.viewInsights}
@@ -226,6 +241,20 @@ export function ResultPage() {
                 </div>
             </section>
 
+            <section className="panel">
+                <div className="panel-head">
+                    <div>
+                        <p className="panel-kicker">{trainingCopy.result.planTitle}</p>
+                        <h2>{trainingPlan?.status === 'complete' ? trainingCopy.result.planComplete : activeTrainingStep?.title || trainingCopy.result.continuePlan}</h2>
+                    </div>
+                </div>
+                <p className="lead-text">
+                    {trainingPlan?.status === 'complete'
+                        ? trainingCopy.result.planCompleteBody
+                        : activeTrainingStep?.summary || trainingCopy.result.planBody}
+                </p>
+            </section>
+
             {session.timeline?.wpm?.length ? (
                 <TrendChart
                     copy={copy}
@@ -235,3 +264,5 @@ export function ResultPage() {
         </div>
     );
 }
+
+export default ResultPage;

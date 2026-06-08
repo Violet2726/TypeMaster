@@ -14,6 +14,10 @@ import { DEFAULT_CONFIG, DEFAULT_SETTINGS, createBuiltinDraft } from '../engine'
 const SETTINGS_KEY = 'typemaster:v2:settings';
 const SESSIONS_KEY = 'typemaster:v2:sessions';
 const COACH_ADVICES_KEY = 'typemaster:v2:coach-advices';
+const SKILL_PROFILE_KEY = 'typemaster:v4:skill-profile';
+const TRAINING_PLAN_KEY = 'typemaster:v4:training-plan';
+const DIAGNOSTIC_JOURNEY_KEY = 'typemaster:v4:diagnostic-journey';
+const ACTIVE_SESSION_CONTEXT_KEY = 'typemaster:v4:active-session-context';
 const SESSION_LIMIT = 50;
 
 /**
@@ -111,6 +115,38 @@ export function appendCoachAdvice(record) {
  */
 export function getCoachAdviceBySessionId(sessionId) {
     return loadCoachAdvices().find((record) => record.sessionId === sessionId) || null;
+}
+
+export function loadSkillProfile() {
+    return readJson(SKILL_PROFILE_KEY, null);
+}
+
+export function saveSkillProfile(profile) {
+    writeJson(SKILL_PROFILE_KEY, profile);
+}
+
+export function loadTrainingPlan() {
+    return readJson(TRAINING_PLAN_KEY, null);
+}
+
+export function saveTrainingPlan(plan) {
+    writeJson(TRAINING_PLAN_KEY, plan);
+}
+
+export function loadDiagnosticJourney() {
+    return readJson(DIAGNOSTIC_JOURNEY_KEY, null);
+}
+
+export function saveDiagnosticJourney(journey) {
+    writeJson(DIAGNOSTIC_JOURNEY_KEY, journey);
+}
+
+export function loadActiveSessionContext() {
+    return readJson(ACTIVE_SESSION_CONTEXT_KEY, null);
+}
+
+export function saveActiveSessionContext(context) {
+    writeJson(ACTIVE_SESSION_CONTEXT_KEY, context);
 }
 
 /**

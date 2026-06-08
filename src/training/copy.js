@@ -1,0 +1,180 @@
+const TRAINING_COPY = {
+    'zh-CN': {
+        home: {
+            todayKicker: '今日训练',
+            diagnosticTitle: '先做 3 分钟诊断',
+            diagnosticBody: '完成三轮短测试后，系统会自动生成你的能力画像与 7 天起步计划。',
+            diagnosticCta: '开始诊断',
+            diagnosticResume: '继续诊断',
+            dashboardTitle: '今天该练什么',
+            dashboardBody: '系统会根据最近表现和当前计划，给你一个最值得继续的回合。',
+            continuePlan: '继续今日任务',
+            freePractice: '自由练习',
+            levelLabel: '当前等级',
+            streakLabel: '连续天数',
+            weakLabel: '当前短板',
+            planLabel: '计划进度',
+            weekLabel: '近 7 天完成',
+            weekGoalSuffix: '次',
+            noWeakness: '继续扩大样本，系统会逐步收敛训练重点。'
+        },
+        diagnostic: {
+            kicker: '能力画像',
+            title: '用 3 分钟建立第一条训练主线',
+            body: '这不是考试，而是一次定向采样。系统会根据准确率、节奏波动和数字符号表现，安排后续训练。',
+            start: '开始诊断',
+            resume: '继续诊断',
+            stepTitle: '诊断步骤',
+            activeTitle: '当前进度',
+            done: '已完成',
+            pending: '待完成'
+        },
+        practice: {
+            taskKicker: '当前任务',
+            diagnosticBadge: '诊断任务',
+            planBadge: '计划任务',
+            challengeBadge: '挑战任务',
+            customSource: '自定义词库',
+            customTitle: '把自己的词库塞进训练主线',
+            customBody: '贴入单词、句子或段落后，这轮会直接用你的文本练习。',
+            customPlaceholder: '在这里粘贴词库、术语表或你想重复练习的段落。',
+            customApply: '使用这段文本',
+            layoutLabel: '键盘布局'
+        },
+        result: {
+            planTitle: '下一步动作',
+            planBody: '这轮已经记入你的训练计划，直接继续下一步会比重新选模式更有效。',
+            continuePlan: '继续计划',
+            planComplete: '计划已完成',
+            planCompleteBody: '这一轮已经把当前起步计划收尾，可以回首页查看新的成长建议。'
+        },
+        nav: {
+            challenge: '挑战'
+        },
+        account: {
+            title: '云端账户',
+            body: '登录后可以同步训练历史、计划续接和挑战成绩。',
+            idle: '尚未登录',
+            connected: '已连接',
+            loading: '连接中',
+            error: '连接异常',
+            nameLabel: '显示名称',
+            namePlaceholder: '输入昵称',
+            signIn: '登录并同步',
+            signOut: '退出登录',
+            export: '导出数据',
+            import: '导入数据',
+            importLabel: '导入 JSON',
+            importPlaceholder: '粘贴导出的训练数据 JSON',
+            importSuccess: '数据已导入本地工作区。'
+        },
+        challenge: {
+            kicker: '今日挑战',
+            title: '用同一轮文本比拼稳定输出',
+            body: '挑战会固定文本和配置，方便比较速度与准确率。',
+            cta: '开始挑战',
+            leaderboard: '今日榜单',
+            empty: '今天还没人交卷，你可以做第一名。'
+        },
+        insights: {
+            radarTitle: '成长雷达',
+            radarBody: '把等级、streak、周目标和计划进度放在同一屏里看。',
+            weekGoal: '周目标',
+            riskLow: '节奏稳定，可以继续加压。',
+            riskHigh: '最近训练在变少，streak 有中断风险。',
+            achievementsTitle: '成就墙',
+            achievementsBody: '让训练关系被看见，不只是数字涨了。'
+        }
+    },
+    'en-US': {
+        home: {
+            todayKicker: 'Today',
+            diagnosticTitle: 'Start with a 3-minute assessment',
+            diagnosticBody: 'Finish three short rounds and the system will build a skill profile plus a 7-day starter plan.',
+            diagnosticCta: 'Start assessment',
+            diagnosticResume: 'Resume assessment',
+            dashboardTitle: 'What to train today',
+            dashboardBody: 'The system picks the most useful next round from your recent performance and active plan.',
+            continuePlan: 'Continue today\'s task',
+            freePractice: 'Free practice',
+            levelLabel: 'Current level',
+            streakLabel: 'Streak',
+            weakLabel: 'Current weakness',
+            planLabel: 'Plan progress',
+            weekLabel: 'Last 7 days',
+            weekGoalSuffix: 'sessions',
+            noWeakness: 'Keep expanding the sample and the plan will tighten around the real weak spots.'
+        },
+        diagnostic: {
+            kicker: 'Skill profile',
+            title: 'Use 3 minutes to define the first training path',
+            body: 'This is not a test score. It is a short sample used to map accuracy, rhythm, and symbol readiness into a plan.',
+            start: 'Start assessment',
+            resume: 'Resume assessment',
+            stepTitle: 'Assessment steps',
+            activeTitle: 'Current progress',
+            done: 'Done',
+            pending: 'Pending'
+        },
+        practice: {
+            taskKicker: 'Current task',
+            diagnosticBadge: 'Assessment',
+            planBadge: 'Planned drill',
+            challengeBadge: 'Challenge round',
+            customSource: 'Custom bank',
+            customTitle: 'Bring your own word bank into the plan',
+            customBody: 'Paste words, sentences, or a paragraph and this round will train directly on that text.',
+            customPlaceholder: 'Paste your glossary, phrases, or repeatable text here.',
+            customApply: 'Use this text',
+            layoutLabel: 'Keyboard layout'
+        },
+        result: {
+            planTitle: 'Next action',
+            planBody: 'This round already updated your plan. Continuing directly is usually better than choosing a fresh mode manually.',
+            continuePlan: 'Continue plan',
+            planComplete: 'Plan complete',
+            planCompleteBody: 'This starter plan is finished. Head back home to review the next growth recommendation.'
+        },
+        nav: {
+            challenge: 'Challenge'
+        },
+        account: {
+            title: 'Cloud account',
+            body: 'Sign in to sync history, resume plans across devices, and submit challenge results.',
+            idle: 'Not signed in',
+            connected: 'Connected',
+            loading: 'Connecting',
+            error: 'Connection issue',
+            nameLabel: 'Display name',
+            namePlaceholder: 'Enter a display name',
+            signIn: 'Sign in and sync',
+            signOut: 'Sign out',
+            export: 'Export data',
+            import: 'Import data',
+            importLabel: 'Import JSON',
+            importPlaceholder: 'Paste exported training JSON here',
+            importSuccess: 'Training data was imported into the local workspace.'
+        },
+        challenge: {
+            kicker: 'Daily challenge',
+            title: 'Compare one shared round with steady output',
+            body: 'The challenge locks the text and setup so speed and accuracy stay comparable.',
+            cta: 'Start challenge',
+            leaderboard: 'Leaderboard',
+            empty: 'No one has posted a result yet. You can take the first spot.'
+        },
+        insights: {
+            radarTitle: 'Growth radar',
+            radarBody: 'Review level, streak, weekly goal, and plan progress in one place.',
+            weekGoal: 'Weekly goal',
+            riskLow: 'Your training rhythm is healthy enough to keep pushing.',
+            riskHigh: 'Recent activity is dropping. Your streak is starting to wobble.',
+            achievementsTitle: 'Achievement wall',
+            achievementsBody: 'Make the training relationship visible, not just the raw numbers.'
+        }
+    }
+};
+
+export function getTrainingCopy(language = 'zh-CN') {
+    return TRAINING_COPY[language] || TRAINING_COPY['zh-CN'];
+}

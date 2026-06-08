@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { buildInsights } from '../engine';
 import { formatDateTime, formatShortDate } from '../i18n';
 import { usePracticeStore } from '../store/practice-store';
+import { getTrainingCopy } from '../training/copy';
 
 function HotspotList({ items, emptyText }) {
     if (!items.length) {
@@ -20,8 +21,21 @@ function HotspotList({ items, emptyText }) {
 
 export function InsightsPage() {
     const navigate = useNavigate();
-    const { copy, language, sessions, latestCoachAdvice } = usePracticeStore();
+    const {
+        copy,
+        language,
+        sessions,
+        latestCoachAdvice,
+        skillProfile,
+        trainingPlanProgress,
+        sessionStreak,
+        weeklySessions,
+        weeklyGoal,
+        achievements
+    } = usePracticeStore();
     const insights = useMemo(() => buildInsights(sessions), [sessions]);
+    const trainingCopy = getTrainingCopy(language);
+    const streakRisk = sessionStreak >= 3 ? trainingCopy.insights.riskLow : trainingCopy.insights.riskHigh;
 
     if (!sessions.length) {
         return (
@@ -108,6 +122,36 @@ export function InsightsPage() {
                 </div>
             </section>
 
+            <section className="insights-overview-grid">
+                <div className="panel insights-latest-card">
+                    <p className="panel-kicker">{trainingCopy.insights.radarTitle}</p>
+                    <h2>{skillProfile?.level?.label || copy.common.emptyValue}</h2>
+                    <p className="lead-text">{skillProfile?.summary || trainingCopy.insights.radarBody}</p>
+                    <p className="muted-text">{streakRisk}</p>
+                </div>
+
+                <div className="panel">
+                    <div className="summary-stack summary-stack--compact">
+                        <div className="metric-card">
+                            <span>{copy.common.accuracy}</span>
+                            <strong>{Math.round(skillProfile?.metrics?.avgAccuracy || 0)}%</strong>
+                        </div>
+                        <div className="metric-card">
+                            <span>{copy.common.consistency}</span>
+                            <strong>{Math.round(skillProfile?.metrics?.avgConsistency || 0)}%</strong>
+                        </div>
+                        <div className="metric-card">
+                            <span>{copy.common.sessions}</span>
+                            <strong>{weeklySessions}</strong>
+                        </div>
+                        <div className="metric-card">
+                            <span>{trainingCopy.insights.weekGoal}</span>
+                            <strong>{weeklyGoal.completed}/{weeklyGoal.target}</strong>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <section className="panel">
                 <div className="insights-hotspots">
                     <div>
@@ -120,6 +164,27 @@ export function InsightsPage() {
                         <h2>{copy.insights.topErrorWords}</h2>
                         <HotspotList items={insights.topErrorWords} emptyText={copy.insights.noErrors} />
                     </div>
+                </div>
+            </section>
+
+            <section className="panel">
+                <div className="panel-head">
+                    <div>
+                        <p className="panel-kicker">{trainingCopy.insights.achievementsTitle}</p>
+                        <h2>{trainingCopy.insights.achievementsTitle}</h2>
+                    </div>
+                </div>
+                <p className="muted-text">{trainingCopy.insights.achievementsBody}</p>
+                <div className="tag-list">
+                    {achievements.map((achievement) => (
+                        <span
+                            key={achievement.id}
+                            className="tag-pill"
+                            style={{ opacity: achievement.unlocked ? 1 : 0.45 }}
+                        >
+                            {achievement.title}
+                        </span>
+                    ))}
                 </div>
             </section>
 
@@ -150,3 +215,5 @@ export function InsightsPage() {
         </div>
     );
 }
+
+export default InsightsPage;

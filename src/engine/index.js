@@ -12,3 +12,5 @@ export * from './metrics';
 export * from './coach';
 export * from './insights';
 export * from './session-machine';
+export * from './training';
+export * from './achievements';
