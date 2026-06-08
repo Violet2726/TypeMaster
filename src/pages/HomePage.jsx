@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { buildInsights } from '../engine';
+import { buildInsights, getChallengePersonalBest, getChallengeStanding, getLatestChallengeSession } from '../engine';
 import { formatDateTime } from '../i18n';
 import { usePracticeStore } from '../store/practice-store';
 import { getTrainingCopy } from '../training/copy';
@@ -37,6 +37,34 @@ function getChallengeFacts(copy, challengeConfig) {
     }
 
     return facts;
+}
+
+function fillTemplate(template, value) {
+    return String(template || '').replace('{value}', value);
+}
+
+function getChallengePerformanceText(copy, challengeSession, challengeStanding, challengePersonalBest, trainingCopy) {
+    if (!challengeSession) {
+        return trainingCopy.challenge.homeIdleNote;
+    }
+
+    if (challengePersonalBest?.isPersonalBest) {
+        return copy.result.challengeBestFresh;
+    }
+
+    if (challengePersonalBest?.gapWpm > 0) {
+        return fillTemplate(copy.result.challengeBestGapWpm, challengePersonalBest.gapWpm);
+    }
+
+    if (challengePersonalBest?.gapAccuracy > 0) {
+        return fillTemplate(copy.result.challengeBestGapAccuracy, challengePersonalBest.gapAccuracy);
+    }
+
+    if (challengeStanding) {
+        return trainingCopy.challenge.homeReadyNote;
+    }
+
+    return trainingCopy.challenge.homeIdleNote;
 }
 
 export function HomePage() {
@@ -81,6 +109,22 @@ export function HomePage() {
         [copy, dailyChallenge?.config]
     );
     const challengeLeaderboardCount = dailyChallenge?.leaderboard?.length || 0;
+    const latestChallengeSession = useMemo(
+        () => getLatestChallengeSession(sessions, dailyChallenge?.id),
+        [dailyChallenge?.id, sessions]
+    );
+    const challengeStanding = useMemo(
+        () => getChallengeStanding(dailyChallenge?.leaderboard || [], latestChallengeSession?.id),
+        [dailyChallenge?.leaderboard, latestChallengeSession?.id]
+    );
+    const challengePersonalBest = useMemo(
+        () => getChallengePersonalBest(sessions, dailyChallenge?.id, latestChallengeSession?.id),
+        [dailyChallenge?.id, latestChallengeSession?.id, sessions]
+    );
+    const challengePerformanceText = useMemo(
+        () => getChallengePerformanceText(copy, latestChallengeSession, challengeStanding, challengePersonalBest, trainingCopy),
+        [challengePersonalBest, challengeStanding, copy, latestChallengeSession, trainingCopy]
+    );
 
     const handleFreePractice = () => {
         resetPracticeToBuiltin();
@@ -189,21 +233,37 @@ export function HomePage() {
                                     <span key={fact} className="home-action-chip">{fact}</span>
                                 ))}
                             </div>
+                            <p className="muted-text">{challengePerformanceText}</p>
                         </div>
 
                         <div className="home-action-card__footer">
-                            <div className="home-action-card__summary">
-                                <span>{trainingCopy.challenge.leaderboard}</span>
-                                <strong>{challengeLeaderboardCount}</strong>
+                            <div className="home-action-card__footer-meta">
+                                <div className="home-action-card__summary">
+                                    <span>{copy.result.challengeRankLabel}</span>
+                                    <strong>{challengeStanding ? `#${challengeStanding.rank}` : copy.common.emptyValue}</strong>
+                                </div>
+                                <div className="home-action-card__summary">
+                                    <span>{trainingCopy.challenge.leaderboard}</span>
+                                    <strong>{challengeLeaderboardCount}</strong>
+                                </div>
                             </div>
-                            <button
-                                type="button"
-                                className="action-btn"
-                                onClick={handleStartChallenge}
-                                disabled={isLaunchingChallenge}
-                            >
-                                {isLaunchingChallenge ? copy.common.loading : trainingCopy.challenge.cta}
-                            </button>
+                            <div className="results-actions home-action-card__actions">
+                                <button
+                                    type="button"
+                                    className="action-btn primary"
+                                    onClick={handleStartChallenge}
+                                    disabled={isLaunchingChallenge}
+                                >
+                                    {isLaunchingChallenge
+                                        ? copy.common.loading
+                                        : latestChallengeSession
+                                            ? trainingCopy.challenge.retryCta
+                                            : trainingCopy.challenge.cta}
+                                </button>
+                                <button type="button" className="action-btn" onClick={() => navigate('/challenge')}>
+                                    {trainingCopy.challenge.viewBoard}
+                                </button>
+                            </div>
                         </div>
                     </article>
 

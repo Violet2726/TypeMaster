@@ -103,3 +103,22 @@ export function getChallengePersonalBest(sessions = [], challengeId, sessionId) 
             : Math.max(0, bestAccuracy - currentAccuracy)
     };
 }
+
+export function getLatestChallengeSession(sessions = [], challengeId) {
+    if (!challengeId) {
+        return null;
+    }
+
+    return sessions.find((session) => (
+        session?.trainingMeta?.type === 'challenge'
+        && session?.trainingMeta?.stepId === challengeId
+    )) || null;
+}
+
+export function getChallengeLevelLeaderboard(leaderboard = [], levelId) {
+    if (!levelId) {
+        return leaderboard;
+    }
+
+    return leaderboard.filter((entry) => entry?.levelId === levelId);
+}

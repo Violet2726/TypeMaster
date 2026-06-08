@@ -93,6 +93,90 @@ test('starts the daily challenge directly from the home action hub', async ({ pa
     await expect(page.getByText('Challenge round')).toBeVisible();
 });
 
+test('opens the challenge page from the home leaderboard shortcut', async ({ page }) => {
+    const challengeId = `daily-${new Date().toISOString().slice(0, 10)}`;
+    await seedEnglishState(page, {
+        'typemaster:v4:skill-profile': {
+            createdAt: '2026-06-08T00:00:00.000Z',
+            level: { id: 'builder', label: 'Builder' },
+            summary: 'Keep pushing challenge consistency.',
+            primaryFocus: 'accuracy',
+            weakZones: [{ id: 'accuracy', label: 'accuracy', score: 92 }],
+            metrics: { avgAccuracy: 92, avgConsistency: 84 }
+        },
+        'typemaster:v2:sessions': [
+            {
+                id: 'session-1',
+                trainingMeta: {
+                    type: 'challenge',
+                    stepId: challengeId,
+                    title: 'Daily challenge'
+                },
+                result: {
+                    wpm: 88,
+                    accuracy: 98,
+                    completedAt: '2026-06-08T08:00:00.000Z'
+                }
+            }
+        ],
+        'typemaster:v4:cloud-store': {
+            currentUserId: 'user-1',
+            users: {
+                'user-1': {
+                    id: 'user-1',
+                    displayName: 'Alice',
+                    createdAt: '2026-06-08T00:00:00.000Z',
+                    sessions: [],
+                    trainingPlan: null,
+                    skillProfile: { level: { id: 'builder', label: 'Builder' } },
+                    challengeResults: {},
+                    achievements: [],
+                    streakState: null
+                }
+            },
+            challenges: {
+                [challengeId]: {
+                    id: challengeId,
+                    dateKey: new Date().toISOString().slice(0, 10),
+                    title: 'Daily challenge',
+                    summary: 'Use one shared text to compare stability and accuracy.',
+                    text: 'steady focus clear rhythm',
+                    config: {
+                        source: 'builtin',
+                        mode: 'words',
+                        durationSeconds: 45,
+                        wordCount: 10,
+                        includeNumbers: false,
+                        includePunctuation: false,
+                        aiTemplate: 'daily',
+                        difficulty: 'medium'
+                    },
+                    leaderboard: [
+                        {
+                            id: 'entry-1',
+                            sessionId: 'session-1',
+                            displayName: 'Alice',
+                            userId: 'user-1',
+                            levelId: 'builder',
+                            wpm: 88,
+                            accuracy: 98,
+                            createdAt: '2026-06-08T08:00:00.000Z'
+                        }
+                    ]
+                }
+            }
+        }
+    });
+
+    await page.goto('/#/');
+    await page.getByRole('button', { name: 'View leaderboard' }).click();
+
+    await expect(page).toHaveURL(/#\/challenge/);
+    await expect(page.getByText('Your challenge status')).toBeVisible();
+    await expect(page.getByText('Peer group')).toBeVisible();
+    await expect(page.locator('.result-item-value').filter({ hasText: '#1' })).toHaveCount(2);
+});
+
 test('shows challenge standing after completing a home-started daily challenge', async ({ page, isMobile }) => {
     test.skip(isMobile, 'desktop flow only');
     await seedEnglishState(page, {

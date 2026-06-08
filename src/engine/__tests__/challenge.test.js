@@ -1,6 +1,8 @@
 import {
     compareChallengeScores,
     createChallengeEntryPreview,
+    getChallengeLevelLeaderboard,
+    getLatestChallengeSession,
     getChallengePersonalBest,
     getChallengeStanding,
     mergeChallengeLeaderboardEntries
@@ -92,5 +94,26 @@ describe('challenge helpers', () => {
             wpm: 90,
             accuracy: 98
         });
+    });
+
+    test('returns the latest session for the current challenge id', () => {
+        const latest = getLatestChallengeSession([
+            { id: 'session-3', trainingMeta: { type: 'challenge', stepId: 'daily-2' } },
+            { id: 'session-2', trainingMeta: { type: 'challenge', stepId: 'daily-1' } },
+            { id: 'session-1', trainingMeta: { type: 'free', stepId: null } }
+        ], 'daily-1');
+
+        expect(latest?.id).toBe('session-2');
+    });
+
+    test('filters leaderboard to the same level when a level id exists', () => {
+        const cohort = getChallengeLevelLeaderboard([
+            { sessionId: 'session-1', levelId: 'builder' },
+            { sessionId: 'session-2', levelId: 'sprinter' },
+            { sessionId: 'session-3', levelId: 'builder' }
+        ], 'builder');
+
+        expect(cohort).toHaveLength(2);
+        expect(cohort.every((entry) => entry.levelId === 'builder')).toBe(true);
     });
 });

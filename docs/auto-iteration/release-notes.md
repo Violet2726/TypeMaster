@@ -72,6 +72,40 @@ main（当前代码已在 main）
 
 ---
 
+## 2026-06-08（迭代 3）
+
+### 今日主线
+把挑战战绩继续前置到首页和挑战页，强化回访入口。
+
+### 合并分支
+main（当前代码已在 main）
+
+### 用户可见变化
+- 首页挑战卡新增当前名次预览与“查看榜单”入口
+- ChallengePage 新增个人战绩卡
+- ChallengePage 新增同级别对比模块，帮助用户判断相近水平位置
+
+### 工程变化
+- 扩展 `src/engine/challenge.js` helper
+- 更新 `src/pages/HomePage.jsx`、`src/pages/ChallengePage.jsx`
+- 更新 `src/training/copy.js` 与 `index.css`
+- 更新 `src/pages/__tests__/HomePage.test.jsx`、`src/pages/__tests__/ChallengePage.test.jsx`
+- 更新 `e2e/app.spec.js` 首页到挑战榜单页路径
+
+### 删除的旧逻辑
+- 无删除业务能力，本次为挑战回访链路增强
+
+### 验证结果
+- npm test: ✅ 通过（245 tests passed）
+- npm run build: ✅ 通过
+- npm run test:e2e: ✅ 通过（8 passed, 4 skipped）
+
+### 已知遗留
+- 首页挑战卡还没有展示“是否刷新个人最佳”的更强提示
+- ChallengePage 尚未提供挑战历史趋势
+
+---
+
 ## 2026-05-10
 
 ### 今日主线

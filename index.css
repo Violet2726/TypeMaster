@@ -451,6 +451,21 @@ body[data-language='zh-CN'] .control-label {
     margin-top: auto;
 }
 
+.home-action-card__footer-meta,
+.home-action-card__actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.home-action-card__footer-meta {
+    flex-wrap: wrap;
+}
+
+.home-action-card__actions {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
 .home-action-chip {
     display: inline-flex;
     align-items: center;
@@ -1943,6 +1958,7 @@ body[data-theme='serika-light'] .replay-accuracy-band {
     .typing-stage__head,
     .practice-toolbar__row,
     .results-actions,
+    .home-action-card__actions,
     .home-action-card__footer,
     .history-row,
     .history-metrics,
@@ -1956,6 +1972,10 @@ body[data-theme='serika-light'] .replay-accuracy-band {
 
     .home-action-section__head {
         align-items: stretch;
+    }
+
+    .home-action-card__footer-meta {
+        flex-direction: column;
     }
 
     .live-stats,
