@@ -146,13 +146,19 @@ export function buildChallengeTrend(challengeSessions = []) {
     const points = [...challengeSessions]
         .slice()
         .reverse()
-        .map((session, index) => ({
+        .map((session, index, all) => {
+            const previous = all[index - 1];
+
+            return ({
             id: session.id,
             attempt: index + 1,
             completedAt: session?.result?.completedAt || null,
             wpm: toNumber(session?.result?.wpm),
-            accuracy: toNumber(session?.result?.accuracy)
-        }));
+            accuracy: toNumber(session?.result?.accuracy),
+            deltaWpm: previous ? toNumber(session?.result?.wpm) - toNumber(previous?.result?.wpm) : 0,
+            deltaAccuracy: previous ? toNumber(session?.result?.accuracy) - toNumber(previous?.result?.accuracy) : 0
+        });
+        });
 
     const first = points[0] || null;
     const latest = points[points.length - 1] || null;
@@ -170,7 +176,8 @@ export function buildChallengeTrend(challengeSessions = []) {
         attempts: points.length,
         deltaWpm,
         deltaAccuracy,
-        spanWpm: maxWpm - minWpm
+        spanWpm: maxWpm - minWpm,
+        bestIndex: best ? points.findIndex((point) => point.id === best.id) : -1
     };
 }
 

@@ -189,6 +189,7 @@ test('opens the challenge page from the home leaderboard shortcut', async ({ pag
     await expect(page.getByText('Your challenge status')).toBeVisible();
     await expect(page.getByText('Peer group')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Today\'s trend' })).toBeVisible();
+    await expect(page.getByText('Run focus')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Today\'s replay' })).toBeVisible();
     await expect(page.locator('.result-item-value').filter({ hasText: '#1' })).toHaveCount(2);
 });

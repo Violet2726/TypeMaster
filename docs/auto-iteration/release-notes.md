@@ -282,6 +282,42 @@ main（当前代码已在 main）
 
 ---
 
+## 2026-06-08（迭代 9）
+
+### 今日主线
+把挑战趋势从“总览”升级成“总览 + 单次细看”，并把建议前置到首页。
+
+### 合并分支
+main（当前代码已在 main）
+
+### 用户可见变化
+- 首页挑战卡新增更明确的“下一步建议”
+- ChallengePage 趋势图新增 Run focus 细看卡片
+- 用户可以切换查看某次挑战相对上一次的 WPM 和准确率变化
+
+### 工程变化
+- 扩展 `src/engine/challenge.js` trend point / trend state helper
+- 更新 `src/components/ChallengeTrendChart.jsx`
+- 更新 `src/pages/HomePage.jsx`
+- 更新 `src/training/copy.js`
+- 更新 `src/engine/__tests__/challenge.test.js`
+- 更新 `src/pages/__tests__/HomePage.test.jsx`、`src/pages/__tests__/ChallengePage.test.jsx`
+- 更新 `e2e/app.spec.js`
+
+### 删除的旧逻辑
+- 无删除业务能力，本次为挑战趋势解释层增强
+
+### 验证结果
+- npm test: ✅ 通过（248 tests passed）
+- npm run build: ✅ 通过
+- npm run test:e2e: ✅ 通过（8 passed, 4 skipped）
+
+### 已知遗留
+- 首页挑战卡仍没有“建议停止继续冲榜”的边界提示
+- ChallengePage 趋势图还没有更强的状态切换动效
+
+---
+
 ## 2026-05-10
 
 ### 今日主线

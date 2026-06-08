@@ -1,3 +1,6 @@
+import { useEffect, useMemo, useState } from 'react';
+import { getChallengeTrendState } from '../engine';
+
 function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
 }
@@ -51,6 +54,10 @@ function formatSigned(value, suffix = '') {
     return `${sign}${safe}${suffix}`;
 }
 
+function fillTemplate(template, value) {
+    return String(template || '').replace('{value}', value);
+}
+
 function getTrendNote(trainingCopy, trend) {
     const state = getChallengeTrendState(trend);
 
@@ -73,6 +80,18 @@ function getTrendNote(trainingCopy, trend) {
     return trainingCopy.challenge.trendSteady;
 }
 
+function getAttemptLabel(trainingCopy, point, index, total) {
+    if (index === 0) {
+        return trainingCopy.challenge.trendFirstLabel;
+    }
+
+    if (index === total - 1) {
+        return trainingCopy.challenge.trendLatestLabel;
+    }
+
+    return fillTemplate(trainingCopy.challenge.trendRunLabel, String(point.attempt));
+}
+
 export function ChallengeTrendChart({ copy, trainingCopy, trend }) {
     const width = 760;
     const height = 300;
@@ -93,9 +112,21 @@ export function ChallengeTrendChart({ copy, trainingCopy, trend }) {
     const averageAccuracy = trend.attempts
         ? Math.round(trend.points.reduce((sum, point) => sum + point.accuracy, 0) / trend.attempts)
         : 0;
-    const bestAttemptIndex = trend.best
-        ? trend.points.findIndex((point) => point.id === trend.best.id)
-        : -1;
+    const [activeIndex, setActiveIndex] = useState(() => Math.max(0, trend.points.length - 1));
+
+    useEffect(() => {
+        setActiveIndex(Math.max(0, trend.points.length - 1));
+    }, [trend.points.length]);
+
+    const activePoint = trend.points[activeIndex] || null;
+    const activePointLabel = useMemo(
+        () => getAttemptLabel(trainingCopy, activePoint, activeIndex, trend.points.length),
+        [activeIndex, activePoint, trainingCopy, trend.points.length]
+    );
+    const activeStatuses = [
+        activeIndex === trend.points.length - 1 ? trainingCopy.challenge.latestBadge : null,
+        activePoint && activePoint.id === trend.best?.id ? trainingCopy.challenge.bestBadge : null
+    ].filter(Boolean);
 
     return (
         <div className="chart-panel replay-panel replay-panel--merged">
@@ -143,6 +174,55 @@ export function ChallengeTrendChart({ copy, trainingCopy, trend }) {
                     </p>
                 </aside>
             </div>
+
+            {trend.points.length > 0 && (
+                <div className="replay-panel__head">
+                    <div className="replay-mode-switch" role="tablist" aria-label={trainingCopy.challenge.trendFocusTitle}>
+                        {trend.points.map((point, index) => (
+                            <button
+                                key={point.id}
+                                type="button"
+                                className={`replay-mode-btn ${index === activeIndex ? 'is-active' : ''}`}
+                                onClick={() => setActiveIndex(index)}
+                            >
+                                {getAttemptLabel(trainingCopy, point, index, trend.points.length)}
+                            </button>
+                        ))}
+                    </div>
+
+                    <aside className="replay-inspect">
+                        <div className="replay-inspect__header">
+                            <span className="summary-label">{trainingCopy.challenge.trendFocusTitle}</span>
+                            <strong>{activePointLabel}</strong>
+                            {activeStatuses.length > 0 && (
+                                <div className="history-metrics">
+                                    {activeStatuses.map((status) => (
+                                        <span key={status} className="panel-badge badge-ready">{status}</span>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                        <div className="replay-inspect__grid">
+                            <div className="replay-inspect__metric">
+                                <span>{copy.common.wpm}</span>
+                                <strong>{activePoint ? `${activePoint.wpm}` : copy.common.emptyValue}</strong>
+                            </div>
+                            <div className="replay-inspect__metric">
+                                <span>{copy.common.accuracy}</span>
+                                <strong>{activePoint ? `${activePoint.accuracy}%` : copy.common.emptyValue}</strong>
+                            </div>
+                            <div className="replay-inspect__metric">
+                                <span>{trainingCopy.challenge.trendPrevDeltaLabel}</span>
+                                <strong>{activePoint ? formatSigned(activePoint.deltaWpm, ` ${copy.common.wpm}`) : copy.common.emptyValue}</strong>
+                            </div>
+                            <div className="replay-inspect__metric">
+                                <span>{trainingCopy.challenge.trendAccuracyChangeLabel}</span>
+                                <strong>{activePoint ? formatSigned(activePoint.deltaAccuracy, '%') : copy.common.emptyValue}</strong>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            )}
 
             <div className="chart-canvas replay-canvas replay-canvas--merged">
                 <svg viewBox={`0 0 ${width} ${height}`} className="result-chart replay-chart replay-chart--merged" aria-label={trainingCopy.challenge.trendTitle}>
@@ -205,13 +285,13 @@ export function ChallengeTrendChart({ copy, trainingCopy, trend }) {
                             <circle
                                 cx={point.x}
                                 cy={point.y}
-                                r={index === bestAttemptIndex ? 5.5 : 4}
+                                r={index === activeIndex ? 5.8 : index === trend.bestIndex ? 5 : 4}
                                 className="replay-focus-point"
                             />
                             <circle
                                 cx={accuracyPoints[index].x}
                                 cy={accuracyPoints[index].y}
-                                r={3.6}
+                                r={index === activeIndex ? 4.2 : 3.6}
                                 className="replay-focus-point replay-focus-point--accuracy"
                             />
                         </g>
@@ -221,4 +301,3 @@ export function ChallengeTrendChart({ copy, trainingCopy, trend }) {
         </div>
     );
 }
-import { getChallengeTrendState } from '../engine';

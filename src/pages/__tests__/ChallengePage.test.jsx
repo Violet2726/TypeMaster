@@ -99,6 +99,8 @@ describe('ChallengePage', () => {
         expect(screen.getByText('Peer group')).toBeInTheDocument();
         expect(screen.getByRole('heading', { name: 'Today\'s trend' })).toBeInTheDocument();
         expect(screen.getByText('Speed change')).toBeInTheDocument();
+        expect(screen.getByText('Run focus')).toBeInTheDocument();
+        expect(screen.getByText('Vs previous')).toBeInTheDocument();
         expect(screen.getByRole('heading', { name: 'Today\'s replay' })).toBeInTheDocument();
         expect(screen.getByText('Best run')).toBeInTheDocument();
         expect(screen.getByRole('heading', { name: 'Leaderboard' })).toBeInTheDocument();

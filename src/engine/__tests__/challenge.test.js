@@ -171,6 +171,10 @@ describe('challenge helpers', () => {
         expect(trend.deltaWpm).toBe(8);
         expect(trend.deltaAccuracy).toBe(1);
         expect(trend.best?.id).toBe('session-2');
+        expect(trend.points[0].deltaWpm).toBe(0);
+        expect(trend.points[1].deltaWpm).toBe(8);
+        expect(trend.points[1].deltaAccuracy).toBe(1);
+        expect(trend.bestIndex).toBe(1);
     });
 
     test('derives the correct challenge trend state', () => {
