@@ -8,6 +8,16 @@ const FOCUS_NOTE_KEYS = {
     empty: 'trendFocusMixed'
 };
 
+const STRATEGY_NOTE_KEYS = {
+    idle: 'strategyIdle',
+    warm: 'strategyWarm',
+    push: 'strategyImproving',
+    improving: 'strategyImproving',
+    cooling: 'strategyCooling',
+    recover: 'strategyRecover',
+    steady: 'strategySteady'
+};
+
 const RECOVERY_FOCUS_STATES = new Set(['accuracy-risk', 'speed-drop']);
 
 export function isChallengeFocusRecoveryState(state) {
@@ -16,6 +26,11 @@ export function isChallengeFocusRecoveryState(state) {
 
 export function getChallengeFocusNote(trainingCopy, state) {
     const key = FOCUS_NOTE_KEYS[state] || FOCUS_NOTE_KEYS.mixed;
+    return trainingCopy?.challenge?.[key] || '';
+}
+
+export function getChallengeStrategyNote(trainingCopy, state) {
+    const key = STRATEGY_NOTE_KEYS[state] || STRATEGY_NOTE_KEYS.steady;
     return trainingCopy?.challenge?.[key] || '';
 }
 
@@ -55,6 +70,19 @@ export function buildChallengeFocusModel(trainingCopy, state, options = {}) {
     return {
         state: state || 'empty',
         note: getChallengeFocusNote(trainingCopy, state),
+        ...actionModel
+    };
+}
+
+export function buildChallengeStrategyModel(trainingCopy, state, options = {}) {
+    const actionModel = buildChallengeActionModel(trainingCopy, {
+        ...options,
+        shouldRecover: state === 'recover'
+    });
+
+    return {
+        state: state || 'idle',
+        note: getChallengeStrategyNote(trainingCopy, state),
         ...actionModel
     };
 }

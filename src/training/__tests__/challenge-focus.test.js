@@ -1,7 +1,9 @@
 import {
     buildChallengeActionModel,
     buildChallengeFocusModel,
+    buildChallengeStrategyModel,
     getChallengeFocusNote,
+    getChallengeStrategyNote,
     isChallengeFocusRecoveryState
 } from '../challenge-focus';
 import { getTrainingCopy } from '../copy';
@@ -16,6 +18,16 @@ describe('challenge focus model', () => {
         expect(getChallengeFocusNote(trainingCopy, 'speed-drop')).toBe(trainingCopy.challenge.trendFocusSpeedDrop);
         expect(getChallengeFocusNote(trainingCopy, 'stable')).toBe(trainingCopy.challenge.trendFocusStable);
         expect(getChallengeFocusNote(trainingCopy, 'unknown')).toBe(trainingCopy.challenge.trendFocusMixed);
+    });
+
+    test('maps strategy states to training copy', () => {
+        expect(getChallengeStrategyNote(trainingCopy, 'idle')).toBe(trainingCopy.challenge.strategyIdle);
+        expect(getChallengeStrategyNote(trainingCopy, 'warm')).toBe(trainingCopy.challenge.strategyWarm);
+        expect(getChallengeStrategyNote(trainingCopy, 'push')).toBe(trainingCopy.challenge.strategyImproving);
+        expect(getChallengeStrategyNote(trainingCopy, 'improving')).toBe(trainingCopy.challenge.strategyImproving);
+        expect(getChallengeStrategyNote(trainingCopy, 'cooling')).toBe(trainingCopy.challenge.strategyCooling);
+        expect(getChallengeStrategyNote(trainingCopy, 'recover')).toBe(trainingCopy.challenge.strategyRecover);
+        expect(getChallengeStrategyNote(trainingCopy, 'unknown')).toBe(trainingCopy.challenge.strategySteady);
     });
 
     test('identifies recovery focus states', () => {
@@ -94,6 +106,30 @@ describe('challenge focus model', () => {
             shouldRecover: true,
             primaryAction: 'free',
             primaryLabel: trainingCopy.challenge.recoverFreeCta
+        });
+    });
+
+    test('builds strategy models with notes and actions', () => {
+        const pushModel = buildChallengeStrategyModel(trainingCopy, 'push', {
+            hasPriorChallenge: true
+        });
+        const recoverModel = buildChallengeStrategyModel(trainingCopy, 'recover', {
+            hasActiveTrainingStep: true,
+            hasPriorChallenge: true
+        });
+
+        expect(pushModel).toMatchObject({
+            state: 'push',
+            note: trainingCopy.challenge.strategyImproving,
+            primaryAction: 'challenge',
+            primaryLabel: trainingCopy.challenge.retryCta
+        });
+        expect(recoverModel).toMatchObject({
+            state: 'recover',
+            note: trainingCopy.challenge.strategyRecover,
+            shouldRecover: true,
+            primaryAction: 'plan',
+            primaryLabel: trainingCopy.challenge.recoverPlanCta
         });
     });
 });

@@ -2,6 +2,45 @@
 
 ---
 
+## 2026-06-08（迭代 16）
+
+### 今日主线
+把首页挑战卡的策略说明文案接入共享挑战策略模型，让首页不再维护页面层 `challengeStrategyState` 文案映射。
+
+### 合并分支
+main（当前代码已在 main）
+
+### 用户可见变化
+- 首页挑战卡文案和按钮行为保持不变
+- 挑战建议的说明与主动作来自同一个模型，体验语义更一致
+- 恢复状态仍会优先引导用户回计划或自由热身
+
+### 工程变化
+- 新增 `getChallengeStrategyNote`
+- 新增 `buildChallengeStrategyModel`
+- HomePage 改为消费 `note`、`primaryAction` 和 `primaryLabel`
+- challenge-focus 测试补充 strategy state 文案映射和策略模型覆盖
+
+### 删除的旧逻辑
+- 删除 HomePage 页面内重复的 `challengeStrategyText` 映射
+- 删除 HomePage 页面内策略说明文案分支判断
+
+### 验证结果
+- `npm test -- --run src/training/__tests__/challenge-focus.test.js`: 通过，9 tests passed
+- `npm test -- --run src/pages/__tests__/HomePage.test.jsx`: 通过，2 tests passed
+- `npm test`: 通过，261 tests passed
+- `npm run build`: 通过
+- `npm run test:e2e`: 通过，9 passed, 5 skipped
+- `git diff --check`: 通过，仅有仓库 CRLF 提示
+- in-app browser: 当前会话没有可用浏览器实例，已使用 Playwright e2e 覆盖核心路径
+
+### 已知遗留
+- 结果页风险状态的完整 UI 路径目前由单测覆盖，后续可补 e2e
+- release notes 顶部存在重复的迭代 10 记录，后续可单独清理
+- 如果挑战策略模型继续扩张，可再评估是否重命名 `challenge-focus.js`
+
+---
+
 ## 2026-06-08（迭代 15）
 
 ### 今日主线

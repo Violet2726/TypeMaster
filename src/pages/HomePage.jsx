@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { buildChallengeTrend, buildInsights, getChallengePersonalBest, getChallengeSessions, getChallengeStanding, getChallengeStrategyState, getLatestChallengeSession } from '../engine';
 import { formatDateTime } from '../i18n';
 import { usePracticeStore } from '../store/practice-store';
-import { buildChallengeActionModel } from '../training/challenge-focus';
+import { buildChallengeStrategyModel } from '../training/challenge-focus';
 import { getTrainingCopy } from '../training/copy';
 
 function getModeLabel(copy, config) {
@@ -142,31 +142,14 @@ export function HomePage() {
         () => getChallengeStrategyState(challengeTrend, challengePersonalBest),
         [challengePersonalBest, challengeTrend]
     );
-    const challengeStrategyText = useMemo(
-        () => {
-            if (challengeStrategyState === 'recover') {
-                return trainingCopy.challenge.strategyRecover;
-            }
-
-            if (challengeStrategyState === 'push') {
-                return trainingCopy.challenge.strategyImproving;
-            }
-
-            if (challengeStrategyState === 'cooling') {
-                return trainingCopy.challenge.strategyCooling;
-            }
-
-            if (challengeStrategyState === 'warm') {
-                return trainingCopy.challenge.strategyWarm;
-            }
-
-            if (challengeStrategyState === 'idle') {
-                return trainingCopy.challenge.strategyIdle;
-            }
-
-            return trainingCopy.challenge.strategySteady;
-        },
-        [challengeStrategyState, trainingCopy]
+    const challengeStrategyModel = useMemo(
+        () => buildChallengeStrategyModel(trainingCopy, challengeStrategyState, {
+            hasActiveTrainingStep: Boolean(trainingPlan),
+            hasPriorChallenge: Boolean(latestChallengeSession),
+            isLoading: isLaunchingChallenge,
+            loadingLabel: copy.common.loading
+        }),
+        [challengeStrategyState, copy.common.loading, isLaunchingChallenge, latestChallengeSession, trainingCopy, trainingPlan]
     );
 
     const handleFreePractice = () => {
@@ -195,24 +178,13 @@ export function HomePage() {
         }
     };
 
-    const challengeActionModel = useMemo(
-        () => buildChallengeActionModel(trainingCopy, {
-            shouldRecover: challengeStrategyState === 'recover',
-            hasActiveTrainingStep: Boolean(trainingPlan),
-            hasPriorChallenge: Boolean(latestChallengeSession),
-            isLoading: isLaunchingChallenge,
-            loadingLabel: copy.common.loading
-        }),
-        [challengeStrategyState, copy.common.loading, isLaunchingChallenge, latestChallengeSession, trainingCopy, trainingPlan]
-    );
-
     const handleChallengePrimaryAction = () => {
-        if (challengeActionModel.primaryAction === 'plan') {
+        if (challengeStrategyModel.primaryAction === 'plan') {
             handlePrimaryAction();
             return;
         }
 
-        if (challengeActionModel.primaryAction === 'free') {
+        if (challengeStrategyModel.primaryAction === 'free') {
             handleFreePractice();
             return;
         }
@@ -304,7 +276,7 @@ export function HomePage() {
                             <p className="muted-text">{challengePerformanceText}</p>
                             <div className="home-action-card__strategy">
                                 <span className="summary-label">{trainingCopy.challenge.strategyTitle}</span>
-                                <p className="lead-text">{challengeStrategyText}</p>
+                                <p className="lead-text">{challengeStrategyModel.note}</p>
                             </div>
                         </div>
 
@@ -334,7 +306,7 @@ export function HomePage() {
                                     onClick={handleChallengePrimaryAction}
                                     disabled={isLaunchingChallenge}
                                 >
-                                    {challengeActionModel.primaryLabel}
+                                    {challengeStrategyModel.primaryLabel}
                                 </button>
                                 <button type="button" className="action-btn" onClick={() => navigate('/challenge')}>
                                     {trainingCopy.challenge.viewBoard}
