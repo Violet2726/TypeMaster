@@ -1,4 +1,5 @@
 import {
+    buildChallengeTrend,
     compareChallengeScores,
     createChallengeEntryPreview,
     getChallengeLevelLeaderboard,
@@ -151,5 +152,23 @@ describe('challenge helpers', () => {
         ], 'daily-1');
 
         expect(ordered.map((session) => session.id)).toEqual(['session-2', 'session-1']);
+    });
+
+    test('builds chronological challenge trend points and deltas', () => {
+        const trend = buildChallengeTrend([
+            {
+                id: 'session-2',
+                result: { completedAt: '2026-06-08T09:00:00.000Z', wpm: 90, accuracy: 97 }
+            },
+            {
+                id: 'session-1',
+                result: { completedAt: '2026-06-08T08:00:00.000Z', wpm: 82, accuracy: 96 }
+            }
+        ]);
+
+        expect(trend.points.map((point) => point.id)).toEqual(['session-1', 'session-2']);
+        expect(trend.deltaWpm).toBe(8);
+        expect(trend.deltaAccuracy).toBe(1);
+        expect(trend.best?.id).toBe('session-2');
     });
 });

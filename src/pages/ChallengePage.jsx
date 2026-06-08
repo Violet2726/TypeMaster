@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getChallengeLevelLeaderboard, getChallengePersonalBest, getChallengeSessions, getChallengeStanding, getLatestChallengeSession } from '../engine';
+import { buildChallengeTrend, getChallengeLevelLeaderboard, getChallengePersonalBest, getChallengeSessions, getChallengeStanding, getLatestChallengeSession } from '../engine';
+import { ChallengeTrendChart } from '../components/ChallengeTrendChart';
 import { usePracticeStore } from '../store/practice-store';
 import { getTrainingCopy } from '../training/copy';
 
@@ -47,6 +48,10 @@ export function ChallengePage() {
     const challengeSessions = useMemo(
         () => getChallengeSessions(sessions, dailyChallenge?.id),
         [dailyChallenge?.id, sessions]
+    );
+    const challengeTrend = useMemo(
+        () => buildChallengeTrend(challengeSessions),
+        [challengeSessions]
     );
     const latestChallengeSession = useMemo(
         () => getLatestChallengeSession(sessions, dailyChallenge?.id),
@@ -211,6 +216,7 @@ export function ChallengePage() {
                     </div>
                 </div>
                 <p className="lead-text">{trainingCopy.challenge.historyBody}</p>
+                <ChallengeTrendChart copy={copy} trainingCopy={trainingCopy} trend={challengeTrend} />
                 <div className="result-metrics-strip" aria-label={trainingCopy.challenge.historyTitle}>
                     <div className="result-item">
                         <span className="result-item-label">{trainingCopy.challenge.attemptsLabel}</span>

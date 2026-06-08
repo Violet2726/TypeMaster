@@ -210,6 +210,42 @@ main（当前代码已在 main）
 
 ---
 
+## 2026-06-08（迭代 7）
+
+### 今日主线
+为 ChallengePage 增加今日挑战趋势图，让速度与准确率变化一眼可见。
+
+### 合并分支
+main（当前代码已在 main）
+
+### 用户可见变化
+- ChallengePage 新增“今日挑战趋势”图表
+- 图表直接展示首次、最新、速度变化、准确率变化
+- 页面会给出今天整体趋势结论，帮助用户判断是否继续提速
+
+### 工程变化
+- 新增 `src/components/ChallengeTrendChart.jsx`
+- 扩展 `src/engine/challenge.js` 趋势 helper
+- 更新 `src/pages/ChallengePage.jsx`
+- 更新 `src/training/copy.js`
+- 更新 `src/engine/__tests__/challenge.test.js`
+- 更新 `src/pages/__tests__/ChallengePage.test.jsx`
+- 更新 `e2e/app.spec.js`
+
+### 删除的旧逻辑
+- 无删除业务能力，本次为挑战趋势可视化增强
+
+### 验证结果
+- npm test: ✅ 通过（247 tests passed）
+- npm run build: ✅ 通过
+- npm run test:e2e: ✅ 通过（8 passed, 4 skipped）
+
+### 已知遗留
+- 首页挑战卡仍缺少“是否值得再来一轮”的策略建议
+- 趋势图目前是静态摘要，未提供更细的 hover 焦点解释
+
+---
+
 ## 2026-05-10
 
 ### 今日主线

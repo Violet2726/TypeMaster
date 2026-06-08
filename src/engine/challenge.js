@@ -141,3 +141,35 @@ export function getChallengeSessions(sessions = [], challengeId) {
             return 0;
         });
 }
+
+export function buildChallengeTrend(challengeSessions = []) {
+    const points = [...challengeSessions]
+        .slice()
+        .reverse()
+        .map((session, index) => ({
+            id: session.id,
+            attempt: index + 1,
+            completedAt: session?.result?.completedAt || null,
+            wpm: toNumber(session?.result?.wpm),
+            accuracy: toNumber(session?.result?.accuracy)
+        }));
+
+    const first = points[0] || null;
+    const latest = points[points.length - 1] || null;
+    const best = [...points].sort((left, right) => compareChallengeScores(left, right))[0] || null;
+    const deltaWpm = first && latest ? latest.wpm - first.wpm : 0;
+    const deltaAccuracy = first && latest ? latest.accuracy - first.accuracy : 0;
+    const maxWpm = points.length ? Math.max(...points.map((point) => point.wpm), 0) : 0;
+    const minWpm = points.length ? Math.min(...points.map((point) => point.wpm), 0) : 0;
+
+    return {
+        points,
+        first,
+        latest,
+        best,
+        attempts: points.length,
+        deltaWpm,
+        deltaAccuracy,
+        spanWpm: maxWpm - minWpm
+    };
+}
