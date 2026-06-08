@@ -12,6 +12,7 @@ import {
 } from '../engine';
 import { getErrorMessage } from '../i18n';
 import { usePracticeStore } from '../store/practice-store';
+import { buildChallengeFocusModel } from '../training/challenge-focus';
 import { getTrainingCopy } from '../training/copy';
 
 function getCoachBadgeLabel(copy, status) {
@@ -61,30 +62,6 @@ function formatSigned(value, suffix = '') {
     const safe = Number(value || 0);
     const sign = safe > 0 ? '+' : '';
     return `${sign}${safe}${suffix}`;
-}
-
-function getChallengeFocusNote(trainingCopy, state) {
-    if (state === 'baseline') {
-        return trainingCopy.challenge.trendFocusBaseline;
-    }
-
-    if (state === 'breakthrough') {
-        return trainingCopy.challenge.trendFocusBreakthrough;
-    }
-
-    if (state === 'accuracy-risk') {
-        return trainingCopy.challenge.trendFocusAccuracyRisk;
-    }
-
-    if (state === 'speed-drop') {
-        return trainingCopy.challenge.trendFocusSpeedDrop;
-    }
-
-    if (state === 'stable') {
-        return trainingCopy.challenge.trendFocusStable;
-    }
-
-    return trainingCopy.challenge.trendFocusMixed;
 }
 
 function buildChallengeStandingModel(copy, sessions, session, leaderboard) {
@@ -184,21 +161,21 @@ export function ResultPage() {
         () => getChallengePointFocusState(challengeFocusPoint || (isChallengeSession ? { attempt: 1 } : null)),
         [challengeFocusPoint, isChallengeSession]
     );
-    const challengeFocusNote = useMemo(
-        () => isChallengeSession ? getChallengeFocusNote(trainingCopy, challengeFocusState) : '',
-        [challengeFocusState, isChallengeSession, trainingCopy]
+    const challengeFocusModel = useMemo(
+        () => isChallengeSession
+            ? buildChallengeFocusModel(trainingCopy, challengeFocusState, {
+                hasActiveTrainingStep: Boolean(activeTrainingStep),
+                isLoading: challengeActionState === 'loading',
+                loadingLabel: copy.common.loading
+            })
+            : null,
+        [activeTrainingStep, challengeActionState, challengeFocusState, copy.common.loading, isChallengeSession, trainingCopy]
     );
+    const challengeFocusNote = challengeFocusModel?.note || '';
     const challengeFocusDelta = challengeFocusPoint && challengeFocusPoint.attempt > 1
         ? `${trainingCopy.challenge.trendPrevDeltaLabel}: ${formatSigned(challengeFocusPoint.deltaWpm, ` ${copy.common.wpm}`)} / ${formatSigned(challengeFocusPoint.deltaAccuracy, '%')}`
         : '';
-    const shouldRecoverFromChallenge = challengeFocusState === 'accuracy-risk' || challengeFocusState === 'speed-drop';
-    const challengePrimaryLabel = shouldRecoverFromChallenge
-        ? activeTrainingStep
-            ? trainingCopy.challenge.recoverPlanCta
-            : trainingCopy.challenge.recoverFreeCta
-        : challengeActionState === 'loading'
-            ? copy.common.loading
-            : trainingCopy.challenge.retryCta;
+    const challengePrimaryLabel = challengeFocusModel?.primaryLabel || trainingCopy.challenge.retryCta;
 
     useEffect(() => {
         if (!session) {
@@ -344,13 +321,14 @@ export function ResultPage() {
     };
 
     const handleChallengePrimaryAction = async () => {
-        if (shouldRecoverFromChallenge) {
-            if (activeTrainingStep) {
-                startTrainingPlanStep();
-            } else {
-                resetPracticeToBuiltin();
-            }
+        if (challengeFocusModel?.primaryAction === 'plan') {
+            startTrainingPlanStep();
+            navigate('/practice');
+            return;
+        }
 
+        if (challengeFocusModel?.primaryAction === 'free') {
+            resetPracticeToBuiltin();
             navigate('/practice');
             return;
         }

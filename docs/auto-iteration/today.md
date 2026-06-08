@@ -6,64 +6,68 @@
 - **完成状态**: 已完成
 
 ## 1. 今日主线
-把挑战结果页的 Run focus 从“只解释表现”升级成“解释表现 + 直接给下一步动作”。用户完成每日挑战后，如果本轮状态健康，可以一键再挑战；如果出现准确率风险或速度回落，主按钮会带用户回到训练计划或自由热身。
+把挑战单次焦点沉淀成共享产品模型。ResultPage 和 ChallengeTrendChart 不再各自维护“状态到文案”的映射，结果页的主动作也直接读取模型给出的 `primaryAction`，避免未来继续扩展挑战教练时出现分叉。
 
 ## 2. 问题背景
-上一轮已经让 ResultPage 能解释本次挑战的单次焦点，但页面的主动作仍然没有跟随焦点状态变化。也就是说，产品已经知道用户可能需要“先稳住”，但按钮仍然没有把这个判断转成可执行路径。
+前几轮已经连续增强了挑战反馈：趋势图能解释单次表现，结果页也能给出下一步动作。但这些能力仍散在组件里，尤其是 focus 文案和恢复状态判断同时出现在不同页面。功能变强之后，如果规则没有收束，后续每加一个入口都可能多出一份隐形维护成本。
 
 ## 3. 根因判断
-- 结果页挑战卡已有焦点状态，但 CTA 仍偏静态
-- 风险状态下继续鼓励冲榜，会削弱产品作为训练教练的可信度
-- 首页已有“回计划 / 去热身”的恢复策略，结果页还没有继承这条产品原则
+- `ChallengeTrendChart` 和 `ResultPage` 各自维护 focus state 到文案的映射
+- ResultPage 自己判断风险状态并决定 CTA，页面层承担了产品规则
+- Vitest 之前没有覆盖 `src/training` 下的产品文案模型
 
 ## 4. 目标用户价值
-挑战结束后，用户不需要自己解读按钮含义：突破或稳定时继续挑战，准确率风险或速度回落时先回主线训练。结果页因此更像一个会收束节奏的教练，而不是只会展示战绩的看板。
+用户可见体验保持稳定，但产品判断更一致：无论在挑战页还是结果页，`accuracy-risk`、`speed-drop`、`breakthrough` 等状态都会走同一套解释与动作模型。后续新增首页提示、移动端引导或更完整教练卡时，不需要重新发明一遍规则。
 
 ## 5. 工程价值
-结果页复用现有 `getChallengePointFocusState` 输出，不新增一套恢复判断规则。动作层只根据焦点状态切换 `startDailyChallenge`、`startTrainingPlanStep` 和 `resetPracticeToBuiltin`，保持挑战、计划、自由练习三条路径清晰。
+新增 `src/training/challenge-focus.js` 作为挑战焦点的共享模型，集中处理文案、恢复状态、主动作和主按钮标签。组件只负责展示与执行，减少重复分支，也让产品规则可以被纯函数测试保护。
 
 ## 6. 涉及模块
-- `src/pages/ResultPage.jsx`：挑战战绩卡新增主 CTA 决策与跳转动作
-- `src/pages/__tests__/ResultPage.test.jsx`：覆盖再挑战路径和风险状态回计划路径
+- `src/training/challenge-focus.js`：新增挑战焦点共享模型
+- `src/training/__tests__/challenge-focus.test.js`：覆盖文案映射、恢复状态和 CTA 模型
+- `src/components/ChallengeTrendChart.jsx`：改为复用共享 focus note
+- `src/pages/ResultPage.jsx`：改为复用共享 focus model 和 `primaryAction`
+- `vitest.config.js`：纳入 `src/training/__tests__`
 - `docs/auto-iteration/today.md`：记录本轮需求、设计和验收
 - `docs/auto-iteration/release-notes.md`：追加发布记录
 - `docs/auto-iteration/decision-log.md`：追加决策记录
 
 ## 7. 非目标
-- 不改变榜单同步逻辑
-- 不改变 challenge API
-- 不重写挑战趋势图
-- 不清理 release notes 顶部重复迭代记录
+- 不改变挑战焦点判断阈值
+- 不改变用户可见文案
+- 不改变结果页 CTA 行为
+- 不新增 e2e 场景
 
 ## 8. 设计方案
-1. ResultPage 根据 `challengeFocusState` 判断是否需要恢复训练节奏
-2. `accuracy-risk` 与 `speed-drop` 视为恢复状态
-3. 恢复状态且存在 `activeTrainingStep` 时，主按钮显示“先回计划 / Back to plan”
-4. 恢复状态且没有计划步骤时，主按钮显示“先去热身 / Free practice”
-5. 健康或中性状态下，主按钮显示“再挑战一次 / Retry challenge”
-6. 再挑战动作调用 `startDailyChallenge()` 后进入 `/practice`
-7. 恢复动作调用 `startTrainingPlanStep()` 或 `resetPracticeToBuiltin()` 后进入 `/practice`
-8. “查看榜单”继续作为次级动作保留
+1. 新增 `getChallengeFocusNote(trainingCopy, state)` 统一 focus 文案映射
+2. 新增 `isChallengeFocusRecoveryState(state)` 统一恢复状态判断
+3. 新增 `buildChallengeFocusModel(trainingCopy, state, options)` 输出 `note`、`shouldRecover`、`primaryAction`、`primaryLabel`
+4. ChallengeTrendChart 移除本地 `getPointFocusNote`
+5. ResultPage 移除本地 `getChallengeFocusNote` 和页面内恢复 CTA 判断
+6. ResultPage 的按钮点击逻辑改为执行 `primaryAction: challenge | plan | free`
+7. Vitest 配置纳入 training 层测试，避免产品模型以后游离在测试范围之外
 
 ## 9. 验收标准
-- [x] 挑战结果页健康状态下可点击“再挑战一次”进入练习页
-- [x] “再挑战一次”会调用 `startDailyChallenge`
-- [x] 准确率风险状态下，存在训练计划时主按钮变为“先回计划 / Back to plan”
-- [x] 风险恢复动作不会误触发 `startDailyChallenge`
-- [x] 原有“查看榜单”入口仍保留
+- [x] ChallengeTrendChart 仍显示原有 Run focus 文案
+- [x] ResultPage 仍显示原有 Run focus 文案
+- [x] ResultPage 风险状态仍回到计划或自由热身
+- [x] 健康状态仍可再挑战一次
+- [x] training 层产品模型有纯函数测试覆盖
 - [x] 构建、全量单测、e2e 通过
 
 ## 10. 质量门禁
+- [x] `npm test -- --run src/training/__tests__/challenge-focus.test.js` 通过，5 tests passed
 - [x] `npm test -- --run src/pages/__tests__/ResultPage.test.jsx` 通过，2 tests passed
-- [x] `npm test` 通过，252 tests passed
+- [x] `npm test -- --run src/pages/__tests__/ChallengePage.test.jsx` 通过，1 test passed
+- [x] `npm test` 通过，257 tests passed
 - [x] `npm run build` 通过
 - [x] `npm run test:e2e` 通过，9 passed, 5 skipped
-- [x] 已重试 in-app browser 检查；当前会话没有可用浏览器实例，已由 Playwright e2e 覆盖核心用户路径
+- [x] `git diff --check` 通过；仅有仓库 CRLF 提示
 
 ## 11. 回滚策略
-如果结果页动作策略造成用户误解，可回滚 ResultPage 中的 `challengePrimaryLabel` 与 `handleChallengePrimaryAction` 新逻辑，保留上一轮 Run focus 展示块和榜单入口不受影响。
+如果共享模型引入意外行为，可回滚 `src/training/challenge-focus.js` 与两个组件 import 改动，恢复 ResultPage 和 ChallengeTrendChart 的本地映射。由于本轮不改阈值和文案，回滚不影响挑战引擎数据结构。
 
 ## 12. 下一轮候选
-- 抽出共享的 challenge focus 文案与动作模型，减少 ResultPage 与 ChallengeTrendChart 的重复
 - 为结果页风险状态补一条 e2e 场景，覆盖从风险挑战回计划的完整 UI 路径
+- 把首页挑战策略 CTA 也接入共享 action model，继续减少页面层产品判断
 - 清理 release notes 顶部重复的迭代 10 记录

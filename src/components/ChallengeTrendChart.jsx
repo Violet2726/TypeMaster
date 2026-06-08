@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { getChallengePointFocusState, getChallengeTrendState } from '../engine';
+import { getChallengeFocusNote } from '../training/challenge-focus';
 
 function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
@@ -92,30 +93,6 @@ function getAttemptLabel(trainingCopy, point, index, total) {
     return fillTemplate(trainingCopy.challenge.trendRunLabel, String(point.attempt));
 }
 
-function getPointFocusNote(trainingCopy, state) {
-    if (state === 'baseline') {
-        return trainingCopy.challenge.trendFocusBaseline;
-    }
-
-    if (state === 'breakthrough') {
-        return trainingCopy.challenge.trendFocusBreakthrough;
-    }
-
-    if (state === 'accuracy-risk') {
-        return trainingCopy.challenge.trendFocusAccuracyRisk;
-    }
-
-    if (state === 'speed-drop') {
-        return trainingCopy.challenge.trendFocusSpeedDrop;
-    }
-
-    if (state === 'stable') {
-        return trainingCopy.challenge.trendFocusStable;
-    }
-
-    return trainingCopy.challenge.trendFocusMixed;
-}
-
 export function ChallengeTrendChart({ copy, trainingCopy, trend }) {
     const width = 760;
     const height = 300;
@@ -152,7 +129,7 @@ export function ChallengeTrendChart({ copy, trainingCopy, trend }) {
         [activePoint]
     );
     const activeFocusNote = useMemo(
-        () => getPointFocusNote(trainingCopy, activeFocusState),
+        () => getChallengeFocusNote(trainingCopy, activeFocusState),
         [activeFocusState, trainingCopy]
     );
     const activeStatuses = [

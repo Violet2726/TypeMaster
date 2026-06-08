@@ -2,6 +2,46 @@
 
 ---
 
+## 2026-06-08（迭代 14）
+
+### 今日主线
+把挑战单次焦点沉淀为共享产品模型，让挑战页与结果页复用同一套文案、恢复判断和主动作定义。
+
+### 合并分支
+main（当前代码已在 main）
+
+### 用户可见变化
+- 用户可见体验保持不变
+- 挑战页与结果页的 Run focus 解释继续一致
+- 结果页风险状态仍会带用户回计划或自由热身，健康状态仍可再挑战一次
+
+### 工程变化
+- 新增 `src/training/challenge-focus.js`
+- 新增 `src/training/__tests__/challenge-focus.test.js`
+- ChallengeTrendChart 移除本地 focus 文案映射
+- ResultPage 改为消费共享 focus model 的 `primaryAction` 和 `primaryLabel`
+- Vitest 配置纳入 training 层测试
+
+### 删除的旧逻辑
+- 删除 ChallengeTrendChart 和 ResultPage 中重复的 focus 文案映射
+- 删除 ResultPage 页面内重复的恢复 CTA 判断
+
+### 验证结果
+- `npm test -- --run src/training/__tests__/challenge-focus.test.js`: 通过，5 tests passed
+- `npm test -- --run src/pages/__tests__/ResultPage.test.jsx`: 通过，2 tests passed
+- `npm test -- --run src/pages/__tests__/ChallengePage.test.jsx`: 通过，1 test passed
+- `npm test`: 通过，257 tests passed
+- `npm run build`: 通过
+- `npm run test:e2e`: 通过，9 passed, 5 skipped
+- `git diff --check`: 通过，仅有仓库 CRLF 提示
+
+### 已知遗留
+- 首页挑战策略 CTA 仍有页面层判断，后续可继续接入共享 action model
+- 结果页风险状态的完整 UI 路径目前由单测覆盖，后续可补 e2e
+- release notes 顶部存在重复的迭代 10 记录，后续可单独清理
+
+---
+
 ## 2026-06-08（迭代 13）
 
 ### 今日主线

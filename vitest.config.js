@@ -11,6 +11,7 @@ export default defineConfig({
             'src/engine/__tests__/**/*.test.js',
             'src/hooks/__tests__/**/*.test.jsx',
             'src/services/__tests__/**/*.test.js',
+            'src/training/__tests__/**/*.test.js',
             'src/components/__tests__/**/*.test.jsx',
             'src/pages/__tests__/**/*.test.jsx'
         ],
