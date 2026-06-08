@@ -9,6 +9,7 @@ const {
     mockGetChallengeLeaderboard,
     mockResetPracticeToBuiltin,
     mockStartDailyChallenge,
+    mockStartDiagnosticJourney,
     mockStartTrainingPlanStep,
     mockStore
 } = vi.hoisted(() => ({
@@ -16,6 +17,7 @@ const {
     mockGetChallengeLeaderboard: vi.fn(),
     mockResetPracticeToBuiltin: vi.fn(),
     mockStartDailyChallenge: vi.fn(),
+    mockStartDiagnosticJourney: vi.fn(),
     mockStartTrainingPlanStep: vi.fn(),
     mockStore: {}
 }));
@@ -128,7 +130,9 @@ const baseStore = {
     generateCoachForSession: vi.fn().mockResolvedValue(null),
     launchNextDrill: vi.fn().mockResolvedValue(null),
     activeTrainingStep: null,
+    activeDiagnosticStep: null,
     trainingPlan: null,
+    startDiagnosticJourney: mockStartDiagnosticJourney,
     startTrainingPlanStep: mockStartTrainingPlanStep,
     resetPracticeToBuiltin: mockResetPracticeToBuiltin,
     startDailyChallenge: mockStartDailyChallenge,
@@ -171,6 +175,7 @@ describe('ResultPage', () => {
         mockResetPracticeToBuiltin.mockReset();
         mockStartDailyChallenge.mockReset();
         mockStartDailyChallenge.mockResolvedValue({ id: 'daily-test' });
+        mockStartDiagnosticJourney.mockReset();
         mockStartTrainingPlanStep.mockReset();
         Object.assign(mockStore, baseStore);
     });
@@ -178,6 +183,8 @@ describe('ResultPage', () => {
     test('shows challenge standing feedback for challenge sessions', async () => {
         render(<ResultPage />);
 
+        expect(screen.getByRole('heading', { name: 'Push the board again' })).toBeInTheDocument();
+        expect(screen.getByText('Today\'s challenge trend is still worth one more push.')).toBeInTheDocument();
         expect(await screen.findByRole('heading', { name: 'Daily challenge standing' })).toBeInTheDocument();
         expect(screen.getByText('#2')).toBeInTheDocument();
         expect(screen.getByText('Current rank')).toBeInTheDocument();
@@ -235,11 +242,52 @@ describe('ResultPage', () => {
 
         render(<ResultPage />);
 
+        expect(screen.getByRole('heading', { name: 'Return to the plan now' })).toBeInTheDocument();
+        expect(screen.getByText('Leaderboard pressure is starting to reduce training quality.')).toBeInTheDocument();
         expect(await screen.findByText('Speed may be coming from accuracy leakage. Slow the next run down slightly.')).toBeInTheDocument();
         fireEvent.click(screen.getByRole('button', { name: 'Back to plan' }));
 
         expect(mockStartTrainingPlanStep).toHaveBeenCalledTimes(1);
         expect(mockResetPracticeToBuiltin).not.toHaveBeenCalled();
+        expect(mockStartDailyChallenge).not.toHaveBeenCalled();
+        expect(mockNavigate).toHaveBeenCalledWith('/practice');
+    });
+
+    test('promotes the next planned drill as the result decision', () => {
+        const planSession = {
+            ...challengeSession,
+            trainingMeta: {
+                type: 'plan',
+                stepId: 'starter-day-1',
+                title: 'Reset accuracy'
+            },
+            sourceTextMeta: {
+                label: 'Reset accuracy',
+                source: 'builtin'
+            }
+        };
+
+        Object.assign(mockStore, {
+            ...baseStore,
+            sessions: [planSession],
+            lastCompletedSession: planSession,
+            activeTrainingStep: {
+                id: 'starter-day-2',
+                title: 'Lock the rhythm',
+                summary: 'Shorten the round and focus on smooth output.'
+            },
+            dailyChallenge: null
+        });
+
+        render(<ResultPage />);
+
+        expect(screen.getByRole('heading', { name: 'Continue the training line' })).toBeInTheDocument();
+        expect(screen.getByText('Shorten the round and focus on smooth output.')).toBeInTheDocument();
+        expect(screen.getByText('Lock the rhythm')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Continue plan' }));
+
+        expect(mockStartTrainingPlanStep).toHaveBeenCalledTimes(1);
         expect(mockStartDailyChallenge).not.toHaveBeenCalled();
         expect(mockNavigate).toHaveBeenCalledWith('/practice');
     });
