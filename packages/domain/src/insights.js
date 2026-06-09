@@ -106,12 +106,11 @@ function sortZoneCounts(left, right) {
     return KEYBOARD_ZONE_ORDER.indexOf(left.id) - KEYBOARD_ZONE_ORDER.indexOf(right.id);
 }
 
-export function buildKeyboardHotspots(chars, options = {}) {
-    const safeChars = Array.isArray(chars) ? chars : [];
+function buildKeyboardHotspotsFromCounter(counter, options = {}) {
     const lookup = createZoneLookup(options.keyboardLayout);
     const zoneMap = new Map();
 
-    safeChars.forEach((char) => {
+    [...counter.entries()].forEach(([char, count]) => {
         const zone = resolveKeyboardZone(char, lookup);
         if (!zone) return;
 
@@ -121,8 +120,9 @@ export function buildKeyboardHotspots(chars, options = {}) {
             chars: new Map()
         };
 
-        existing.count += 1;
-        existing.chars.set(char, (existing.chars.get(char) || 0) + 1);
+        const safeCount = Math.max(0, Number(count || 0));
+        existing.count += safeCount;
+        existing.chars.set(char, (existing.chars.get(char) || 0) + safeCount);
         zoneMap.set(zone, existing);
     });
 
@@ -142,6 +142,29 @@ export function buildKeyboardHotspots(chars, options = {}) {
         primaryZone: zones[0] || null,
         zones
     };
+}
+
+export function buildKeyboardHotspots(chars, options = {}) {
+    const safeChars = Array.isArray(chars) ? chars : [];
+    const counter = buildCounter(safeChars);
+
+    return buildKeyboardHotspotsFromCounter(counter, options);
+}
+
+export function buildKeyboardHotspotsFromStats(charStats, options = {}) {
+    const counter = new Map();
+
+    (Array.isArray(charStats) ? charStats : []).forEach((item) => {
+        const label = String(item?.label || '').trim();
+        const count = Math.max(0, Number(item?.count || 0));
+        if (!label || count <= 0) {
+            return;
+        }
+
+        counter.set(label, (counter.get(label) || 0) + count);
+    });
+
+    return buildKeyboardHotspotsFromCounter(counter, options);
 }
 
 function topCounts(counts, limit = 5) {

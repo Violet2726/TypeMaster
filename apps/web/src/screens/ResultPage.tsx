@@ -31,6 +31,7 @@ export function ResultPage() {
         resultDecision,
         resultPrescription,
         session,
+        targetedFeedback,
         trainingCopy
     } = useResultPageModel({
         ...store,
@@ -154,6 +155,28 @@ export function ResultPage() {
                     ))}
                 </div>
             </section>
+
+            {targetedFeedback && (
+                <section className={`panel result-target-feedback result-target-feedback--${targetedFeedback.badgeTone}`}>
+                    <div className="panel-head">
+                        <div>
+                            <p className="panel-kicker">{session.sourceTextMeta?.label || copy.result.heroKicker}</p>
+                            <h2>{targetedFeedback.title}</h2>
+                        </div>
+                        <span className={`panel-badge badge-${targetedFeedback.badgeTone}`}>{targetedFeedback.badge}</span>
+                    </div>
+
+                    <p className="lead-text">{targetedFeedback.body}</p>
+                    <div className="result-target-feedback__chips" aria-label={targetedFeedback.title}>
+                        {targetedFeedback.chips.map((chip) => (
+                            <div key={chip.label} className="adaptive-drill-chip">
+                                <span>{chip.label}</span>
+                                <strong>{chip.value}</strong>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            )}
 
             {isChallengeSession && (
                 <section className="panel result-advice-panel">

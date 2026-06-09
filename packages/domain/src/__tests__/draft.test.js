@@ -155,6 +155,8 @@ describe('draft', () => {
                     incorrectChars: 3,
                     extraChars: 1,
                     missedChars: 0,
+                    errorCharStats: [{ label: 'a', count: 2 }],
+                    errorWordStats: [{ label: 'alpha', count: 2 }],
                     topErrorChars: ['a'],
                     topErrorWords: ['alpha']
                 }
@@ -167,6 +169,10 @@ describe('draft', () => {
             expect(draft.sourceTextMeta.label).toBe('Adaptive accuracy drill');
             expect(draft.sourceTextMeta.adaptiveFocus).toBe('accuracy');
             expect(draft.sourceTextMeta.adaptiveHotspots).toContain('alpha');
+            expect(draft.sourceTextMeta.adaptiveTargetChars).toEqual(['a']);
+            expect(draft.sourceTextMeta.adaptiveTargetWords).toEqual(['alpha']);
+            expect(draft.sourceTextMeta.adaptiveBaselineCount).toBe(4);
+            expect(draft.sourceTextMeta.adaptiveSourceSessionId).toBeNull();
             expect(draft.sourceTextMeta.adaptiveMetrics).toMatchObject({
                 accuracy: 92,
                 consistency: 91,

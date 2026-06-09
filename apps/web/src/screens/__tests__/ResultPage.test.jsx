@@ -105,6 +105,29 @@ const previousChallengeSession = {
     }
 };
 
+const adaptiveSession = {
+    ...challengeSession,
+    id: 'session-adaptive',
+    sourceTextMeta: {
+        label: 'Adaptive accuracy drill',
+        source: 'builtin',
+        generatedBy: 'adaptive',
+        adaptiveFocus: 'accuracy',
+        adaptiveHotspots: ['alpha', 'again'],
+        adaptiveTargetChars: ['a'],
+        adaptiveTargetWords: ['alpha'],
+        adaptiveBaselineCount: 5
+    },
+    trainingMeta: null,
+    result: {
+        ...challengeSession.result,
+        topErrorChars: ['a'],
+        topErrorWords: ['alpha'],
+        errorCharStats: [{ label: 'a', count: 1 }],
+        errorWordStats: [{ label: 'alpha', count: 1 }]
+    }
+};
+
 const baseStore = {
     copy: getCopy('en-US'),
     language: 'en-US',
@@ -284,5 +307,24 @@ describe('ResultPage', () => {
         expect(mockStartTrainingPlanStep).toHaveBeenCalledTimes(1);
         expect(mockStartDailyChallenge).not.toHaveBeenCalled();
         expect(mockRouterPush).toHaveBeenCalledWith('/practice');
+    });
+
+    test('shows targeted feedback for adaptive drills', () => {
+        Object.assign(mockStore, {
+            ...baseStore,
+            sessions: [adaptiveSession, previousChallengeSession],
+            lastCompletedSession: adaptiveSession,
+            dailyChallenge: null
+        });
+        setMockNavigation({ route: '/result?session=session-adaptive' });
+
+        render(<ResultPage />);
+
+        expect(screen.getByRole('heading', { name: 'Targeted feedback' })).toBeInTheDocument();
+        expect(screen.getByText('Still improving')).toBeInTheDocument();
+        expect(screen.getByText('The targeted misses are shrinking, but a few are still shaping the round.')).toBeInTheDocument();
+        expect(screen.getByText('Protect accuracy')).toBeInTheDocument();
+        expect(screen.getByText('2 now / 5 before')).toBeInTheDocument();
+        expect(screen.getByText('alpha / a')).toBeInTheDocument();
     });
 });

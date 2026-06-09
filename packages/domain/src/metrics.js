@@ -45,6 +45,20 @@ function buildWordStats(target, typed, includeMissed) {
     return { correct, incorrect, extra, missed, errorChars };
 }
 
+function sortCountEntries(left, right) {
+    if (right[1] !== left[1]) {
+        return right[1] - left[1];
+    }
+
+    return String(left[0]).localeCompare(String(right[0]));
+}
+
+function toCountStats(counts) {
+    return [...counts.entries()]
+        .sort(sortCountEntries)
+        .map(([label, count]) => ({ label, count }));
+}
+
 /**
  * 计算“真正打对的字符数”。
  * 这是标准 WPM 的核心分子来源。
@@ -167,17 +181,17 @@ export function collectErrorBreakdown(words, typedHistory, currentInput = '', in
         registerWordErrors(words[typedHistory.length] || '', currentInput);
     }
 
-    const topErrorChars = [...errorCharCounts.entries()]
-        .sort((left, right) => right[1] - left[1])
-        .slice(0, 5)
-        .map(([char]) => char);
+    const errorCharStats = toCountStats(errorCharCounts);
+    const errorWordStats = toCountStats(errorWordCounts);
+    const topErrorChars = errorCharStats.slice(0, 5).map((item) => item.label);
+    const topErrorWords = errorWordStats.slice(0, 5).map((item) => item.label);
 
-    const topErrorWords = [...errorWordCounts.entries()]
-        .sort((left, right) => right[1] - left[1])
-        .slice(0, 5)
-        .map(([word]) => word);
-
-    return { topErrorChars, topErrorWords };
+    return {
+        topErrorChars,
+        topErrorWords,
+        errorCharStats,
+        errorWordStats
+    };
 }
 
 /**
@@ -217,6 +231,8 @@ export function calculateMetrics({
         missedChars: charStats.missed,
         topErrorChars: errorBreakdown.topErrorChars,
         topErrorWords: errorBreakdown.topErrorWords,
+        errorCharStats: errorBreakdown.errorCharStats,
+        errorWordStats: errorBreakdown.errorWordStats,
         durationSeconds: Math.max(1, Math.round(safeElapsedMs / 1000)),
         completedAt: new Date().toISOString(),
         errors

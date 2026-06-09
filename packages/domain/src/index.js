@@ -10,6 +10,7 @@ export * from './draft.js';
 export * from './rendering.js';
 export * from './metrics.js';
 export * from './coach.js';
+export * from './drill-feedback.js';
 export * from './insights.js';
 export * from './session-machine.js';
 export * from './training.js';

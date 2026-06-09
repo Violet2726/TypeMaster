@@ -146,6 +146,8 @@ describe('metrics.js', () => {
             const result = collectErrorBreakdown(['hello'], ['hello'], '', true);
             expect(result.topErrorChars).toEqual([]);
             expect(result.topErrorWords).toEqual([]);
+            expect(result.errorCharStats).toEqual([]);
+            expect(result.errorWordStats).toEqual([]);
         });
 
         it('collects incorrect characters', () => {
@@ -175,6 +177,12 @@ describe('metrics.js', () => {
             const result = collectErrorBreakdown([], [], '', true);
             expect(result.topErrorChars).toEqual([]);
             expect(result.topErrorWords).toEqual([]);
+        });
+
+        it('returns ranked count stats for later drill feedback', () => {
+            const result = collectErrorBreakdown(['alpha', 'alpha'], ['alpja', 'alpja'], '', true);
+            expect(result.errorCharStats).toContainEqual({ label: 'j', count: 2 });
+            expect(result.errorWordStats).toContainEqual({ label: 'alpha', count: 2 });
         });
 
         it('excludes current input when includeCurrent is false', () => {

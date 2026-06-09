@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+    buildTargetedDrillFeedback,
     buildChallengeTrend,
     deriveComparison,
     getChallengePersonalBest,
@@ -63,6 +64,92 @@ function formatSigned(value, suffix = '') {
     const safe = Number(value || 0);
     const sign = safe > 0 ? '+' : '';
     return `${sign}${safe}${suffix}`;
+}
+
+function buildBeforeAfterValue(current, baseline, suffix = '') {
+    return `${current}${suffix} now / ${baseline}${suffix} before`;
+}
+
+function buildTargetedFeedbackModel(copy, trainingCopy, session) {
+    const summary = buildTargetedDrillFeedback(session);
+    if (!summary) {
+        return null;
+    }
+
+    const badgeTone = summary.tone === 'success'
+        ? 'ready'
+        : summary.tone === 'progress'
+            ? 'stale'
+            : 'error';
+    const badge = summary.tone === 'success'
+        ? copy.result.targetedFeedbackReady
+        : summary.tone === 'progress'
+            ? copy.result.targetedFeedbackProgress
+            : copy.result.targetedFeedbackRetry;
+
+    if (summary.type === 'adaptive') {
+        const focusLabel = trainingCopy.practice.adaptiveFocusLabels?.[summary.focus]
+            || trainingCopy.practice.adaptiveFocusLabels?.speed
+            || copy.common.emptyValue;
+        const body = summary.tone === 'success'
+            ? copy.result.targetedFeedbackAdaptiveClear
+            : summary.tone === 'progress'
+                ? copy.result.targetedFeedbackAdaptiveProgress
+                : copy.result.targetedFeedbackAdaptiveStalled;
+
+        return {
+            title: copy.result.targetedFeedbackTitle,
+            badge,
+            badgeTone,
+            body,
+            chips: [
+                {
+                    label: copy.result.targetedFeedbackFocusLabel,
+                    value: focusLabel
+                },
+                {
+                    label: copy.result.targetedFeedbackMissesLabel,
+                    value: buildBeforeAfterValue(summary.currentCount, summary.baselineCount)
+                },
+                {
+                    label: copy.result.targetedFeedbackRemainingLabel,
+                    value: summary.remainingTargets.length
+                        ? summary.remainingTargets.join(' / ')
+                        : copy.result.targetedFeedbackCleared
+                }
+            ]
+        };
+    }
+
+    const zoneLabel = copy.insights.keyboardZoneLabels?.[summary.zoneId] || summary.zoneId;
+    const body = summary.tone === 'success'
+        ? copy.result.targetedFeedbackKeyboardClear
+        : summary.tone === 'progress'
+            ? copy.result.targetedFeedbackKeyboardProgress
+            : copy.result.targetedFeedbackKeyboardStalled;
+
+    return {
+        title: copy.result.targetedFeedbackTitle,
+        badge,
+        badgeTone,
+        body,
+        chips: [
+            {
+                label: copy.result.targetedFeedbackFocusLabel,
+                value: zoneLabel
+            },
+            {
+                label: copy.result.targetedFeedbackPressureLabel,
+                value: buildBeforeAfterValue(summary.currentShare, summary.baselineShare, '%')
+            },
+            {
+                label: copy.result.targetedFeedbackRemainingLabel,
+                value: summary.remainingTargets.length
+                    ? summary.remainingTargets.join(' / ')
+                    : copy.result.targetedFeedbackCleared
+            }
+        ]
+    };
 }
 
 function isSameChallengeStandingModel(left, right) {
@@ -374,6 +461,9 @@ export function useResultPageModel({
             coachRecord
         })
         : null;
+    const targetedFeedback = session
+        ? buildTargetedFeedbackModel(copy, trainingCopy, session)
+        : null;
 
     const handleRetryAdvice = useCallback(async () => {
         if (!session) {
@@ -478,6 +568,7 @@ export function useResultPageModel({
         nextDrillState,
         resultDecision,
         resultPrescription,
+        targetedFeedback,
         session,
         trainingCopy
     };

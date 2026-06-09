@@ -178,6 +178,45 @@ function buildHotspotWords(session) {
     return [...new Set([...words, ...charWords])].slice(0, 12);
 }
 
+function readRankedLabels(items, fallback = [], limit = 4) {
+    const ranked = Array.isArray(items)
+        ? items
+            .map((item) => {
+                if (typeof item === 'string') {
+                    return normalizePracticeToken(item);
+                }
+
+                return normalizePracticeToken(item?.label || item?.value || '');
+            })
+            .filter(Boolean)
+        : [];
+
+    if (ranked.length) {
+        return [...new Set(ranked)].slice(0, limit);
+    }
+
+    return Array.isArray(fallback)
+        ? [...new Set(fallback.map(normalizePracticeToken).filter(Boolean))].slice(0, limit)
+        : [];
+}
+
+function sumRankedCounts(items, targets) {
+    if (!Array.isArray(items) || !Array.isArray(targets) || !targets.length) {
+        return 0;
+    }
+
+    const targetSet = new Set(targets.map(normalizePracticeToken).filter(Boolean));
+
+    return items.reduce((sum, item) => {
+        const label = normalizePracticeToken(item?.label || item);
+        if (!targetSet.has(label)) {
+            return sum;
+        }
+
+        return sum + Number(item?.count || 0);
+    }, 0);
+}
+
 function fillAdaptiveWords(seedWords, targetCount) {
     const safeSeed = seedWords.filter(Boolean);
     const source = safeSeed.length ? safeSeed : ADAPTIVE_DRILL_WORDS.speed;
@@ -281,6 +320,22 @@ export function createAdaptiveDrillDraft(session, options = {}) {
     const focus = resolveAdaptiveDrillFocus(session);
     const config = buildAdaptiveConfig(session, focus);
     const hotspots = buildHotspotWords(session);
+    const charStatItems = Array.isArray(session?.result?.errorCharStats) && session.result.errorCharStats.length
+        ? session.result.errorCharStats
+        : Array.isArray(session?.result?.topErrorChars)
+            ? session.result.topErrorChars.map((label) => ({ label, count: 1 }))
+            : [];
+    const wordStatItems = Array.isArray(session?.result?.errorWordStats) && session.result.errorWordStats.length
+        ? session.result.errorWordStats
+        : Array.isArray(session?.result?.topErrorWords)
+            ? session.result.topErrorWords.map((label) => ({ label, count: 1 }))
+            : [];
+    const targetChars = readRankedLabels(session?.result?.errorCharStats, session?.result?.topErrorChars, 4)
+        .filter((item) => item.length === 1);
+    const targetWords = readRankedLabels(session?.result?.errorWordStats, session?.result?.topErrorWords, 4)
+        .filter((item) => item.length > 1);
+    const adaptiveBaselineCount = sumRankedCounts(charStatItems, targetChars)
+        + sumRankedCounts(wordStatItems, targetWords);
     const targetCount = estimateTargetWordCount(config);
     const focusWords = ADAPTIVE_DRILL_WORDS[focus] || ADAPTIVE_DRILL_WORDS.speed;
     const seedWords = focus === 'speed'
@@ -294,6 +349,10 @@ export function createAdaptiveDrillDraft(session, options = {}) {
         template: focus,
         adaptiveFocus: focus,
         adaptiveHotspots: hotspots.slice(0, 6),
+        adaptiveTargetChars: targetChars,
+        adaptiveTargetWords: targetWords,
+        adaptiveBaselineCount,
+        adaptiveSourceSessionId: session?.id || null,
         adaptiveMetrics: {
             accuracy: Number(session?.result?.accuracy || 0),
             consistency: Number(session?.result?.consistency || 0),
@@ -367,6 +426,10 @@ export function createDraftFromWords(words, config, meta = {}) {
         ? {
             adaptiveFocus: meta.adaptiveFocus || meta.template || null,
             adaptiveHotspots: Array.isArray(meta.adaptiveHotspots) ? meta.adaptiveHotspots : [],
+            adaptiveTargetChars: Array.isArray(meta.adaptiveTargetChars) ? meta.adaptiveTargetChars : [],
+            adaptiveTargetWords: Array.isArray(meta.adaptiveTargetWords) ? meta.adaptiveTargetWords : [],
+            adaptiveBaselineCount: Number(meta.adaptiveBaselineCount || 0),
+            adaptiveSourceSessionId: meta.adaptiveSourceSessionId || null,
             adaptiveMetrics: meta.adaptiveMetrics || {}
         }
         : {};

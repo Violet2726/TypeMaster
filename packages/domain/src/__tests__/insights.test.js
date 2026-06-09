@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildInsights, buildKeyboardHotspots } from '../insights';
+import { buildInsights, buildKeyboardHotspots, buildKeyboardHotspotsFromStats } from '../insights';
 
 describe('insights.js', () => {
     describe('buildInsights', () => {
@@ -149,6 +149,23 @@ describe('insights.js', () => {
 
             expect(qwerty.primaryZone.id).toBe('leftHome');
             expect(colemak.primaryZone.id).toBe('leftTop');
+        });
+
+        it('builds keyboard hotspots from counted character stats', () => {
+            const result = buildKeyboardHotspotsFromStats([
+                { label: 'a', count: 4 },
+                { label: 's', count: 2 },
+                { label: '.', count: 1 }
+            ], { keyboardLayout: 'qwerty' });
+
+            expect(result.primaryZone).toMatchObject({
+                id: 'leftHome',
+                count: 6,
+                share: 86
+            });
+            expect(result.zones.find((zone) => zone.id === 'symbolLayer')).toMatchObject({
+                count: 1
+            });
         });
 
         it('limits topErrorChars to 5 entries', () => {

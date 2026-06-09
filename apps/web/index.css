@@ -621,6 +621,7 @@ body[data-language='zh-CN'] .control-label {
 .typing-stage,
 .result-summary,
 .result-decision-panel,
+.result-target-feedback,
 .result-advice-panel,
 .insights-header {
     display: grid;
@@ -656,7 +657,31 @@ body[data-language='zh-CN'] .control-label {
         linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
 }
 
+.result-target-feedback--ready {
+    background:
+        radial-gradient(circle at top right, rgba(135, 215, 168, 0.15), transparent 38%),
+        linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
+}
+
+.result-target-feedback--stale {
+    background:
+        radial-gradient(circle at top right, rgba(244, 197, 107, 0.15), transparent 38%),
+        linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
+}
+
+.result-target-feedback--error {
+    background:
+        radial-gradient(circle at top right, rgba(255, 134, 152, 0.15), transparent 38%),
+        linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
+}
+
 .adaptive-drill-panel__chips {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.result-target-feedback__chips {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.75rem;
@@ -2195,6 +2220,7 @@ body[data-theme='serika-light'] .replay-accuracy-band {
     .home-stats-strip,
     .result-metrics-strip,
     .adaptive-drill-panel__chips,
+    .result-target-feedback__chips,
     .config-strip__main,
     .workshop-grid,
     .summary-stack--compact,

@@ -134,6 +134,8 @@ describe('training state contracts', () => {
                 consistency: 0,
                 correctChars: 0,
                 durationSeconds: 0,
+                errorCharStats: [],
+                errorWordStats: [],
                 errors: 0,
                 extraChars: 0,
                 incorrectChars: 0,
@@ -170,6 +172,10 @@ describe('training state contracts', () => {
                 generatedBy: 'adaptive',
                 adaptiveFocus: 'accuracy',
                 adaptiveHotspots: ['alpha', 'again'],
+                adaptiveTargetChars: ['a'],
+                adaptiveTargetWords: ['alpha'],
+                adaptiveBaselineCount: 4,
+                adaptiveSourceSessionId: 'session-0',
                 adaptiveMetrics: {
                     accuracy: 92,
                     missCount: 4
@@ -179,6 +185,10 @@ describe('training state contracts', () => {
             generatedBy: 'adaptive',
             adaptiveFocus: 'accuracy',
             adaptiveHotspots: ['alpha', 'again'],
+            adaptiveTargetChars: ['a'],
+            adaptiveTargetWords: ['alpha'],
+            adaptiveBaselineCount: 4,
+            adaptiveSourceSessionId: 'session-0',
             adaptiveMetrics: {
                 accuracy: 92,
                 missCount: 4
@@ -231,6 +241,8 @@ describe('training state contracts', () => {
             consistency: 0,
             correctChars: 0,
             durationSeconds: 0,
+            errorCharStats: [],
+            errorWordStats: [],
             errors: 0,
             extraChars: 0,
             incorrectChars: 0,

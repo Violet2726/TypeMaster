@@ -15,6 +15,8 @@ describe('storage contracts', () => {
                     consistency: 0,
                     correctChars: 0,
                     durationSeconds: 0,
+                    errorCharStats: [],
+                    errorWordStats: [],
                     errors: 0,
                     extraChars: 0,
                     incorrectChars: 0,

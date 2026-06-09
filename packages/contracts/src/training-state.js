@@ -144,6 +144,11 @@ export const CoachAdviceRecordSchema = CoachAdviceContentSchema.extend({
     fallbackReasonMessage: z.string().optional()
 }).catchall(z.unknown());
 
+const SessionCountStatSchema = z.object({
+    label: z.string(),
+    count: z.number()
+}).catchall(z.unknown());
+
 export const SessionResultSchema = z.object({
     wpm: z.number().optional().default(0),
     rawWpm: z.number().optional().default(0),
@@ -157,7 +162,9 @@ export const SessionResultSchema = z.object({
     completedAt: z.string().optional(),
     errors: z.number().optional().default(0),
     topErrorChars: z.array(z.string()).optional().default([]),
-    topErrorWords: z.array(z.string()).optional().default([])
+    topErrorWords: z.array(z.string()).optional().default([]),
+    errorCharStats: z.array(SessionCountStatSchema).optional().default([]),
+    errorWordStats: z.array(SessionCountStatSchema).optional().default([])
 }).catchall(z.unknown());
 
 export const SessionTimelineSampleSchema = z.object({
@@ -190,6 +197,10 @@ export const SessionSourceTextMetaSchema = z.object({
     generatedBy: z.string().optional(),
     adaptiveFocus: z.string().nullable().optional(),
     adaptiveHotspots: z.array(z.string()).optional().default([]),
+    adaptiveTargetChars: z.array(z.string()).optional().default([]),
+    adaptiveTargetWords: z.array(z.string()).optional().default([]),
+    adaptiveBaselineCount: z.number().optional().default(0),
+    adaptiveSourceSessionId: z.string().nullable().optional(),
     adaptiveMetrics: z.record(z.unknown()).optional().default({}),
     keyboardZone: z.string().nullable().optional(),
     keyboardLayout: z.string().nullable().optional(),
