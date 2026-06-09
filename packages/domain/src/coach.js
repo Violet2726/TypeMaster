@@ -1,5 +1,5 @@
-import { getTemplateMeta } from './config';
-import { deriveComparison } from './metrics';
+import { getTemplateMeta } from './config.js';
+import { deriveComparison } from './metrics.js';
 
 /**
  * 本地规则教练。

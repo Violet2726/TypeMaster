@@ -1,5 +1,5 @@
-import { DEFAULT_CONFIG } from './config';
-import { createBuiltinWords, createDraftFromText, createDraftFromWords } from './draft';
+import { DEFAULT_CONFIG } from './config.js';
+import { createBuiltinWords, createDraftFromText, createDraftFromWords } from './draft.js';
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 

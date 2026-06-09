@@ -1,4 +1,4 @@
-import { commonWords } from './data/words';
+import { commonWords } from './data/words.js';
 
 function generateId() {
     if (typeof crypto !== 'undefined' && crypto.randomUUID) {
