@@ -29,6 +29,7 @@ export function ResultPage() {
         nextDrillError,
         nextDrillState,
         resultDecision,
+        resultPrescription,
         session,
         trainingCopy
     } = useResultPageModel({
@@ -113,6 +114,24 @@ export function ResultPage() {
                         <strong>{resultDecision.signal}</strong>
                     </div>
                 </div>
+
+                {resultPrescription && (
+                    <div className="result-prescription" aria-label={resultPrescription.title}>
+                        <div className="result-prescription__head">
+                            <strong>{resultPrescription.title}</strong>
+                            <span>{resultPrescription.body}</span>
+                        </div>
+                        <div className="result-prescription__grid">
+                            {resultPrescription.items.map((item) => (
+                                <div key={item.id} className={`result-prescription__item result-prescription__item--${item.tone}`}>
+                                    <span className="summary-label">{item.label}</span>
+                                    <strong>{item.value}</strong>
+                                    <p>{item.note}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 <div className="results-actions">
                     <button

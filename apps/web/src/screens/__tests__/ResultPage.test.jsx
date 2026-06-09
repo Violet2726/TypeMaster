@@ -176,6 +176,9 @@ describe('ResultPage', () => {
 
         expect(screen.getByRole('heading', { name: 'Push the board again' })).toBeInTheDocument();
         expect(screen.getByText('Today\'s challenge trend is still worth one more push.')).toBeInTheDocument();
+        expect(screen.getByText('Next round brief')).toBeInTheDocument();
+        expect(screen.getByText('Add controlled speed')).toBeInTheDocument();
+        expect(screen.getByText('10 words')).toBeInTheDocument();
         expect(await screen.findByRole('heading', { name: 'Daily challenge standing' })).toBeInTheDocument();
         expect(screen.getByText('#2')).toBeInTheDocument();
         expect(screen.getByText('Current rank')).toBeInTheDocument();

@@ -1,5 +1,10 @@
 import { getCopy } from '../../i18n';
-import { buildHomeDecisionModel, buildResultDecisionModel, pickChallengeDecisionModel } from '../decision-models';
+import {
+    buildHomeDecisionModel,
+    buildResultDecisionModel,
+    buildResultPrescriptionModel,
+    pickChallengeDecisionModel
+} from '../decision-models';
 import { getTrainingCopy } from '../copy';
 
 describe('decision-models', () => {
@@ -125,6 +130,52 @@ describe('decision-models', () => {
             headline: 'Continue the training line',
             signal: 'Lock the rhythm',
             primaryAction: 'plan'
+        });
+    });
+
+    test('builds an accuracy-first prescription when a result leaks errors', () => {
+        const model = buildResultPrescriptionModel({
+            copy,
+            coachRecord: null,
+            session: {
+                config: {
+                    mode: 'words',
+                    wordCount: 30
+                },
+                result: {
+                    wpm: 64,
+                    rawWpm: 75,
+                    accuracy: 93,
+                    consistency: 91,
+                    incorrectChars: 3,
+                    extraChars: 1,
+                    missedChars: 2
+                },
+                sourceTextMeta: {
+                    label: 'Built-in'
+                }
+            }
+        });
+
+        expect(model).toMatchObject({
+            title: 'Next round brief',
+            items: [
+                {
+                    id: 'focus',
+                    tone: 'error',
+                    value: 'Protect accuracy',
+                    note: '6 misses to clean up'
+                },
+                {
+                    id: 'dose',
+                    value: '30 words',
+                    note: 'Built-in'
+                },
+                {
+                    id: 'checkpoint',
+                    value: 'Keep accuracy at or above 95%'
+                }
+            ]
         });
     });
 });

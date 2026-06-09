@@ -13,7 +13,7 @@ import { normalizeCoachAdviceComparison } from '@typemaster/contracts/training-s
 import { getErrorMessage } from '../../i18n';
 import { buildChallengeFocusModel, buildChallengeStrategyModel } from '../../training/challenge-focus';
 import { getTrainingCopy } from '../../training/copy';
-import { buildResultDecisionModel, pickChallengeDecisionModel } from '../../training/decision-models';
+import { buildResultDecisionModel, buildResultPrescriptionModel, pickChallengeDecisionModel } from '../../training/decision-models';
 
 function getCoachBadgeLabel(copy, status) {
     if (status === 'success') return copy.common.coachReady;
@@ -367,6 +367,13 @@ export function useResultPageModel({
             nextDrillState
         })
         : null;
+    const resultPrescription = session
+        ? buildResultPrescriptionModel({
+            copy,
+            session,
+            coachRecord
+        })
+        : null;
 
     const handleRetryAdvice = useCallback(async () => {
         if (!session) {
@@ -469,6 +476,7 @@ export function useResultPageModel({
         nextDrillError,
         nextDrillState,
         resultDecision,
+        resultPrescription,
         session,
         trainingCopy
     };

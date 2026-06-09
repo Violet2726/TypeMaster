@@ -10,6 +10,106 @@ function uniqueActions(actions) {
     });
 }
 
+function fillTemplate(template, value) {
+    return String(template || '').replace('{value}', value);
+}
+
+function getMissCount(session) {
+    return Number(session?.result?.incorrectChars || 0)
+        + Number(session?.result?.extraChars || 0)
+        + Number(session?.result?.missedChars || 0);
+}
+
+function buildDoseValue(copy, config) {
+    if (config?.mode === 'time') {
+        return fillTemplate(copy.result.prescriptionTimeDose, config.durationSeconds || 60);
+    }
+
+    if (config?.mode === 'words') {
+        return fillTemplate(copy.result.prescriptionWordsDose, config.wordCount || 50);
+    }
+
+    return copy.result.prescriptionDefaultDose;
+}
+
+export function buildResultPrescriptionModel({ copy, session, coachRecord }) {
+    const accuracy = Number(session?.result?.accuracy || 0);
+    const consistency = Number(session?.result?.consistency || 0);
+    const wpm = Number(session?.result?.wpm || 0);
+    const rawWpm = Number(session?.result?.rawWpm || wpm);
+    const rawGap = Math.max(0, rawWpm - wpm);
+    const missCount = getMissCount(session);
+    let focus = {
+        tone: 'ready',
+        value: copy.result.prescriptionSpeedFocus,
+        note: copy.result.prescriptionSpeedNote
+    };
+    let checkpoint = {
+        value: fillTemplate(copy.result.prescriptionCheckpointSpeed, wpm + 2),
+        note: fillTemplate(copy.result.prescriptionCheckpointAccuracy, Math.max(96, accuracy || 96))
+    };
+
+    if (accuracy && accuracy < 96) {
+        focus = {
+            tone: 'error',
+            value: copy.result.prescriptionAccuracyFocus,
+            note: fillTemplate(copy.result.prescriptionAccuracyNote, missCount || 1)
+        };
+        checkpoint = {
+            value: fillTemplate(copy.result.prescriptionCheckpointAccuracy, Math.min(99, accuracy + 2)),
+            note: fillTemplate(copy.result.prescriptionCheckpointClean, Math.max(1, missCount - 1))
+        };
+    } else if (consistency && consistency < 88) {
+        focus = {
+            tone: 'stale',
+            value: copy.result.prescriptionConsistencyFocus,
+            note: fillTemplate(copy.result.prescriptionConsistencyNote, consistency)
+        };
+        checkpoint = {
+            value: fillTemplate(copy.result.prescriptionCheckpointConsistency, 90),
+            note: fillTemplate(copy.result.prescriptionCheckpointAccuracy, Math.max(96, accuracy || 96))
+        };
+    } else if (rawGap >= 8) {
+        focus = {
+            tone: 'stale',
+            value: copy.result.prescriptionRawFocus,
+            note: fillTemplate(copy.result.prescriptionRawNote, rawGap)
+        };
+        checkpoint = {
+            value: fillTemplate(copy.result.prescriptionCheckpointClean, Math.max(1, missCount || 2)),
+            note: fillTemplate(copy.result.prescriptionCheckpointAccuracy, Math.max(96, accuracy || 96))
+        };
+    }
+
+    return {
+        title: copy.result.prescriptionTitle,
+        body: coachRecord?.nextDrill?.reason || copy.result.prescriptionBody,
+        items: [
+            {
+                id: 'focus',
+                tone: focus.tone,
+                label: copy.result.prescriptionFocusLabel,
+                value: focus.value,
+                note: focus.note
+            },
+            {
+                id: 'dose',
+                tone: 'idle',
+                label: copy.result.prescriptionDoseLabel,
+                value: buildDoseValue(copy, session?.config),
+                note: session?.trainingMeta?.title || session?.sourceTextMeta?.label || copy.common.currentText
+            },
+            {
+                id: 'checkpoint',
+                tone: 'ready',
+                label: copy.result.prescriptionCheckpointLabel,
+                value: checkpoint.value,
+                note: checkpoint.note
+            }
+        ]
+    };
+}
+
 export function pickChallengeDecisionModel(strategyModel, focusModel) {
     if (strategyModel?.shouldRecover) {
         return strategyModel;
