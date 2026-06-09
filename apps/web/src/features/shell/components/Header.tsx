@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Languages, Moon, Sun } from 'lucide-react';
 import { StoredSettingsSchema } from '@typemaster/contracts/storage';
 import { getCopy, getLanguageMeta } from '../../../i18n';
 import { getTrainingCopy } from '../../../training/copy';
@@ -22,6 +23,8 @@ export function Header({ settings, copy, hasTrainingPlan = false, onToggleTheme,
     const compact = settings.focusMode && pathname === '/practice';
     const languageMeta = getLanguageMeta(settings.language);
     const trainingCopy = getTrainingCopy(settings.language);
+    const ThemeIcon = settings.theme === 'serika-dark' ? Sun : Moon;
+    const themeLabel = settings.theme === 'serika-dark' ? copy.settings.themeLight : copy.settings.themeDark;
 
     return (
         <header className={`app-header ${compact ? 'is-compact' : ''}`}>
@@ -45,11 +48,24 @@ export function Header({ settings, copy, hasTrainingPlan = false, onToggleTheme,
                 )}
 
                 <div className="nav-actions">
-                    <button className="nav-icon" type="button" onClick={onToggleTheme} title={copy.nav.toggleTheme}>
-                        {settings.theme === 'serika-dark' ? copy.settings.themeLight : copy.settings.themeDark}
+                    <button
+                        className="nav-icon nav-icon--tool"
+                        type="button"
+                        onClick={onToggleTheme}
+                        title={themeLabel}
+                        aria-label={copy.nav.toggleTheme}
+                    >
+                        <ThemeIcon aria-hidden="true" size={17} strokeWidth={2.2} />
                     </button>
-                    <button className="nav-icon" type="button" onClick={onOpenSettings} title={copy.nav.openSettings}>
-                        {copy.common.language}: {languageMeta.shortLabel}
+                    <button
+                        className="nav-icon nav-icon--language"
+                        type="button"
+                        onClick={onOpenSettings}
+                        title={copy.nav.openSettings}
+                        aria-label={copy.nav.openSettings}
+                    >
+                        <Languages aria-hidden="true" size={17} strokeWidth={2.2} />
+                        <span>{languageMeta.shortLabel}</span>
                     </button>
                 </div>
             </div>
