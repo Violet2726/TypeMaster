@@ -229,17 +229,17 @@ export function buildResultDecisionModel({
         return {
             context: 'complete',
             badge: trainingCopy.result.decisionBadge,
-            badgeTone: 'ready',
-            headline: trainingCopy.result.completeDecisionTitle,
-            body: trainingCopy.result.planCompleteBody,
+            badgeTone: 'stale',
+            headline: trainingCopy.result.reassessmentDecisionTitle,
+            body: trainingCopy.result.reassessmentDecisionBody,
             signalLabel: trainingCopy.result.signalLabel,
-            signal: trainingCopy.result.planComplete,
-            primaryAction: 'home',
-            primaryLabel: trainingCopy.result.homeAction,
+            signal: trainingCopy.result.reassessmentSignal,
+            primaryAction: 'diagnostic',
+            primaryLabel: trainingCopy.result.reassessmentAction,
             isLoading: false,
             secondaryActions: uniqueActions([
                 { action: 'insights', label: copy.common.viewInsights },
-                { action: 'free', label: trainingCopy.result.freePracticeAction }
+                { action: 'home', label: trainingCopy.result.homeAction }
             ])
         };
     }
@@ -320,6 +320,20 @@ export function buildHomeDecisionModel({
             signal: activeTrainingStep.title,
             primaryAction: 'plan',
             primaryLabel: trainingCopy.home.continuePlan
+        };
+    }
+
+    if (trainingPlan?.status === 'complete') {
+        return {
+            context: 'complete',
+            badge: trainingCopy.result.decisionBadge,
+            badgeTone: 'stale',
+            headline: trainingCopy.result.reassessmentDecisionTitle,
+            body: trainingCopy.result.reassessmentDecisionBody,
+            signalLabel: trainingCopy.result.signalLabel,
+            signal: trainingCopy.result.reassessmentSignal,
+            primaryAction: 'diagnostic',
+            primaryLabel: trainingCopy.result.reassessmentAction
         };
     }
 

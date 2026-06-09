@@ -370,4 +370,45 @@ describe('ResultPage', () => {
         expect(screen.getByText('50% now / 56% before')).toBeInTheDocument();
         expect(screen.getByText('a / s')).toBeInTheDocument();
     });
+
+    test('promotes reassessment when a training plan has just completed', () => {
+        const completedPlanSession = {
+            ...challengeSession,
+            trainingMeta: {
+                type: 'plan',
+                stepId: 'starter-day-7',
+                title: 'Review checkpoint'
+            },
+            sourceTextMeta: {
+                label: 'Review checkpoint',
+                source: 'builtin'
+            }
+        };
+
+        Object.assign(mockStore, {
+            ...baseStore,
+            sessions: [completedPlanSession],
+            lastCompletedSession: completedPlanSession,
+            activeTrainingStep: null,
+            trainingPlan: {
+                id: 'plan-1',
+                status: 'complete',
+                steps: []
+            },
+            dailyChallenge: null
+        });
+        setMockNavigation({ route: '/result?session=session-1' });
+
+        render(<ResultPage />);
+
+        expect(screen.getByRole('heading', { name: 'Reassess for the next phase' })).toBeInTheDocument();
+        expect(screen.getByText('The starter plan has done its job. Run three fresh assessment rounds and the app will build the next phase from your current state.')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Start reassessment' })).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Start reassessment' }));
+
+        expect(mockStartDiagnosticJourney).toHaveBeenCalledTimes(1);
+        expect(mockStartTrainingPlanStep).not.toHaveBeenCalled();
+        expect(mockRouterPush).toHaveBeenCalledWith('/practice');
+    });
 });

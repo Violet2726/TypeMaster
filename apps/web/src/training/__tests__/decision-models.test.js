@@ -133,6 +133,62 @@ describe('decision-models', () => {
         });
     });
 
+    test('routes completed plans into reassessment instead of returning home', () => {
+        const model = buildResultDecisionModel({
+            copy,
+            trainingCopy,
+            session: {
+                trainingMeta: { type: 'plan' }
+            },
+            advice: {
+                headline: 'Hold this pace',
+                body: 'Keep the same pressure next round.'
+            },
+            coachRecord: null,
+            activeTrainingStep: null,
+            activeDiagnosticStep: null,
+            trainingPlan: { status: 'complete' },
+            isChallengeSession: false,
+            challengeDecisionModel: null,
+            nextDrillState: 'idle'
+        });
+
+        expect(model).toMatchObject({
+            context: 'complete',
+            headline: 'Reassess for the next phase',
+            primaryAction: 'diagnostic',
+            primaryLabel: 'Start reassessment',
+            signal: 'Starter plan is fully complete'
+        });
+    });
+
+    test('builds a reassessment home decision when the training plan is complete', () => {
+        const model = buildHomeDecisionModel({
+            copy,
+            trainingCopy,
+            skillProfile: {
+                level: { label: 'Builder' },
+                summary: 'Your next phase should focus on reinforcing accuracy.'
+            },
+            activeTrainingStep: null,
+            activeDiagnosticStep: null,
+            hasDiagnosticInFlight: false,
+            latestSession: {
+                trainingMeta: { type: 'plan', stepId: 'starter-day-7' }
+            },
+            dailyChallengeId: 'daily-test',
+            challengeDecisionModel: null,
+            trainingPlan: { id: 'plan-1', status: 'complete' }
+        });
+
+        expect(model).toMatchObject({
+            context: 'complete',
+            headline: 'Reassess for the next phase',
+            primaryAction: 'diagnostic',
+            primaryLabel: 'Start reassessment'
+        });
+    });
+
     test('builds an accuracy-first prescription when a result leaks errors', () => {
         const model = buildResultPrescriptionModel({
             copy,

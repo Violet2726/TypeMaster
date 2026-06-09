@@ -149,6 +149,7 @@ export function useTrainingPlanPageStore() {
 
     return {
         language: shell.language,
+        startDiagnosticJourney: planActions.startDiagnosticJourney,
         startTrainingPlanStep: planActions.startTrainingPlanStep,
         trainingPlan: plan.trainingPlan,
         trainingPlanProgress: plan.trainingPlanProgress

@@ -7,7 +7,16 @@ import { useTrainingPlanPageStore } from '../store/app-state-selectors';
 export function TrainingPlanPage() {
     const navigate = useAppNavigate();
     const store = useTrainingPlanPageStore();
-    const { handleContinue, trainingCopy, trainingPlan, trainingPlanProgress } = useTrainingPlanPageModel({
+    const {
+        handleContinue,
+        isComplete,
+        primaryActionLabel,
+        summaryBody,
+        summaryTitle,
+        trainingCopy,
+        trainingPlan,
+        trainingPlanProgress
+    } = useTrainingPlanPageModel({
         ...store,
         navigate
     });
@@ -17,13 +26,26 @@ export function TrainingPlanPage() {
             <section className="panel insights-header">
                 <div className="insights-header__body">
                     <p className="panel-kicker">{trainingCopy.home.todayKicker}</p>
-                    <h1>{trainingPlan?.title || trainingCopy.result.planTitle}</h1>
-                    <p className="muted-text">{trainingPlan?.summary || trainingCopy.result.planBody}</p>
+                    <h1>{summaryTitle}</h1>
+                    <p className="muted-text">{summaryBody}</p>
                 </div>
                 <button type="button" className="action-btn primary" onClick={handleContinue}>
-                    {trainingCopy.result.continuePlan}
+                    {primaryActionLabel}
                 </button>
             </section>
+
+            {isComplete && (
+                <section className="panel result-target-feedback result-target-feedback--stale">
+                    <div className="panel-head">
+                        <div>
+                            <p className="panel-kicker">{trainingCopy.result.planComplete}</p>
+                            <h2>{trainingCopy.result.reassessmentDecisionTitle}</h2>
+                        </div>
+                        <span className="panel-badge badge-stale">{trainingCopy.result.reassessmentAction}</span>
+                    </div>
+                    <p className="lead-text">{trainingCopy.result.reassessmentDecisionBody}</p>
+                </section>
+            )}
 
             <section className="home-stats-strip" aria-label={trainingCopy.home.planLabel}>
                 <div className="metric-card">

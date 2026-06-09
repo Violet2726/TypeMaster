@@ -54,6 +54,11 @@ export function startDiagnosticJourney(environment) {
 }
 
 export function startTrainingPlanStep(environment) {
+    if (environment.trainingPlan?.status === 'complete') {
+        startDiagnosticJourney(environment);
+        return null;
+    }
+
     const nextPlan = environment.trainingPlan?.status === 'active'
         ? environment.trainingPlan
         : createOrRefreshTrainingPlan(environment, environment.skillProfile);
@@ -74,6 +79,11 @@ export function startTrainingPlanStep(environment) {
 
 export function startRecommendedSession(environment) {
     if (!environment.skillProfile) {
+        startDiagnosticJourney(environment);
+        return 'diagnostic';
+    }
+
+    if (environment.trainingPlan?.status === 'complete') {
         startDiagnosticJourney(environment);
         return 'diagnostic';
     }

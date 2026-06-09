@@ -183,4 +183,28 @@ describe('training flow use cases', () => {
             stepId: 'starter-day-3'
         });
     });
+
+    test('restarts diagnostic flow when the training plan is already complete', () => {
+        const environment = createEnvironment({
+            skillProfile: {
+                primaryFocus: 'accuracy'
+            },
+            trainingPlan: {
+                id: 'plan-1',
+                status: 'complete',
+                currentStepIndex: 6,
+                steps: []
+            }
+        });
+
+        const nextRoute = startRecommendedSession(environment);
+        const draft = environment.setCurrentDraft.mock.calls[0][0];
+
+        expect(nextRoute).toBe('diagnostic');
+        expect(draft.sourceTextMeta.label).toBe('Accuracy baseline');
+        expect(environment.setActiveSessionContext).toHaveBeenCalledWith(expect.objectContaining({
+            type: 'diagnostic',
+            stepId: 'diagnostic-accuracy'
+        }));
+    });
 });

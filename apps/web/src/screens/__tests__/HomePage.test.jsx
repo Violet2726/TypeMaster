@@ -278,4 +278,56 @@ describe('HomePage', () => {
             });
         });
     });
+
+    test('promotes reassessment when the starter plan is complete', async () => {
+        renderWithProvider(<HomePage />, {
+            storageState: {
+                'typemaster:v5:preferences': {
+                    language: 'en-US',
+                    lastConfig: {
+                        source: 'builtin',
+                        mode: 'time',
+                        durationSeconds: 30,
+                        wordCount: 25,
+                        includePunctuation: false,
+                        includeNumbers: false,
+                        aiTemplate: 'daily',
+                        difficulty: 'medium'
+                    }
+                },
+                'typemaster:v5:skill-profile-cache': {
+                    createdAt: '2026-06-08T00:00:00.000Z',
+                    level: { id: 'builder', label: 'Builder' },
+                    summary: 'Your next phase should focus on reinforcing accuracy.',
+                    primaryFocus: 'accuracy',
+                    weakZones: [{ id: 'accuracy', label: 'accuracy', score: 92 }],
+                    metrics: { avgAccuracy: 92, avgConsistency: 84 }
+                },
+                'typemaster:v5:training-plan-cache': {
+                    id: 'plan-1',
+                    title: '7-day starter plan',
+                    summary: 'Stabilize the clearest weakness first, then add pressure.',
+                    status: 'complete',
+                    currentStepIndex: 6,
+                    steps: [
+                        { id: 'starter-day-7', status: 'complete', title: 'Review checkpoint', summary: 'Run a blended round and check whether the week held.', config: { mode: 'time', durationSeconds: 60 } }
+                    ]
+                }
+            }
+        });
+
+        expect(await screen.findByRole('heading', { name: 'Reassess for the next phase' })).toBeInTheDocument();
+        const button = screen.getByRole('button', { name: 'Start reassessment' });
+        expect(button).toBeInTheDocument();
+
+        fireEvent.click(button);
+
+        await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith('/practice'));
+        await waitFor(() => {
+            expect(loadActiveSessionContext()).toMatchObject({
+                type: 'diagnostic',
+                stepId: 'diagnostic-accuracy'
+            });
+        });
+    });
 });
