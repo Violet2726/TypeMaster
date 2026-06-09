@@ -1,5 +1,6 @@
 # Core config
 config.js
+!packages/domain/src/config.js
 
 # Frontend build
 node_modules
@@ -21,6 +22,8 @@ coverage
 test-results
 playwright-report
 data
+!packages/domain/src/data/
+!packages/domain/src/data/words.js
 
 docs/*
 !docs/ai-iteration/
