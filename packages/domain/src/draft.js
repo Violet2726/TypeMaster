@@ -62,12 +62,16 @@ function getMissCount(session) {
         + Number(session?.result?.missedChars || 0);
 }
 
+function getRawGap(session) {
+    const wpm = Number(session?.result?.wpm || 0);
+    const rawWpm = Number(session?.result?.rawWpm || wpm);
+    return Math.max(0, rawWpm - wpm);
+}
+
 export function resolveAdaptiveDrillFocus(session) {
     const accuracy = Number(session?.result?.accuracy || 0);
     const consistency = Number(session?.result?.consistency || 0);
-    const wpm = Number(session?.result?.wpm || 0);
-    const rawWpm = Number(session?.result?.rawWpm || wpm);
-    const rawGap = Math.max(0, rawWpm - wpm);
+    const rawGap = getRawGap(session);
 
     if (accuracy && accuracy < 96) {
         return 'accuracy';
@@ -163,7 +167,15 @@ export function createAdaptiveDrillDraft(session, options = {}) {
         label: getAdaptiveLabel(focus, language),
         language,
         generatedBy: 'adaptive',
-        template: focus
+        template: focus,
+        adaptiveFocus: focus,
+        adaptiveHotspots: hotspots.slice(0, 6),
+        adaptiveMetrics: {
+            accuracy: Number(session?.result?.accuracy || 0),
+            consistency: Number(session?.result?.consistency || 0),
+            missCount: getMissCount(session),
+            rawGap: getRawGap(session)
+        }
     });
 }
 
@@ -227,6 +239,13 @@ export function createBuiltinWords(config) {
 export function createDraftFromWords(words, config, meta = {}) {
     const safeWords = Array.isArray(words) ? words.filter(Boolean) : [];
     const text = safeWords.join(' ').trim();
+    const adaptiveMeta = meta.generatedBy === 'adaptive'
+        ? {
+            adaptiveFocus: meta.adaptiveFocus || meta.template || null,
+            adaptiveHotspots: Array.isArray(meta.adaptiveHotspots) ? meta.adaptiveHotspots : [],
+            adaptiveMetrics: meta.adaptiveMetrics || {}
+        }
+        : {};
 
     return {
         id: generateId(),
@@ -242,7 +261,8 @@ export function createDraftFromWords(words, config, meta = {}) {
             difficulty: meta.difficulty || null,
             createdAt: meta.createdAt || new Date().toISOString(),
             prompt: meta.prompt || null,
-            generatedBy: meta.generatedBy || (config.source === 'ai' ? 'ai' : 'builtin')
+            generatedBy: meta.generatedBy || (config.source === 'ai' ? 'ai' : 'builtin'),
+            ...adaptiveMeta
         }
     };
 }

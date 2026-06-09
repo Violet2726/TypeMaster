@@ -560,6 +560,7 @@ body[data-language='zh-CN'] .control-label {
 .panel-head h2,
 .home-action-section__head h2,
 .home-action-card h2,
+.adaptive-drill-panel h2,
 .practice-toolbar h2,
 .result-copy h2,
 .result-decision-panel h2,
@@ -615,6 +616,7 @@ body[data-language='zh-CN'] .control-label {
 }
 
 .practice-brief-panel,
+.adaptive-drill-panel,
 .practice-toolbar,
 .typing-stage,
 .result-summary,
@@ -645,6 +647,39 @@ body[data-language='zh-CN'] .control-label {
     padding: 0;
     background: transparent;
     border-color: transparent;
+}
+
+.adaptive-drill-panel {
+    gap: 0.85rem;
+    background:
+        linear-gradient(135deg, rgba(135, 215, 168, 0.1), rgba(105, 201, 255, 0.05)),
+        linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
+}
+
+.adaptive-drill-panel__chips {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.adaptive-drill-chip {
+    display: grid;
+    gap: 0.2rem;
+    min-width: 0;
+    padding: 0.82rem 0.88rem;
+    border-radius: 16px;
+    background: var(--surface-2);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.adaptive-drill-chip span {
+    color: var(--text-dim);
+    font-size: 0.78rem;
+}
+
+.adaptive-drill-chip strong {
+    color: var(--text-strong);
+    overflow-wrap: anywhere;
 }
 
 .config-strip {
@@ -2088,6 +2123,7 @@ body[data-theme='serika-light'] .replay-accuracy-band {
     .home-action-grid,
     .home-stats-strip,
     .result-metrics-strip,
+    .adaptive-drill-panel__chips,
     .config-strip__main,
     .workshop-grid,
     .summary-stack--compact,

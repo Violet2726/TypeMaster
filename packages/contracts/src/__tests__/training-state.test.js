@@ -162,6 +162,29 @@ describe('training state contracts', () => {
             pauseMoments: []
         });
 
+        expect(SessionRecordSchema.parse({
+            id: 'session-adaptive',
+            sourceTextMeta: {
+                source: 'builtin',
+                label: 'Adaptive accuracy drill',
+                generatedBy: 'adaptive',
+                adaptiveFocus: 'accuracy',
+                adaptiveHotspots: ['alpha', 'again'],
+                adaptiveMetrics: {
+                    accuracy: 92,
+                    missCount: 4
+                }
+            }
+        }).sourceTextMeta).toMatchObject({
+            generatedBy: 'adaptive',
+            adaptiveFocus: 'accuracy',
+            adaptiveHotspots: ['alpha', 'again'],
+            adaptiveMetrics: {
+                accuracy: 92,
+                missCount: 4
+            }
+        });
+
         expect(normalizeCoachAdviceRecord({
             sessionId: 'session-1',
             source: 'fallback'

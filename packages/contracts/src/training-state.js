@@ -187,7 +187,10 @@ export const SessionSourceTextMetaSchema = z.object({
     difficulty: z.string().nullable().optional(),
     createdAt: z.string().optional(),
     prompt: z.string().nullable().optional(),
-    generatedBy: z.string().optional()
+    generatedBy: z.string().optional(),
+    adaptiveFocus: z.string().nullable().optional(),
+    adaptiveHotspots: z.array(z.string()).optional().default([]),
+    adaptiveMetrics: z.record(z.unknown()).optional().default({})
 }).catchall(z.unknown());
 
 export const SessionTrainingMetaSchema = z.object({

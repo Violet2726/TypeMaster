@@ -25,6 +25,63 @@ function getPrimaryActionLabel(copy, config, aiPracticeStatus, status) {
         : copy.common.startTyping;
 }
 
+function fillTemplate(template, value) {
+    return String(template || '').replace('{value}', value);
+}
+
+function readNumber(value, key) {
+    return Number(value && typeof value === 'object' ? value[key] || 0 : 0);
+}
+
+function buildAdaptiveMetricLabel(copy, trainingCopy, focus, metrics = {}, config = {}) {
+    if (focus === 'accuracy') {
+        return `${readNumber(metrics, 'accuracy')}% ${copy.common.accuracy}`;
+    }
+
+    if (focus === 'rhythm') {
+        return `${readNumber(metrics, 'consistency')}% ${copy.common.consistency}`;
+    }
+
+    if (focus === 'rework') {
+        return fillTemplate(trainingCopy.practice.adaptiveRawGap, readNumber(metrics, 'rawGap'));
+    }
+
+    return fillTemplate(copy.result.prescriptionWordsDose, readNumber(config, 'wordCount'));
+}
+
+function buildAdaptiveDrillInsight({ copy, currentDraft, status, trainingCopy }) {
+    const meta = currentDraft?.sourceTextMeta || {};
+
+    if (status !== 'idle' || meta.generatedBy !== 'adaptive') {
+        return null;
+    }
+
+    const focus = meta.adaptiveFocus || meta.template || 'speed';
+    const focusLabel = trainingCopy.practice.adaptiveFocusLabels?.[focus] || trainingCopy.practice.adaptiveFocusLabels?.speed;
+    const reason = trainingCopy.practice.adaptiveReasons?.[focus] || trainingCopy.practice.adaptiveReasons?.speed;
+    const hotspots = Array.isArray(meta.adaptiveHotspots) ? meta.adaptiveHotspots.filter(Boolean).slice(0, 4) : [];
+
+    return {
+        kicker: trainingCopy.practice.adaptiveKicker,
+        title: focusLabel,
+        body: reason,
+        chips: [
+            {
+                label: trainingCopy.practice.adaptiveFocusLabel,
+                value: focusLabel
+            },
+            {
+                label: trainingCopy.practice.adaptiveSignalLabel,
+                value: buildAdaptiveMetricLabel(copy, trainingCopy, focus, meta.adaptiveMetrics, currentDraft.configSnapshot)
+            },
+            {
+                label: trainingCopy.practice.adaptiveHotspotLabel,
+                value: hotspots.length ? hotspots.join(' / ') : trainingCopy.practice.adaptiveNoHotspots
+            }
+        ]
+    };
+}
+
 export function usePracticePageModel({
     applyCustomWordBank,
     aiPracticeStatus,
@@ -219,6 +276,12 @@ export function usePracticePageModel({
     }, [aiPracticeStatus, config.source, displayDraft?.words?.length, handleGenerateAi, typingSession]);
 
     const trainingCopy = useMemo(() => getTrainingCopy(language), [language]);
+    const adaptiveDrillInsight = useMemo(() => buildAdaptiveDrillInsight({
+        copy,
+        currentDraft: displayDraft,
+        status: typingSession.status,
+        trainingCopy
+    }), [copy, displayDraft, trainingCopy, typingSession.status]);
     const latestSessionCoachRecord = latestCoachAdvice?.sessionId === lastCompletedSession?.id
         ? latestCoachAdvice
         : null;
@@ -252,6 +315,7 @@ export function usePracticePageModel({
 
     return {
         aiPracticeStatus,
+        adaptiveDrillInsight,
         confirmState,
         controlsOpen,
         currentDraft,

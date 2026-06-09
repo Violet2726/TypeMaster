@@ -329,6 +329,24 @@ export const enUSMessages = {
                 challengeBadge: 'Challenge round',
                 nextBriefKicker: 'Before this round',
                 nextBriefBadge: 'Target',
+                adaptiveKicker: 'Adaptive drill',
+                adaptiveFocusLabel: 'Focus',
+                adaptiveSignalLabel: 'Signal',
+                adaptiveHotspotLabel: 'Hotspots',
+                adaptiveNoHotspots: 'Fresh sample',
+                adaptiveRawGap: '{value} WPM rework gap',
+                adaptiveFocusLabels: {
+                    accuracy: 'Protect accuracy',
+                    rhythm: 'Smooth rhythm',
+                    rework: 'Reduce rework',
+                    speed: 'Add controlled speed'
+                },
+                adaptiveReasons: {
+                    accuracy: 'This text repeats recent misses so the next round can clean up accuracy before adding pressure.',
+                    rhythm: 'This text keeps the word stream short and even so pacing can settle before speed goes up.',
+                    rework: 'This text narrows the loop around correction cost so raw speed turns into cleaner net speed.',
+                    speed: 'This text keeps the round clean but slightly denser, because the last result was stable enough to push.'
+                },
                 customSource: 'Custom bank',
                 customTitle: 'Bring your own word bank into the plan',
                 customBody: 'Paste words, sentences, or a paragraph and this round will train directly on that text.',

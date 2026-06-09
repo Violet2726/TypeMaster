@@ -329,6 +329,24 @@ export const zhCNMessages = {
                 challengeBadge: '挑战回合',
                 nextBriefKicker: '本轮开始前',
                 nextBriefBadge: '目标',
+                adaptiveKicker: '自适应训练',
+                adaptiveFocusLabel: '训练重点',
+                adaptiveSignalLabel: '触发信号',
+                adaptiveHotspotLabel: '错误热点',
+                adaptiveNoHotspots: '扩展样本',
+                adaptiveRawGap: '返工损耗 {value} WPM',
+                adaptiveFocusLabels: {
+                    accuracy: '保护准确率',
+                    rhythm: '抹平节奏',
+                    rework: '减少返工',
+                    speed: '小幅加速'
+                },
+                adaptiveReasons: {
+                    accuracy: '这段文本会重复最近错误点，先把准确率清理干净，再继续加压。',
+                    rhythm: '这段文本保持短而均匀的词流，先让击键节奏稳定下来。',
+                    rework: '这段文本会缩窄纠错成本，把原始速度更多转成有效速度。',
+                    speed: '上一轮已经足够稳定，这段文本会保持干净输入并轻微提高密度。'
+                },
                 customSource: '自定义词库',
                 customTitle: '把自己的词库带入计划',
                 customBody: '粘贴单词、句子或段落，本轮会直接用这段文本训练。',

@@ -158,4 +158,40 @@ describe('PracticePage', () => {
         expect(screen.queryByRole('heading', { name: 'Next round brief' })).not.toBeInTheDocument();
         expect(screen.getByTestId('typing-area')).toHaveTextContent('running');
     });
+
+    test('explains why an adaptive drill was prepared before typing starts', () => {
+        Object.assign(mockStore, {
+            currentDraft: {
+                id: 'adaptive-draft-1',
+                words: ['alpha', 'steady'],
+                configSnapshot: {
+                    ...baseStore.config,
+                    mode: 'words',
+                    wordCount: 28
+                },
+                sourceTextMeta: {
+                    label: 'Adaptive accuracy drill',
+                    source: 'builtin',
+                    generatedBy: 'adaptive',
+                    template: 'accuracy',
+                    adaptiveFocus: 'accuracy',
+                    adaptiveHotspots: ['alpha', 'again'],
+                    adaptiveMetrics: {
+                        accuracy: 92,
+                        consistency: 91,
+                        missCount: 4,
+                        rawGap: 9
+                    }
+                }
+            }
+        });
+
+        render(<PracticePage />);
+
+        expect(screen.getByLabelText('Adaptive drill')).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'Protect accuracy' })).toBeInTheDocument();
+        expect(screen.getByText('This text repeats recent misses so the next round can clean up accuracy before adding pressure.')).toBeInTheDocument();
+        expect(screen.getByText('92% Accuracy')).toBeInTheDocument();
+        expect(screen.getByText('alpha / again')).toBeInTheDocument();
+    });
 });

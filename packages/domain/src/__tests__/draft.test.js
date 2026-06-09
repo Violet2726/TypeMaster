@@ -164,6 +164,14 @@ describe('draft', () => {
             })).toBe('accuracy');
             expect(draft.sourceTextMeta.generatedBy).toBe('adaptive');
             expect(draft.sourceTextMeta.label).toBe('Adaptive accuracy drill');
+            expect(draft.sourceTextMeta.adaptiveFocus).toBe('accuracy');
+            expect(draft.sourceTextMeta.adaptiveHotspots).toContain('alpha');
+            expect(draft.sourceTextMeta.adaptiveMetrics).toMatchObject({
+                accuracy: 92,
+                consistency: 91,
+                missCount: 4,
+                rawGap: 9
+            });
             expect(draft.configSnapshot).toMatchObject({
                 source: 'builtin',
                 mode: 'words',

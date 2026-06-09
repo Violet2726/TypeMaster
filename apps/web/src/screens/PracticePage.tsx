@@ -19,6 +19,7 @@ export function PracticePage() {
     const store = usePracticePageStore();
     const {
         aiPracticeStatus,
+        adaptiveDrillInsight,
         confirmState,
         controlsOpen,
         currentDraft,
@@ -130,6 +131,24 @@ export function PracticePage() {
                                 </div>
                             ))}
                         </div>
+                    </div>
+                </section>
+            )}
+
+            {adaptiveDrillInsight && (
+                <section className="panel adaptive-drill-panel" aria-label={adaptiveDrillInsight.kicker}>
+                    <div>
+                        <p className="panel-kicker">{adaptiveDrillInsight.kicker}</p>
+                        <h2>{adaptiveDrillInsight.title}</h2>
+                    </div>
+                    <p className="muted-text">{adaptiveDrillInsight.body}</p>
+                    <div className="adaptive-drill-panel__chips">
+                        {adaptiveDrillInsight.chips.map((chip) => (
+                            <div key={chip.label} className="adaptive-drill-chip">
+                                <span>{chip.label}</span>
+                                <strong>{chip.value}</strong>
+                            </div>
+                        ))}
                     </div>
                 </section>
             )}
