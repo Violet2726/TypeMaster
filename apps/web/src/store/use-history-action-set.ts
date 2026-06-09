@@ -28,8 +28,8 @@ export function useHistoryActionSet(environment, configActions) {
     const generateCoachForSessionAction = useCallback((sessionId, options: GenerateCoachOptions = {}) => (
         generateCoachForSession(environment, sessionId, options)
     ), [environment]);
-    const launchNextDrillAction = useCallback((adviceRecord) => (
-        launchNextDrill(configActions, adviceRecord)
+    const launchNextDrillAction = useCallback((adviceRecord, fallbackSession = null) => (
+        launchNextDrill(configActions, adviceRecord, fallbackSession)
     ), [configActions]);
 
     return useMemo(() => ({

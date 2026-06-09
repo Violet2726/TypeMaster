@@ -5,8 +5,10 @@ import {
     createBuiltinWords,
     createDraftFromWords,
     createBuiltinDraft,
+    createAdaptiveDrillDraft,
     createDraftFromText,
-    doesDraftMatchConfig
+    doesDraftMatchConfig,
+    resolveAdaptiveDrillFocus
 } from '../draft';
 import { DEFAULT_CONFIG } from '../config';
 
@@ -137,6 +139,65 @@ describe('draft', () => {
             const draft = createDraftFromText('test', { ...DEFAULT_CONFIG, source: 'ai' }, { template: 'daily', difficulty: 'easy' });
             expect(draft.sourceTextMeta.template).toBe('daily');
             expect(draft.sourceTextMeta.difficulty).toBe('easy');
+        });
+    });
+
+    describe('createAdaptiveDrillDraft', () => {
+        test('builds an accuracy drill from error hotspots', () => {
+            const draft = createAdaptiveDrillDraft({
+                config: { ...DEFAULT_CONFIG, mode: 'time', durationSeconds: 60 },
+                result: {
+                    accuracy: 92,
+                    consistency: 91,
+                    wpm: 52,
+                    rawWpm: 61,
+                    incorrectChars: 3,
+                    extraChars: 1,
+                    missedChars: 0,
+                    topErrorChars: ['a'],
+                    topErrorWords: ['alpha']
+                }
+            }, { language: 'en-US' });
+
+            expect(resolveAdaptiveDrillFocus({
+                result: { accuracy: 92, consistency: 91, wpm: 52, rawWpm: 61 }
+            })).toBe('accuracy');
+            expect(draft.sourceTextMeta.generatedBy).toBe('adaptive');
+            expect(draft.sourceTextMeta.label).toBe('Adaptive accuracy drill');
+            expect(draft.configSnapshot).toMatchObject({
+                source: 'builtin',
+                mode: 'words',
+                wordCount: 28,
+                includeNumbers: false,
+                includePunctuation: false
+            });
+            expect(draft.words).toContain('alpha');
+            expect(draft.words).toHaveLength(28);
+        });
+
+        test('keeps speed drills slightly denser when the round is already clean', () => {
+            const draft = createAdaptiveDrillDraft({
+                config: { ...DEFAULT_CONFIG, mode: 'words', wordCount: 30, includePunctuation: true, includeNumbers: true },
+                result: {
+                    accuracy: 98,
+                    consistency: 94,
+                    wpm: 72,
+                    rawWpm: 75,
+                    incorrectChars: 0,
+                    extraChars: 0,
+                    missedChars: 0,
+                    topErrorChars: [],
+                    topErrorWords: []
+                }
+            }, { language: 'en-US' });
+
+            expect(draft.sourceTextMeta.label).toBe('Adaptive speed drill');
+            expect(draft.configSnapshot.wordCount).toBe(35);
+            expect(draft.configSnapshot.includePunctuation).toBe(true);
+            expect(draft.configSnapshot.includeNumbers).toBe(true);
+            expect(draft.words.some((word) => /[.,!?;:]$/.test(word))).toBe(true);
+            expect(draft.words.some((word) => /^\d+$/.test(word))).toBe(true);
+            expect(draft.words).toHaveLength(35);
         });
     });
 

@@ -392,6 +392,7 @@ export function useResultPageModel({
         }
 
         if (!coachRecord?.nextDrill) {
+            await launchNextDrill(null, session);
             navigate('/practice');
             return;
         }
@@ -400,7 +401,7 @@ export function useResultPageModel({
         setNextDrillError(null);
 
         try {
-            await launchNextDrill(coachRecord);
+            await launchNextDrill(coachRecord, session);
             setNextDrillState('idle');
             navigate('/practice');
         } catch (error) {

@@ -136,14 +136,22 @@ export async function generateCoachForSession(environment, sessionId, options: G
     }
 }
 
-export async function launchNextDrill(configActions, adviceRecord) {
+export async function launchNextDrill(configActions, adviceRecord, fallbackSession = null) {
     const nextDrill = adviceRecord?.nextDrill;
     if (!nextDrill) {
-        return null;
+        return fallbackSession ? configActions.setAdaptiveDrillDraft(fallbackSession) : null;
     }
 
-    return configActions.generateAiPractice({
-        promptOverride: nextDrill.aiPrompt,
-        configPatch: nextDrill.configPatch
-    });
+    try {
+        return await configActions.generateAiPractice({
+            promptOverride: nextDrill.aiPrompt,
+            configPatch: nextDrill.configPatch
+        });
+    } catch (error) {
+        if (!fallbackSession) {
+            throw error;
+        }
+
+        return configActions.setAdaptiveDrillDraft(fallbackSession);
+    }
 }

@@ -173,4 +173,39 @@ describe('coach feedback use cases', () => {
             }
         });
     });
+
+    test('falls back to an adaptive local drill when ai text generation fails', async () => {
+        const failed = new Error('AI unavailable');
+        const fallbackDraft = { id: 'adaptive-1' };
+        const session = createSession('session-1');
+        const generateAiPractice = vi.fn().mockRejectedValue(failed);
+        const setAdaptiveDrillDraft = vi.fn().mockReturnValue(fallbackDraft);
+
+        const result = await launchNextDrill({ generateAiPractice, setAdaptiveDrillDraft }, {
+            nextDrill: {
+                aiPrompt: 'Practice accuracy',
+                configPatch: {
+                    source: 'ai',
+                    mode: 'words',
+                    wordCount: 20
+                }
+            }
+        }, session);
+
+        expect(result).toBe(fallbackDraft);
+        expect(setAdaptiveDrillDraft).toHaveBeenCalledWith(session);
+    });
+
+    test('starts an adaptive local drill when no coach next drill exists', async () => {
+        const fallbackDraft = { id: 'adaptive-1' };
+        const session = createSession('session-1');
+        const generateAiPractice = vi.fn();
+        const setAdaptiveDrillDraft = vi.fn().mockReturnValue(fallbackDraft);
+
+        const result = await launchNextDrill({ generateAiPractice, setAdaptiveDrillDraft }, null, session);
+
+        expect(result).toBe(fallbackDraft);
+        expect(generateAiPractice).not.toHaveBeenCalled();
+        expect(setAdaptiveDrillDraft).toHaveBeenCalledWith(session);
+    });
 });
