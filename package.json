@@ -1,36 +1,21 @@
 {
-  "name": "typemaster",
-  "version": "2.0.0",
-  "description": "TypeMaster 2.0 AI coach typing trainer",
-  "main": "server.js",
+  "name": "typemaster-workspace",
+  "private": true,
+  "packageManager": "pnpm@10.20.0",
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
-    "preview": "vite preview --host 0.0.0.0",
-    "api": "node server.js",
-    "serve": "node server.js",
-    "start": "npm run build && node server.js",
-    "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
-    "test:e2e": "playwright test"
-  },
-  "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.28.0"
+    "dev": "turbo run dev --parallel",
+    "dev:web": "pnpm --filter @typemaster/web dev",
+    "dev:api": "pnpm --filter @typemaster/api dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "typecheck": "pnpm --filter @typemaster/web typecheck && pnpm --filter @typemaster/api typecheck",
+    "test:coverage": "turbo run test:coverage",
+    "test:e2e": "pnpm --filter @typemaster/web test:e2e"
   },
   "devDependencies": {
-    "@playwright/test": "^1.60.0",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.2",
-    "@testing-library/user-event": "^14.6.1",
-    "@vitejs/plugin-react": "^4.3.3",
-    "@vitest/coverage-v8": "^2.1.9",
-    "jsdom": "^29.1.1",
-    "vite": "^5.4.10",
-    "vitest": "^2.1.0"
+    "turbo": "^2.5.8"
   },
   "engines": {
-    "node": ">=18.x"
+    "node": ">=20.9.0"
   }
 }

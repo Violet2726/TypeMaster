@@ -4,7 +4,17 @@ config.js
 # Frontend build
 node_modules
 dist
+.next
 .vite
+.turbo
+*.tsbuildinfo
+*.tmp-dev.out.log
+*.tmp-dev.err.log
+*.tmp-vite-out.log
+*.tmp-vite-err.log
+*.vite-out.log
+*.vite-err.log
+pnpm-debug.log*
 
 # Coverage reports
 coverage

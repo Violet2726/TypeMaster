@@ -1,0 +1,22 @@
+{
+  "name": "@typemaster/ai",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "dependencies": {
+    "@typemaster/contracts": "workspace:*",
+    "@typemaster/domain": "workspace:*"
+  },
+  "devDependencies": {
+    "@typemaster/config": "workspace:*",
+    "@vitest/coverage-v8": "^2.1.9",
+    "vitest": "^2.1.0"
+  },
+  "scripts": {
+    "test": "vitest run --config vitest.config.js",
+    "test:coverage": "vitest run --config vitest.config.js --coverage"
+  }
+}

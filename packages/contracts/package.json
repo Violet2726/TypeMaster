@@ -1,0 +1,29 @@
+{
+  "name": "@typemaster/contracts",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./src/index.js",
+      "require": "./src/index.cjs"
+    },
+    "./api": "./src/api.js",
+    "./server-state": "./src/server-state.js",
+    "./training-state": "./src/training-state.js",
+    "./storage": "./src/storage.js"
+  },
+  "scripts": {
+    "test": "vitest run --config vitest.config.js",
+    "test:coverage": "vitest run --config vitest.config.js --coverage"
+  },
+  "devDependencies": {
+    "@typemaster/config": "workspace:*",
+    "@vitest/coverage-v8": "^2.1.9",
+    "vitest": "^2.1.0"
+  },
+  "dependencies": {
+    "zod": "3.25.76",
+    "zod-to-json-schema": "3.23.5"
+  }
+}

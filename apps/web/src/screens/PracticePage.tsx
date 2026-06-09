@@ -1,0 +1,256 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useAppNavigate } from '../application/use-app-navigate';
+import { AIWorkshop } from '../features/practice/components/AIWorkshop';
+import { ConfigPanel } from '../features/practice/components/ConfigPanel';
+import { CustomTextWorkshop } from '../features/practice/components/CustomTextWorkshop';
+import { TypingArea } from '../features/practice/components/TypingArea';
+import { usePracticePageModel } from '../features/practice/use-practice-page-model';
+import { usePracticePageStore } from '../store/app-state-selectors';
+import { ConfirmDialog } from '@typemaster/ui';
+
+export function PracticePage() {
+    const router = useRouter();
+    const pathname = usePathname();
+    const navigate = useAppNavigate();
+    const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
+    const store = usePracticePageStore();
+    const {
+        aiPracticeStatus,
+        confirmState,
+        controlsOpen,
+        currentDraft,
+        currentTrainingTask,
+        customText,
+        handleApplyCustomText,
+        handleConfigChange,
+        handleGenerateAi,
+        handlePrimaryAction,
+        handleReset,
+        handleUseBuiltin,
+        isCustomEmpty,
+        isDirty,
+        lockBody,
+        lockTitle,
+        practiceError,
+        primaryActionLabel,
+        restoreAiDraftConfig,
+        handleBeforeUnload,
+        setConfirmState,
+        setControlsOpen,
+        setCustomText,
+        sourceLabel,
+        shouldBlockNavigation,
+        trainingCopy,
+        typingSession
+    } = usePracticePageModel({
+        ...store,
+        navigate
+    });
+
+    useEffect(() => {
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [handleBeforeUnload]);
+
+    useEffect(() => {
+        const handleClick = (event: MouseEvent) => {
+            if (
+                event.defaultPrevented
+                || event.button !== 0
+                || event.metaKey
+                || event.ctrlKey
+                || event.shiftKey
+                || event.altKey
+                || !shouldBlockNavigation()
+            ) {
+                return;
+            }
+
+            const target = event.target as Element | null;
+            const anchor = target?.closest('a[href]') as HTMLAnchorElement | null;
+
+            if (!anchor || anchor.target || anchor.hasAttribute('download')) {
+                return;
+            }
+
+            const nextUrl = new URL(anchor.href);
+
+            if (nextUrl.origin !== window.location.origin) {
+                return;
+            }
+
+            const nextHref = `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`;
+            const currentHref = `${pathname}${window.location.search}${window.location.hash}`;
+
+            if (nextHref === currentHref) {
+                return;
+            }
+
+            event.preventDefault();
+            setPendingNavigation(nextHref);
+        };
+
+        document.addEventListener('click', handleClick, true);
+
+        return () => {
+            document.removeEventListener('click', handleClick, true);
+        };
+    }, [pathname, shouldBlockNavigation]);
+
+    useEffect(() => {
+        setPendingNavigation(null);
+    }, [pathname]);
+
+    return (
+        <div className="page-stack practice-page">
+            {currentTrainingTask && (
+                <section className="panel">
+                    <div className="panel-head">
+                        <div>
+                            <p className="panel-kicker">{trainingCopy.practice.taskKicker}</p>
+                            <h2>{currentTrainingTask.title}</h2>
+                        </div>
+                        <span className="panel-badge badge-ready">
+                            {currentTrainingTask.id.startsWith('daily-')
+                                ? trainingCopy.practice.challengeBadge
+                                : currentTrainingTask.order <= 3 && currentTrainingTask.id.startsWith('diagnostic')
+                                ? trainingCopy.practice.diagnosticBadge
+                                : trainingCopy.practice.planBadge}
+                        </span>
+                    </div>
+                    <p className="muted-text">{currentTrainingTask.summary}</p>
+                    <p className="muted-text">{trainingCopy.practice.layoutLabel}: {store.settings.keyboardLayout.toUpperCase()}</p>
+                </section>
+            )}
+
+            <section className="panel practice-toolbar">
+                <div className="practice-toolbar__row">
+                    <div>
+                        <p className="panel-kicker">{store.copy.practice.configTitle}</p>
+                        <h2>{sourceLabel}</h2>
+                    </div>
+                    <button type="button" className="ghost-btn ghost-btn--small" onClick={handleReset}>
+                        {store.copy.common.resetRound}
+                    </button>
+                </div>
+
+                <ConfigPanel
+                    copy={store.copy}
+                    language={store.language}
+                    config={store.config}
+                    onConfigChange={handleConfigChange}
+                    showAdvanced={controlsOpen}
+                    onToggleAdvanced={() => setControlsOpen((value) => !value)}
+                />
+
+                {controlsOpen && store.config.source === 'ai' && (
+                    <AIWorkshop
+                        copy={store.copy}
+                        language={store.language}
+                        config={store.config}
+                        currentDraft={currentDraft}
+                        aiPracticeStatus={aiPracticeStatus}
+                        practiceError={practiceError}
+                        onConfigChange={handleConfigChange}
+                        onGenerate={handleGenerateAi}
+                        onRestoreConfig={restoreAiDraftConfig}
+                        onUseBuiltin={handleUseBuiltin}
+                    />
+                )}
+
+                {controlsOpen && store.config.source === 'builtin' && (
+                    <p className="muted-text practice-toolbar__hint">{store.copy.practice.builtInReady}</p>
+                )}
+
+                {controlsOpen && store.config.source === 'custom' && (
+                    <CustomTextWorkshop
+                        language={store.language}
+                        value={customText}
+                        onChange={setCustomText}
+                        onApply={handleApplyCustomText}
+                    />
+                )}
+            </section>
+
+            <TypingArea
+                copy={store.copy}
+                words={typingSession.words}
+                typedHistory={typingSession.typedHistory}
+                currentInput={typingSession.currentInput}
+                currentWordIndex={typingSession.currentWordIndex}
+                isFocused={typingSession.isFocused}
+                status={typingSession.status}
+                liveMetrics={typingSession.liveMetrics}
+                timerDisplay={typingSession.timerDisplay}
+                mode={store.config.mode}
+                sourceLabel={sourceLabel}
+                inputRef={typingSession.inputRef}
+                onInputChange={typingSession.handleInputChange}
+                onKeyDown={typingSession.handleKeyDown}
+                onCompositionStart={typingSession.handleCompositionStart}
+                onCompositionEnd={typingSession.handleCompositionEnd}
+                onFocus={typingSession.handleFocus}
+                onBlur={typingSession.handleBlur}
+                onActivate={typingSession.focusInput}
+                onReset={handleReset}
+                isLocked={(store.config.source === 'ai' && aiPracticeStatus !== 'ready') || isCustomEmpty}
+                lockTitle={lockTitle}
+                lockBody={lockBody}
+            />
+
+            <div className="sticky-action-bar">
+                <div>
+                    <span className="summary-label">{store.copy.practice.helperTitle}</span>
+                    <strong>{store.config.source === 'ai' && aiPracticeStatus !== 'ready' ? store.copy.practice.aiIdle : store.copy.practice.helperBody}</strong>
+                </div>
+                <button
+                    type="button"
+                    className="action-btn primary"
+                    onClick={handlePrimaryAction}
+                    disabled={store.config.source === 'ai' && aiPracticeStatus === 'loading'}
+                >
+                    {primaryActionLabel}
+                </button>
+            </div>
+
+            <ConfirmDialog
+                isOpen={Boolean(confirmState)}
+                title={confirmState?.title}
+                body={confirmState?.body}
+                confirmLabel={confirmState?.confirmLabel || store.copy.common.confirm}
+                cancelLabel={confirmState?.cancelLabel || store.copy.common.cancel}
+                onConfirm={() => {
+                    const pending = confirmState;
+                    setConfirmState(null);
+                    pending?.action?.();
+                }}
+                onCancel={() => setConfirmState(null)}
+            />
+
+            <ConfirmDialog
+                isOpen={Boolean(pendingNavigation)}
+                title={store.copy.practice.confirmLeaveTitle}
+                body={store.copy.practice.confirmLeaveBody}
+                confirmLabel={store.copy.confirm.leave}
+                cancelLabel={store.copy.confirm.stay}
+                onConfirm={() => {
+                    const href = pendingNavigation;
+                    setPendingNavigation(null);
+
+                    if (href) {
+                        router.push(href);
+                    }
+                }}
+                onCancel={() => setPendingNavigation(null)}
+            />
+        </div>
+    );
+}
+
+export default PracticePage;
