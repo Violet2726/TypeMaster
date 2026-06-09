@@ -1,6 +1,122 @@
 import { useCallback, useMemo } from 'react';
-import { buildInsights } from '@typemaster/domain';
+import { buildInsights, buildTargetedDrillTrend } from '@typemaster/domain';
 import { getTrainingCopy } from '../../training/copy';
+
+function fillTemplate(template, value) {
+    return String(template || '').replace('{value}', value);
+}
+
+function getTargetedToneMeta(copy, tone) {
+    if (tone === 'success') {
+        return {
+            badge: copy.result.targetedFeedbackReady,
+            badgeTone: 'ready'
+        };
+    }
+
+    if (tone === 'progress') {
+        return {
+            badge: copy.result.targetedFeedbackProgress,
+            badgeTone: 'stale'
+        };
+    }
+
+    return {
+        badge: copy.result.targetedFeedbackRetry,
+        badgeTone: 'error'
+    };
+}
+
+function getTargetedAreaLabel(copy, trainingCopy, summary) {
+    if (summary.type === 'adaptive') {
+        return trainingCopy.practice.adaptiveFocusLabels?.[summary.focus]
+            || trainingCopy.practice.adaptiveFocusLabels?.speed
+            || copy.common.emptyValue;
+    }
+
+    return copy.insights.keyboardZoneLabels?.[summary.zoneId] || summary.zoneId || copy.common.emptyValue;
+}
+
+function getTargetedLatestBody(copy, summary) {
+    if (summary.type === 'adaptive') {
+        if (summary.tone === 'success') {
+            return copy.result.targetedFeedbackAdaptiveClear;
+        }
+
+        if (summary.tone === 'progress') {
+            return copy.result.targetedFeedbackAdaptiveProgress;
+        }
+
+        return copy.result.targetedFeedbackAdaptiveStalled;
+    }
+
+    if (summary.tone === 'success') {
+        return copy.result.targetedFeedbackKeyboardClear;
+    }
+
+    if (summary.tone === 'progress') {
+        return copy.result.targetedFeedbackKeyboardProgress;
+    }
+
+    return copy.result.targetedFeedbackKeyboardStalled;
+}
+
+function buildTargetedTrendModel(copy, trainingCopy, trend) {
+    if (!trend?.total || !trend.latest) {
+        return {
+            title: copy.insights.targetedTitle,
+            body: copy.insights.targetedBody,
+            empty: copy.insights.targetedEmpty,
+            counts: [],
+            latest: null,
+            areas: []
+        };
+    }
+
+    return {
+        title: copy.insights.targetedTitle,
+        body: copy.insights.targetedBody,
+        empty: copy.insights.targetedEmpty,
+        counts: [
+            {
+                id: 'rounds',
+                label: copy.insights.targetedRoundsLabel,
+                value: String(trend.total)
+            },
+            {
+                id: 'improved',
+                label: copy.insights.targetedImprovedLabel,
+                value: `${trend.improvementRate}%`
+            },
+            {
+                id: 'cleared',
+                label: copy.insights.targetedClearedLabel,
+                value: String(trend.successCount)
+            },
+            {
+                id: 'retry',
+                label: copy.insights.targetedRetryLabel,
+                value: String(trend.stalledCount)
+            }
+        ],
+        latest: {
+            areaLabel: getTargetedAreaLabel(copy, trainingCopy, trend.latest),
+            body: getTargetedLatestBody(copy, trend.latest),
+            remaining: trend.latest.remainingTargets?.length
+                ? trend.latest.remainingTargets.join(' / ')
+                : copy.insights.targetedAreaStable,
+            ...getTargetedToneMeta(copy, trend.latest.tone)
+        },
+        areas: trend.areas.slice(0, 4).map((area) => ({
+            id: area.id,
+            label: getTargetedAreaLabel(copy, trainingCopy, area),
+            note: `${fillTemplate(copy.insights.targetedAreaRounds, area.sessions)} / ${area.latestRemainingTargets?.length
+                ? fillTemplate(copy.insights.targetedAreaShowing, area.latestRemainingTargets.join(' / '))
+                : copy.insights.targetedAreaStable}`,
+            ...getTargetedToneMeta(copy, area.latestTone)
+        }))
+    };
+}
 
 export function useInsightsPageModel({
     achievements,
@@ -18,6 +134,11 @@ export function useInsightsPageModel({
 }) {
     const insights = useMemo(() => buildInsights(sessions, { keyboardLayout }), [keyboardLayout, sessions]);
     const trainingCopy = useMemo(() => getTrainingCopy(language), [language]);
+    const targetedTrend = useMemo(() => buildTargetedTrendModel(
+        copy,
+        trainingCopy,
+        buildTargetedDrillTrend(sessions, { limit: 8 })
+    ), [copy, sessions, trainingCopy]);
     const streakRisk = sessionStreak >= 3 ? trainingCopy.insights.riskLow : trainingCopy.insights.riskHigh;
     const handleKeyboardZoneDrill = useCallback(() => {
         if (!insights.keyboardHotspots.primaryZone) {
@@ -39,6 +160,7 @@ export function useInsightsPageModel({
         sessions,
         skillProfile,
         streakRisk,
+        targetedTrend,
         trainingCopy,
         weeklyGoal,
         weeklySessions

@@ -56,6 +56,49 @@ function KeyboardHotspots({ copy, hotspots, language, onStartDrill }) {
     );
 }
 
+function TargetedProgress({ copy, trend }) {
+    if (!trend.latest) {
+        return <p className="muted-text">{trend.empty}</p>;
+    }
+
+    return (
+        <div className="targeted-progress">
+            <div className="targeted-progress__summary">
+                <div className={`targeted-progress__hero targeted-progress__hero--${trend.latest.badgeTone}`}>
+                    <div className="targeted-progress__hero-head">
+                        <span className="summary-label">{copy.insights.targetedLatestLabel}</span>
+                        <span className={`panel-badge badge-${trend.latest.badgeTone}`}>{trend.latest.badge}</span>
+                    </div>
+                    <strong>{trend.latest.areaLabel}</strong>
+                    <p>{trend.latest.body}</p>
+                    <span>{copy.result.targetedFeedbackRemainingLabel}: {trend.latest.remaining}</span>
+                </div>
+
+                <div className="summary-stack summary-stack--compact">
+                    {trend.counts.map((item) => (
+                        <div key={item.id} className="metric-card">
+                            <span>{item.label}</span>
+                            <strong>{item.value}</strong>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div className="targeted-progress__areas">
+                {trend.areas.map((area) => (
+                    <div key={area.id} className="targeted-area-row">
+                        <div>
+                            <strong>{area.label}</strong>
+                            <span>{area.note}</span>
+                        </div>
+                        <span className={`panel-badge badge-${area.badgeTone}`}>{area.badge}</span>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 export function InsightsPage() {
     const navigate = useAppNavigate();
     const store = useInsightsPageStore();
@@ -69,6 +112,7 @@ export function InsightsPage() {
         sessions,
         skillProfile,
         streakRisk,
+        targetedTrend,
         trainingCopy,
         weeklyGoal,
         weeklySessions
@@ -190,6 +234,17 @@ export function InsightsPage() {
                         </div>
                     </div>
                 </div>
+            </section>
+
+            <section className="panel">
+                <div className="panel-head">
+                    <div>
+                        <p className="panel-kicker">{copy.insights.targetedTitle}</p>
+                        <h2>{copy.insights.targetedTitle}</h2>
+                    </div>
+                </div>
+                <p className="muted-text">{copy.insights.targetedBody}</p>
+                <TargetedProgress copy={copy} trend={targetedTrend} />
             </section>
 
             <section className="panel">

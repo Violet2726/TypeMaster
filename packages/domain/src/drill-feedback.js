@@ -130,6 +130,28 @@ function buildKeyboardZoneDrillFeedback(session) {
     };
 }
 
+function buildTargetedAreaKey(summary) {
+    if (summary.type === 'adaptive') {
+        return `adaptive:${summary.focus || 'speed'}`;
+    }
+
+    return `keyboard-zone:${summary.zoneId || 'other'}`;
+}
+
+function createEmptyTrend() {
+    return {
+        total: 0,
+        improvedCount: 0,
+        improvementRate: 0,
+        successCount: 0,
+        progressCount: 0,
+        stalledCount: 0,
+        latest: null,
+        areas: [],
+        recent: []
+    };
+}
+
 export function buildTargetedDrillFeedback(session) {
     const generatedBy = session?.sourceTextMeta?.generatedBy;
 
@@ -142,4 +164,78 @@ export function buildTargetedDrillFeedback(session) {
     }
 
     return null;
+}
+
+export function buildTargetedDrillTrend(sessions, options = {}) {
+    const limit = Math.max(1, Number(options.limit || 8));
+    const feedbacks = (Array.isArray(sessions) ? sessions : [])
+        .map((session) => {
+            const summary = buildTargetedDrillFeedback(session);
+            if (!summary) {
+                return null;
+            }
+
+            return {
+                ...summary,
+                sessionId: session?.id || null,
+                completedAt: session?.result?.completedAt || session?.sourceTextMeta?.createdAt || null
+            };
+        })
+        .filter(Boolean)
+        .slice(0, limit);
+
+    if (!feedbacks.length) {
+        return createEmptyTrend();
+    }
+
+    const counts = {
+        success: 0,
+        progress: 0,
+        stalled: 0
+    };
+    const areaMap = new Map();
+
+    feedbacks.forEach((item) => {
+        counts[item.tone] += 1;
+        const key = buildTargetedAreaKey(item);
+        const existing = areaMap.get(key) || {
+            id: key,
+            type: item.type,
+            focus: item.focus || null,
+            zoneId: item.zoneId || null,
+            sessions: 0,
+            successCount: 0,
+            progressCount: 0,
+            stalledCount: 0,
+            latestTone: item.tone,
+            latestRemainingTargets: item.remainingTargets || [],
+            latestSessionId: item.sessionId || null
+        };
+
+        existing.sessions += 1;
+        if (item.tone === 'success') {
+            existing.successCount += 1;
+        } else if (item.tone === 'progress') {
+            existing.progressCount += 1;
+        } else {
+            existing.stalledCount += 1;
+        }
+
+        areaMap.set(key, existing);
+    });
+
+    const improvedCount = counts.success + counts.progress;
+
+    return {
+        total: feedbacks.length,
+        improvedCount,
+        improvementRate: Math.round((improvedCount / feedbacks.length) * 100),
+        successCount: counts.success,
+        progressCount: counts.progress,
+        stalledCount: counts.stalled,
+        latest: feedbacks[0],
+        areas: [...areaMap.values()]
+            .sort((left, right) => right.sessions - left.sessions || right.progressCount - left.progressCount || right.successCount - left.successCount),
+        recent: feedbacks
+    };
 }

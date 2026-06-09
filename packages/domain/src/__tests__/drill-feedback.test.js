@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { buildTargetedDrillFeedback } from '../drill-feedback';
+import { buildTargetedDrillFeedback, buildTargetedDrillTrend } from '../drill-feedback';
 
 describe('drill-feedback.js', () => {
     test('summarizes adaptive drills against the stored target baseline', () => {
@@ -67,5 +67,81 @@ describe('drill-feedback.js', () => {
                 generatedBy: 'builtin'
             }
         })).toBeNull();
+    });
+
+    test('aggregates recent targeted drills into a long-term trend summary', () => {
+        const trend = buildTargetedDrillTrend([
+            {
+                id: 'session-zone-1',
+                result: {
+                    errorCharStats: [
+                        { label: 'a', count: 1 },
+                        { label: 's', count: 1 },
+                        { label: 'k', count: 1 },
+                        { label: '.', count: 1 }
+                    ]
+                },
+                sourceTextMeta: {
+                    generatedBy: 'keyboard-zone',
+                    keyboardZone: 'leftHome',
+                    keyboardLayout: 'qwerty',
+                    keyboardZoneShare: 56
+                }
+            },
+            {
+                id: 'session-adaptive-1',
+                result: {
+                    errorCharStats: [{ label: 'a', count: 1 }],
+                    errorWordStats: [{ label: 'alpha', count: 1 }]
+                },
+                sourceTextMeta: {
+                    generatedBy: 'adaptive',
+                    adaptiveFocus: 'accuracy',
+                    adaptiveTargetChars: ['a'],
+                    adaptiveTargetWords: ['alpha'],
+                    adaptiveBaselineCount: 5
+                }
+            },
+            {
+                id: 'session-adaptive-2',
+                result: {
+                    errorCharStats: [{ label: 'a', count: 3 }],
+                    errorWordStats: [{ label: 'alpha', count: 2 }]
+                },
+                sourceTextMeta: {
+                    generatedBy: 'adaptive',
+                    adaptiveFocus: 'accuracy',
+                    adaptiveTargetChars: ['a'],
+                    adaptiveTargetWords: ['alpha'],
+                    adaptiveBaselineCount: 5
+                }
+            }
+        ]);
+
+        expect(trend).toMatchObject({
+            total: 3,
+            improvedCount: 2,
+            improvementRate: 67,
+            successCount: 0,
+            progressCount: 2,
+            stalledCount: 1,
+            latest: {
+                sessionId: 'session-zone-1',
+                type: 'keyboard-zone',
+                tone: 'progress'
+            }
+        });
+        expect(trend.areas).toEqual(expect.arrayContaining([
+            expect.objectContaining({
+                id: 'adaptive:accuracy',
+                sessions: 2,
+                latestTone: 'progress'
+            }),
+            expect.objectContaining({
+                id: 'keyboard-zone:leftHome',
+                sessions: 1,
+                latestTone: 'progress'
+            })
+        ]));
     });
 });

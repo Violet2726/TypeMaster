@@ -1324,6 +1324,92 @@ body[data-theme='serika-light'] .words-shell::after {
     margin-top: 1rem;
 }
 
+.targeted-progress {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.targeted-progress__summary {
+    display: grid;
+    grid-template-columns: minmax(240px, 0.88fr) minmax(0, 1.12fr);
+    gap: 1rem;
+}
+
+.targeted-progress__hero,
+.targeted-area-row {
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.targeted-progress__hero {
+    display: grid;
+    gap: 0.42rem;
+    align-content: start;
+    padding: 1rem 1.05rem;
+}
+
+.targeted-progress__hero--ready {
+    border-color: rgba(135, 215, 168, 0.18);
+}
+
+.targeted-progress__hero--stale {
+    border-color: rgba(244, 197, 107, 0.18);
+}
+
+.targeted-progress__hero--error {
+    border-color: rgba(255, 134, 152, 0.18);
+}
+
+.targeted-progress__hero-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.targeted-progress__hero strong {
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+}
+
+.targeted-progress__hero > p,
+.targeted-progress__hero > span {
+    margin: 0;
+    color: var(--text-dim);
+}
+
+.targeted-progress__areas {
+    display: grid;
+    gap: 0.7rem;
+}
+
+.targeted-area-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.86rem 0.95rem;
+}
+
+.targeted-area-row div {
+    display: grid;
+    gap: 0.18rem;
+    min-width: 0;
+}
+
+.targeted-area-row strong {
+    color: var(--text-strong);
+}
+
+.targeted-area-row div span {
+    color: var(--text-dim);
+    overflow-wrap: anywhere;
+}
+
 .keyboard-hotspots__primary,
 .keyboard-zone-row {
     border-radius: var(--radius-md);
@@ -2221,6 +2307,7 @@ body[data-theme='serika-light'] .replay-accuracy-band {
     .result-metrics-strip,
     .adaptive-drill-panel__chips,
     .result-target-feedback__chips,
+    .targeted-progress__summary,
     .config-strip__main,
     .workshop-grid,
     .summary-stack--compact,
