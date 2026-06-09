@@ -5,13 +5,13 @@
  * 不必关心具体逻辑被拆到了哪个细分文件中。
  */
 
-export * from './config';
-export * from './draft';
-export * from './rendering';
-export * from './metrics';
-export * from './coach';
-export * from './insights';
-export * from './session-machine';
-export * from './training';
-export * from './achievements';
-export * from './challenge';
+export * from './config.js';
+export * from './draft.js';
+export * from './rendering.js';
+export * from './metrics.js';
+export * from './coach.js';
+export * from './insights.js';
+export * from './session-machine.js';
+export * from './training.js';
+export * from './achievements.js';
+export * from './challenge.js';
