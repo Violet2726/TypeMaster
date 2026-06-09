@@ -116,6 +116,7 @@ export function useInsightsPageStore() {
     return {
         achievements: achievements.achievements,
         copy: shell.copy,
+        keyboardLayout: shell.settings.keyboardLayout,
         language: shell.language,
         latestCoachAdvice: history.latestCoachAdvice,
         sessions: history.sessions,

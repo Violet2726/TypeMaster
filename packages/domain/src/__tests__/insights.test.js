@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildInsights } from '../insights';
+import { buildInsights, buildKeyboardHotspots } from '../insights';
 
 describe('insights.js', () => {
     describe('buildInsights', () => {
@@ -31,6 +31,7 @@ describe('insights.js', () => {
             expect(result).toHaveProperty('aiShareOverall');
             expect(result).toHaveProperty('topErrorChars');
             expect(result).toHaveProperty('topErrorWords');
+            expect(result).toHaveProperty('keyboardHotspots');
             expect(result).toHaveProperty('daily7');
             expect(result).toHaveProperty('daily30');
         });
@@ -118,6 +119,36 @@ describe('insights.js', () => {
             expect(result.topErrorChars.length).toBeGreaterThan(0);
             const aEntry = result.topErrorChars.find((e) => e.label === 'a');
             expect(aEntry.count).toBe(2);
+        });
+
+        it('aggregates error characters into keyboard zones', () => {
+            const sessions = [
+                createMockSession({ result: { wpm: 50, accuracy: 95, topErrorChars: ['a', 's', 'd', 'j', '1', '.'], topErrorWords: [] } }),
+                createMockSession({ result: { wpm: 52, accuracy: 94, topErrorChars: ['a', 'g', 'k'], topErrorWords: [] } })
+            ];
+            const result = buildInsights(sessions, { keyboardLayout: 'qwerty' });
+
+            expect(result.keyboardHotspots.total).toBe(9);
+            expect(result.keyboardHotspots.primaryZone).toMatchObject({
+                id: 'leftHome',
+                count: 5,
+                share: 56
+            });
+            expect(result.keyboardHotspots.zones.find((zone) => zone.id === 'numberRow')).toMatchObject({
+                count: 1,
+                chars: [{ label: '1', count: 1 }]
+            });
+            expect(result.keyboardHotspots.zones.find((zone) => zone.id === 'symbolLayer')).toMatchObject({
+                count: 1
+            });
+        });
+
+        it('respects keyboard layout when resolving zones', () => {
+            const qwerty = buildKeyboardHotspots(['f', 'f', 'p'], { keyboardLayout: 'qwerty' });
+            const colemak = buildKeyboardHotspots(['f', 'f', 'p'], { keyboardLayout: 'colemak' });
+
+            expect(qwerty.primaryZone.id).toBe('leftHome');
+            expect(colemak.primaryZone.id).toBe('leftTop');
         });
 
         it('limits topErrorChars to 5 entries', () => {

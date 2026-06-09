@@ -5,6 +5,7 @@ import { getTrainingCopy } from '../../training/copy';
 export function useInsightsPageModel({
     achievements,
     copy,
+    keyboardLayout,
     language,
     latestCoachAdvice,
     sessions,
@@ -13,7 +14,7 @@ export function useInsightsPageModel({
     weeklyGoal,
     weeklySessions
 }) {
-    const insights = useMemo(() => buildInsights(sessions), [sessions]);
+    const insights = useMemo(() => buildInsights(sessions, { keyboardLayout }), [keyboardLayout, sessions]);
     const trainingCopy = useMemo(() => getTrainingCopy(language), [language]);
     const streakRisk = sessionStreak >= 3 ? trainingCopy.insights.riskLow : trainingCopy.insights.riskHigh;
 

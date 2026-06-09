@@ -1292,6 +1292,72 @@ body[data-theme='serika-light'] .words-shell::after {
     gap: 0.7rem;
 }
 
+.keyboard-hotspots {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.72fr) minmax(0, 1.28fr);
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.keyboard-hotspots__primary,
+.keyboard-zone-row {
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.keyboard-hotspots__primary {
+    display: grid;
+    gap: 0.38rem;
+    align-content: start;
+    padding: 1rem 1.05rem;
+}
+
+.keyboard-hotspots__primary strong {
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+}
+
+.keyboard-hotspots__primary p {
+    margin: 0;
+    color: var(--text-dim);
+}
+
+.keyboard-hotspots__list {
+    display: grid;
+    gap: 0.7rem;
+}
+
+.keyboard-zone-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.86rem 0.95rem;
+}
+
+.keyboard-zone-row div {
+    display: grid;
+    gap: 0.18rem;
+    min-width: 0;
+}
+
+.keyboard-zone-row strong {
+    color: var(--text-strong);
+}
+
+.keyboard-zone-row span {
+    color: var(--text-dim);
+    overflow-wrap: anywhere;
+}
+
+.keyboard-zone-row > span {
+    flex: 0 0 auto;
+    color: var(--main-color);
+    font-family: var(--font-mono);
+}
+
 .mini-series {
     display: grid;
     gap: 0.7rem;
@@ -2135,6 +2201,7 @@ body[data-theme='serika-light'] .replay-accuracy-band {
     .result-summary,
     .result-decision-panel__body,
     .insights-header,
+    .keyboard-hotspots,
     .chart-panel__head,
     .chart-summary,
     .result-prescription__grid,

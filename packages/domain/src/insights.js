@@ -20,6 +20,130 @@ function buildCounter(items) {
     return counts;
 }
 
+const KEYBOARD_ZONE_ORDER = [
+    'leftTop',
+    'leftHome',
+    'leftBottom',
+    'rightTop',
+    'rightHome',
+    'rightBottom',
+    'numberRow',
+    'symbolLayer',
+    'other'
+];
+
+const KEYBOARD_LAYOUT_ZONE_CHARS = {
+    qwerty: {
+        leftTop: 'qwert',
+        leftHome: 'asdfg',
+        leftBottom: 'zxcvb',
+        rightTop: 'yuiop',
+        rightHome: 'hjkl',
+        rightBottom: 'nm'
+    },
+    colemak: {
+        leftTop: 'qwfpb',
+        leftHome: 'arstg',
+        leftBottom: 'zxcvd',
+        rightTop: 'jluy',
+        rightHome: 'hneio',
+        rightBottom: 'km'
+    },
+    dvorak: {
+        leftTop: 'py',
+        leftHome: 'aoeui',
+        leftBottom: 'qjkx',
+        rightTop: 'fgcrl',
+        rightHome: 'dhtns',
+        rightBottom: 'bmwvz'
+    }
+};
+
+const SYMBOL_CHARS = new Set(['`', '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '=', '+', '[', ']', '{', '}', '\\', '|', ';', ':', "'", '"', ',', '<', '.', '>', '/', '?']);
+
+function normalizeKeyboardLayout(layout) {
+    const normalized = String(layout || 'qwerty').toLowerCase();
+    return KEYBOARD_LAYOUT_ZONE_CHARS[normalized] ? normalized : 'qwerty';
+}
+
+function createZoneLookup(layout) {
+    const zones = KEYBOARD_LAYOUT_ZONE_CHARS[normalizeKeyboardLayout(layout)];
+    const lookup = new Map();
+
+    Object.entries(zones).forEach(([zone, chars]) => {
+        chars.split('').forEach((char) => {
+            lookup.set(char, zone);
+        });
+    });
+
+    return lookup;
+}
+
+function resolveKeyboardZone(char, lookup) {
+    const value = String(char || '').trim().toLowerCase();
+    const firstChar = value[0] || '';
+
+    if (!firstChar) {
+        return null;
+    }
+
+    if (/\d/.test(firstChar)) {
+        return 'numberRow';
+    }
+
+    if (SYMBOL_CHARS.has(firstChar)) {
+        return 'symbolLayer';
+    }
+
+    return lookup.get(firstChar) || 'other';
+}
+
+function sortZoneCounts(left, right) {
+    if (right.count !== left.count) {
+        return right.count - left.count;
+    }
+
+    return KEYBOARD_ZONE_ORDER.indexOf(left.id) - KEYBOARD_ZONE_ORDER.indexOf(right.id);
+}
+
+export function buildKeyboardHotspots(chars, options = {}) {
+    const safeChars = Array.isArray(chars) ? chars : [];
+    const lookup = createZoneLookup(options.keyboardLayout);
+    const zoneMap = new Map();
+
+    safeChars.forEach((char) => {
+        const zone = resolveKeyboardZone(char, lookup);
+        if (!zone) return;
+
+        const existing = zoneMap.get(zone) || {
+            id: zone,
+            count: 0,
+            chars: new Map()
+        };
+
+        existing.count += 1;
+        existing.chars.set(char, (existing.chars.get(char) || 0) + 1);
+        zoneMap.set(zone, existing);
+    });
+
+    const total = [...zoneMap.values()].reduce((sum, item) => sum + item.count, 0);
+    const zones = [...zoneMap.values()]
+        .map((zone) => ({
+            id: zone.id,
+            count: zone.count,
+            share: total ? Math.round((zone.count / total) * 100) : 0,
+            chars: topCounts(zone.chars, 4)
+        }))
+        .sort(sortZoneCounts);
+
+    return {
+        layout: normalizeKeyboardLayout(options.keyboardLayout),
+        total,
+        primaryZone: zones[0] || null,
+        zones
+    };
+}
+
 function topCounts(counts, limit = 5) {
     return [...counts.entries()]
         .sort((left, right) => right[1] - left[1])
@@ -75,13 +199,14 @@ function buildDailySeries(sessions, days = 7) {
     });
 }
 
-export function buildInsights(sessions) {
+export function buildInsights(sessions, options = {}) {
     const safeSessions = Array.isArray(sessions) ? sessions : [];
     const recent7 = clampSessions(safeSessions, 7);
     const recent30 = clampSessions(safeSessions, 30);
+    const recent30ErrorChars = recent30.flatMap((session) => session.result?.topErrorChars || []);
 
     const charCounter = buildCounter(
-        recent30.flatMap((session) => session.result?.topErrorChars || [])
+        recent30ErrorChars
     );
     const wordCounter = buildCounter(
         recent30.flatMap((session) => session.result?.topErrorWords || [])
@@ -99,8 +224,10 @@ export function buildInsights(sessions) {
             : 0,
         topErrorChars: topCounts(charCounter),
         topErrorWords: topCounts(wordCounter),
+        keyboardHotspots: buildKeyboardHotspots(recent30ErrorChars, {
+            keyboardLayout: options.keyboardLayout
+        }),
         daily7: buildDailySeries(recent30, 7),
         daily30: buildDailySeries(recent30, 30)
     };
 }
-

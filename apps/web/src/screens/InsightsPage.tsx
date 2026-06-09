@@ -19,6 +19,40 @@ function HotspotList({ items, emptyText, language }) {
     );
 }
 
+function formatZoneChars(chars, language) {
+    return chars.map((item) => `${item.label}${getInlineSeparator(language)}${item.count}`).join(' / ');
+}
+
+function KeyboardHotspots({ copy, hotspots, language }) {
+    const labels = copy.insights.keyboardZoneLabels || {};
+    const primary = hotspots.primaryZone;
+
+    if (!hotspots.zones.length) {
+        return <p className="muted-text">{copy.insights.keyboardEmpty}</p>;
+    }
+
+    return (
+        <div className="keyboard-hotspots">
+            <div className="keyboard-hotspots__primary">
+                <span className="summary-label">{copy.insights.keyboardPrimary}</span>
+                <strong>{labels[primary.id] || primary.id}</strong>
+                <p>{copy.insights.keyboardTotal}: {hotspots.total}</p>
+            </div>
+            <div className="keyboard-hotspots__list">
+                {hotspots.zones.map((zone) => (
+                    <div key={zone.id} className="keyboard-zone-row">
+                        <div>
+                            <strong>{labels[zone.id] || zone.id}</strong>
+                            <span>{formatZoneChars(zone.chars, language) || copy.common.emptyValue}</span>
+                        </div>
+                        <span>{zone.share}%</span>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 export function InsightsPage() {
     const navigate = useAppNavigate();
     const store = useInsightsPageStore();
@@ -149,6 +183,17 @@ export function InsightsPage() {
                         </div>
                     </div>
                 </div>
+            </section>
+
+            <section className="panel">
+                <div className="panel-head">
+                    <div>
+                        <p className="panel-kicker">{copy.insights.keyboardZonesTitle}</p>
+                        <h2>{copy.insights.keyboardZonesTitle}</h2>
+                    </div>
+                </div>
+                <p className="muted-text">{copy.insights.keyboardZonesBody}</p>
+                <KeyboardHotspots copy={copy} hotspots={insights.keyboardHotspots} language={language} />
             </section>
 
             <section className="panel">
