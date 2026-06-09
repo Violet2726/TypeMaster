@@ -1,4 +1,4 @@
-import { createAdaptiveDrillDraft, createBuiltinDraft, createCustomDraft, doesDraftMatchConfig } from '@typemaster/domain';
+import { createAdaptiveDrillDraft, createBuiltinDraft, createCustomDraft, createKeyboardZoneDrillDraft, doesDraftMatchConfig } from '@typemaster/domain';
 import { generatePracticeText } from '@typemaster/ai';
 import { normalizeAiIssue, normalizeConfig, shouldLogAiIssue } from './app-state-helpers';
 
@@ -37,6 +37,21 @@ export function setCustomDraft(environment, nextConfig, text = environment.setti
 
 export function setAdaptiveDrillDraft(environment, session) {
     const draft = createAdaptiveDrillDraft(session, {
+        language: environment.settings.language
+    });
+
+    environment.setConfigState(draft.configSnapshot);
+    environment.setCurrentDraft(draft);
+    environment.setPracticeError(null);
+    environment.setAiPracticeStatus('idle');
+    environment.setActiveSessionContext(null);
+
+    return draft;
+}
+
+export function setKeyboardZoneDrillDraft(environment, zone) {
+    const draft = createKeyboardZoneDrillDraft(zone, {
+        keyboardLayout: environment.settings.keyboardLayout,
         language: environment.settings.language
     });
 

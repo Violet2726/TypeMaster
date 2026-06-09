@@ -23,7 +23,7 @@ function formatZoneChars(chars, language) {
     return chars.map((item) => `${item.label}${getInlineSeparator(language)}${item.count}`).join(' / ');
 }
 
-function KeyboardHotspots({ copy, hotspots, language }) {
+function KeyboardHotspots({ copy, hotspots, language, onStartDrill }) {
     const labels = copy.insights.keyboardZoneLabels || {};
     const primary = hotspots.primaryZone;
 
@@ -37,6 +37,9 @@ function KeyboardHotspots({ copy, hotspots, language }) {
                 <span className="summary-label">{copy.insights.keyboardPrimary}</span>
                 <strong>{labels[primary.id] || primary.id}</strong>
                 <p>{copy.insights.keyboardTotal}: {hotspots.total}</p>
+                <button type="button" className="action-btn primary" onClick={onStartDrill}>
+                    {copy.insights.keyboardPracticeAction}
+                </button>
             </div>
             <div className="keyboard-hotspots__list">
                 {hotspots.zones.map((zone) => (
@@ -59,6 +62,7 @@ export function InsightsPage() {
     const {
         achievements,
         copy,
+        handleKeyboardZoneDrill,
         insights,
         language,
         latestCoachAdvice,
@@ -68,7 +72,10 @@ export function InsightsPage() {
         trainingCopy,
         weeklyGoal,
         weeklySessions
-    } = useInsightsPageModel(store);
+    } = useInsightsPageModel({
+        ...store,
+        navigate
+    });
 
     if (!sessions.length) {
         return (
@@ -193,7 +200,12 @@ export function InsightsPage() {
                     </div>
                 </div>
                 <p className="muted-text">{copy.insights.keyboardZonesBody}</p>
-                <KeyboardHotspots copy={copy} hotspots={insights.keyboardHotspots} language={language} />
+                <KeyboardHotspots
+                    copy={copy}
+                    hotspots={insights.keyboardHotspots}
+                    language={language}
+                    onStartDrill={handleKeyboardZoneDrill}
+                />
             </section>
 
             <section className="panel">

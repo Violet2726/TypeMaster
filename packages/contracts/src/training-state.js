@@ -190,7 +190,11 @@ export const SessionSourceTextMetaSchema = z.object({
     generatedBy: z.string().optional(),
     adaptiveFocus: z.string().nullable().optional(),
     adaptiveHotspots: z.array(z.string()).optional().default([]),
-    adaptiveMetrics: z.record(z.unknown()).optional().default({})
+    adaptiveMetrics: z.record(z.unknown()).optional().default({}),
+    keyboardZone: z.string().nullable().optional(),
+    keyboardLayout: z.string().nullable().optional(),
+    keyboardZoneChars: z.array(z.string()).optional().default([]),
+    keyboardZoneShare: z.number().optional().default(0)
 }).catchall(z.unknown());
 
 export const SessionTrainingMetaSchema = z.object({

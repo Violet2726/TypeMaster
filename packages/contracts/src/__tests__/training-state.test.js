@@ -185,6 +185,25 @@ describe('training state contracts', () => {
             }
         });
 
+        expect(SessionRecordSchema.parse({
+            id: 'session-keyboard-zone',
+            sourceTextMeta: {
+                source: 'builtin',
+                label: 'Left home row drill',
+                generatedBy: 'keyboard-zone',
+                keyboardZone: 'leftHome',
+                keyboardLayout: 'qwerty',
+                keyboardZoneChars: ['a', 's'],
+                keyboardZoneShare: 56
+            }
+        }).sourceTextMeta).toMatchObject({
+            generatedBy: 'keyboard-zone',
+            keyboardZone: 'leftHome',
+            keyboardLayout: 'qwerty',
+            keyboardZoneChars: ['a', 's'],
+            keyboardZoneShare: 56
+        });
+
         expect(normalizeCoachAdviceRecord({
             sessionId: 'session-1',
             source: 'fallback'

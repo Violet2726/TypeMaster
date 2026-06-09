@@ -234,6 +234,7 @@ export const enUSMessages = {
             keyboardZonesBody: 'Group frequent misses by physical keyboard area so the next practice target is easier to feel.',
             keyboardPrimary: 'Main pressure',
             keyboardTotal: 'Recent misses',
+            keyboardPracticeAction: 'Practice this zone',
             keyboardEmpty: 'No keyboard pressure is visible yet. More completed rounds will make the pattern clearer.',
             keyboardZoneLabels: {
                 leftTop: 'Left hand / top row',

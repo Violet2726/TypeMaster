@@ -6,6 +6,7 @@ import {
     createDraftFromWords,
     createBuiltinDraft,
     createAdaptiveDrillDraft,
+    createKeyboardZoneDrillDraft,
     createDraftFromText,
     doesDraftMatchConfig,
     resolveAdaptiveDrillFocus
@@ -206,6 +207,51 @@ describe('draft', () => {
             expect(draft.words.some((word) => /[.,!?;:]$/.test(word))).toBe(true);
             expect(draft.words.some((word) => /^\d+$/.test(word))).toBe(true);
             expect(draft.words).toHaveLength(35);
+        });
+    });
+
+    describe('createKeyboardZoneDrillDraft', () => {
+        test('builds a local drill from a keyboard pressure zone', () => {
+            const draft = createKeyboardZoneDrillDraft({
+                id: 'leftHome',
+                share: 56,
+                chars: [
+                    { label: 'a', count: 2 },
+                    { label: 's', count: 1 }
+                ]
+            }, {
+                keyboardLayout: 'qwerty',
+                language: 'en-US'
+            });
+
+            expect(draft.sourceTextMeta).toMatchObject({
+                generatedBy: 'keyboard-zone',
+                label: 'Left home row drill',
+                keyboardZone: 'leftHome',
+                keyboardLayout: 'qwerty',
+                keyboardZoneChars: ['a', 's'],
+                keyboardZoneShare: 56
+            });
+            expect(draft.configSnapshot).toMatchObject({
+                source: 'builtin',
+                mode: 'words',
+                wordCount: 32,
+                includeNumbers: false,
+                includePunctuation: false
+            });
+            expect(draft.words.some((word) => word.includes('a'))).toBe(true);
+        });
+
+        test('uses number mode pressure when the number row is selected', () => {
+            const draft = createKeyboardZoneDrillDraft({
+                id: 'numberRow',
+                share: 30,
+                chars: [{ label: '7', count: 2 }]
+            }, { language: 'en-US' });
+
+            expect(draft.sourceTextMeta.label).toBe('Number row drill');
+            expect(draft.configSnapshot.includeNumbers).toBe(true);
+            expect(draft.words.some((word) => /^\d+$/.test(word))).toBe(true);
         });
     });
 

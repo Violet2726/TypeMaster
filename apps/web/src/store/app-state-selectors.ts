@@ -112,6 +112,7 @@ export function useInsightsPageStore() {
     const plan = usePlanSnapshot();
     const history = useHistorySnapshot();
     const achievements = useAchievementSnapshot();
+    const { configActions } = useAppActions();
 
     return {
         achievements: achievements.achievements,
@@ -122,6 +123,7 @@ export function useInsightsPageStore() {
         sessions: history.sessions,
         sessionStreak: achievements.sessionStreak,
         skillProfile: plan.skillProfile,
+        startKeyboardZoneDrill: configActions.setKeyboardZoneDrillDraft,
         weeklyGoal: achievements.weeklyGoal,
         weeklySessions: achievements.weeklySessions
     };

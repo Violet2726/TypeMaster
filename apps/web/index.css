@@ -1324,6 +1324,11 @@ body[data-theme='serika-light'] .words-shell::after {
     color: var(--text-dim);
 }
 
+.keyboard-hotspots__primary .action-btn {
+    justify-self: start;
+    margin-top: 0.35rem;
+}
+
 .keyboard-hotspots__list {
     display: grid;
     gap: 0.7rem;

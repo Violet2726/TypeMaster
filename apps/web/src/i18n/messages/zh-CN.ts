@@ -234,6 +234,7 @@ export const zhCNMessages = {
             keyboardZonesBody: '把高频错误按物理键盘区域归类，让下一轮该练哪只手、哪一排更容易感知。',
             keyboardPrimary: '主要压力',
             keyboardTotal: '近期错误',
+            keyboardPracticeAction: '练这个区域',
             keyboardEmpty: '暂时还看不出明确键位压力。完成更多回合后模式会更清楚。',
             keyboardZoneLabels: {
                 leftTop: '左手 / 上排',

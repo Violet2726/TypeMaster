@@ -29,6 +29,30 @@ const ADAPTIVE_DRILL_WORDS = {
     ]
 };
 
+const KEYBOARD_ZONE_FALLBACK_CHARS = {
+    leftTop: ['q', 'w', 'e', 'r', 't'],
+    leftHome: ['a', 's', 'd', 'f', 'g'],
+    leftBottom: ['z', 'x', 'c', 'v', 'b'],
+    rightTop: ['y', 'u', 'i', 'o', 'p'],
+    rightHome: ['h', 'j', 'k', 'l'],
+    rightBottom: ['n', 'm'],
+    numberRow: ['1', '2', '3', '4', '5'],
+    symbolLayer: ['.', ',', '?', ';', ':'],
+    other: ['steady', 'focus']
+};
+
+const KEYBOARD_ZONE_DRILL_WORDS = {
+    leftTop: ['quiet', 'write', 'tree', 'treat', 'reset', 'water', 'tower', 'true'],
+    leftHome: ['ask', 'sad', 'glass', 'flag', 'fall', 'safe', 'dash', 'gas'],
+    leftBottom: ['zebra', 'exact', 'civic', 'vivid', 'brave', 'basic', 'cable', 'vocal'],
+    rightTop: ['input', 'union', 'option', 'upper', 'point', 'opinion', 'pilot', 'unity'],
+    rightHome: ['hold', 'joke', 'kill', 'hill', 'link', 'kind', 'join', 'look'],
+    rightBottom: ['moment', 'minimum', 'name', 'mean', 'moon', 'mind', 'normal', 'number'],
+    numberRow: ['100', '24', '365', '808', '12', '404', '2026', '75'],
+    symbolLayer: ['end.', 'pause,', 'why?', 'list;', 'note:', 'clean.', 'again,', 'ready?'],
+    other: ['steady', 'focus', 'control', 'motion', 'signal', 'target', 'clear', 'finish']
+};
+
 function getBuiltinLabel(language = 'zh-CN') {
     return language === 'en-US' ? 'Built-in word bank' : '标准词库训练';
 }
@@ -54,6 +78,35 @@ function getAdaptiveLabel(focus, language = 'zh-CN') {
     };
 
     return (labels[language] || labels['zh-CN'])[focus] || labels[language]?.speed || labels['zh-CN'].speed;
+}
+
+function getKeyboardZoneLabel(zoneId, language = 'zh-CN') {
+    const labels = {
+        'zh-CN': {
+            leftTop: '左手上排专项',
+            leftHome: '左手主键位专项',
+            leftBottom: '左手下排专项',
+            rightTop: '右手上排专项',
+            rightHome: '右手主键位专项',
+            rightBottom: '右手下排专项',
+            numberRow: '数字排专项',
+            symbolLayer: '符号层专项',
+            other: '输入稳定专项'
+        },
+        'en-US': {
+            leftTop: 'Left top row drill',
+            leftHome: 'Left home row drill',
+            leftBottom: 'Left bottom row drill',
+            rightTop: 'Right top row drill',
+            rightHome: 'Right home row drill',
+            rightBottom: 'Right bottom row drill',
+            numberRow: 'Number row drill',
+            symbolLayer: 'Symbol layer drill',
+            other: 'Input stability drill'
+        }
+    };
+
+    return (labels[language] || labels['zh-CN'])[zoneId] || labels[language]?.other || labels['zh-CN'].other;
 }
 
 function getMissCount(session) {
@@ -152,6 +205,77 @@ function decorateAdaptiveWords(words, config) {
     });
 }
 
+function buildKeyboardZoneConfig(zone) {
+    const zoneId = zone?.id || 'other';
+
+    return {
+        mode: 'words',
+        durationSeconds: 30,
+        wordCount: zoneId === 'numberRow' || zoneId === 'symbolLayer' ? 28 : 32,
+        includePunctuation: zoneId === 'symbolLayer',
+        includeNumbers: zoneId === 'numberRow',
+        source: 'builtin',
+        aiTemplate: 'daily',
+        difficulty: 'medium'
+    };
+}
+
+function buildKeyboardZoneSeedWords(zone) {
+    const zoneId = zone?.id || 'other';
+    const hotspotChars = Array.isArray(zone?.chars)
+        ? zone.chars.map((item) => normalizePracticeToken(item?.label || item)).filter(Boolean)
+        : [];
+    const fallbackChars = KEYBOARD_ZONE_FALLBACK_CHARS[zoneId] || KEYBOARD_ZONE_FALLBACK_CHARS.other;
+    const chars = [...new Set([...hotspotChars, ...fallbackChars])].slice(0, 8);
+
+    if (zoneId === 'numberRow') {
+        return [...chars.filter((char) => /^\d$/.test(char)), ...KEYBOARD_ZONE_DRILL_WORDS.numberRow];
+    }
+
+    if (zoneId === 'symbolLayer') {
+        return [
+            ...chars.filter((char) => /[^a-z0-9]/i.test(char)).map((char) => `mark${char}`),
+            ...KEYBOARD_ZONE_DRILL_WORDS.symbolLayer
+        ];
+    }
+
+    const charWords = chars
+        .filter((char) => /^[a-z]$/.test(char))
+        .flatMap((char) => [
+            char.repeat(2),
+            ...commonWords.filter((word) => word.includes(char)).slice(0, 3)
+        ]);
+
+    return [
+        ...charWords,
+        ...(KEYBOARD_ZONE_DRILL_WORDS[zoneId] || KEYBOARD_ZONE_DRILL_WORDS.other),
+        ...chars
+    ];
+}
+
+export function createKeyboardZoneDrillDraft(zone, options = {}) {
+    const language = options.language || 'zh-CN';
+    const keyboardLayout = options.keyboardLayout || 'qwerty';
+    const zoneId = zone?.id || 'other';
+    const config = buildKeyboardZoneConfig(zone);
+    const targetCount = estimateTargetWordCount(config);
+    const seedWords = buildKeyboardZoneSeedWords(zone);
+    const words = fillAdaptiveWords(seedWords, targetCount);
+
+    return createDraftFromWords(words, config, {
+        label: getKeyboardZoneLabel(zoneId, language),
+        language,
+        generatedBy: 'keyboard-zone',
+        template: zoneId,
+        keyboardZone: zoneId,
+        keyboardLayout,
+        keyboardZoneChars: Array.isArray(zone?.chars)
+            ? zone.chars.slice(0, 5).map((item) => item.label).filter(Boolean)
+            : [],
+        keyboardZoneShare: Number(zone?.share || 0)
+    });
+}
+
 export function createAdaptiveDrillDraft(session, options = {}) {
     const language = options.language || 'zh-CN';
     const focus = resolveAdaptiveDrillFocus(session);
@@ -246,6 +370,14 @@ export function createDraftFromWords(words, config, meta = {}) {
             adaptiveMetrics: meta.adaptiveMetrics || {}
         }
         : {};
+    const keyboardZoneMeta = meta.generatedBy === 'keyboard-zone'
+        ? {
+            keyboardZone: meta.keyboardZone || meta.template || null,
+            keyboardLayout: meta.keyboardLayout || null,
+            keyboardZoneChars: Array.isArray(meta.keyboardZoneChars) ? meta.keyboardZoneChars : [],
+            keyboardZoneShare: Number(meta.keyboardZoneShare || 0)
+        }
+        : {};
 
     return {
         id: generateId(),
@@ -262,7 +394,8 @@ export function createDraftFromWords(words, config, meta = {}) {
             createdAt: meta.createdAt || new Date().toISOString(),
             prompt: meta.prompt || null,
             generatedBy: meta.generatedBy || (config.source === 'ai' ? 'ai' : 'builtin'),
-            ...adaptiveMeta
+            ...adaptiveMeta,
+            ...keyboardZoneMeta
         }
     };
 }

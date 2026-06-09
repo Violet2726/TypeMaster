@@ -1,8 +1,9 @@
 /** @vitest-environment jsdom */
-import { screen } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import InsightsPage from '../InsightsPage';
 import { renderWithProvider } from '../../test/render-with-provider';
-import { resetMockNavigation } from '../../test/next-navigation';
+import { mockRouterPush, resetMockNavigation } from '../../test/next-navigation';
+import { usePracticeRuntimeStore } from '../../features/practice/state/practice-runtime-store';
 
 describe('InsightsPage', () => {
     beforeEach(() => {
@@ -69,5 +70,22 @@ describe('InsightsPage', () => {
         expect(screen.getByText('56%')).toBeInTheDocument();
         expect(screen.getByText('Number row')).toBeInTheDocument();
         expect(screen.getByText('Symbol layer')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Practice this zone' }));
+
+        await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith('/practice'));
+        expect(usePracticeRuntimeStore.getState().currentDraft.sourceTextMeta).toMatchObject({
+            generatedBy: 'keyboard-zone',
+            label: 'Left home row drill',
+            keyboardZone: 'leftHome',
+            keyboardLayout: 'qwerty',
+            keyboardZoneChars: ['a', 's', 'd', 'g'],
+            keyboardZoneShare: 56
+        });
+        expect(usePracticeRuntimeStore.getState().config).toMatchObject({
+            source: 'builtin',
+            mode: 'words',
+            wordCount: 32
+        });
     });
 });

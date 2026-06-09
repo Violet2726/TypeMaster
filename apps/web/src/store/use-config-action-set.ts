@@ -4,6 +4,7 @@ import {
     generateAiPractice,
     resetPracticeToBuiltin,
     setAdaptiveDrillDraft,
+    setKeyboardZoneDrillDraft,
     restoreAiDraftConfig,
     setBuiltinDraft,
     setCustomDraft,
@@ -29,6 +30,9 @@ export function useConfigActionSet(environment) {
     const setAdaptiveDrillDraftAction = useCallback((session) => (
         setAdaptiveDrillDraft(environment, session)
     ), [environment]);
+    const setKeyboardZoneDrillDraftAction = useCallback((zone) => (
+        setKeyboardZoneDrillDraft(environment, zone)
+    ), [environment]);
     const applyCustomWordBankAction = useCallback((text, options: ApplyCustomWordBankOptions = {}) => (
         applyCustomWordBank(environment, text, options)
     ), [environment]);
@@ -53,6 +57,7 @@ export function useConfigActionSet(environment) {
         setAdaptiveDrillDraft: setAdaptiveDrillDraftAction,
         setBuiltinDraft: setBuiltinDraftAction,
         setCustomDraft: setCustomDraftAction,
+        setKeyboardZoneDrillDraft: setKeyboardZoneDrillDraftAction,
         updateConfig: updateConfigAction
     }), [
         applyCustomWordBankAction,
@@ -62,6 +67,7 @@ export function useConfigActionSet(environment) {
         setAdaptiveDrillDraftAction,
         setBuiltinDraftAction,
         setCustomDraftAction,
+        setKeyboardZoneDrillDraftAction,
         updateConfigAction
     ]);
 }

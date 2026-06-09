@@ -11,6 +11,7 @@ vi.mock('@typemaster/ai', () => ({
 import {
     applyCustomWordBank,
     generateAiPractice,
+    setKeyboardZoneDrillDraft,
     updateConfig
 } from '../practice-draft-use-cases';
 
@@ -36,6 +37,7 @@ function createEnvironment(overrides = {}) {
         currentDraft: null,
         settings: {
             language: 'en-US',
+            keyboardLayout: 'qwerty',
             customWordBankText: ''
         },
         setActiveSessionContext: vi.fn(),
@@ -131,6 +133,38 @@ describe('practice draft use cases', () => {
         expect(environment.setAiPracticeStatus).toHaveBeenNthCalledWith(1, 'loading');
         expect(environment.setAiPracticeStatus).toHaveBeenLastCalledWith('ready');
         expect(environment.setCurrentDraft).toHaveBeenCalledWith(aiDraft);
+    });
+
+    test('starts a keyboard zone drill and clears the active training context', () => {
+        const environment = createEnvironment({
+            activeSessionContext: {
+                type: 'plan',
+                planId: 'plan-1',
+                stepId: 'starter-day-1'
+            }
+        });
+
+        const draft = setKeyboardZoneDrillDraft(environment, {
+            id: 'leftHome',
+            share: 56,
+            chars: [{ label: 'a', count: 2 }]
+        });
+
+        expect(draft.sourceTextMeta).toMatchObject({
+            generatedBy: 'keyboard-zone',
+            keyboardZone: 'leftHome',
+            keyboardLayout: 'qwerty',
+            keyboardZoneChars: ['a']
+        });
+        expect(environment.setConfigState).toHaveBeenCalledWith(expect.objectContaining({
+            source: 'builtin',
+            mode: 'words',
+            wordCount: 32
+        }));
+        expect(environment.setCurrentDraft).toHaveBeenCalledWith(draft);
+        expect(environment.setPracticeError).toHaveBeenCalledWith(null);
+        expect(environment.setAiPracticeStatus).toHaveBeenCalledWith('idle');
+        expect(environment.setActiveSessionContext).toHaveBeenCalledWith(null);
     });
 
     test('captures ai generation issues before rethrowing', async () => {
