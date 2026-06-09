@@ -1,5 +1,6 @@
 import { DEFAULT_CONFIG } from './config.js';
-import { createBuiltinWords, createDraftFromText, createDraftFromWords } from './draft.js';
+import { buildKeyboardHotspotsFromStats } from './insights.js';
+import { createBuiltinWords, createDraftFromText, createDraftFromWords, createKeyboardZoneDrillDraft } from './draft.js';
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
@@ -9,6 +10,31 @@ const PROFILE_LEVELS = [
     { id: 'fluent', minWpm: 70, minAccuracy: 96 },
     { id: 'sprint', minWpm: 100, minAccuracy: 97 }
 ];
+
+const KEYBOARD_ZONE_LABELS = {
+    'zh-CN': {
+        leftTop: '左手 / 上排',
+        leftHome: '左手 / 主键位',
+        leftBottom: '左手 / 下排',
+        rightTop: '右手 / 上排',
+        rightHome: '右手 / 主键位',
+        rightBottom: '右手 / 下排',
+        numberRow: '数字排',
+        symbolLayer: '符号层',
+        other: '其他输入'
+    },
+    'en-US': {
+        leftTop: 'Left hand / top row',
+        leftHome: 'Left hand / home row',
+        leftBottom: 'Left hand / bottom row',
+        rightTop: 'Right hand / top row',
+        rightHome: 'Right hand / home row',
+        rightBottom: 'Right hand / bottom row',
+        numberRow: 'Number row',
+        symbolLayer: 'Symbol layer',
+        other: 'Other input'
+    }
+};
 
 const TRAINING_COPY = {
     'zh-CN': {
@@ -42,6 +68,8 @@ const TRAINING_COPY = {
             day1: ['精度回正', '用中等时长找回稳定命中率。'],
             day2: ['节奏定型', '缩短时长，先练稳定输出。'],
             day3: ['弱项补强', '围绕最近最常见错误做针对性重复。'],
+            keyboardDayTitle: '{zone}回正',
+            keyboardDayBody: '最近 {count} 轮都在这个区域掉点，先用一轮计划专项把压力降下来。',
             day4: ['耐力拉伸', '延长一轮时长，避免后半段掉速。'],
             day5: ['数字符号', '把数字和标点重新带回主流程。'],
             day6: ['压力回合', '在更紧凑的节奏下维持准确率。'],
@@ -79,6 +107,8 @@ const TRAINING_COPY = {
             day1: ['Reset accuracy', 'Use a mid-length round to bring hit rate back under control.'],
             day2: ['Lock the rhythm', 'Shorten the round and focus on smooth output.'],
             day3: ['Weak spot drill', 'Repeat the patterns that caused the latest mistakes.'],
+            keyboardDayTitle: '{zone} reset',
+            keyboardDayBody: 'This zone stayed under pressure across {count} recent rounds. Use one planned drill to cool it down before wider practice.',
             day4: ['Stretch endurance', 'Lengthen the round so the back half does not collapse.'],
             day5: ['Numbers and punctuation', 'Bring symbols back into the main loop.'],
             day6: ['Pressure round', 'Hold accuracy while the pace gets tighter.'],
@@ -89,6 +119,20 @@ const TRAINING_COPY = {
 
 function getTrainingLocale(language = 'zh-CN') {
     return TRAINING_COPY[language] || TRAINING_COPY['zh-CN'];
+}
+
+function normalizeTrainingOptions(languageOrOptions = 'zh-CN') {
+    if (languageOrOptions && typeof languageOrOptions === 'object' && !Array.isArray(languageOrOptions)) {
+        return {
+            language: languageOrOptions.language || 'zh-CN',
+            keyboardLayout: languageOrOptions.keyboardLayout || 'qwerty'
+        };
+    }
+
+    return {
+        language: languageOrOptions || 'zh-CN',
+        keyboardLayout: 'qwerty'
+    };
 }
 
 function toConfig(overrides) {
@@ -118,6 +162,17 @@ function countLabels(items) {
     return [...counts.entries()]
         .sort((left, right) => right[1] - left[1])
         .map(([label, count]) => ({ label, count }));
+}
+
+function getKeyboardZoneLabel(zoneId, language = 'zh-CN') {
+    const labels = KEYBOARD_ZONE_LABELS[language] || KEYBOARD_ZONE_LABELS['zh-CN'];
+    return labels[zoneId] || labels.other;
+}
+
+function fillTemplate(template, values = {}) {
+    return Object.entries(values).reduce((result, [key, value]) => (
+        result.replace(`{${key}}`, value)
+    ), String(template || ''));
 }
 
 function resolveProfileLevel(avgWpm, avgAccuracy) {
@@ -204,6 +259,8 @@ function buildWeakSpotText(skillProfile) {
 }
 
 function buildStep(id, order, tuple, config, options = {}) {
+    const { text = '', ...rest } = options;
+
     return {
         id,
         order,
@@ -211,9 +268,98 @@ function buildStep(id, order, tuple, config, options = {}) {
         summary: tuple[1],
         config,
         status: 'pending',
-        text: options.text || '',
-        completedSessionId: null
+        text,
+        completedSessionId: null,
+        ...rest
     };
+}
+
+function readErrorCharStats(session) {
+    if (Array.isArray(session?.result?.errorCharStats) && session.result.errorCharStats.length) {
+        return session.result.errorCharStats
+            .map((item) => ({
+                label: String(item?.label || '').trim(),
+                count: Math.max(0, Number(item?.count || 0))
+            }))
+            .filter((item) => item.label && item.count > 0);
+    }
+
+    return Array.isArray(session?.result?.topErrorChars)
+        ? session.result.topErrorChars.map((label) => ({ label, count: 1 }))
+        : [];
+}
+
+function buildKeyboardFocus(sessions, keyboardLayout = 'qwerty') {
+    const aggregateCounts = new Map();
+    const sessionPrimaryZones = [];
+
+    sessions.forEach((session) => {
+        const stats = readErrorCharStats(session);
+        stats.forEach((item) => {
+            aggregateCounts.set(item.label, (aggregateCounts.get(item.label) || 0) + item.count);
+        });
+
+        const hotspots = buildKeyboardHotspotsFromStats(stats, { keyboardLayout });
+        if (hotspots.primaryZone && hotspots.primaryZone.id !== 'other' && hotspots.primaryZone.count >= 2) {
+            sessionPrimaryZones.push(hotspots.primaryZone.id);
+        }
+    });
+
+    const aggregateStats = [...aggregateCounts.entries()].map(([label, count]) => ({ label, count }));
+    const hotspots = buildKeyboardHotspotsFromStats(aggregateStats, { keyboardLayout });
+    const primaryZone = hotspots.primaryZone;
+
+    if (!primaryZone || primaryZone.id === 'other') {
+        return null;
+    }
+
+    return {
+        zoneId: primaryZone.id,
+        zoneShare: primaryZone.share,
+        zoneChars: primaryZone.chars.map((item) => item.label).slice(0, 5),
+        repeatedSessionCount: sessionPrimaryZones.filter((zoneId) => zoneId === primaryZone.id).length,
+        totalErrors: hotspots.total,
+        keyboardLayout
+    };
+}
+
+function shouldPromoteKeyboardFocus(keyboardFocus) {
+    return Boolean(
+        keyboardFocus
+        && keyboardFocus.zoneId
+        && keyboardFocus.zoneId !== 'other'
+        && keyboardFocus.repeatedSessionCount >= 2
+        && keyboardFocus.zoneShare >= 35
+        && keyboardFocus.totalErrors >= 4
+    );
+}
+
+function buildKeyboardPlanStep(keyboardFocus, language = 'zh-CN') {
+    if (!shouldPromoteKeyboardFocus(keyboardFocus)) {
+        return null;
+    }
+
+    const locale = getTrainingLocale(language);
+    const zoneLabel = getKeyboardZoneLabel(keyboardFocus.zoneId, language);
+    const title = fillTemplate(locale.plan.keyboardDayTitle, { zone: zoneLabel });
+    const summary = fillTemplate(locale.plan.keyboardDayBody, { count: keyboardFocus.repeatedSessionCount });
+    const draft = createKeyboardZoneDrillDraft({
+        id: keyboardFocus.zoneId,
+        share: keyboardFocus.zoneShare,
+        chars: keyboardFocus.zoneChars.map((label) => ({ label, count: 1 }))
+    }, {
+        keyboardLayout: keyboardFocus.keyboardLayout,
+        language,
+        label: title
+    });
+
+    return buildStep('starter-day-3', 3, [title, summary], draft.configSnapshot, {
+        generatedBy: 'keyboard-zone',
+        keyboardZone: keyboardFocus.zoneId,
+        keyboardLayout: keyboardFocus.keyboardLayout,
+        keyboardZoneChars: keyboardFocus.zoneChars,
+        keyboardZoneShare: keyboardFocus.zoneShare
+    });
 }
 
 export function createDiagnosticJourney(language = 'zh-CN') {
@@ -316,7 +462,12 @@ export function advanceJourney(journey, sessionId) {
     };
 }
 
-export function buildSkillProfile(sessions, language = 'zh-CN') {
+/**
+ * @param {Array<unknown>} sessions
+ * @param {string | { language?: string, keyboardLayout?: string }} [languageOrOptions='zh-CN']
+ */
+export function buildSkillProfile(sessions, languageOrOptions = 'zh-CN') {
+    const { language, keyboardLayout } = normalizeTrainingOptions(languageOrOptions);
     const locale = getTrainingLocale(language);
     const safeSessions = Array.isArray(sessions) ? sessions.filter(Boolean) : [];
 
@@ -339,6 +490,7 @@ export function buildSkillProfile(sessions, language = 'zh-CN') {
     ).slice(0, 5).map((item) => item.label);
 
     const weakZones = buildWeakZones(safeSessions, metrics, language);
+    const keyboardFocus = buildKeyboardFocus(safeSessions, keyboardLayout);
     const primaryFocus = weakZones.find((item) => item.id === 'accuracy')?.id
         || weakZones.find((item) => item.id === 'rhythm')?.id
         || weakZones.find((item) => item.id === 'symbols')?.id
@@ -359,6 +511,7 @@ export function buildSkillProfile(sessions, language = 'zh-CN') {
         weakZones,
         topErrorChars,
         topErrorWords,
+        keyboardFocus,
         metrics
     };
 }
@@ -371,6 +524,7 @@ export function createStarterTrainingPlan(skillProfile, language = 'zh-CN') {
     const accuracyHeavy = primaryFocus === 'accuracy';
     const rhythmHeavy = primaryFocus === 'rhythm';
     const enduranceHeavy = primaryFocus === 'endurance';
+    const keyboardPlanStep = buildKeyboardPlanStep(skillProfile?.keyboardFocus, language);
 
     const steps = [
         buildStep('starter-day-1', 1, locale.plan.day1, toConfig({
@@ -387,7 +541,7 @@ export function createStarterTrainingPlan(skillProfile, language = 'zh-CN') {
             includeNumbers: false,
             includePunctuation: false
         })),
-        buildStep('starter-day-3', 3, locale.plan.day3, toConfig({
+        keyboardPlanStep || buildStep('starter-day-3', 3, locale.plan.day3, toConfig({
             source: 'builtin',
             mode: 'words',
             wordCount: 35,
@@ -488,6 +642,29 @@ export function getTrainingPlanProgress(plan) {
 export function createDraftFromTrainingStep(step, language = 'zh-CN') {
     if (!step) {
         return null;
+    }
+
+    if (step.generatedBy === 'keyboard-zone' || step.keyboardZone) {
+        const draft = createKeyboardZoneDrillDraft({
+            id: step.keyboardZone || 'other',
+            share: Number(step.keyboardZoneShare || 0),
+            chars: Array.isArray(step.keyboardZoneChars)
+                ? step.keyboardZoneChars.map((label) => ({ label, count: 1 }))
+                : []
+        }, {
+            keyboardLayout: step.keyboardLayout || 'qwerty',
+            language,
+            label: step.title,
+            configOverrides: step.config
+        });
+
+        return {
+            ...draft,
+            sourceTextMeta: {
+                ...draft.sourceTextMeta,
+                label: step.title
+            }
+        };
     }
 
     if (step.text) {

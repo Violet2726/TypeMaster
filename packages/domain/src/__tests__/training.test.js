@@ -67,6 +67,10 @@ describe('training.js', () => {
         expect(profile.weakZones.some((item) => item.id === 'rhythm')).toBe(true);
         expect(profile.topErrorChars[0]).toBe('a');
         expect(profile.topErrorWords[0]).toBe('alpha');
+        expect(profile.keyboardFocus).toMatchObject({
+            zoneId: 'leftHome',
+            repeatedSessionCount: 2
+        });
     });
 
     it('creates a 7-day starter plan and advances through it', () => {
@@ -89,6 +93,30 @@ describe('training.js', () => {
         });
     });
 
+    it('replaces the weak spot day with a keyboard zone step when the pressure repeats', () => {
+        const plan = createStarterTrainingPlan({
+            primaryFocus: 'accuracy',
+            topErrorChars: ['a'],
+            topErrorWords: ['alpha'],
+            keyboardFocus: {
+                zoneId: 'leftHome',
+                zoneShare: 56,
+                zoneChars: ['a', 's', 'd'],
+                repeatedSessionCount: 2,
+                totalErrors: 9,
+                keyboardLayout: 'qwerty'
+            }
+        }, 'en-US');
+
+        expect(plan.steps[2]).toMatchObject({
+            id: 'starter-day-3',
+            generatedBy: 'keyboard-zone',
+            keyboardZone: 'leftHome',
+            keyboardZoneChars: ['a', 's', 'd']
+        });
+        expect(plan.steps[2].title).toBe('Left hand / home row reset');
+    });
+
     it('creates a draft from a training step', () => {
         const plan = createStarterTrainingPlan({
             primaryFocus: 'accuracy',
@@ -101,6 +129,41 @@ describe('training.js', () => {
         expect(draft).toBeDefined();
         expect(draft.sourceTextMeta.label).toBe(plan.steps[2].title);
         expect(draft.words.length).toBeGreaterThan(0);
+    });
+
+    it('creates a keyboard-zone draft from a specialized training step', () => {
+        const draft = createDraftFromTrainingStep({
+            id: 'starter-day-3',
+            order: 3,
+            title: 'Left hand / home row reset',
+            summary: 'Pressure stayed here twice.',
+            status: 'pending',
+            config: {
+                source: 'builtin',
+                mode: 'words',
+                durationSeconds: 30,
+                wordCount: 32,
+                includeNumbers: false,
+                includePunctuation: false,
+                aiTemplate: 'daily',
+                difficulty: 'medium'
+            },
+            generatedBy: 'keyboard-zone',
+            keyboardZone: 'leftHome',
+            keyboardLayout: 'qwerty',
+            keyboardZoneChars: ['a', 's', 'd'],
+            keyboardZoneShare: 56
+        }, 'en-US');
+
+        expect(draft.sourceTextMeta).toMatchObject({
+            generatedBy: 'keyboard-zone',
+            label: 'Left hand / home row reset',
+            keyboardZone: 'leftHome',
+            keyboardLayout: 'qwerty',
+            keyboardZoneChars: ['a', 's', 'd'],
+            keyboardZoneShare: 56
+        });
+        expect(draft.configSnapshot.wordCount).toBe(32);
     });
 
     it('calculates streak and weekly session counts', () => {

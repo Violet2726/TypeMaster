@@ -98,7 +98,10 @@ export function advanceAssessment(environment, session, nextSessions) {
             .map((step) => step.completedSessionId)
             .filter(Boolean);
         const diagnosticSessions = nextSessions.filter((item) => diagnosticSessionIds.includes(item.id));
-        const nextProfile = buildSkillProfile(diagnosticSessions, environment.settings.language);
+        const nextProfile = buildSkillProfile(diagnosticSessions, {
+            language: environment.settings.language,
+            keyboardLayout: environment.settings.keyboardLayout
+        });
         environment.setSkillProfile(nextProfile);
         environment.setTrainingPlan(createStarterTrainingPlan(nextProfile, environment.settings.language));
     }

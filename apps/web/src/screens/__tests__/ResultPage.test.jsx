@@ -128,6 +128,30 @@ const adaptiveSession = {
     }
 };
 
+const keyboardZoneSession = {
+    ...challengeSession,
+    id: 'session-keyboard-zone',
+    sourceTextMeta: {
+        label: 'Left hand / home row reset',
+        source: 'builtin',
+        generatedBy: 'keyboard-zone',
+        keyboardZone: 'leftHome',
+        keyboardLayout: 'qwerty',
+        keyboardZoneChars: ['a', 's', 'd'],
+        keyboardZoneShare: 56
+    },
+    trainingMeta: null,
+    result: {
+        ...challengeSession.result,
+        errorCharStats: [
+            { label: 'a', count: 1 },
+            { label: 's', count: 1 },
+            { label: 'k', count: 1 },
+            { label: '.', count: 1 }
+        ]
+    }
+};
+
 const baseStore = {
     copy: getCopy('en-US'),
     language: 'en-US',
@@ -326,5 +350,24 @@ describe('ResultPage', () => {
         expect(screen.getByText('Protect accuracy')).toBeInTheDocument();
         expect(screen.getByText('2 now / 5 before')).toBeInTheDocument();
         expect(screen.getByText('alpha / a')).toBeInTheDocument();
+    });
+
+    test('shows targeted feedback for keyboard-zone drills', () => {
+        Object.assign(mockStore, {
+            ...baseStore,
+            sessions: [keyboardZoneSession, previousChallengeSession],
+            lastCompletedSession: keyboardZoneSession,
+            dailyChallenge: null
+        });
+        setMockNavigation({ route: '/result?session=session-keyboard-zone' });
+
+        render(<ResultPage />);
+
+        expect(screen.getByRole('heading', { name: 'Targeted feedback' })).toBeInTheDocument();
+        expect(screen.getByText('Still improving')).toBeInTheDocument();
+        expect(screen.getByText('Pressure in this zone is lower than the hotspot that triggered the drill, but it is not gone yet.')).toBeInTheDocument();
+        expect(screen.getByText('Left hand / home row')).toBeInTheDocument();
+        expect(screen.getByText('50% now / 56% before')).toBeInTheDocument();
+        expect(screen.getByText('a / s')).toBeInTheDocument();
     });
 });

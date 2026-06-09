@@ -296,13 +296,16 @@ export function createKeyboardZoneDrillDraft(zone, options = {}) {
     const language = options.language || 'zh-CN';
     const keyboardLayout = options.keyboardLayout || 'qwerty';
     const zoneId = zone?.id || 'other';
-    const config = buildKeyboardZoneConfig(zone);
+    const config = {
+        ...buildKeyboardZoneConfig(zone),
+        ...(options.configOverrides || {})
+    };
     const targetCount = estimateTargetWordCount(config);
     const seedWords = buildKeyboardZoneSeedWords(zone);
     const words = fillAdaptiveWords(seedWords, targetCount);
 
     return createDraftFromWords(words, config, {
-        label: getKeyboardZoneLabel(zoneId, language),
+        label: options.label || getKeyboardZoneLabel(zoneId, language),
         language,
         generatedBy: 'keyboard-zone',
         template: zoneId,

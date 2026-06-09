@@ -1,7 +1,8 @@
 import { describe, expect, test, vi } from 'vitest';
 import {
     startDailyChallenge,
-    startRecommendedSession
+    startRecommendedSession,
+    startTrainingPlanStep
 } from '../training-flow-use-cases';
 
 const { getDailyChallengeMock } = vi.hoisted(() => ({
@@ -32,7 +33,8 @@ function createEnvironment(overrides = {}) {
         dailyChallengeState: null,
         diagnosticJourney: null,
         settings: {
-            language: 'en-US'
+            language: 'en-US',
+            keyboardLayout: 'qwerty'
         },
         skillProfile: null,
         trainingPlan: null,
@@ -119,6 +121,66 @@ describe('training flow use cases', () => {
             stepId: 'challenge-1',
             title: 'Daily challenge',
             summary: 'Shared pressure round.'
+        });
+    });
+
+    test('starts a keyboard-zone plan step as a specialized draft', () => {
+        const environment = createEnvironment({
+            skillProfile: {
+                primaryFocus: 'accuracy'
+            },
+            trainingPlan: {
+                id: 'plan-1',
+                status: 'active',
+                currentStepIndex: 2,
+                steps: [
+                    { id: 'starter-day-1', status: 'complete', config: {} },
+                    { id: 'starter-day-2', status: 'complete', config: {} },
+                    {
+                        id: 'starter-day-3',
+                        order: 3,
+                        title: 'Left hand / home row reset',
+                        summary: 'Pressure stayed here twice.',
+                        status: 'pending',
+                        generatedBy: 'keyboard-zone',
+                        keyboardZone: 'leftHome',
+                        keyboardLayout: 'qwerty',
+                        keyboardZoneChars: ['a', 's', 'd'],
+                        keyboardZoneShare: 56,
+                        config: {
+                            source: 'builtin',
+                            mode: 'words',
+                            durationSeconds: 30,
+                            wordCount: 32,
+                            includeNumbers: false,
+                            includePunctuation: false,
+                            aiTemplate: 'daily',
+                            difficulty: 'medium'
+                        }
+                    }
+                ]
+            }
+        });
+
+        const activeStep = startTrainingPlanStep(environment);
+        const draft = environment.setCurrentDraft.mock.calls[0][0];
+
+        expect(activeStep.id).toBe('starter-day-3');
+        expect(environment.setConfigState).toHaveBeenCalledWith(expect.objectContaining({
+            mode: 'words',
+            wordCount: 32
+        }));
+        expect(draft.sourceTextMeta).toMatchObject({
+            generatedBy: 'keyboard-zone',
+            label: 'Left hand / home row reset',
+            keyboardZone: 'leftHome',
+            keyboardLayout: 'qwerty',
+            keyboardZoneChars: ['a', 's', 'd']
+        });
+        expect(environment.setActiveSessionContext).toHaveBeenCalledWith({
+            type: 'plan',
+            planId: 'plan-1',
+            stepId: 'starter-day-3'
         });
     });
 });
