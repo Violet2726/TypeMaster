@@ -110,6 +110,13 @@ Main URLs:
 
 During development, Next.js rewrites `/api` from the web app to `http://localhost:8080`.
 
+## Vercel Deployment Notes
+
+- In this monorepo, the frontend entry lives in `apps/web`. If you import the repository through the Vercel dashboard, the project `Root Directory` should point to `apps/web`.
+- The root `vercel.json` keeps a compatibility route mapping for the existing `type_master` project so the homepage does not end up mounted under `/apps/web/*`.
+- The `/api` rewrite in `apps/web/next.config.mjs` is now development-only. Production should never proxy requests to `localhost:8080`.
+- When deploying with the Vercel CLI, keep `.vercelignore` in place so `node_modules`, coverage outputs, test artifacts, and `.vercel/output` are not uploaded.
+
 ## Verification
 
 ```bash

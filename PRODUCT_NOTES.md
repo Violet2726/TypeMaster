@@ -1,5 +1,29 @@
 # TypeMaster 产品迭代记录
 
+## 2026-06-09 Vercel 部署根路由修复
+
+本轮诊断：Vercel 上的 `type_master` 项目虽然显示部署成功，但访问生产域名时返回 404。根因不是 Next 构建失败，而是仓库根目录仍使用旧的 `builds` 配置，导致 monorepo 里的 Web 应用被挂到了 `/apps/web/*` 前缀下；同时 Web 端把 `/api/*` 固定重写到 `localhost:8080`，这只适合本地开发。
+
+本轮需求：修复 monorepo 在 Vercel 上的根路由映射，让生产域名能直接落到 Web 应用首页，并避免线上继续把 API 请求错误代理到本地地址。
+
+目标用户：通过 Vercel 访问线上演示地址的用户，以及后续需要继续用 Vercel CLI 或 Git 自动部署该仓库的开发者。
+
+使用场景：用户打开 `type-master-2726.vercel.app`；系统不再返回 404，而是直接进入 Next 首页。开发者通过 CLI 打 preview 时，也不会把 `node_modules`、coverage 和本地产物整包上传。
+
+预期收益：修复线上第一屏不可用的问题，降低部署偶发失败和上传过慢的概率，也让后续产品迭代能稳定地通过 Vercel 验证。
+
+产品与技术设计：`vercel.json` 保留当前能在 monorepo 根目录工作的 Next builder，但增加显式根路由映射，把 `/` 和所有前端请求转到 `apps/web/*`；`apps/web/next.config.mjs` 把 `/api` 到 `localhost:8080` 的 rewrite 限制为开发态；新增 `.vercelignore`，排除 `node_modules`、coverage、test-results、`.vercel/output` 等大体积本地产物；README 增加 Vercel 部署说明，明确 `apps/web` 才是前端根目录。
+
+改动范围：Vercel 静态配置、Next 运行时配置、本地部署打包忽略规则、README/README_EN、产品记录。
+
+验收标准：
+
+- Vercel preview 部署可以成功完成，不再因为上传本地产物导致异常。
+- 生产/preview 根路径可以直达 Next 首页，不再落到 `/apps/web` 前缀的 404。
+- 线上环境不再把 `/api/*` 重写到 `localhost:8080`。
+- 本地开发仍保留 `/api/* -> localhost:8080` 的便捷代理。
+- 后续开发者能从 README 直接知道 Vercel 的正确部署前提。
+
 ## 2026-06-09 计划完成后的再评估入口
 
 本轮诊断：7 天起步计划完成后，系统已经知道计划状态是 `complete`，但用户路径仍然停留在“回首页看看”这类弱提示上。结果页、首页和计划页没有把用户自然带进新的评估流程，反而可能继续沿用旧画像或停在已经结束的计划里。

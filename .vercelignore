@@ -1,0 +1,17 @@
+node_modules
+.next
+.turbo
+coverage
+test-results
+playwright-report
+dist
+/data
+.history
+.vercel/output
+pnpm-debug.log*
+*.tmp-dev.out.log
+*.tmp-dev.err.log
+*.tmp-vite-out.log
+*.tmp-vite-err.log
+*.vite-out.log
+*.vite-err.log

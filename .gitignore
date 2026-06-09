@@ -33,3 +33,4 @@ docs/*
 
 !src/engine/config.js
 .vercel
+.env*.local

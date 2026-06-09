@@ -110,6 +110,13 @@ pnpm dev:api
 
 开发时 Next.js rewrites 会把 Web 里的 `/api` 转发到 `http://localhost:8080`。
 
+## Vercel 部署说明
+
+- 当前 monorepo 的前端入口在 `apps/web`。如果在 Vercel 后台直接导入仓库，项目的 `Root Directory` 应指向 `apps/web`。
+- 仓库根目录的 `vercel.json` 为现有 `type_master` 项目保留了兼容性路由映射，用来避免旧的 monorepo `builds` 配置把首页挂到 `/apps/web/*` 前缀。
+- `apps/web/next.config.mjs` 里的 `/api` rewrite 只在开发态启用；线上环境不应再代理到 `localhost:8080`。
+- 使用 Vercel CLI 手动部署时，推荐保留仓库里的 `.vercelignore`，避免把 `node_modules`、coverage、test-results 和 `.vercel/output` 一起上传。
+
 ## 验证命令
 
 ```bash
