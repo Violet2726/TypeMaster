@@ -8,5 +8,11 @@
       "import": "./src/vitest.js",
       "require": "./src/vitest.cjs"
     }
+  },
+  "peerDependencies": {
+    "vitest": "^2.1.0"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.0"
   }
 }
