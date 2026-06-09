@@ -2,111 +2,64 @@
 
 # TypeMaster
 
-TypeMaster 是一个面向英文打字训练的 `AI Training Studio`。当前版本已经从单纯练习工具升级为 `诊断 / 计划 / 挑战 / 自由练习 / 结果复盘 / 成长洞察` 的训练闭环，核心目标是减少用户决策成本，让每次打开产品都能知道今天最值得练什么。
+TypeMaster 是一个围绕 `assessment / plan / challenge / practice / review` 闭环设计的英文打字训练器。
 
-它提供四条训练路径：
+当前仓库已经迁移为 pnpm + Turborepo workspace，让 Web 产品壳、API、共享契约、纯领域逻辑、AI 客户端和 UI 组件各自拥有清晰边界。
 
-- `能力诊断`：用三轮短测试生成能力画像和 7 天起步计划
-- `计划训练`：根据短板安排下一轮训练，减少重复选择
-- `今日挑战`：固定文本和配置，比较速度、准确率和稳定输出
-- `自由练习`：支持标准词库、自定义词库和 AI 生成文本
-
-## 当前版本包含什么
-
-### 产品能力
-
-- `今日训练首页`：把诊断、计划、挑战和自由练习组织成清晰的行动中心
-- `诊断与 7 天计划`：完成能力采样后自动生成等级、短板和起步训练计划
-- `今日挑战`：支持共享文本、个人最佳、同级对比、趋势复盘和榜单入口
-- `训练工作台`：练习页拆分为配置区、自定义词库、AI 工坊和打字区，AI 训练采用明确三步流转
-- `AI 文本状态管理`：支持 `idle / loading / ready / stale / error`，配置变更后会要求重新生成文本
-- `结果页反馈`：展示 WPM、Raw WPM、准确率、一致性、字符统计、趋势图，以及 AI 教练建议
-- `教练建议兜底`：AI 建议失败时，会自动退回本地规则建议，并保留明确状态
-- `成长洞察页`：汇总最近建议、近 7/30 次趋势、最佳 WPM、平均准确率、AI 使用占比、高频错误字符/单词和最近历史
-- `双语界面`：支持 `简体中文 / English`，语言设置持久化到本地
-- `本地持久化`：设置、最近 50 次练习记录、最近 50 条教练建议都会存入 `localStorage`
-- `桌面 / 移动体验分流`：桌面端保持内嵌打字体验，移动端使用显式输入框避免软键盘场景迷失
-
-### 技术能力
-
-- `React 18 + Vite` 前端
-- `React Router Data Router + Hash URL` 路由方案，地址形如 `#/practice`
-- `Node 本地代理`：通过 [`server.js`](./server.js) 暴露 `/api/chat`
-- `Vercel Serverless 代理`：通过 [`api/chat.js`](./api/chat.js) 兼容部署环境
-- `本地规则引擎`：打字草稿、统计指标、趋势、洞察和本地教练逻辑均在 `src/engine/` 中维护
-
-## 页面与核心流程
-
-### 页面结构
-
-- `首页 /`：今日训练行动中心、计划续接、挑战状态、自由练习和最近记录
-- `诊断 /diagnostic`：三轮短测试入口和诊断进度
-- `计划 /plan`：当前训练计划、进度和下一步入口
-- `挑战 /challenge`：今日榜单、趋势、同级对比和挑战回放
-- `练习 /practice`：配置、AI 工坊、打字区
-- `结果 /result`：结算、问题总结、亮点、下一练建议、趋势图
-- `成长洞察 /insights`：长期表现和错误热点
-- `旧入口 /coach`：自动重定向到 `/insights`
-
-### AI 训练闭环
-
-1. 进入练习页并切换到 `AI` 来源
-2. 选择模板与难度
-3. 生成训练文本
-4. 完成一轮练习
-5. 结果页自动生成 AI 教练建议
-6. 如 AI 失败，则使用本地规则建议兜底
-7. 可直接从结果页发起 `下一练`
-
-## 项目结构
+## 工作区结构
 
 ```text
 typemaster/
-├─ api/
-│  └─ chat.js                    # Vercel Serverless AI 代理
-├─ docs/
-│  └─ v2-major-update-plan.md    # 历史版本规划文档
-├─ src/
-│  ├─ components/                # Header、设置抽屉、图表、确认弹窗、打字区等
-│  ├─ data/                      # 标准词库等静态数据
-│  ├─ engine/                    # 配置常量、草稿生成、统计、洞察、本地教练规则
-│  ├─ hooks/                     # 练习时序与输入控制
-│  ├─ i18n/                      # 中英文文案与格式化方法
-│  ├─ pages/                     # Home / Diagnostic / Plan / Challenge / Practice / Result / Insights
-│  ├─ services/                  # AI 调用、本地存储、云端契约占位
-│  ├─ store/                     # 全局业务状态编排
-│  ├─ App.jsx                    # 应用路由与壳层
-│  └─ main.jsx                   # 前端入口
-├─ index.css                     # 全局样式与主题系统
-├─ server.js                     # 本地静态服务 + /api/chat 代理
-├─ package.json
-└─ README.md / README_EN.md
+|-- apps/
+|   |-- web/               # Next.js + React 应用
+|   `-- api/               # Hono API、静态服务和 Vercel 兼容入口
+|-- packages/
+|   |-- ai/                # AI 文本生成与教练反馈客户端
+|   |-- config/            # 共享 Vitest/config 辅助
+|   |-- contracts/         # Zod API 契约与存储/cache schema
+|   |-- domain/            # 纯打字、训练、挑战和洞察规则
+|   `-- ui/                # 共享 UI 原语
+|-- pnpm-workspace.yaml
+|-- tsconfig.base.json
+`-- turbo.json
 ```
+
+## 主要边界
+
+- `apps/web/app`：Next.js App Router route tree 与根 layout
+- `apps/web/src/application`：providers、query client、app shell 和导航适配
+- `apps/web/src/screens`：home、practice、result、challenge、insights、diagnostic、training plan 页面
+- `apps/web/src/features`：feature 自有 model、component、hook 和局部 UI state
+- `apps/web/src/services/api`：浏览器侧 API gateway 与本地 API fallback cache
+- `apps/web/src/services/storage`：浏览器 preferences 和 client cache repository
+- `apps/web/src/store`：Zustand/React Query 桥接、持久化、薄 feature action 适配和可测试的产品 use case
+- `apps/api/routes`：按 API 边界拆分的 Hono route
+- `apps/api/services`：用户、会话、计划、画像、挑战和静态资源服务
+- `apps/api/repositories`：服务层数据边界；优先使用 Postgres/Drizzle，未配置时回退到本地 JSON state
+- `apps/api/infra`：Clerk 身份、Postgres/Drizzle、Upstash Redis 和 Inngest 适配器
+- `apps/api/jobs`：Inngest 后台函数；处理教练反馈生成、画像重算和榜单缓存刷新
+- `apps/api/state`：本地开发用 JSON state fallback 和 server-state use case
+- `packages/contracts/src`：共享 storage key、API schema、server-state schema 和 OpenAPI 元信息
+- `packages/domain/src`：无 React、无 IO 的纯规则和计算
+- `packages/ai/src`：AI 请求客户端与 prompt 侧辅助
+- `packages/ui/src`：可复用展示组件
 
 ## 环境要求
 
-- Node.js `18+`
-- npm `9+` 或兼容版本
+- Node.js `20.9+`
+- pnpm `10+`
 
 ## AI 配置
 
-如果你只使用标准词库训练，可以跳过这一节。  
-如果你要启用 `AI 训练工坊` 或 `AI 教练建议`，需要提供：
+AI 功能是可选的。内置文本和自定义文本训练不依赖 AI。
 
-- `AI_API_KEY`
-- `AI_API_URL`
-- `VITE_TYPEMASTER_AI_PROXY=1`
+```bash
+AI_API_KEY=your_key_here
+AI_API_URL=your_url_here
+NEXT_PUBLIC_TYPEMASTER_AI_PROXY=1
+```
 
-说明：
-
-- `AI_API_KEY` 和 `AI_API_URL` 只放在 Node/Vercel 服务端环境，不要暴露到前端
-- `VITE_TYPEMASTER_AI_PROXY=1` 只是前端开关，不包含密钥；未设置时，AI 功能会安静降级到本地规则，避免开发环境反复请求不可用的 `/api/chat`
-
-支持两种方式：
-
-### 方式一：本地 `config.js`
-
-在项目根目录创建 `config.js`：
+也可以在仓库根目录的 `config.js` 放置服务端 AI 配置：
 
 ```js
 module.exports = {
@@ -115,162 +68,78 @@ module.exports = {
 };
 ```
 
-说明：
+`NEXT_PUBLIC_TYPEMASTER_AI_PROXY=1` 只是前端功能开关，密钥只留在 API 侧。
 
-- `config.js` 已被 `.gitignore` 忽略
-- [`server.js`](./server.js) 和 [`api/chat.js`](./api/chat.js) 都会优先读取它
+Web AI 功能调用产品级 API route：`/api/practice-text` 生成练习文本，`/api/coach` 同步生成训练反馈；会话完成后的异步教练反馈会持久化到 `/api/coach-feedback`。Provider 细节留在 API 边界之后。
 
-### 方式二：环境变量
+## 服务端基础设施配置
+
+API 已预留生产基础设施边界；未设置这些变量时，本地开发会继续使用 JSON state 和本地开发 bearer token。
 
 ```bash
-AI_API_KEY=your_key_here
-AI_API_URL=your_url_here
-VITE_TYPEMASTER_AI_PROXY=1
+CLERK_SECRET_KEY=sk_...
+CLERK_JWT_KEY=...
+CLERK_AUTHORIZED_PARTIES=http://localhost:5173
+DATABASE_URL=postgres://...
+UPSTASH_REDIS_REST_URL=https://...
+UPSTASH_REDIS_REST_TOKEN=...
+INNGEST_EVENT_KEY=...
+INNGEST_SIGNING_KEY=...
+INNGEST_DEV=1
 ```
+
+- API 身份入口统一走 `Authorization: Bearer <token>`；生产 token 由 Clerk 校验，本地未配置 Clerk 时使用 `typemaster-local:<userId>` 作为开发 token。
+- Clerk identity 会通过 `apps/api/services/auth-service.ts` 映射到内部 account；Postgres 使用 `users.clerk_user_id`，本地 JSON fallback 使用扩展的 `authIdentity` 字段。
+- 后端 user/session/plan/profile/challenge 服务统一通过 `apps/api/repositories/training-repository.ts` 访问数据；设置 `DATABASE_URL` 时使用 Postgres/Drizzle，否则使用 JSON state fallback。
+- Postgres 表结构定义在 `apps/api/infra/db/schema.ts`，迁移入口为 `pnpm --filter @typemaster/api db:generate` 和 `pnpm --filter @typemaster/api db:push`。
+- 每日挑战榜单缓存走 Upstash Redis adapter；会话完成、coach feedback、画像重算和榜单刷新事件走 Inngest adapter。Inngest worker 入口暴露在 `/api/inngest`；当前注册的后台函数会处理教练反馈生成、画像重算和挑战榜单刷新，本地调试可设置 `INNGEST_DEV=1`。
+- 训练数据导出/导入走 `/api/exports`，使用 `TrainingDataBundle` v1 契约；服务端从 repository 组装 sessions、coach feedback、skill profile 和 training plan，不导出前端 store 快照。
 
 ## 本地开发
 
-### 1. 安装依赖
+```bash
+pnpm install
+pnpm dev:web
+pnpm dev:api
+```
+
+主要地址：
+
+- Web：`http://localhost:5173`
+- API：`http://localhost:8080`
+
+开发时 Next.js rewrites 会把 Web 里的 `/api` 转发到 `http://localhost:8080`。
+
+## 验证命令
 
 ```bash
-npm install
+pnpm typecheck
+pnpm test
+pnpm build
+pnpm test:e2e
 ```
 
-### 2. 启动本地 API 代理
+## 运行模型
 
-终端 A：
-
-```bash
-npm run api
-```
-
-默认地址：
-
-```text
-http://localhost:8080
-```
-
-### 3. 启动前端开发服务
-
-终端 B：
-
-```bash
-npm run dev
-```
-
-打开：
-
-```text
-http://localhost:5173/#/
-```
-
-说明：
-
-- 开发时，Vite 会把 `/api` 代理到 `http://localhost:8080`
-- 云端账户、同步和挑战接口默认使用浏览器本地契约，不会请求 `/api/cloud`；需要联调 Node 云端占位接口时，先启动 `npm run api`，再设置 `VITE_TYPEMASTER_REMOTE_CLOUD=1`
-- 当前使用的是 `Hash` 路由，因此地址会显示为 `#/...`
-
-## 构建与运行
-
-### 构建前端
-
-```bash
-npm run build
-```
-
-### 启动构建产物
-
-```bash
-npm run serve
-```
-
-打开：
-
-```text
-http://localhost:8080/#/
-```
-
-### 一键启动
-
-```bash
-npm start
-```
-
-说明：
-
-- `npm start` 会先执行 `npm run build`
-- 然后启动 [`server.js`](./server.js)
-
-## 可用脚本
-
-```bash
-npm run dev      # 启动 Vite 前端开发服务
-npm run api      # 启动本地 Node 代理
-npm run build    # 构建前端到 dist/
-npm run preview  # 用 Vite 预览构建结果
-npm run serve    # 用 server.js 提供 dist/ 与 /api/chat
-npm start        # 先构建，再启动本地服务
-npm test         # 运行单元测试
-npm run test:coverage  # 运行单元测试并生成覆盖率报告
-```
-
-## 数据与状态约定
-
-### 本地存储
-
-- `settings`：主题、字号、专注模式、语言、上次练习配置
-- `sessions`：最近 50 次练习记录
-- `coachAdvices`：最近 50 条教练建议
-
-### 关键状态合同
-
-- `aiPracticeStatus = idle | loading | ready | stale | error`
-- `coach status = idle | loading | success | fallback | error`
-
-前端页面统一消费这些显式状态，不再依赖隐式推断。
-
-## 架构说明
-
-### 前端分层
-
-- `pages`：路由级页面
-- `components`：通用 UI 组件
-- `hooks`：输入、焦点、计时、结束判定
-- `store`：练习配置、草稿、历史、AI 状态、教练状态统一编排
-- `services`：AI 请求、本地存储、云端接口占位
-- `engine`：练习规则、文本草稿、指标计算、趋势与洞察规则
-
-### 代理层
-
-- [`server.js`](./server.js)：本地开发和本地部署共用的 Node 代理
-- [`api/chat.js`](./api/chat.js)：Vercel Serverless 版本
-
-两者都使用同一套字段白名单，只允许前端透传安全字段给上游模型接口。
-
-## 当前限制
-
-- 还没有账号系统
-- 还没有跨设备同步
-- `challenge / sync` 仍然只是前端契约占位
-- 自动化测试套件处于初始阶段，目前仅覆盖 engine 核心模块
-- 包版本号目前仍停留在 `package.json` 的 `2.0.0`，但当前代码已经是更新后的体验版本
+- 路由使用 Next.js App Router 的 `/practice` 这类浏览器路径，不再使用 hash route。
+- React Query 管理 account、sessions、plans、skill profiles、daily challenges 等 API 快照。
+- Zustand 管理当前输入稿、运行时控制、UI 偏好和进行中的训练流等客户端交互状态。
+- Store action hook 保持薄层适配；账号同步、稿件生成、训练流启动、教练反馈和会话完成等产品流程放在 `*-use-cases.ts` 模块中，并配有聚焦测试。
+- 浏览器存储拆成 localStorage preferences 和 IndexedDB client cache。preferences 保存小型 UI 设置，client cache 保存最近会话、训练快照、恢复上下文和本地 API fallback 数据。
+- 旧 localStorage cache key 不再作为数据来源；client cache hydrate 时会清理这些过时 key。
+- `packages/contracts` 是 Web/API request 与 response shape 的共享契约来源。
+- `packages/domain` 是打字、训练、挑战和洞察规则的唯一领域来源。
+- 导出/导入数据包使用 `packages/contracts/storage` 中的 `TrainingDataBundle` v1，前端本地导入导出和 API `/api/exports` 共用同一版本化 shape。
 
 ## 建议阅读顺序
 
-如果你要快速熟悉这个项目，建议按下面顺序看：
-
-1. [`src/App.jsx`](./src/App.jsx)
-2. [`src/store/practice-store.jsx`](./src/store/practice-store.jsx)
-3. [`src/pages/PracticePage.jsx`](./src/pages/PracticePage.jsx)
-4. [`src/hooks/useTypingSession.jsx`](./src/hooks/useTypingSession.jsx)
-5. [`src/engine/`](./src/engine)
-6. [`src/services/ai-service.js`](./src/services/ai-service.js)
-7. [`server.js`](./server.js) / [`api/chat.js`](./api/chat.js)
-
-## 相关文档
-
-- 历史版本规划：[docs/v2-major-update-plan.md](./docs/v2-major-update-plan.md)
-
----
-
-TypeMaster 目前更适合作为一个围绕 `AI 教练 + 本地训练数据` 持续迭代的前端产品基线。后续如果继续扩展，优先方向通常会是账号、同步、挑战机制和更细的练习模式。
+1. [`apps/web/app/layout.tsx`](./apps/web/app/layout.tsx)
+2. [`apps/web/app/page.tsx`](./apps/web/app/page.tsx)
+3. [`apps/web/src/store/app-state-bootstrap.tsx`](./apps/web/src/store/app-state-bootstrap.tsx)
+4. [`apps/web/src/store/account-sync-use-cases.ts`](./apps/web/src/store/account-sync-use-cases.ts)
+5. [`apps/web/src/store/session-completion-use-cases.ts`](./apps/web/src/store/session-completion-use-cases.ts)
+6. [`apps/web/src/services/api/index.ts`](./apps/web/src/services/api/index.ts)
+7. [`apps/api/app.ts`](./apps/api/app.ts)
+8. [`apps/api/repositories/training-repository.ts`](./apps/api/repositories/training-repository.ts)
+9. [`packages/contracts/src/api.js`](./packages/contracts/src/api.js)
+10. [`packages/domain/src/index.js`](./packages/domain/src/index.js)

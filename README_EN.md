@@ -1,112 +1,65 @@
-[English](./README_EN.md) | [简体中文](./README.md)
+[English](./README_EN.md) | [Chinese](./README.md)
 
 # TypeMaster
 
-TypeMaster is an English typing trainer built around an `AI Training Studio` flow. The current app has moved beyond a single practice surface into a full `Assessment / Plan / Challenge / Free practice / Result review / Insights` loop, with one core goal: reduce decision cost so users always know what to train next.
+TypeMaster is an English typing trainer built around an `assessment / plan / challenge / practice / review` loop.
 
-It supports four training paths:
+The repo is organized as a pnpm + Turborepo workspace so the product shell, local API, shared contracts, pure domain logic, AI client, and reusable UI pieces each have a clear boundary.
 
-- `Skill assessment`: three short rounds that create a profile and 7-day starter plan
-- `Planned training`: the next drill is selected from current weaknesses
-- `Daily challenge`: one locked text and setup for comparable speed, accuracy, and stability
-- `Free practice`: built-in text, custom word banks, or AI-generated practice text
-
-## What The Current App Includes
-
-### Product features
-
-- `Today training home`: organizes assessment, plan continuation, challenge status, and free practice into one action hub
-- `Assessment and 7-day plan`: turns a short skill sample into a level, weak spots, and a starter training plan
-- `Daily challenge`: supports shared text, personal best, peer comparison, trend review, and leaderboard navigation
-- `Practice workspace`: the practice page is split into config controls, custom word banks, an AI workshop, and the typing area
-- `AI practice state management`: supports `idle / loading / ready / stale / error`, and requires regeneration after config changes
-- `Result feedback`: shows WPM, raw WPM, accuracy, consistency, character breakdown, trend charts, and coaching advice
-- `Coaching fallback`: if AI advice fails, the result page falls back to deterministic local guidance with an explicit status
-- `Insights page`: aggregates the latest advice, 7/30-session trends, best WPM, average accuracy, AI usage share, top error chars/words, and recent history
-- `Bilingual UI`: supports `简体中文 / English`, and persists language settings locally
-- `Local persistence`: settings, the latest 50 sessions, and the latest 50 coach records are stored in `localStorage`
-- `Desktop / mobile split UX`: desktop keeps an embedded typing feel, while mobile uses an explicit input field for soft-keyboard scenarios
-
-### Technical features
-
-- `React 18 + Vite` frontend
-- `React Router data router + hash URLs`, so routes look like `#/practice`
-- `Local Node proxy` via [`server.js`](./server.js) for `/api/chat`
-- `Vercel Serverless proxy` via [`api/chat.js`](./api/chat.js)
-- `Local engine layer` in `src/engine/` for draft generation, metrics, insights, and deterministic coaching
-
-## Pages And Core Flow
-
-### Pages
-
-- `Home /`: today action hub, plan continuation, challenge status, free practice, and recent overview
-- `Assessment /diagnostic`: three-round assessment entry and progress
-- `Plan /plan`: active training plan, progress, and next-step entry
-- `Challenge /challenge`: daily board, trend, peer comparison, and challenge replay
-- `Practice /practice`: config panel, AI workshop, typing area
-- `Result /result`: summary, issues, strengths, next drill, trend chart
-- `Insights /insights`: long-term performance and error hotspots
-- `Legacy /coach`: compatibility redirect to `/insights`
-
-### AI practice loop
-
-1. Open the practice page and switch to `AI`
-2. Choose a template and difficulty
-3. Generate a practice draft
-4. Complete a session
-5. Let the result page request AI coaching
-6. Fall back to local coaching if AI is unavailable
-7. Launch the `next drill` directly from the result page
-
-## Project Structure
+## Workspace Layout
 
 ```text
 typemaster/
-├─ api/
-│  └─ chat.js                    # Vercel Serverless AI proxy
-├─ docs/
-│  └─ v2-major-update-plan.md    # Historical planning document
-├─ src/
-│  ├─ components/                # Header, settings drawer, charts, dialogs, typing UI
-│  ├─ data/                      # Static datasets such as the built-in word bank
-│  ├─ engine/                    # Config, draft generation, metrics, insights, local coach rules
-│  ├─ hooks/                     # Typing session timing and input control
-│  ├─ i18n/                      # Chinese / English copy and format helpers
-│  ├─ pages/                     # Home / Diagnostic / Plan / Challenge / Practice / Result / Insights
-│  ├─ services/                  # AI calls, storage, cloud contract stubs
-│  ├─ store/                     # Global business orchestration
-│  ├─ App.jsx                    # App shell and routing
-│  └─ main.jsx                   # Frontend entry
-├─ index.css                     # Global styles and theme system
-├─ server.js                     # Local static server + /api/chat proxy
-├─ package.json
-└─ README.md / README_EN.md
+|-- apps/
+|   |-- web/               # Next.js + React app
+|   `-- api/               # Hono API, static server, and Vercel-compatible handler
+|-- packages/
+|   |-- ai/                # AI text generation and coaching client
+|   |-- config/            # Shared Vitest/config helpers
+|   |-- contracts/         # Zod API contracts and storage/cache schemas
+|   |-- domain/            # Pure typing, training, challenge, and insight logic
+|   `-- ui/                # Shared UI primitives
+|-- pnpm-workspace.yaml
+|-- tsconfig.base.json
+`-- turbo.json
 ```
+
+## Main Boundaries
+
+- `apps/web/app`: Next.js App Router route tree and root layout
+- `apps/web/src/application`: providers, query client, app shell, and navigation adapters
+- `apps/web/src/screens`: route screens for home, practice, result, challenge, insights, diagnostic, and training plan views
+- `apps/web/src/features`: feature-owned models, components, hooks, and local UI state
+- `apps/web/src/services/api`: browser-side API gateways plus local API fallback cache
+- `apps/web/src/services/storage`: browser preferences and client cache repositories
+- `apps/web/src/store`: Zustand/React Query bridge, persistence, thin feature action adapters, and tested product use cases
+- `apps/api/routes`: Hono route registration by API boundary
+- `apps/api/services`: backend user, session, plan, profile, challenge, and static helpers
+- `apps/api/repositories`: service-layer data boundary; Postgres/Drizzle first, local JSON state fallback when unconfigured
+- `apps/api/infra`: Clerk identity, Postgres/Drizzle, Upstash Redis, and Inngest adapters
+- `apps/api/jobs`: Inngest background functions for coach feedback generation, profile recompute, and leaderboard cache refresh
+- `apps/api/state`: local JSON-backed development state fallback and server-state use cases
+- `packages/contracts/src`: shared storage keys, API schemas, server-state schemas, and OpenAPI source metadata
+- `packages/domain/src`: pure rules and calculations with no React or IO
+- `packages/ai/src`: AI request client and prompt-facing helpers
+- `packages/ui/src`: reusable presentational primitives
 
 ## Requirements
 
-- Node.js `18+`
-- npm `9+` or a compatible version
+- Node.js `20.9+`
+- pnpm `10+`
 
 ## AI Configuration
 
-If you only want built-in word practice, you can skip this section.  
-If you want to enable the `AI workshop` or `AI coaching`, provide:
+AI features are optional. Built-in and custom text practice work without them.
 
-- `AI_API_KEY`
-- `AI_API_URL`
-- `VITE_TYPEMASTER_AI_PROXY=1`
+```bash
+AI_API_KEY=your_key_here
+AI_API_URL=your_url_here
+NEXT_PUBLIC_TYPEMASTER_AI_PROXY=1
+```
 
-Notes:
-
-- keep `AI_API_KEY` and `AI_API_URL` only in the Node/Vercel server environment; do not expose them to the frontend
-- `VITE_TYPEMASTER_AI_PROXY=1` is only a frontend switch and contains no secret; when it is not set, AI features quietly fall back to local rules instead of repeatedly calling an unavailable `/api/chat`
-
-You can configure them in either of these ways:
-
-### Option 1: local `config.js`
-
-Create `config.js` in the project root:
+You can also place server-side AI values in `config.js` at the repo root:
 
 ```js
 module.exports = {
@@ -115,162 +68,78 @@ module.exports = {
 };
 ```
 
-Notes:
+`NEXT_PUBLIC_TYPEMASTER_AI_PROXY=1` is a frontend feature flag only. Secrets stay on the API side.
 
-- `config.js` is ignored by `.gitignore`
-- both [`server.js`](./server.js) and [`api/chat.js`](./api/chat.js) try to read it first
+Web AI features call product-level API routes: `/api/practice-text` for generated drills and `/api/coach` for synchronous feedback. Session-completion feedback is persisted through the asynchronous `/api/coach-feedback` path. Provider details stay behind the API boundary.
 
-### Option 2: environment variables
+## Server Infrastructure Configuration
+
+The API now has production infrastructure boundaries in place. When these variables are not set, local development continues to use JSON state and a local development bearer token.
 
 ```bash
-AI_API_KEY=your_key_here
-AI_API_URL=your_url_here
-VITE_TYPEMASTER_AI_PROXY=1
+CLERK_SECRET_KEY=sk_...
+CLERK_JWT_KEY=...
+CLERK_AUTHORIZED_PARTIES=http://localhost:5173
+DATABASE_URL=postgres://...
+UPSTASH_REDIS_REST_URL=https://...
+UPSTASH_REDIS_REST_TOKEN=...
+INNGEST_EVENT_KEY=...
+INNGEST_SIGNING_KEY=...
+INNGEST_DEV=1
 ```
+
+- API identity is centralized on `Authorization: Bearer <token>`; production tokens are verified by Clerk, while local development without Clerk uses `typemaster-local:<userId>`.
+- Clerk identities are mapped to internal accounts through `apps/api/services/auth-service.ts`; Postgres uses `users.clerk_user_id`, while the local JSON fallback uses an extended `authIdentity` field.
+- Backend user/session/plan/profile/challenge services access data through `apps/api/repositories/training-repository.ts`; `DATABASE_URL` selects Postgres/Drizzle, otherwise JSON state fallback is used.
+- Postgres table definitions live in `apps/api/infra/db/schema.ts`; migration entry points are `pnpm --filter @typemaster/api db:generate` and `pnpm --filter @typemaster/api db:push`.
+- Daily challenge leaderboard caching uses the Upstash Redis adapter. Session completion, coach feedback, profile recompute, and leaderboard refresh events use the Inngest adapter. The Inngest worker endpoint is exposed at `/api/inngest`; the registered background functions currently handle coach feedback generation, profile recompute, and challenge leaderboard refresh, and local debugging can use `INNGEST_DEV=1`.
+- Training data export/import uses `/api/exports` and the `TrainingDataBundle` v1 contract. The server assembles sessions, coach feedback, skill profile, and training plan through the repository instead of exporting a frontend store snapshot.
 
 ## Local Development
 
-### 1. Install dependencies
+```bash
+pnpm install
+pnpm dev:web
+pnpm dev:api
+```
+
+Main URLs:
+
+- Web: `http://localhost:5173`
+- API: `http://localhost:8080`
+
+During development, Next.js rewrites `/api` from the web app to `http://localhost:8080`.
+
+## Verification
 
 ```bash
-npm install
+pnpm typecheck
+pnpm test
+pnpm build
+pnpm test:e2e
 ```
 
-### 2. Start the local API proxy
+## Runtime Model
 
-Terminal A:
-
-```bash
-npm run api
-```
-
-Default address:
-
-```text
-http://localhost:8080
-```
-
-### 3. Start the frontend dev server
-
-Terminal B:
-
-```bash
-npm run dev
-```
-
-Open:
-
-```text
-http://localhost:5173/#/
-```
-
-Notes:
-
-- during development, Vite proxies `/api` to `http://localhost:8080`
-- cloud account, sync, and challenge contracts use browser-local storage by default and do not call `/api/cloud`; to test the Node placeholder API, start `npm run api` and set `VITE_TYPEMASTER_REMOTE_CLOUD=1`
-- the app uses hash-based routing, so URLs appear as `#/...`
-
-## Build And Run
-
-### Build the frontend
-
-```bash
-npm run build
-```
-
-### Serve the built app
-
-```bash
-npm run serve
-```
-
-Open:
-
-```text
-http://localhost:8080/#/
-```
-
-### One-command mode
-
-```bash
-npm start
-```
-
-Notes:
-
-- `npm start` runs `npm run build` first
-- then starts [`server.js`](./server.js)
-
-## Available Scripts
-
-```bash
-npm run dev      # Start the Vite frontend dev server
-npm run api      # Start the local Node proxy
-npm run build    # Build the frontend into dist/
-npm run preview  # Preview the build with Vite
-npm run serve    # Serve dist/ and expose /api/chat via server.js
-npm start        # Build first, then serve
-npm test         # Run unit tests
-npm run test:coverage  # Run unit tests with coverage report
-```
-
-## Data And State Contracts
-
-### Local storage
-
-- `settings`: theme, font scale, focus mode, language, and last practice config
-- `sessions`: latest 50 session records
-- `coachAdvices`: latest 50 coach advice records
-
-### Key status contracts
-
-- `aiPracticeStatus = idle | loading | ready | stale | error`
-- `coach status = idle | loading | success | fallback | error`
-
-The UI consumes these explicit states instead of inferring state from side effects.
-
-## Architecture Notes
-
-### Frontend layers
-
-- `pages`: route-level screens
-- `components`: reusable UI parts
-- `hooks`: typing, focus, timing, and completion orchestration
-- `store`: config, draft, history, AI status, and coaching status orchestration
-- `services`: AI requests, storage, and cloud contract placeholders
-- `engine`: typing rules, draft generation, metrics, trends, and insights
-
-### Proxy layer
-
-- [`server.js`](./server.js): local Node proxy for development and local serving
-- [`api/chat.js`](./api/chat.js): Vercel Serverless version
-
-Both follow the same payload whitelist so the frontend only forwards safe fields to the upstream model API.
-
-## Current Limitations
-
-- No account system yet
-- No cross-device sync yet
-- `challenge / sync` are still frontend contract stubs
-- Automated test suite is in early stages, currently covering only the engine core modules
-- `package.json` still reports version `2.0.0`, even though the app flow has already moved to the refreshed experience
+- Routing uses Next.js App Router browser paths such as `/practice`, not hash routes.
+- React Query owns server/API snapshots such as account, sessions, plans, skill profiles, and daily challenges.
+- Zustand owns client interaction state such as the active typing draft, runtime controls, UI preferences, and in-progress training flow.
+- Store action hooks stay thin. Product workflows such as account sync, draft generation, training flow launch, coach feedback, and session completion live in `*-use-cases.ts` modules with focused tests.
+- Browser storage is split into localStorage preferences and IndexedDB-backed client cache. Preferences keep small UI settings, while client cache keeps recent sessions, training snapshots, recovery context, and local API fallback data.
+- Old localStorage cache keys are no longer treated as data sources; client cache hydration clears those obsolete keys.
+- `packages/contracts` is the shared contract source for Web/API request and response shapes.
+- `packages/domain` is the single source of truth for typing, training, challenge, and insight rules.
+- Export/import bundles use `TrainingDataBundle` v1 from `packages/contracts/storage`; local frontend import/export and API `/api/exports` share the same versioned shape.
 
 ## Suggested Reading Order
 
-If you are onboarding to this project, read the code in this order:
-
-1. [`src/App.jsx`](./src/App.jsx)
-2. [`src/store/practice-store.jsx`](./src/store/practice-store.jsx)
-3. [`src/pages/PracticePage.jsx`](./src/pages/PracticePage.jsx)
-4. [`src/hooks/useTypingSession.jsx`](./src/hooks/useTypingSession.jsx)
-5. [`src/engine/`](./src/engine)
-6. [`src/services/ai-service.js`](./src/services/ai-service.js)
-7. [`server.js`](./server.js) / [`api/chat.js`](./api/chat.js)
-
-## Related Docs
-
-- Historical planning doc: [docs/v2-major-update-plan.md](./docs/v2-major-update-plan.md)
-
----
-
-TypeMaster is currently a solid frontend baseline for iterating on `AI coaching + local training data`. The next logical expansion areas are account systems, sync, challenge mechanics, and more specialized drill modes.
+1. [`apps/web/app/layout.tsx`](./apps/web/app/layout.tsx)
+2. [`apps/web/app/page.tsx`](./apps/web/app/page.tsx)
+3. [`apps/web/src/store/app-state-bootstrap.tsx`](./apps/web/src/store/app-state-bootstrap.tsx)
+4. [`apps/web/src/store/account-sync-use-cases.ts`](./apps/web/src/store/account-sync-use-cases.ts)
+5. [`apps/web/src/store/session-completion-use-cases.ts`](./apps/web/src/store/session-completion-use-cases.ts)
+6. [`apps/web/src/services/api/index.ts`](./apps/web/src/services/api/index.ts)
+7. [`apps/api/app.ts`](./apps/api/app.ts)
+8. [`apps/api/repositories/training-repository.ts`](./apps/api/repositories/training-repository.ts)
+9. [`packages/contracts/src/api.js`](./packages/contracts/src/api.js)
+10. [`packages/domain/src/index.js`](./packages/domain/src/index.js)
