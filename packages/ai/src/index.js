@@ -1,12 +1,14 @@
 import {
     buildLocalCoachAdvice,
     createDraftFromText,
-    estimateTargetWordCount,
+    estimateTargetWordCount
+} from '@typemaster/domain';
+import {
     getDifficultyLabel,
     getDifficultyMeta,
     getTemplateLabel,
     getTemplateMeta
-} from '@typemaster/domain';
+} from '@typemaster/domain/config';
 import { normalizeCoachAdviceContent } from '@typemaster/contracts/training-state';
 
 const PRACTICE_TEXT_API_URL = '/api/practice-text';
