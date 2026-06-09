@@ -43,11 +43,45 @@ export function HomePage() {
     return (
         <div className="page-stack page-stack--home">
             <section className="home-launch">
-                <p className="hero-kicker">{trainingCopy.home.todayKicker}</p>
-                <h1>{skillProfile ? trainingCopy.home.dashboardTitle : trainingCopy.home.diagnosticTitle}</h1>
-                <p className="hero-body">
-                    {skillProfile ? trainingCopy.home.dashboardBody : trainingCopy.home.diagnosticBody}
-                </p>
+                <div className="home-launch__copy">
+                    <p className="hero-kicker">{trainingCopy.home.todayKicker}</p>
+                    <h1>{skillProfile ? trainingCopy.home.dashboardTitle : trainingCopy.home.diagnosticTitle}</h1>
+                    <p className="hero-body">
+                        {skillProfile ? trainingCopy.home.dashboardBody : trainingCopy.home.diagnosticBody}
+                    </p>
+                </div>
+                <div className="home-product-visual" aria-hidden="true">
+                    <div className="home-product-visual__window">
+                        <div className="home-product-visual__chrome">
+                            <span />
+                            <span />
+                            <span />
+                        </div>
+                        <div className="home-product-visual__screen">
+                            <div className="home-product-visual__metrics">
+                                <span>WPM</span>
+                                <strong>{insights.recent7.avgWpm || 82}</strong>
+                            </div>
+                            <div className="home-product-visual__metrics">
+                                <span>ACC</span>
+                                <strong>{recentBestAccuracy || 98}%</strong>
+                            </div>
+                            <div className="home-product-visual__rail">
+                                <span />
+                            </div>
+                            <div className="home-product-visual__copy">
+                                <span />
+                                <span />
+                                <span />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="home-product-visual__keyboard">
+                        {Array.from({ length: 18 }).map((_, index) => (
+                            <span key={index} />
+                        ))}
+                    </div>
+                </div>
             </section>
 
             <section className="home-stats-strip" aria-label={copy.home.statsTitle}>
