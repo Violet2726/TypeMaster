@@ -34,6 +34,7 @@ export function PracticePage() {
         isDirty,
         lockBody,
         lockTitle,
+        nextRoundBrief,
         practiceError,
         primaryActionLabel,
         restoreAiDraftConfig,
@@ -109,6 +110,30 @@ export function PracticePage() {
 
     return (
         <div className="page-stack practice-page">
+            {nextRoundBrief && (
+                <section className="panel practice-brief-panel" aria-labelledby="practice-brief-title">
+                    <div className="panel-head">
+                        <div>
+                            <p className="panel-kicker">{trainingCopy.practice.nextBriefKicker}</p>
+                            <h2 id="practice-brief-title">{nextRoundBrief.title}</h2>
+                        </div>
+                        <span className="panel-badge badge-ready">{trainingCopy.practice.nextBriefBadge}</span>
+                    </div>
+                    <p className="muted-text">{nextRoundBrief.body}</p>
+                    <div className="result-prescription result-prescription--practice" aria-label={nextRoundBrief.title}>
+                        <div className="result-prescription__grid">
+                            {nextRoundBrief.items.map((item) => (
+                                <div key={item.id} className={`result-prescription__item result-prescription__item--${item.tone}`}>
+                                    <span className="summary-label">{item.label}</span>
+                                    <strong>{item.value}</strong>
+                                    <p>{item.note}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )}
+
             {currentTrainingTask && (
                 <section className="panel">
                     <div className="panel-head">

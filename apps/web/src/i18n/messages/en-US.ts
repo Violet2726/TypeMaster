@@ -327,6 +327,8 @@ export const enUSMessages = {
                 diagnosticBadge: 'Assessment',
                 planBadge: 'Planned drill',
                 challengeBadge: 'Challenge round',
+                nextBriefKicker: 'Before this round',
+                nextBriefBadge: 'Target',
                 customSource: 'Custom bank',
                 customTitle: 'Bring your own word bank into the plan',
                 customBody: 'Paste words, sentences, or a paragraph and this round will train directly on that text.',

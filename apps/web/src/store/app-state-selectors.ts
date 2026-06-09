@@ -156,6 +156,7 @@ export function usePracticePageStore() {
     const shell = useShellSnapshot();
     const runtime = useRuntimeSnapshot();
     const plan = usePlanSnapshot();
+    const history = useHistorySnapshot();
     const { configActions, sessionActions } = useAppActions();
 
     return {
@@ -167,6 +168,8 @@ export function usePracticePageStore() {
         currentTrainingTask: plan.currentTrainingTask,
         generateAiPractice: sessionActions.generateAiPractice,
         language: shell.language,
+        lastCompletedSession: history.lastCompletedSession,
+        latestCoachAdvice: history.latestCoachAdvice,
         practiceError: runtime.practiceError,
         recordCompletedSession: sessionActions.recordCompletedSession,
         resetPracticeToBuiltin: sessionActions.resetPracticeToBuiltin,

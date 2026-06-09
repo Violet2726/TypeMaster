@@ -394,7 +394,8 @@ test('routes challenge recovery advice back into the plan', async ({ page, isMob
     await page.getByRole('button', { name: 'Back to plan' }).click();
 
     await expect(page).toHaveURL(/\/practice/);
-    await expect(page.locator('.panel').first().getByRole('heading', { name: 'Reset accuracy' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Next round brief' })).toBeVisible();
+    await expect(page.locator('section').filter({ hasText: 'Current task' }).getByRole('heading', { name: 'Reset accuracy' })).toBeVisible();
 });
 
 test('shows challenge standing after completing a home-started daily challenge', async ({ page, isMobile }) => {
@@ -585,7 +586,8 @@ test('routes result-page challenge risk advice back into the plan', async ({ pag
     await page.getByRole('button', { name: 'Back to plan' }).click();
 
     await expect(page).toHaveURL(/\/practice/);
-    await expect(page.locator('.panel').first().getByRole('heading', { name: 'Reset accuracy' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Next round brief' })).toBeVisible();
+    await expect(page.locator('section').filter({ hasText: 'Current task' }).getByRole('heading', { name: 'Reset accuracy' })).toBeVisible();
     await expect.poll(async () => readClientCacheValue(page, 'typemaster:v5:active-session-context')).toMatchObject({
         type: 'plan',
         planId: 'plan-1',

@@ -327,6 +327,8 @@ export const zhCNMessages = {
                 diagnosticBadge: '评估',
                 planBadge: '计划练习',
                 challengeBadge: '挑战回合',
+                nextBriefKicker: '本轮开始前',
+                nextBriefBadge: '目标',
                 customSource: '自定义词库',
                 customTitle: '把自己的词库带入计划',
                 customBody: '粘贴单词、句子或段落，本轮会直接用这段文本训练。',

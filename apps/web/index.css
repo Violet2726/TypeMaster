@@ -614,6 +614,7 @@ body[data-language='zh-CN'] .control-label {
     gap: 1rem;
 }
 
+.practice-brief-panel,
 .practice-toolbar,
 .typing-stage,
 .result-summary,
@@ -638,6 +639,12 @@ body[data-language='zh-CN'] .control-label {
 
 .practice-toolbar__hint {
     margin: 0;
+}
+
+.result-prescription--practice {
+    padding: 0;
+    background: transparent;
+    border-color: transparent;
 }
 
 .config-strip {

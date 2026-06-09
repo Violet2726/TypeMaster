@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getTrainingCopy } from '../../training/copy';
+import { buildResultPrescriptionModel } from '../../training/decision-models';
 import { useTypingSession } from '../../hooks/useTypingSession';
 
 type ConfigChangeOptions = {
@@ -33,6 +34,8 @@ export function usePracticePageModel({
     currentTrainingTask,
     generateAiPractice,
     language,
+    lastCompletedSession,
+    latestCoachAdvice,
     navigate,
     practiceError,
     recordCompletedSession,
@@ -216,6 +219,18 @@ export function usePracticePageModel({
     }, [aiPracticeStatus, config.source, displayDraft?.words?.length, handleGenerateAi, typingSession]);
 
     const trainingCopy = useMemo(() => getTrainingCopy(language), [language]);
+    const latestSessionCoachRecord = latestCoachAdvice?.sessionId === lastCompletedSession?.id
+        ? latestCoachAdvice
+        : null;
+    const nextRoundBrief = useMemo(() => (
+        lastCompletedSession && typingSession.status === 'idle'
+            ? buildResultPrescriptionModel({
+                copy,
+                session: lastCompletedSession,
+                coachRecord: latestSessionCoachRecord
+            })
+            : null
+    ), [copy, lastCompletedSession, latestSessionCoachRecord, typingSession.status]);
     const isCustomEmpty = config.source === 'custom' && !(displayDraft?.words?.length > 0);
     const lockTitle = config.source === 'ai'
         ? copy.practice.wordsLockedTitle
@@ -253,6 +268,7 @@ export function usePracticePageModel({
         isDirty,
         lockBody,
         lockTitle,
+        nextRoundBrief,
         practiceError,
         primaryActionLabel,
         restoreAiDraftConfig,
