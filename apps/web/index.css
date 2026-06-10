@@ -3600,3 +3600,496 @@ body[data-theme='serika-light'] .modal-overlay {
         font-size: 3rem;
     }
 }
+
+/* ============================================
+   Apple Design System – Animations & Polish
+   ============================================ */
+
+/* --- Keyframe Animations --- */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        box-shadow: 0 0 18px rgba(10, 132, 255, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 28px rgba(10, 132, 255, 0.5);
+    }
+}
+
+@keyframes breathe {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+@keyframes heroFloat {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+}
+
+@keyframes counterUp {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- Page Entrance Animations --- */
+
+.page-stack {
+    animation: fadeInUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.page-stack > * {
+    animation: fadeInUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.page-stack > *:nth-child(1) { animation-delay: 0s; }
+.page-stack > *:nth-child(2) { animation-delay: 0.06s; }
+.page-stack > *:nth-child(3) { animation-delay: 0.12s; }
+.page-stack > *:nth-child(4) { animation-delay: 0.18s; }
+.page-stack > *:nth-child(5) { animation-delay: 0.24s; }
+.page-stack > *:nth-child(6) { animation-delay: 0.30s; }
+.page-stack > *:nth-child(7) { animation-delay: 0.36s; }
+.page-stack > *:nth-child(8) { animation-delay: 0.42s; }
+
+/* --- Button Micro-interactions --- */
+
+.action-btn,
+.ghost-btn,
+.nav-link,
+.nav-icon,
+.toggle-btn,
+.segment-btn {
+    transition:
+        background-color 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
+        border-color 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
+        color 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
+        transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
+        box-shadow 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
+        opacity 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.action-btn:active:not(:disabled),
+.ghost-btn:active:not(:disabled),
+.nav-link:active:not(:disabled),
+.nav-icon:active:not(:disabled),
+.toggle-btn:active:not(:disabled),
+.segment-btn:active:not(:disabled) {
+    transform: scale(0.97);
+    opacity: 0.85;
+}
+
+.action-btn:hover:not(:disabled),
+.ghost-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+}
+
+.action-btn.primary:hover:not(:disabled) {
+    box-shadow: 0 12px 32px rgba(10, 132, 255, 0.32);
+}
+
+.action-btn.primary:active:not(:disabled) {
+    transform: scale(0.97);
+    box-shadow: 0 6px 16px rgba(10, 132, 255, 0.2);
+}
+
+/* --- Card Hover Interactions --- */
+
+.panel,
+.metric-card,
+.home-action-card,
+.result-item,
+.tag-pill,
+.chart-summary__item,
+.history-row {
+    transition:
+        background-color 0.24s cubic-bezier(0.2, 0.8, 0.2, 1),
+        border-color 0.24s cubic-bezier(0.2, 0.8, 0.2, 1),
+        transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1),
+        box-shadow 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.home-action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.28);
+}
+
+.metric-card:hover,
+.result-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+}
+
+.tag-pill:hover {
+    transform: translateY(-1px);
+    background: var(--surface-2);
+    border-color: var(--panel-stroke);
+}
+
+.history-row:hover {
+    background: var(--surface-2);
+}
+
+/* --- Caret Refinement --- */
+
+.caret {
+    border-radius: 999px;
+    background: var(--main-color);
+    box-shadow: 0 0 20px rgba(10, 132, 255, 0.45);
+    transition:
+        left 0.08s cubic-bezier(0.2, 0.8, 0.2, 1),
+        top 0.12s cubic-bezier(0.2, 0.8, 0.2, 1),
+        height 0.15s cubic-bezier(0.2, 0.8, 0.2, 1),
+        opacity 0.2s ease;
+}
+
+.caret.active {
+    animation: none;
+    box-shadow: 0 0 24px rgba(10, 132, 255, 0.5);
+}
+
+.caret:not(.active) {
+    animation: breathe 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* --- Hero Section Enhancement --- */
+
+.home-product-visual {
+    animation: heroFloat 6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.home-product-visual__window {
+    transition:
+        transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+        box-shadow 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.home-launch__copy h1 {
+    background: linear-gradient(
+        135deg,
+        var(--text-strong) 0%,
+        var(--text-strong) 40%,
+        var(--main-color) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* --- Live Stats Counter Animation --- */
+
+.live-stat-value {
+    animation: counterUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    font-variant-numeric: tabular-nums;
+}
+
+.result-value {
+    animation: counterUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    font-variant-numeric: tabular-nums;
+}
+
+/* --- Settings Drawer Animation --- */
+
+.settings-overlay {
+    animation: fadeIn 0.25s ease both;
+}
+
+.settings-drawer {
+    animation: slideInRight 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* --- Modal/Dialog Animation --- */
+
+.modal-overlay {
+    animation: fadeIn 0.2s ease both;
+}
+
+.confirm-dialog {
+    animation: scaleIn 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* --- Badge Pulse for Loading State --- */
+
+.badge-loading {
+    animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* --- Focus Ring Apple Style --- */
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+}
+
+/* --- Smooth Scroll for Typing Area --- */
+
+.words-wrapper {
+    transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* --- Glass Morphism Enhancement --- */
+
+.panel {
+    backdrop-filter: saturate(140%) blur(16px);
+    -webkit-backdrop-filter: saturate(140%) blur(16px);
+}
+
+.app-header {
+    backdrop-filter: saturate(180%) blur(24px);
+    -webkit-backdrop-filter: saturate(180%) blur(24px);
+}
+
+.settings-overlay,
+.modal-overlay {
+    backdrop-filter: saturate(160%) blur(20px);
+    -webkit-backdrop-filter: saturate(160%) blur(20px);
+}
+
+/* --- Result Page Large Number Animation --- */
+
+.result-big {
+    animation: fadeInUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.result-big:nth-child(2) {
+    animation-delay: 0.08s;
+}
+
+/* --- Badge Transitions --- */
+
+.panel-badge {
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+/* --- Chart Hover Enhancement --- */
+
+.chart-summary__item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+}
+
+.chart-summary__item:active {
+    transform: scale(0.98);
+}
+
+/* --- Improved Select Styling --- */
+
+.field select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%238e8e93' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.88rem center;
+    padding-right: 2.4rem;
+}
+
+body[data-theme='serika-light'] .field select {
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%236e6e73' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* --- Improved Input Focus --- */
+
+.field select:focus,
+.field input:focus,
+.field textarea:focus {
+    border-color: var(--main-color);
+    box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.15);
+    outline: none;
+}
+
+/* --- Reduced Motion --- */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .home-product-visual {
+        animation: none;
+    }
+}
+
+/* --- Mobile Bottom Navigation --- */
+
+@media (max-width: 720px) {
+    .app-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 30;
+    }
+
+    .app-header__inner {
+        padding: 0.5rem 0;
+        min-height: 3.2rem;
+    }
+
+    .nav-links {
+        display: none;
+    }
+
+    .app-main {
+        padding-top: 4rem;
+        padding-bottom: 5.5rem;
+    }
+
+    .mobile-tab-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 30;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        height: 3.5rem;
+        padding-bottom: env(safe-area-inset-bottom, 0);
+        background: rgba(12, 12, 13, 0.82);
+        backdrop-filter: saturate(180%) blur(24px);
+        -webkit-backdrop-filter: saturate(180%) blur(24px);
+        border-top: 0.5px solid var(--panel-stroke);
+    }
+
+    body[data-theme='serika-light'] .mobile-tab-bar {
+        background: rgba(245, 245, 247, 0.82);
+    }
+
+    .mobile-tab-bar__item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.18rem;
+        padding: 0.3rem 0.6rem;
+        min-width: 3rem;
+        color: var(--text-dim);
+        font-size: 0.62rem;
+        font-weight: 600;
+        text-decoration: none;
+        border: none;
+        background: none;
+        cursor: pointer;
+        transition: color 0.18s ease;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .mobile-tab-bar__item svg {
+        width: 1.25rem;
+        height: 1.25rem;
+        stroke-width: 2;
+    }
+
+    .mobile-tab-bar__item.is-active {
+        color: var(--main-color);
+    }
+
+    .mobile-tab-bar__item:active {
+        opacity: 0.65;
+    }
+
+    /* Hide footer on mobile when tab bar is present */
+    .app-footer {
+        display: none;
+    }
+}
+
+/* --- Desktop: hide mobile tab bar --- */
+
+@media (min-width: 721px) {
+    .mobile-tab-bar {
+        display: none;
+    }
+}
+
+/* --- Scrollbar Styling (WebKit) --- */
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+body[data-theme='serika-light'] ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.12);
+}
+
+body[data-theme='serika-light'] ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+/* --- Selection Color --- */
+
+::selection {
+    background: rgba(10, 132, 255, 0.3);
+    color: var(--text-strong);
+}
+
+body[data-theme='serika-light'] ::selection {
+    background: rgba(0, 113, 227, 0.2);
+}

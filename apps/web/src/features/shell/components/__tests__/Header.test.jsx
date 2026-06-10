@@ -1,4 +1,4 @@
-/** @vitest-environment jsdom */
+﻿/** @vitest-environment jsdom */
 import { render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
 import { Header } from '../Header';
@@ -42,6 +42,8 @@ describe('Header', () => {
             />
         );
 
-        expect(screen.getByRole('link', { name: 'Plan' })).toBeInTheDocument();
+        // Desktop nav + mobile tab bar both render a "Plan" link
+        const planLinks = screen.getAllByRole('link', { name: 'Plan' });
+        expect(planLinks.length).toBeGreaterThanOrEqual(1);
     });
 });
