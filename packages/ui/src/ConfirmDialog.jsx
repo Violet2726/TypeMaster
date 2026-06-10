@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 
 export function ConfirmDialog({
     isOpen,
@@ -29,10 +29,14 @@ export function ConfirmDialog({
                 </div>
 
                 <div className="confirm-dialog__actions">
-                    <button type="button" className="action-btn" onClick={onCancel}>
+                    <button type="button" className="confirm-dialog__btn" onClick={onCancel}>
                         {cancelLabel}
                     </button>
-                    <button type="button" className={`action-btn primary ${tone === 'danger' ? 'danger' : ''}`} onClick={onConfirm}>
+                    <button
+                        type="button"
+                        className={`confirm-dialog__btn confirm-dialog__btn--confirm${tone === 'danger' ? ' confirm-dialog__btn--danger' : ''}`}
+                        onClick={onConfirm}
+                    >
                         {confirmLabel}
                     </button>
                 </div>
