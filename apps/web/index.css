@@ -4403,3 +4403,275 @@ body[data-theme='serika-light'] .apple-toggle.is-on {
 .banner strong {
     color: var(--warning-color);
 }
+
+/* ============================================
+   Result Page – Apple Refinements
+   ============================================ */
+
+/* Result summary hero scores */
+.result-summary {
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse at 20% 50%, rgba(10, 132, 255, 0.08), transparent 50%),
+        linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
+}
+
+.result-summary__scores {
+    position: relative;
+    z-index: 1;
+}
+
+.result-big {
+    display: grid;
+    gap: 0.15rem;
+}
+
+.result-label {
+    color: var(--text-dim);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+body[data-language='zh-CN'] .result-label {
+    text-transform: none;
+    font-size: 0.75rem;
+}
+
+.result-value {
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(3rem, 7vw, 4.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+}
+
+.result-unit {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-dim);
+}
+
+/* Result decision panel depth */
+.result-decision-panel {
+    position: relative;
+    overflow: hidden;
+}
+
+.result-decision-panel::before {
+    content: '';
+    position: absolute;
+    top: -30%;
+    right: -10%;
+    width: 50%;
+    height: 60%;
+    background: radial-gradient(circle, rgba(50, 215, 75, 0.08), transparent 70%);
+    pointer-events: none;
+}
+
+/* Result prescription items hover */
+.result-prescription__item {
+    transition:
+        transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
+        box-shadow 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
+        border-color 0.2s ease;
+}
+
+.result-prescription__item:hover {
+    transform: translateY(-1px);
+}
+
+/* ============================================
+   Insights Page – Apple Refinements
+   ============================================ */
+
+/* Insights header hero */
+.insights-header {
+    position: relative;
+    overflow: hidden;
+    background:
+        linear-gradient(135deg, rgba(10, 132, 255, 0.06), transparent 40%),
+        linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
+}
+
+.insights-header h1 {
+    letter-spacing: -0.04em;
+    background: linear-gradient(
+        135deg,
+        var(--text-strong) 0%,
+        var(--text-strong) 50%,
+        var(--main-color) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Insights overview grid cards */
+.insights-overview-grid .panel {
+    transition:
+        transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1),
+        box-shadow 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.insights-overview-grid .panel:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22);
+}
+
+/* Mini series rows */
+.mini-series__row {
+    transition: background-color 0.15s ease;
+    border-radius: var(--radius-sm);
+    padding: 0.65rem 0.75rem;
+}
+
+.mini-series__row:hover {
+    background: var(--surface-2);
+}
+
+/* ============================================
+   Home Page – Hero Polish
+   ============================================ */
+
+.home-launch {
+    position: relative;
+}
+
+.home-launch::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--panel-stroke), transparent);
+}
+
+/* Home action card gradient overlays */
+.home-action-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.home-action-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.12), transparent);
+    pointer-events: none;
+    z-index: 0;
+}
+
+body[data-theme='serika-light'] .home-action-card::after {
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.03), transparent);
+}
+
+/* ============================================
+   Diagnostic Page
+   ============================================ */
+
+.insights-header .action-btn {
+    align-self: center;
+}
+
+/* ============================================
+   Challenge Page
+   ============================================ */
+
+.challenge-page .panel {
+    position: relative;
+}
+
+/* ============================================
+   Training Plan Page
+   ============================================ */
+
+.training-plan-page .panel {
+    position: relative;
+}
+
+/* ============================================
+   Global Typography Refinements
+   ============================================ */
+
+/* Improved heading hierarchy */
+h1 {
+    letter-spacing: -0.035em;
+}
+
+h2 {
+    letter-spacing: -0.02em;
+}
+
+h3 {
+    letter-spacing: -0.01em;
+}
+
+/* Improved paragraph line height */
+.lead-text {
+    line-height: 1.6;
+}
+
+.muted-text {
+    line-height: 1.5;
+    font-size: 0.88rem;
+}
+
+/* Improved kicker spacing */
+.panel-kicker {
+    margin: 0 0 0.15rem;
+    color: var(--text-dim);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+
+body[data-language='zh-CN'] .panel-kicker {
+    text-transform: none;
+    font-size: 0.75rem;
+}
+
+/* Tabular numbers for metrics */
+.metric-card strong,
+.live-stat-value,
+.result-item-value {
+    font-variant-numeric: tabular-nums;
+}
+
+/* History table refinement */
+.history-row {
+    transition: background-color 0.15s ease;
+}
+
+.history-row:hover {
+    background: var(--surface-2);
+}
+
+/* Achievement tag refinement */
+.tag-pill {
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Footer refinement */
+.app-footer {
+    color: var(--text-dim);
+    font-size: 0.82rem;
+    padding: 1.2rem 0;
+}
+
+.app-footer__inner {
+    justify-content: center;
+}
