@@ -1,73 +1,6 @@
-:root {
-    --bg-color: #0a1020;
-    --bg-elevated: rgba(12, 20, 36, 0.88);
-    --bg-panel: rgba(15, 24, 43, 0.9);
-    --bg-soft: rgba(255, 255, 255, 0.03);
-    --surface-2: rgba(255, 255, 255, 0.04);
-    --surface-3: rgba(255, 255, 255, 0.06);
-    --main-color: #69c9ff;
-    --main-soft: rgba(105, 201, 255, 0.14);
-    --main-color-strong: #091220;
-    --success-color: #87d7a8;
-    --success-soft: rgba(135, 215, 168, 0.12);
-    --warning-color: #f4c56b;
-    --warning-soft: rgba(244, 197, 107, 0.12);
-    --error-color: #ff8698;
-    --error-soft: rgba(255, 134, 152, 0.12);
-    --text-color: #9fb0cf;
-    --text-strong: #f6f8ff;
-    --text-dim: #7283a2;
-    --panel-stroke: rgba(162, 184, 222, 0.12);
-    --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.2);
-    --shadow-focus: 0 0 0 3px rgba(105, 201, 255, 0.18);
-    --radius-sm: 14px;
-    --radius-md: 20px;
-    --radius-lg: 28px;
-    --font-ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "Noto Sans SC", "PingFang SC", sans-serif;
-    --font-mono: "SF Mono", "Cascadia Mono", Consolas, monospace;
-    --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", "Noto Sans SC", "PingFang SC", sans-serif;
-    --font-size-base: 16px;
-    --typing-size: clamp(1.75rem, 2.8vw, 2.4rem);
-    --typing-line-height: 1.85;
-    --typing-visible-lines: 3.4;
-    --transition-fast: 0.16s ease;
-    --transition-normal: 0.24s ease;
-}
+﻿/* TypeMaster – Apple Design System */
+/* Variables, themes, and font sizes are declared in the Apple refresh section at the bottom. */
 
-body[data-theme='serika-light'] {
-    --bg-color: #f2f5fb;
-    --bg-elevated: rgba(255, 255, 255, 0.86);
-    --bg-panel: rgba(255, 255, 255, 0.94);
-    --bg-soft: rgba(13, 29, 56, 0.03);
-    --surface-2: rgba(23, 44, 81, 0.05);
-    --surface-3: rgba(23, 44, 81, 0.08);
-    --main-color: #1378c8;
-    --main-soft: rgba(19, 120, 200, 0.12);
-    --main-color-strong: #f7fbff;
-    --success-color: #2d8a5f;
-    --success-soft: rgba(45, 138, 95, 0.12);
-    --warning-color: #a97400;
-    --warning-soft: rgba(169, 116, 0, 0.12);
-    --error-color: #bf4f67;
-    --error-soft: rgba(191, 79, 103, 0.12);
-    --text-color: #435575;
-    --text-strong: #12233d;
-    --text-dim: #71829d;
-    --panel-stroke: rgba(78, 103, 143, 0.14);
-    --shadow-soft: 0 16px 32px rgba(91, 110, 148, 0.12);
-}
-
-body[data-font='sm'] {
-    --font-size-base: 15px;
-    --typing-size: clamp(1.6rem, 2.5vw, 2.15rem);
-    --typing-visible-lines: 3.3;
-}
-
-body[data-font='lg'] {
-    --font-size-base: 17px;
-    --typing-size: clamp(1.9rem, 3vw, 2.6rem);
-    --typing-visible-lines: 3.5;
-}
 
 *,
 *::before,
@@ -93,20 +26,6 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
-
-body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    background:
-        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-    background-size: 120px 120px;
-    opacity: 0.18;
-    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.45), transparent 92%);
-}
-
 a {
     color: inherit;
     text-decoration: none;
@@ -3602,7 +3521,7 @@ body[data-theme='serika-light'] .modal-overlay {
 }
 
 /* ============================================
-   Apple Design System – Animations & Polish
+   Apple Design System 鈥?Animations & Polish
    ============================================ */
 
 /* --- Keyframe Animations --- */
@@ -4095,7 +4014,7 @@ body[data-theme='serika-light'] ::selection {
 }
 
 /* ============================================
-   Settings Drawer – Apple HIG Redesign
+   Settings Drawer 鈥?Apple HIG Redesign
    ============================================ */
 
 .settings-drawer__header {
@@ -4266,7 +4185,7 @@ body[data-theme='serika-light'] .apple-toggle.is-on {
 }
 
 /* ============================================
-   ConfirmDialog – Apple HIG Redesign
+   ConfirmDialog 鈥?Apple HIG Redesign
    ============================================ */
 
 .confirm-dialog {
@@ -4338,7 +4257,7 @@ body[data-theme='serika-light'] .apple-toggle.is-on {
 }
 
 /* ============================================
-   TypingArea – Apple Refinements
+   TypingArea 鈥?Apple Refinements
    ============================================ */
 
 /* Typing shell depth effect */
@@ -4405,7 +4324,7 @@ body[data-theme='serika-light'] .apple-toggle.is-on {
 }
 
 /* ============================================
-   Result Page – Apple Refinements
+   Result Page 鈥?Apple Refinements
    ============================================ */
 
 /* Result summary hero scores */
@@ -4486,7 +4405,7 @@ body[data-language='zh-CN'] .result-label {
 }
 
 /* ============================================
-   Insights Page – Apple Refinements
+   Insights Page 鈥?Apple Refinements
    ============================================ */
 
 /* Insights header hero */
@@ -4535,7 +4454,7 @@ body[data-language='zh-CN'] .result-label {
 }
 
 /* ============================================
-   Home Page – Hero Polish
+   Home Page 鈥?Hero Polish
    ============================================ */
 
 .home-launch {
