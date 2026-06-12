@@ -6924,3 +6924,307 @@ body[data-theme='serika-light'] .nav-icon {
         color: #006edb;
     }
 }
+
+/* Practice workspace control refresh */
+.practice-toolbar {
+    position: relative;
+    overflow: hidden;
+}
+
+.practice-toolbar::before,
+.typing-stage::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(135deg, rgba(10, 132, 255, 0.1), transparent 38%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.07), transparent 44%);
+}
+
+.practice-toolbar > *,
+.typing-stage > * {
+    position: relative;
+    z-index: 1;
+}
+
+.practice-toolbar h2 {
+    font-size: 1.62rem;
+    letter-spacing: 0;
+}
+
+.config-strip {
+    gap: 0.78rem;
+}
+
+.config-strip__main {
+    grid-template-columns: 1.08fr 0.72fr 1fr;
+    align-items: end;
+    gap: 0.78rem;
+}
+
+.control-group {
+    gap: 0.42rem;
+    min-width: 0;
+}
+
+.control-label-row {
+    min-height: 1.25rem;
+}
+
+.control-label {
+    letter-spacing: 0;
+}
+
+.segmented-group {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    gap: 0.16rem;
+    width: fit-content;
+    max-width: 100%;
+    padding: 0.22rem;
+    border: 1px solid var(--panel-stroke);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.055);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+body[data-theme='serika-light'] .segmented-group {
+    background: rgba(255, 255, 255, 0.62);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.88);
+}
+
+.segment-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.36rem;
+    min-height: 2.1rem;
+    min-width: 0;
+    padding: 0.44rem 0.66rem;
+    border: 0;
+    background: transparent;
+    color: var(--text-dim);
+    font-size: 0.82rem;
+    font-weight: 720;
+    letter-spacing: 0;
+    white-space: nowrap;
+}
+
+.segment-btn svg {
+    flex: 0 0 auto;
+}
+
+.segment-btn.active,
+.segment-btn[aria-pressed='true'] {
+    color: var(--text-strong);
+    background: rgba(255, 255, 255, 0.14);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.14),
+        0 8px 18px rgba(0, 0, 0, 0.12);
+}
+
+body[data-theme='serika-light'] .segment-btn.active,
+body[data-theme='serika-light'] .segment-btn[aria-pressed='true'] {
+    color: #1d1d1f;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.96),
+        0 8px 18px rgba(0, 0, 0, 0.07);
+}
+
+.segment-btn:hover {
+    background: rgba(255, 255, 255, 0.09);
+    color: var(--text-strong);
+}
+
+body[data-theme='serika-light'] .segment-btn:hover {
+    background: rgba(255, 255, 255, 0.78);
+}
+
+.config-strip__actions .ghost-btn {
+    min-height: 2.36rem;
+    border-color: var(--panel-stroke);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.typing-stage {
+    position: relative;
+    overflow: hidden;
+}
+
+.typing-stage__head {
+    align-items: start;
+}
+
+.typing-stage__source strong {
+    font-size: 1.05rem;
+    letter-spacing: 0;
+}
+
+.typing-stage__status .panel-badge {
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.typing-stage .words-shell {
+    border-radius: 8px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.015)),
+        rgba(0, 0, 0, 0.28);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.06),
+        0 18px 54px rgba(0, 0, 0, 0.16);
+}
+
+.typing-stage .words-shell.is-focused {
+    border-color: rgba(10, 132, 255, 0.42);
+    box-shadow:
+        inset 0 0 0 1px rgba(10, 132, 255, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.07),
+        0 20px 60px rgba(10, 132, 255, 0.11);
+}
+
+body[data-theme='serika-light'] .typing-stage .words-shell {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 255, 0.74)),
+        #ffffff;
+}
+
+.typing-stage__footer {
+    grid-template-columns: minmax(0, 1fr) minmax(24rem, 0.92fr);
+    align-items: center;
+}
+
+.typing-stage__hint {
+    max-width: 42rem;
+}
+
+.typing-stage .live-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.58rem;
+}
+
+.typing-stage .live-stat {
+    position: relative;
+    min-height: 4.75rem;
+    align-content: end;
+    gap: 0.18rem;
+    padding: 0.78rem 0.82rem;
+    overflow: hidden;
+    border-radius: 8px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.02)),
+        rgba(255, 255, 255, 0.035);
+}
+
+.live-stat__icon {
+    position: absolute;
+    top: 0.72rem;
+    right: 0.76rem;
+    display: inline-grid;
+    place-items: center;
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.07);
+    color: #8ecaff;
+}
+
+.live-stat--accuracy .live-stat__icon {
+    color: #7ee198;
+}
+
+.live-stat--time .live-stat__icon {
+    color: #ffd60a;
+}
+
+.typing-stage .live-stat-value {
+    font-size: 2rem;
+    letter-spacing: 0;
+}
+
+.typing-stage .live-stat-label {
+    letter-spacing: 0;
+}
+
+@media (max-width: 1120px) {
+    .config-strip__main,
+    .typing-stage__footer {
+        grid-template-columns: 1fr;
+    }
+
+    .segmented-group {
+        width: 100%;
+    }
+
+    .segment-btn {
+        flex: 1 1 0;
+    }
+}
+
+@media (max-width: 720px) {
+    .practice-toolbar h2 {
+        font-size: 1.25rem;
+        line-height: 1.12;
+    }
+
+    .config-strip {
+        gap: 0.72rem;
+    }
+
+    .segmented-group {
+        width: 100%;
+        overflow-x: auto;
+        padding: 0.2rem;
+    }
+
+    .segment-btn {
+        flex: 0 0 auto;
+        min-height: 2.32rem;
+        padding: 0.5rem 0.72rem;
+        font-size: 0.82rem;
+    }
+
+    .typing-stage__source strong {
+        font-size: 0.96rem;
+    }
+
+    .typing-stage__status .panel-badge {
+        min-height: 1.86rem;
+        font-size: 0.68rem;
+    }
+
+    .typing-stage .words-shell {
+        padding: 0.82rem;
+    }
+
+    .typing-stage .live-stats {
+        gap: 0.48rem;
+    }
+
+    .typing-stage .live-stat {
+        min-height: 4.15rem;
+        padding: 0.62rem 0.58rem;
+    }
+
+    .live-stat__icon {
+        top: 0.52rem;
+        right: 0.52rem;
+        width: 1.46rem;
+        height: 1.46rem;
+    }
+
+    .live-stat__icon svg {
+        width: 0.88rem;
+        height: 0.88rem;
+    }
+
+    .typing-stage .live-stat-value {
+        font-size: 1.62rem;
+    }
+
+    .typing-stage .live-stat-label {
+        font-size: 0.66rem;
+    }
+}

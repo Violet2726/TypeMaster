@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { RotateCcw } from 'lucide-react';
+import { Clock3, Gauge, RotateCcw, ShieldCheck } from 'lucide-react';
 import { buildRenderedWords } from '@typemaster/domain';
 
 function getSessionStatusText(copy, status) {
@@ -52,6 +52,29 @@ export function TypingArea({
     const extraRefs = useRef(new Map());
     const [caretStyle, setCaretStyle] = useState({});
     const [layoutVersion, setLayoutVersion] = useState(0);
+    const liveStatItems = [
+        {
+            key: 'wpm',
+            className: 'live-stat--wpm',
+            icon: Gauge,
+            value: liveMetrics.wpm,
+            label: copy.common.wpm
+        },
+        {
+            key: 'accuracy',
+            className: 'live-stat--accuracy',
+            icon: ShieldCheck,
+            value: `${liveMetrics.accuracy}%`,
+            label: copy.common.accuracy
+        },
+        {
+            key: 'time',
+            className: 'live-stat--time',
+            icon: Clock3,
+            value: timerDisplay,
+            label: mode === 'time' ? copy.practice.timeRemaining : copy.practice.timeElapsed
+        }
+    ];
 
     const renderedWords = useMemo(
         () => buildRenderedWords(words, typedHistory, currentInput, currentWordIndex),
@@ -322,18 +345,15 @@ export function TypingArea({
             <div className="typing-stage__footer">
                 <p className="muted-text typing-stage__hint">{getHintText(copy, status)}</p>
                 <div className="live-stats">
-                    <div className="live-stat">
-                        <span className="live-stat-value">{liveMetrics.wpm}</span>
-                        <span className="live-stat-label">{copy.common.wpm}</span>
-                    </div>
-                    <div className="live-stat">
-                        <span className="live-stat-value">{liveMetrics.accuracy}%</span>
-                        <span className="live-stat-label">{copy.common.accuracy}</span>
-                    </div>
-                    <div className="live-stat">
-                        <span className="live-stat-value">{timerDisplay}</span>
-                        <span className="live-stat-label">{mode === 'time' ? copy.practice.timeRemaining : copy.practice.timeElapsed}</span>
-                    </div>
+                    {liveStatItems.map(({ key, className, icon: Icon, value, label }) => (
+                        <div key={key} className={`live-stat ${className}`}>
+                            <span className="live-stat__icon" aria-hidden="true">
+                                <Icon size={17} strokeWidth={2.25} />
+                            </span>
+                            <span className="live-stat-value">{value}</span>
+                            <span className="live-stat-label">{label}</span>
+                        </div>
+                    ))}
                 </div>
             </div>
         </section>

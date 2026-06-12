@@ -1,16 +1,18 @@
-import { SlidersHorizontal } from 'lucide-react';
+import { Bot, Clock3, Hash, Library, PencilLine, SlidersHorizontal, Timer } from 'lucide-react';
 import { getTrainingCopy } from '../../../training/copy';
 
 const timeOptions = [15, 30, 60, 120];
 const wordOptions = [10, 25, 50, 100];
 
-function SegmentedButton({ active, children, onClick }) {
+function SegmentedButton({ active, children, icon: Icon = null, onClick }) {
     return (
         <button
             type="button"
             className={`segment-btn ${active ? 'active' : ''}`}
+            aria-pressed={active}
             onClick={onClick}
         >
+            {Icon && <Icon aria-hidden="true" size={15} strokeWidth={2.3} />}
             {children}
         </button>
     );
@@ -27,13 +29,13 @@ export function ConfigPanel({ copy, language, config, onConfigChange, showAdvanc
                         <span className="control-label">{copy.practice.sourceTitle}</span>
                     </div>
                     <div className="segmented-group">
-                        <SegmentedButton active={config.source === 'builtin'} onClick={() => onConfigChange({ source: 'builtin' }, { risky: true, intent: 'config' })}>
+                        <SegmentedButton icon={Library} active={config.source === 'builtin'} onClick={() => onConfigChange({ source: 'builtin' }, { risky: true, intent: 'config' })}>
                             {copy.practice.sourceBuiltin}
                         </SegmentedButton>
-                        <SegmentedButton active={config.source === 'custom'} onClick={() => onConfigChange({ source: 'custom' }, { risky: true, intent: 'config' })}>
+                        <SegmentedButton icon={PencilLine} active={config.source === 'custom'} onClick={() => onConfigChange({ source: 'custom' }, { risky: true, intent: 'config' })}>
                             {trainingCopy.practice.customSource}
                         </SegmentedButton>
-                        <SegmentedButton active={config.source === 'ai'} onClick={() => onConfigChange({ source: 'ai' }, { risky: true, intent: 'config' })}>
+                        <SegmentedButton icon={Bot} active={config.source === 'ai'} onClick={() => onConfigChange({ source: 'ai' }, { risky: true, intent: 'config' })}>
                             {copy.practice.sourceAi}
                         </SegmentedButton>
                     </div>
@@ -44,10 +46,10 @@ export function ConfigPanel({ copy, language, config, onConfigChange, showAdvanc
                         <span className="control-label">{copy.practice.modeTitle}</span>
                     </div>
                     <div className="segmented-group">
-                        <SegmentedButton active={config.mode === 'time'} onClick={() => onConfigChange({ mode: 'time' }, { risky: true, intent: 'config' })}>
+                        <SegmentedButton icon={Timer} active={config.mode === 'time'} onClick={() => onConfigChange({ mode: 'time' }, { risky: true, intent: 'config' })}>
                             {copy.common.timeMode}
                         </SegmentedButton>
-                        <SegmentedButton active={config.mode === 'words'} onClick={() => onConfigChange({ mode: 'words' }, { risky: true, intent: 'config' })}>
+                        <SegmentedButton icon={Hash} active={config.mode === 'words'} onClick={() => onConfigChange({ mode: 'words' }, { risky: true, intent: 'config' })}>
                             {copy.common.wordsMode}
                         </SegmentedButton>
                     </div>
@@ -62,6 +64,7 @@ export function ConfigPanel({ copy, language, config, onConfigChange, showAdvanc
                         <div className="segmented-group">
                             {timeOptions.map((value) => (
                                 <SegmentedButton
+                                    icon={Clock3}
                                     key={value}
                                     active={config.durationSeconds === value}
                                     onClick={() => onConfigChange({ durationSeconds: value }, { risky: true, intent: 'config' })}
@@ -74,6 +77,7 @@ export function ConfigPanel({ copy, language, config, onConfigChange, showAdvanc
                         <div className="segmented-group">
                             {wordOptions.map((value) => (
                                 <SegmentedButton
+                                    icon={Hash}
                                     key={value}
                                     active={config.wordCount === value}
                                     onClick={() => onConfigChange({ wordCount: value }, { risky: true, intent: 'config' })}
