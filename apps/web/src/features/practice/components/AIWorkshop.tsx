@@ -33,8 +33,22 @@ export function AIWorkshop({
     const errorCopy = practiceError ? getErrorMessage(language, practiceError.code) : null;
     const selectedTemplate = AI_TEMPLATES.find((template) => template.id === config.aiTemplate);
     const selectedDifficulty = DIFFICULTY_OPTIONS.find((difficulty) => difficulty.id === config.difficulty);
-    const draftLabel = currentDraft?.sourceTextMeta?.source === 'ai' ? currentDraft.sourceTextMeta.label : copy.common.emptyValue;
     const statusLabel = getStatusLabel(copy, aiPracticeStatus);
+    const aiDraftName = currentDraft?.sourceTextMeta?.source === 'ai' ? currentDraft.sourceTextMeta.label : '';
+    const hasNamedAiDraft = Boolean(aiDraftName)
+        && aiDraftName !== copy.common.emptyValue
+        && aiPracticeStatus !== 'idle'
+        && aiPracticeStatus !== 'error';
+    const draftLabel = hasNamedAiDraft ? aiDraftName : statusLabel;
+    const headline = hasNamedAiDraft ? draftLabel : copy.common.generateAiText;
+    const statusBody = getStatusBody(copy, aiPracticeStatus);
+    const templateLabel = selectedTemplate ? getTemplateLabel(selectedTemplate, language) : copy.common.emptyValue;
+    const difficultyLabel = selectedDifficulty ? getDifficultyLabel(selectedDifficulty, language) : copy.common.emptyValue;
+    const primaryActionLabel = aiPracticeStatus === 'stale'
+        ? copy.common.reGenerateAiText
+        : aiPracticeStatus === 'loading'
+            ? copy.common.loading
+            : copy.common.generateAiText;
 
     return (
         <section className={`ai-custom-panel ai-custom-panel--ai ai-custom-panel--${aiPracticeStatus}`}>
@@ -44,13 +58,39 @@ export function AIWorkshop({
                 </span>
                 <div>
                     <p className="panel-kicker">{copy.practice.customTitle}</p>
-                    <strong>{copy.practice.customTitle}</strong>
-                    <p className="muted-text">{copy.practice.customBody}</p>
+                    <strong>{headline}</strong>
+                    <p className="muted-text">{statusBody}</p>
                 </div>
-                <span className={`panel-badge badge-${aiPracticeStatus}`}>
-                    <Sparkles aria-hidden="true" size={14} strokeWidth={2.2} />
-                    {statusLabel}
-                </span>
+                <div className="ai-custom-panel__command">
+                    <span className={`ai-custom-panel__status-pill ai-custom-panel__status-pill--${aiPracticeStatus}`} aria-live="polite">
+                        <Sparkles aria-hidden="true" size={14} strokeWidth={2.2} />
+                        <small>{copy.common.status}</small>
+                        <strong>{statusLabel}</strong>
+                    </span>
+                    <div className="workshop-actions">
+                        <button
+                            type="button"
+                            className="action-btn primary"
+                            onClick={onGenerate}
+                            disabled={aiPracticeStatus === 'loading'}
+                        >
+                            <WandSparkles aria-hidden="true" size={18} strokeWidth={2.25} />
+                            {primaryActionLabel}
+                        </button>
+                        {aiPracticeStatus === 'stale' && (
+                            <button type="button" className="action-btn" onClick={onRestoreConfig}>
+                                <RefreshCw aria-hidden="true" size={18} strokeWidth={2.25} />
+                                {copy.common.restoreLastConfig}
+                            </button>
+                        )}
+                        {aiPracticeStatus === 'error' && (
+                            <button type="button" className="action-btn" onClick={onUseBuiltin}>
+                                <FileText aria-hidden="true" size={18} strokeWidth={2.25} />
+                                {copy.common.useBuiltIn}
+                            </button>
+                        )}
+                    </div>
+                </div>
             </div>
 
             <div className="ai-custom-panel__body">
@@ -86,20 +126,16 @@ export function AIWorkshop({
                     <div>
                         <p className="summary-label">{copy.common.currentText}</p>
                         <strong>{draftLabel}</strong>
-                        <span>{getStatusBody(copy, aiPracticeStatus)}</span>
+                        <span>{copy.practice.customBody}</span>
                     </div>
                     <div className="ai-custom-panel__state-grid">
                         <span>
-                            <small>{copy.common.status}</small>
-                            <strong>{statusLabel}</strong>
-                        </span>
-                        <span>
                             <small>{copy.practice.templateLabel}</small>
-                            <strong>{selectedTemplate ? getTemplateLabel(selectedTemplate, language) : copy.common.emptyValue}</strong>
+                            <strong>{templateLabel}</strong>
                         </span>
                         <span>
                             <small>{copy.practice.difficultyLabel}</small>
-                            <strong>{selectedDifficulty ? getDifficultyLabel(selectedDifficulty, language) : copy.common.emptyValue}</strong>
+                            <strong>{difficultyLabel}</strong>
                         </span>
                     </div>
                 </div>
@@ -111,34 +147,6 @@ export function AIWorkshop({
                     <p>{errorCopy.description}</p>
                 </div>
             )}
-
-            <div className="workshop-actions">
-                <button
-                    type="button"
-                    className="action-btn primary"
-                    onClick={onGenerate}
-                    disabled={aiPracticeStatus === 'loading'}
-                >
-                    <WandSparkles aria-hidden="true" size={18} strokeWidth={2.25} />
-                    {aiPracticeStatus === 'stale'
-                        ? copy.common.reGenerateAiText
-                        : aiPracticeStatus === 'loading'
-                            ? copy.common.loading
-                            : copy.common.generateAiText}
-                </button>
-                {aiPracticeStatus === 'stale' && (
-                    <button type="button" className="action-btn" onClick={onRestoreConfig}>
-                        <RefreshCw aria-hidden="true" size={18} strokeWidth={2.25} />
-                        {copy.common.restoreLastConfig}
-                    </button>
-                )}
-                {aiPracticeStatus === 'error' && (
-                    <button type="button" className="action-btn" onClick={onUseBuiltin}>
-                        <FileText aria-hidden="true" size={18} strokeWidth={2.25} />
-                        {copy.common.useBuiltIn}
-                    </button>
-                )}
-            </div>
         </section>
     );
 }
