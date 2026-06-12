@@ -32,6 +32,10 @@ describe('HomePage', () => {
         expect(await screen.findByText('Make the training relationship visible, not just the raw numbers.')).toBeInTheDocument();
         expect(screen.getAllByText('Built-in · Time 30s').length).toBeGreaterThan(0);
         expect(screen.getAllByRole('button', { name: 'Start assessment' }).length).toBeGreaterThan(0);
+        expect(screen.queryByText('--')).not.toBeInTheDocument();
+        expect(screen.queryByText('0 WPM')).not.toBeInTheDocument();
+        expect(screen.getAllByText('Pending').length).toBeGreaterThan(0);
+        expect(screen.getAllByText('Ready').length).toBeGreaterThan(0);
     });
 
     test('shows the training dashboard when skill profile and plan exist', async () => {

@@ -47,6 +47,30 @@ function HomeRecordPill({ icon: Icon, children, tone = 'speed' }) {
     );
 }
 
+function HomeActionEmptySignal({ icon: Icon, title, value, items, tone = 'challenge' }) {
+    return (
+        <div className={`home-action-empty-signal home-action-empty-signal--${tone}`}>
+            <div className="home-action-empty-signal__head">
+                <span className="home-action-empty-signal__icon" aria-hidden="true">
+                    <Icon size={18} strokeWidth={2.25} />
+                </span>
+                <div>
+                    <span className="summary-label">{title}</span>
+                    <strong>{value}</strong>
+                </div>
+            </div>
+            <div className="home-action-empty-signal__grid">
+                {items.map((item) => (
+                    <span key={item.label}>
+                        <small>{item.label}</small>
+                        <strong>{item.value}</strong>
+                    </span>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 export function HomePage() {
     const navigate = useAppNavigate();
     const store = useHomePageStore();
@@ -81,6 +105,24 @@ export function HomePage() {
         ...store,
         navigate
     });
+    const hasSessions = insights.totalSessions > 0;
+    const hasChallengeRun = challengeSessions.length > 0;
+    const pendingLabel = trainingCopy.diagnostic.pending;
+    const homeLevelLabel = skillProfile?.level?.label || pendingLabel;
+    const homeStreakLabel = sessionStreak || pendingLabel;
+    const homePlanLabel = trainingPlan ? `${planPercent}%` : pendingLabel;
+    const homeAverageWpmLabel = hasSessions ? `${insights.recent7.avgWpm} ${copy.common.wpm}` : copy.statuses.ready;
+    const homeBestAccuracyLabel = recentBestAccuracy ? `${recentBestAccuracy}%` : pendingLabel;
+    const homeSessionsLabel = hasSessions ? insights.totalSessions : pendingLabel;
+    const challengeEmptyItems = [
+        { label: copy.result.challengeRankLabel, value: trainingCopy.challenge.leaderboard },
+        { label: copy.result.challengeBestLabel, value: trainingCopy.challenge.trendFirstLabel },
+        { label: trainingCopy.challenge.attemptsLabel, value: trainingCopy.challenge.cta }
+    ];
+    const freeReadyItems = [
+        { label: copy.home.latestMode, value: latestModeLabel },
+        { label: copy.common.sessions, value: pendingLabel }
+    ];
 
     return (
         <div className="page-stack page-stack--home">
@@ -146,15 +188,15 @@ export function HomePage() {
             <section className="home-stats-strip" aria-label={copy.home.statsTitle}>
                 <div className="metric-card">
                     <span>{trainingCopy.home.levelLabel}</span>
-                    <strong>{skillProfile?.level?.label || copy.common.emptyValue}</strong>
+                    <strong>{homeLevelLabel}</strong>
                 </div>
                 <div className="metric-card">
                     <span>{trainingCopy.home.streakLabel}</span>
-                    <strong>{sessionStreak || copy.common.emptyValue}</strong>
+                    <strong>{homeStreakLabel}</strong>
                 </div>
                 <div className="metric-card">
                     <span>{trainingCopy.home.planLabel}</span>
-                    <strong>{trainingPlan ? `${planPercent}%` : copy.common.emptyValue}</strong>
+                    <strong>{homePlanLabel}</strong>
                 </div>
                 <div className="metric-card">
                     <span>{trainingCopy.home.weekLabel}</span>
@@ -193,7 +235,7 @@ export function HomePage() {
                         <div className="home-action-card__footer">
                             <div className="home-action-card__summary">
                                 <span>{trainingCopy.home.levelLabel}</span>
-                                <strong>{skillProfile?.level?.label || copy.common.emptyValue}</strong>
+                                <strong>{homeLevelLabel}</strong>
                             </div>
                             <button
                                 type="button"
@@ -226,24 +268,33 @@ export function HomePage() {
                         </div>
 
                         <div className="home-action-card__footer">
-                            <div className="home-action-card__footer-meta">
-                                <div className="home-action-card__summary">
-                                    <span>{copy.result.challengeRankLabel}</span>
-                                    <strong>{challengeStanding ? `#${challengeStanding.rank}` : copy.common.emptyValue}</strong>
+                            {hasChallengeRun ? (
+                                <div className="home-action-card__footer-meta">
+                                    <div className="home-action-card__summary">
+                                        <span>{copy.result.challengeRankLabel}</span>
+                                        <strong>{challengeStanding ? `#${challengeStanding.rank}` : copy.common.emptyValue}</strong>
+                                    </div>
+                                    <div className="home-action-card__summary">
+                                        <span>{copy.result.challengeBestLabel}</span>
+                                        <strong>{challengePersonalBest?.bestSession?.result?.wpm ? `${challengePersonalBest.bestSession.result.wpm} ${copy.common.wpm}` : copy.common.emptyValue}</strong>
+                                    </div>
+                                    <div className="home-action-card__summary">
+                                        <span>{trainingCopy.challenge.leaderboard}</span>
+                                        <strong>{challengeLeaderboardCount}</strong>
+                                    </div>
+                                    <div className="home-action-card__summary">
+                                        <span>{trainingCopy.challenge.attemptsLabel}</span>
+                                        <strong>{challengeSessions.length}</strong>
+                                    </div>
                                 </div>
-                                <div className="home-action-card__summary">
-                                    <span>{copy.result.challengeBestLabel}</span>
-                                    <strong>{challengePersonalBest?.bestSession?.result?.wpm ? `${challengePersonalBest.bestSession.result.wpm} ${copy.common.wpm}` : copy.common.emptyValue}</strong>
-                                </div>
-                                <div className="home-action-card__summary">
-                                    <span>{trainingCopy.challenge.leaderboard}</span>
-                                    <strong>{challengeLeaderboardCount}</strong>
-                                </div>
-                                <div className="home-action-card__summary">
-                                    <span>{trainingCopy.challenge.attemptsLabel}</span>
-                                    <strong>{challengeSessions.length || copy.common.emptyValue}</strong>
-                                </div>
-                            </div>
+                            ) : (
+                                <HomeActionEmptySignal
+                                    icon={Trophy}
+                                    title={trainingCopy.challenge.statusTitle}
+                                    value={trainingCopy.challenge.trendFirstLabel}
+                                    items={challengeEmptyItems}
+                                />
+                            )}
                             <div className="results-actions home-action-card__actions">
                                 {!challengeIsPrimaryDecision && (
                                     <button
@@ -271,15 +322,25 @@ export function HomePage() {
                             <p className="lead-text">{trainingCopy.home.freePracticeBody}</p>
                             <div className="home-action-card__meta">
                                 <span className="home-action-chip">{latestModeLabel}</span>
-                                <span className="home-action-chip">{insights.recent7.avgWpm} {copy.common.wpm}</span>
+                                <span className="home-action-chip">{homeAverageWpmLabel}</span>
                             </div>
                         </div>
 
                         <div className="home-action-card__footer">
-                            <div className="home-action-card__summary">
-                                <span>{copy.common.sessions}</span>
-                                <strong>{insights.totalSessions || copy.common.emptyValue}</strong>
-                            </div>
+                            {hasSessions ? (
+                                <div className="home-action-card__summary">
+                                    <span>{copy.common.sessions}</span>
+                                    <strong>{homeSessionsLabel}</strong>
+                                </div>
+                            ) : (
+                                <HomeActionEmptySignal
+                                    icon={Keyboard}
+                                    title={trainingCopy.home.freePracticeKicker}
+                                    value={copy.statuses.ready}
+                                    items={freeReadyItems}
+                                    tone="free"
+                                />
+                            )}
                             <button type="button" className="action-btn" onClick={() => handleDecisionAction('free')}>
                                 {trainingCopy.home.freePractice}
                             </button>
@@ -313,15 +374,15 @@ export function HomePage() {
                     <div className="summary-stack summary-stack--compact">
                         <div className="metric-card">
                             <span>{copy.home.avgWpm}</span>
-                            <strong>{insights.recent7.avgWpm} {copy.common.wpm}</strong>
+                            <strong>{homeAverageWpmLabel}</strong>
                         </div>
                         <div className="metric-card">
                             <span>{copy.home.bestAccuracy}</span>
-                            <strong>{recentBestAccuracy ? `${recentBestAccuracy}%` : copy.common.emptyValue}</strong>
+                            <strong>{homeBestAccuracyLabel}</strong>
                         </div>
                         <div className="metric-card">
                             <span>{copy.common.sessions}</span>
-                            <strong>{insights.totalSessions || copy.common.emptyValue}</strong>
+                            <strong>{homeSessionsLabel}</strong>
                         </div>
                         <div className="metric-card">
                             <span>{copy.home.latestMode}</span>
