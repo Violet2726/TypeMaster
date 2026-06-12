@@ -24,7 +24,10 @@ describe('ChallengePage', () => {
             }
         });
 
-        expect((await screen.findAllByText('Your challenge status')).length).toBeGreaterThanOrEqual(1);
+        const firstRunPanel = await screen.findByLabelText('Your challenge status');
+
+        expect(firstRunPanel).toHaveClass('challenge-first-run-panel');
+        expect(screen.getAllByText('Your challenge status')).toHaveLength(1);
         expect(screen.getAllByText('No result posted yet. Finish one round and your rank plus best status will appear here.').length).toBeGreaterThanOrEqual(1);
         expect(screen.getAllByText('No same-level results yet. You can leave the first one.').length).toBeGreaterThanOrEqual(1);
         expect(screen.getByText('Waiting for your first mark')).toBeInTheDocument();

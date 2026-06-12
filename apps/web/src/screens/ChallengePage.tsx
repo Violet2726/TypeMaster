@@ -57,6 +57,38 @@ function ChallengeEmptyStatus({ title, headline, body, icon: Icon, tone = 'prima
     );
 }
 
+function ChallengeFirstRunPanel({ title, headline, body, items }) {
+    return (
+        <section className="panel challenge-first-run-panel" aria-label={title}>
+            <div className="challenge-first-run-panel__copy">
+                <span className="challenge-first-run-panel__icon" aria-hidden="true">
+                    <Trophy size={22} strokeWidth={2.25} />
+                </span>
+                <div>
+                    <p className="panel-kicker">{title}</p>
+                    <h2>{headline}</h2>
+                    <p className="lead-text">{body}</p>
+                </div>
+            </div>
+
+            <div className="challenge-first-run-panel__grid">
+                {items.map(({ body: itemBody, icon: Icon, label, tone, value }) => (
+                    <div key={label} className={`challenge-first-run-card challenge-first-run-card--${tone}`}>
+                        <span className="challenge-first-run-card__icon" aria-hidden="true">
+                            <Icon size={18} strokeWidth={2.25} />
+                        </span>
+                        <div>
+                            <span className="summary-label">{label}</span>
+                            <strong>{value}</strong>
+                            <p>{itemBody}</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </section>
+    );
+}
+
 export function ChallengePage() {
     const navigate = useAppNavigate();
     const store = useChallengePageStore();
@@ -96,6 +128,29 @@ export function ChallengePage() {
         { label: copy.result.challengeEntriesLabel, value: trainingCopy.challenge.leaderboard },
         { label: trainingCopy.challenge.trendFocusTitle, value: trainingCopy.challenge.trendFirstLabel }
     ];
+    const firstRunItems = [
+        {
+            body: trainingCopy.challenge.statusEmpty,
+            icon: Trophy,
+            label: copy.result.challengeRankLabel,
+            tone: 'status',
+            value: trainingCopy.challenge.leaderboard
+        },
+        {
+            body: trainingCopy.challenge.peerEmpty,
+            icon: Medal,
+            label: trainingCopy.challenge.peerTitle,
+            tone: 'peer',
+            value: trainingCopy.challenge.peerPreviewTitle
+        },
+        {
+            body: trainingCopy.challenge.strategyIdle,
+            icon: BarChart3,
+            label: trainingCopy.challenge.trendTitle,
+            tone: 'trend',
+            value: trainingCopy.challenge.trendFirstLabel
+        }
+    ];
 
     return (
         <div className="page-stack challenge-page">
@@ -118,6 +173,14 @@ export function ChallengePage() {
                 </button>
             </section>
 
+            {!hasChallengeResult && !hasPeerResults ? (
+                <ChallengeFirstRunPanel
+                    title={trainingCopy.challenge.statusTitle}
+                    headline={trainingCopy.challenge.statusPreviewTitle}
+                    body={trainingCopy.challenge.statusEmpty}
+                    items={firstRunItems}
+                />
+            ) : (
             <section className="insights-overview-grid">
                 <div className="panel insights-latest-card challenge-status-card">
                     <p className="panel-kicker">{trainingCopy.challenge.statusTitle}</p>
@@ -218,6 +281,7 @@ export function ChallengePage() {
                     )}
                 </div>
             </section>
+            )}
 
             <section className="panel challenge-replay-section">
                 <div className="panel-head">
