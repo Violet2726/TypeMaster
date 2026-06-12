@@ -7,7 +7,7 @@ type ConfigChangeOptions = {
     risky?: boolean,
 };
 
-function getPrimaryActionLabel(copy, config, aiPracticeStatus, status) {
+function getPrimaryActionLabel(copy, trainingCopy, config, aiPracticeStatus, status, isCustomEmpty) {
     if (config.source === 'ai') {
         if (aiPracticeStatus === 'loading') return copy.common.loading;
         if (aiPracticeStatus === 'ready') {
@@ -20,9 +20,27 @@ function getPrimaryActionLabel(copy, config, aiPracticeStatus, status) {
             : copy.practice.mobileActionGenerate;
     }
 
+    if (config.source === 'custom' && isCustomEmpty) {
+        return trainingCopy.practice.customApply;
+    }
+
     return status === 'paused' || status === 'running'
         ? copy.practice.mobileActionResume
         : copy.common.startTyping;
+}
+
+function getPrimaryActionHint(copy, trainingCopy, config, aiPracticeStatus, isCustomEmpty, customText) {
+    if (config.source === 'ai' && aiPracticeStatus !== 'ready') {
+        return copy.practice.aiIdle;
+    }
+
+    if (config.source === 'custom' && isCustomEmpty) {
+        return customText.trim()
+            ? trainingCopy.practice.customBody
+            : trainingCopy.practice.customPlaceholder;
+    }
+
+    return copy.practice.helperBody;
 }
 
 function isDraftForSource(draft, source) {
@@ -271,6 +289,11 @@ export function usePracticePageModel({
     }, [copy.confirm.apply, copy.confirm.stay, copy.practice.confirmConfigBody, copy.practice.confirmConfigTitle, requestRiskyAction, resetPracticeToBuiltin, typingSession]);
 
     const handleApplyCustomText = useCallback(() => {
+        if (!customText.trim()) {
+            setControlsOpen(true);
+            return;
+        }
+
         requestRiskyAction({
             title: copy.practice.confirmConfigTitle,
             body: copy.practice.confirmConfigBody,
@@ -306,11 +329,14 @@ export function usePracticePageModel({
 
         if (config.source === 'custom' && !(displayDraft?.words?.length > 0)) {
             setControlsOpen(true);
+            if (customText.trim()) {
+                handleApplyCustomText();
+            }
             return;
         }
 
         typingSession.focusInput();
-    }, [aiPracticeStatus, config.source, displayDraft?.words?.length, handleGenerateAi, typingSession]);
+    }, [aiPracticeStatus, config.source, customText, displayDraft?.words?.length, handleApplyCustomText, handleGenerateAi, typingSession]);
 
     const trainingCopy = useMemo(() => getTrainingCopy(language), [language]);
     const adaptiveDrillInsight = useMemo(() => buildAdaptiveDrillInsight({
@@ -348,7 +374,10 @@ export function usePracticePageModel({
             : config.source === 'custom'
                 ? trainingCopy.practice.customSource
                 : copy.practice.sourceBuiltin);
-    const primaryActionLabel = getPrimaryActionLabel(copy, config, aiPracticeStatus, typingSession.status);
+    const primaryActionLabel = getPrimaryActionLabel(copy, trainingCopy, config, aiPracticeStatus, typingSession.status, isCustomEmpty);
+    const primaryActionHint = getPrimaryActionHint(copy, trainingCopy, config, aiPracticeStatus, isCustomEmpty, customText);
+    const isPrimaryActionDisabled = (config.source === 'ai' && aiPracticeStatus === 'loading')
+        || (config.source === 'custom' && isCustomEmpty && !customText.trim());
 
     return {
         aiPracticeStatus,
@@ -372,6 +401,8 @@ export function usePracticePageModel({
         nextRoundBrief,
         practiceError,
         primaryActionLabel,
+        primaryActionHint,
+        isPrimaryActionDisabled,
         restoreAiDraftConfig,
         handleBeforeUnload,
         setConfirmState,

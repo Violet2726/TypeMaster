@@ -1,7 +1,8 @@
 /** @vitest-environment jsdom */
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
 import { getCopy } from '../../i18n';
+import { getTrainingCopy } from '../../training/copy';
 import PracticePage from '../PracticePage';
 import { resetMockNavigation, setMockNavigation } from '../../test/next-navigation';
 
@@ -272,5 +273,48 @@ describe('PracticePage', () => {
 
         expect(screen.getByTestId('typing-area')).toHaveAttribute('data-locked', 'true');
         expect(screen.getByTestId('typing-area')).toHaveTextContent('Custom bank');
+    });
+
+    test('keeps the mobile action aligned with an empty custom word bank', () => {
+        const trainingCopy = getTrainingCopy('en-US');
+
+        Object.assign(mockStore, {
+            config: {
+                ...baseStore.config,
+                source: 'custom'
+            },
+            currentDraft: null
+        });
+
+        render(<PracticePage />);
+
+        expect(screen.getByText(trainingCopy.practice.customPlaceholder)).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: trainingCopy.practice.customApply })).toBeDisabled();
+    });
+
+    test('lets the mobile action apply a drafted custom word bank', () => {
+        const trainingCopy = getTrainingCopy('en-US');
+        mockStore.applyCustomWordBank.mockClear();
+
+        Object.assign(mockStore, {
+            config: {
+                ...baseStore.config,
+                source: 'custom'
+            },
+            currentDraft: null,
+            settings: {
+                ...baseStore.settings,
+                customWordBankText: 'alpha beta'
+            }
+        });
+
+        render(<PracticePage />);
+
+        const applyButton = screen.getByRole('button', { name: trainingCopy.practice.customApply });
+        expect(applyButton).toBeEnabled();
+
+        fireEvent.click(applyButton);
+
+        expect(mockStore.applyCustomWordBank).toHaveBeenCalledWith('alpha beta');
     });
 });

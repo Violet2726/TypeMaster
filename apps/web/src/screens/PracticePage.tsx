@@ -34,11 +34,13 @@ export function PracticePage() {
         handleUseBuiltin,
         isCustomEmpty,
         isDirty,
+        isPrimaryActionDisabled,
         lockBody,
         lockTitle,
         nextRoundBrief,
         practiceError,
         primaryActionLabel,
+        primaryActionHint,
         restoreAiDraftConfig,
         handleBeforeUnload,
         setConfirmState,
@@ -253,13 +255,13 @@ export function PracticePage() {
             <div className="sticky-action-bar">
                 <div>
                     <span className="summary-label">{store.copy.practice.helperTitle}</span>
-                    <strong>{store.config.source === 'ai' && aiPracticeStatus !== 'ready' ? store.copy.practice.aiIdle : store.copy.practice.helperBody}</strong>
+                    <strong>{primaryActionHint}</strong>
                 </div>
                 <button
                     type="button"
                     className="action-btn primary"
                     onClick={handlePrimaryAction}
-                    disabled={store.config.source === 'ai' && aiPracticeStatus === 'loading'}
+                    disabled={isPrimaryActionDisabled}
                 >
                     {primaryActionLabel}
                 </button>
