@@ -32,7 +32,7 @@ function ChallengeMetricPill({ icon: Icon, children, tone = 'speed' }) {
     );
 }
 
-function ChallengeEmptyStatus({ title, body, icon: Icon, tone = 'primary', items, actionLabel, onAction }) {
+function ChallengeEmptyStatus({ title, headline, body, icon: Icon, tone = 'primary', items }) {
     return (
         <div className={`challenge-empty-status challenge-empty-status--${tone}`}>
             <div className="challenge-empty-status__head">
@@ -41,7 +41,7 @@ function ChallengeEmptyStatus({ title, body, icon: Icon, tone = 'primary', items
                 </span>
                 <div>
                     <span className="summary-label">{title}</span>
-                    <strong>{actionLabel}</strong>
+                    <strong>{headline}</strong>
                 </div>
             </div>
             <p className="muted-text">{body}</p>
@@ -53,10 +53,6 @@ function ChallengeEmptyStatus({ title, body, icon: Icon, tone = 'primary', items
                     </span>
                 ))}
             </div>
-            <button type="button" className="action-btn primary" onClick={onAction}>
-                <Trophy aria-hidden="true" size={17} strokeWidth={2.2} />
-                {actionLabel}
-            </button>
         </div>
     );
 }
@@ -98,7 +94,7 @@ export function ChallengePage() {
     const peerEmptyItems = [
         { label: copy.result.challengeRankLabel, value: trainingCopy.challenge.peerTitle },
         { label: copy.result.challengeEntriesLabel, value: trainingCopy.challenge.leaderboard },
-        { label: trainingCopy.challenge.trendFocusTitle, value: trainingCopy.challenge.cta }
+        { label: trainingCopy.challenge.trendFocusTitle, value: trainingCopy.challenge.trendFirstLabel }
     ];
 
     return (
@@ -166,11 +162,10 @@ export function ChallengePage() {
                     ) : (
                         <ChallengeEmptyStatus
                             title={trainingCopy.challenge.statusTitle}
+                            headline={trainingCopy.challenge.statusPreviewTitle}
                             body={trainingCopy.challenge.statusEmpty}
                             icon={Trophy}
                             items={challengeEmptyItems}
-                            actionLabel={trainingCopy.challenge.cta}
-                            onAction={handleStart}
                         />
                     )}
                 </div>
@@ -214,12 +209,11 @@ export function ChallengePage() {
                     ) : (
                         <ChallengeEmptyStatus
                             title={trainingCopy.challenge.peerTitle}
+                            headline={trainingCopy.challenge.peerPreviewTitle}
                             body={trainingCopy.challenge.peerEmpty}
                             icon={Medal}
                             tone="peer"
                             items={peerEmptyItems}
-                            actionLabel={trainingCopy.challenge.cta}
-                            onAction={handleStart}
                         />
                     )}
                 </div>
@@ -291,10 +285,6 @@ export function ChallengePage() {
                             <span />
                             <span />
                         </div>
-                        <button type="button" className="action-btn primary" onClick={handleStart}>
-                            <Trophy aria-hidden="true" size={17} strokeWidth={2.2} />
-                            {trainingCopy.challenge.cta}
-                        </button>
                     </div>
                 )}
             </section>
@@ -305,10 +295,12 @@ export function ChallengePage() {
                         <p className="panel-kicker">{trainingCopy.challenge.kicker}</p>
                         <h2>{trainingCopy.challenge.leaderboard}</h2>
                     </div>
-                    <button type="button" className="action-btn" onClick={handleStart}>
-                        <Trophy aria-hidden="true" size={17} strokeWidth={2.2} />
-                        {latestChallengeSession ? trainingCopy.challenge.retryCta : trainingCopy.challenge.cta}
-                    </button>
+                    {latestChallengeSession && (
+                        <button type="button" className="action-btn" onClick={handleStart}>
+                            <Trophy aria-hidden="true" size={17} strokeWidth={2.2} />
+                            {trainingCopy.challenge.retryCta}
+                        </button>
+                    )}
                 </div>
 
                 {leaderboard.length ? (

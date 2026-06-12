@@ -5147,6 +5147,7 @@ body[data-language='zh-CN'] .panel-kicker {
     margin-top: 0.12rem;
     color: var(--text-strong);
     font-size: 1.08rem;
+    line-height: 1.22;
 }
 
 .challenge-empty-status__icon {
@@ -5213,10 +5214,6 @@ body[data-language='zh-CN'] .panel-kicker {
     line-height: 1.2;
 }
 
-.challenge-empty-status .action-btn {
-    width: 100%;
-}
-
 .challenge-metrics-grid.result-metrics-strip {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 0.62rem;
@@ -5262,7 +5259,7 @@ body[data-language='zh-CN'] .panel-kicker {
 
 .challenge-replay-empty {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) minmax(14rem, 0.48fr) auto;
+    grid-template-columns: auto minmax(0, 1fr) minmax(14rem, 0.48fr);
     align-items: center;
     gap: 0.82rem;
     min-height: 8.8rem;

@@ -460,6 +460,7 @@ export const zhCNMessages = {
                 statusTitle: '你的挑战状态',
                 statusEmpty: '还没有提交结果。完成一轮后，排名和最佳状态会显示在这里。',
                 statusReady: '你已经进入今日榜单。可以再冲一次更好的排名。',
+                statusPreviewTitle: '等待你的首个成绩',
                 homeIdleNote: '完成一轮后，这张卡会显示今日排名。',
                 homeReadyNote: '你的结果已经在榜单上。再来一轮刷新成绩。',
                 historyTitle: '今日回放',
@@ -501,6 +502,7 @@ export const zhCNMessages = {
                 peerTitle: '同级比较',
                 peerBody: '先和相同等级的玩家比较，理解自己的相对位置。',
                 peerEmpty: '还没有同级结果。你可以留下第一条。',
+                peerPreviewTitle: '完成一轮后开启同级榜单',
                 empty: '还没有人提交结果。你可以抢下第一名。'
             },
             insights: {

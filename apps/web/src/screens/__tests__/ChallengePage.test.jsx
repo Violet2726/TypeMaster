@@ -27,10 +27,12 @@ describe('ChallengePage', () => {
         expect((await screen.findAllByText('Your challenge status')).length).toBeGreaterThanOrEqual(1);
         expect(screen.getAllByText('No result posted yet. Finish one round and your rank plus best status will appear here.').length).toBeGreaterThanOrEqual(1);
         expect(screen.getAllByText('No same-level results yet. You can leave the first one.').length).toBeGreaterThanOrEqual(1);
+        expect(screen.getByText('Waiting for your first mark')).toBeInTheDocument();
+        expect(screen.getByText('Peer board opens after one run')).toBeInTheDocument();
         expect(screen.queryByText('--')).not.toBeInTheDocument();
         expect(screen.queryByText('0 WPM')).not.toBeInTheDocument();
         expect(screen.queryByText('0%')).not.toBeInTheDocument();
-        expect(screen.getAllByRole('button', { name: 'Start challenge' }).length).toBeGreaterThan(1);
+        expect(screen.getAllByRole('button', { name: 'Start challenge' })).toHaveLength(1);
     });
 
     test('renders daily challenge controls and leaderboard section', async () => {

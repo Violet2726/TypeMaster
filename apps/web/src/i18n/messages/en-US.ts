@@ -460,6 +460,7 @@ export const enUSMessages = {
                 statusTitle: 'Your challenge status',
                 statusEmpty: 'No result posted yet. Finish one round and your rank plus best status will appear here.',
                 statusReady: 'You are already on today\'s board. Push again to chase a better rank.',
+                statusPreviewTitle: 'Waiting for your first mark',
                 homeIdleNote: 'Finish one round and this card will start showing today\'s rank.',
                 homeReadyNote: 'Your result is already on the board. Push again to set a better mark.',
                 historyTitle: 'Today\'s replay',
@@ -501,6 +502,7 @@ export const enUSMessages = {
                 peerTitle: 'Peer group',
                 peerBody: 'Compare with players at the same level first to understand your relative position.',
                 peerEmpty: 'No same-level results yet. You can leave the first one.',
+                peerPreviewTitle: 'Peer board opens after one run',
                 empty: 'No one has posted a result yet. You can take the first spot.'
             },
             insights: {
