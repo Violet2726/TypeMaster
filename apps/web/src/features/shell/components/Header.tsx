@@ -25,6 +25,17 @@ const NAV_TABS = [
     { href: '/insights', icon: BarChart3 },
 ] as const;
 
+function getNavProps(pathname: string, href: string) {
+    const isActive = href === '/'
+        ? pathname === '/'
+        : pathname === href;
+
+    return {
+        className: `nav-link${isActive ? ' active' : ''}`,
+        'aria-current': isActive ? 'page' as const : undefined
+    };
+}
+
 export function Header({ settings, copy, hasTrainingPlan = false, onToggleTheme, onOpenSettings }: HeaderProps) {
     const pathname = usePathname();
     const compact = settings.focusMode && pathname === '/practice';
@@ -47,11 +58,11 @@ export function Header({ settings, copy, hasTrainingPlan = false, onToggleTheme,
 
                     {!compact && (
                         <nav className="nav-links" aria-label="Primary">
-                            <Link href="/" className={`nav-link ${pathname === '/' ? 'active' : ''}`}>{copy.nav.home}</Link>
-                            <Link href="/practice" className={`nav-link ${pathname === '/practice' ? 'active' : ''}`}>{copy.nav.practice}</Link>
-                            {hasTrainingPlan && <Link href="/plan" className={`nav-link ${pathname === '/plan' ? 'active' : ''}`}>{trainingCopy.nav.plan}</Link>}
-                            <Link href="/challenge" className={`nav-link ${pathname === '/challenge' ? 'active' : ''}`}>{trainingCopy.nav.challenge}</Link>
-                            <Link href="/insights" className={`nav-link ${pathname === '/insights' ? 'active' : ''}`}>{copy.nav.insights}</Link>
+                            <Link href="/" {...getNavProps(pathname, '/')}>{copy.nav.home}</Link>
+                            <Link href="/practice" {...getNavProps(pathname, '/practice')}>{copy.nav.practice}</Link>
+                            {hasTrainingPlan && <Link href="/plan" {...getNavProps(pathname, '/plan')}>{trainingCopy.nav.plan}</Link>}
+                            <Link href="/challenge" {...getNavProps(pathname, '/challenge')}>{trainingCopy.nav.challenge}</Link>
+                            <Link href="/insights" {...getNavProps(pathname, '/insights')}>{copy.nav.insights}</Link>
                         </nav>
                     )}
 

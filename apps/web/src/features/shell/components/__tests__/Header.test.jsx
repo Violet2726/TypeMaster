@@ -12,8 +12,8 @@ const baseSettings = {
     focusMode: false
 };
 
-function renderHeader(hasTrainingPlan) {
-    setMockNavigation({ pathname: '/' });
+function renderHeader(hasTrainingPlan, pathname = '/') {
+    setMockNavigation({ pathname });
 
     return render(
         <Header
@@ -45,5 +45,13 @@ describe('Header', () => {
         // Desktop nav + mobile tab bar both render a "Plan" link
         const planLinks = screen.getAllByRole('link', { name: 'Plan' });
         expect(planLinks.length).toBeGreaterThanOrEqual(1);
+    });
+
+    test('marks the active desktop nav link as the current page', () => {
+        renderHeader(false, '/challenge');
+
+        const challengeLinks = screen.getAllByRole('link', { name: 'Challenge' });
+        expect(challengeLinks.some((link) => link.getAttribute('aria-current') === 'page')).toBe(true);
+        expect(screen.queryByRole('link', { name: 'Home', current: 'page' })).not.toBeInTheDocument();
     });
 });
