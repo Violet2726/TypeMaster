@@ -6035,3 +6035,398 @@ body[data-theme='serika-light'] .settings-group__items {
         grid-template-columns: 1fr;
     }
 }
+
+/* Training plan path refresh */
+.training-plan-page {
+    gap: 1.05rem;
+}
+
+.training-plan-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    min-height: 12.4rem;
+    padding: 1.45rem;
+    overflow: hidden;
+    background:
+        linear-gradient(135deg, rgba(52, 199, 89, 0.13), transparent 38%),
+        linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
+}
+
+.training-plan-hero h1 {
+    max-width: 43rem;
+    font-size: 4.35rem;
+    line-height: 0.94;
+    letter-spacing: 0;
+}
+
+.training-plan-hero .muted-text {
+    max-width: 42rem;
+    color: var(--text-color);
+}
+
+.training-plan-hero__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-top: 0.95rem;
+}
+
+.training-plan-hero__chips span,
+.training-plan-step__status,
+.training-plan-step__dose {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    min-height: 2.05rem;
+    padding: 0.36rem 0.66rem;
+    border-radius: 999px;
+    border: 1px solid var(--panel-stroke);
+    background: var(--bg-soft);
+    color: var(--text-strong);
+    font-size: 0.76rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.training-plan-hero__action {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.85rem;
+}
+
+.training-plan-ring {
+    display: grid;
+    place-items: center;
+    width: 6.4rem;
+    height: 6.4rem;
+    border-radius: 50%;
+    border: 1px solid rgba(52, 199, 89, 0.34);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.09),
+        0 18px 46px rgba(52, 199, 89, 0.16);
+}
+
+.training-plan-ring::before {
+    content: '';
+    position: absolute;
+}
+
+.training-plan-ring strong,
+.training-plan-ring span {
+    position: relative;
+    z-index: 1;
+}
+
+.training-plan-ring strong {
+    margin-top: 0.32rem;
+    color: var(--text-strong);
+    font-size: 1.32rem;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.training-plan-ring span {
+    color: var(--text-dim);
+    font-size: 0.68rem;
+    font-weight: 700;
+}
+
+.training-plan-ring {
+    position: relative;
+}
+
+.training-plan-ring::after {
+    content: '';
+    position: absolute;
+    inset: 0.58rem;
+    border-radius: 50%;
+    background: var(--bg-panel);
+}
+
+.training-plan-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.training-plan-stat {
+    min-height: 6rem;
+    align-content: center;
+    gap: 0.38rem;
+}
+
+.training-plan-stat svg {
+    color: #7ee198;
+}
+
+.training-plan-board {
+    display: grid;
+    gap: 0.95rem;
+    overflow: hidden;
+}
+
+.training-plan-board .panel-head {
+    align-items: center;
+}
+
+.training-plan-progress-line {
+    height: 0.42rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+}
+
+.training-plan-progress-line span {
+    display: block;
+    min-width: 0.42rem;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #34c759, #64d2ff);
+}
+
+.training-plan-step-list {
+    display: grid;
+    gap: 0.62rem;
+}
+
+.training-plan-step {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.78rem;
+    min-height: 5.25rem;
+    padding: 0.86rem;
+    border: 1px solid var(--panel-stroke);
+    border-radius: 8px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018)),
+        var(--bg-soft);
+}
+
+.training-plan-step__index {
+    display: inline-grid;
+    place-items: center;
+    width: 2.35rem;
+    height: 2.35rem;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.07);
+    color: var(--text-strong);
+    font-size: 0.88rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.training-plan-step--active {
+    border-color: rgba(10, 132, 255, 0.42);
+    box-shadow: 0 16px 44px rgba(10, 132, 255, 0.1);
+}
+
+.training-plan-step--active .training-plan-step__index,
+.training-plan-step__status--active {
+    border-color: rgba(10, 132, 255, 0.42);
+    background: rgba(10, 132, 255, 0.15);
+    color: #8ecaff;
+}
+
+.training-plan-step--complete .training-plan-step__index,
+.training-plan-step__status--complete {
+    border-color: rgba(52, 199, 89, 0.38);
+    background: rgba(52, 199, 89, 0.13);
+    color: #7ee198;
+}
+
+.training-plan-step__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.7rem;
+}
+
+.training-plan-step__head strong {
+    color: var(--text-strong);
+    font-size: 1.02rem;
+}
+
+.training-plan-step__badges {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.45rem;
+    flex: 0 0 auto;
+}
+
+.training-plan-step__content .muted-text {
+    margin-top: 0.22rem;
+}
+
+.training-plan-empty {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 1rem;
+    border: 1px solid rgba(10, 132, 255, 0.22);
+    border-radius: 8px;
+    background:
+        linear-gradient(135deg, rgba(10, 132, 255, 0.12), transparent 58%),
+        var(--bg-soft);
+}
+
+.training-plan-empty__icon {
+    display: inline-grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: rgba(10, 132, 255, 0.14);
+    color: #8ecaff;
+}
+
+.training-plan-empty strong {
+    color: var(--text-strong);
+    font-size: 1.08rem;
+}
+
+.training-plan-focus {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.88rem;
+    border: 1px solid var(--panel-stroke);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.training-plan-focus .summary-label {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2rem;
+    padding: 0.34rem 0.62rem;
+    border-radius: 999px;
+    background: var(--bg-soft);
+    color: var(--text-strong);
+}
+
+.training-plan-focus strong {
+    color: var(--text-strong);
+}
+
+body[data-theme='serika-light'] .training-plan-hero,
+body[data-theme='serika-light'] .training-plan-step,
+body[data-theme='serika-light'] .training-plan-empty {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 255, 0.72)),
+        var(--bg-panel);
+}
+
+body[data-theme='serika-light'] .training-plan-ring::after {
+    background: #ffffff;
+}
+
+@media (max-width: 900px) {
+    .training-plan-hero {
+        grid-template-columns: 1fr;
+    }
+
+    .training-plan-hero__action {
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 720px) {
+    .training-plan-page {
+        gap: 0.82rem;
+        padding-bottom: 5.2rem;
+    }
+
+    .training-plan-hero {
+        min-height: auto;
+        padding: 1rem;
+    }
+
+    .training-plan-hero h1 {
+        font-size: 3.05rem;
+    }
+
+    .training-plan-hero__action {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 0.72rem;
+    }
+
+    .training-plan-hero__action .action-btn {
+        width: 100%;
+        min-height: 2.85rem;
+    }
+
+    .training-plan-ring {
+        width: 4.55rem;
+        height: 4.55rem;
+    }
+
+    .training-plan-ring strong {
+        font-size: 1rem;
+    }
+
+    .training-plan-ring span {
+        font-size: 0.56rem;
+    }
+
+    .training-plan-stats {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.52rem;
+    }
+
+    .training-plan-stat {
+        min-height: 4.7rem;
+        padding: 0.68rem 0.62rem;
+    }
+
+    .training-plan-stat span {
+        font-size: 0.68rem;
+        line-height: 1.18;
+    }
+
+    .training-plan-stat strong {
+        font-size: 1.28rem;
+    }
+
+    .training-plan-step {
+        align-items: start;
+        min-height: auto;
+        padding: 0.82rem;
+    }
+
+    .training-plan-step__head {
+        align-items: flex-start;
+        gap: 0.48rem;
+    }
+
+    .training-plan-step__badges {
+        gap: 0.35rem;
+    }
+
+    .training-plan-step__status,
+    .training-plan-step__dose {
+        min-height: 1.9rem;
+        padding-inline: 0.55rem;
+        font-size: 0.68rem;
+    }
+
+    .training-plan-empty {
+        grid-template-columns: auto minmax(0, 1fr);
+        align-items: start;
+    }
+
+    .training-plan-empty .action-btn {
+        grid-column: 1 / -1;
+        width: 100%;
+    }
+
+    .training-plan-focus {
+        grid-template-columns: 1fr;
+    }
+}
