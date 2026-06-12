@@ -25,6 +25,31 @@ function getPrimaryActionLabel(copy, config, aiPracticeStatus, status) {
         : copy.common.startTyping;
 }
 
+function isDraftForSource(draft, source) {
+    const meta = draft?.sourceTextMeta || {};
+    const draftSource = meta.source;
+    const configSource = draft?.configSnapshot?.source;
+
+    if (!draftSource) {
+        return source === 'builtin';
+    }
+
+    if (source === 'custom') {
+        return draftSource === 'custom'
+            && (!meta.generatedBy || meta.generatedBy === 'custom')
+            && (!configSource || configSource === 'custom');
+    }
+
+    if (source === 'ai') {
+        return draftSource === 'ai'
+            && (!meta.generatedBy || meta.generatedBy === 'ai')
+            && (!configSource || configSource === 'ai');
+    }
+
+    return draftSource === 'builtin'
+        && (!configSource || configSource === 'builtin');
+}
+
 function fillTemplate(template, value) {
     return String(template || '').replace('{value}', value);
 }
@@ -107,9 +132,14 @@ export function usePracticePageModel({
     const bypassBlockerRef = useRef(false);
     const isDirtyRef = useRef(false);
 
-    const displayDraft = config.source === 'ai' && aiPracticeStatus !== 'ready'
-        ? null
-        : currentDraft;
+    const hasDraftForCurrentSource = isDraftForSource(currentDraft, config.source);
+    const displayDraft = config.source === 'ai'
+        ? aiPracticeStatus === 'ready' && hasDraftForCurrentSource
+            ? currentDraft
+            : null
+        : hasDraftForCurrentSource
+            ? currentDraft
+            : null;
 
     const typingSession = useTypingSession({
         draft: displayDraft,

@@ -34,7 +34,11 @@ vi.mock('../../features/practice/components/CustomTextWorkshop', () => ({
 }));
 
 vi.mock('../../features/practice/components/TypingArea', () => ({
-    TypingArea: ({ status }) => <div data-testid="typing-area">{status}</div>
+    TypingArea: ({ isLocked, sourceLabel, status }) => (
+        <div data-testid="typing-area" data-locked={String(isLocked)}>
+            {sourceLabel} {status}
+        </div>
+    )
 }));
 
 const baseSession = {
@@ -240,5 +244,33 @@ describe('PracticePage', () => {
         vi.advanceTimersByTime(200);
 
         expect(mockTypingSession.focusInput).toHaveBeenCalledTimes(1);
+    });
+
+    test('shows the custom word bank workshop immediately when custom source is selected', () => {
+        Object.assign(mockStore, {
+            config: {
+                ...baseStore.config,
+                source: 'custom'
+            },
+            currentDraft: null
+        });
+
+        render(<PracticePage />);
+
+        expect(screen.getByTestId('custom-workshop')).toBeInTheDocument();
+    });
+
+    test('locks custom practice when the current draft belongs to another source', () => {
+        Object.assign(mockStore, {
+            config: {
+                ...baseStore.config,
+                source: 'custom'
+            }
+        });
+
+        render(<PracticePage />);
+
+        expect(screen.getByTestId('typing-area')).toHaveAttribute('data-locked', 'true');
+        expect(screen.getByTestId('typing-area')).toHaveTextContent('Custom bank');
     });
 });

@@ -51,6 +51,7 @@ describe('Practice workshop panels', () => {
     });
 
     test('keeps custom text apply disabled until text exists', () => {
+        const copy = getCopy('en-US');
         const trainingCopy = getTrainingCopy('en-US');
         const onApply = vi.fn();
 
@@ -64,6 +65,7 @@ describe('Practice workshop panels', () => {
         );
 
         expect(screen.getByRole('button', { name: trainingCopy.practice.customApply })).toBeDisabled();
+        expect(screen.getAllByText(copy.common.aiNeedsGenerate).length).toBeGreaterThan(0);
 
         rerender(
             <CustomTextWorkshop
@@ -73,6 +75,13 @@ describe('Practice workshop panels', () => {
                 onApply={onApply}
             />
         );
+
+        expect(screen.getAllByText(copy.common.aiReady).length).toBeGreaterThan(0);
+        expect(screen.getByText(copy.common.wordsMode)).toBeInTheDocument();
+        expect(screen.getByText(copy.common.characterStats)).toBeInTheDocument();
+        expect(screen.getByText('3')).toBeInTheDocument();
+        expect(screen.getByText('19')).toBeInTheDocument();
+
         fireEvent.click(screen.getByRole('button', { name: trainingCopy.practice.customApply }));
 
         expect(onApply).toHaveBeenCalled();

@@ -214,7 +214,7 @@ export function PracticePage() {
                     <p className="muted-text practice-toolbar__hint">{store.copy.practice.builtInReady}</p>
                 )}
 
-                {controlsOpen && store.config.source === 'custom' && (
+                {store.config.source === 'custom' && (
                     <CustomTextWorkshop
                         language={store.language}
                         value={customText}
