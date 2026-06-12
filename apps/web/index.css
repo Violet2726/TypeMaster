@@ -5908,8 +5908,287 @@ body[data-theme='serika-light'] .insights-empty-preview {
     box-shadow: none;
 }
 
+.insights-command-center {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.04fr) minmax(22rem, 0.82fr);
+    grid-template-areas:
+        "lead coach"
+        "metrics coach"
+        "metrics radar";
+    align-items: stretch;
+    gap: 1rem;
+    overflow: hidden;
+    padding: 1rem;
+    background:
+        linear-gradient(135deg, rgba(10, 132, 255, 0.11), transparent 38%),
+        linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
+}
+
+.insights-command-center::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 80% 18%, rgba(52, 199, 89, 0.12), transparent 26%),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.07), transparent 34%);
+}
+
+.insights-command-center > * {
+    position: relative;
+    z-index: 1;
+}
+
+.insights-command-center__lead {
+    grid-area: lead;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 1rem;
+    min-width: 0;
+    padding: 0.35rem 0.2rem 0;
+}
+
+.insights-command-center__lead > div {
+    display: grid;
+    gap: 0.3rem;
+    min-width: 0;
+}
+
+.insights-command-center h1 {
+    margin: 0;
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 6vw, 4.6rem);
+    line-height: 0.95;
+    letter-spacing: 0;
+}
+
+.insights-command-center__lead .muted-text {
+    max-width: 34rem;
+    color: var(--text-color);
+}
+
+.insights-command-center__lead .action-btn {
+    min-width: 9rem;
+    min-height: 2.8rem;
+}
+
+.insights-command-center__metrics {
+    grid-area: metrics;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.72rem;
+}
+
+.insights-command-center__metric,
+.insights-command-center__coach,
+.insights-command-center__radar {
+    border: 1px solid var(--panel-stroke);
+    border-radius: 8px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02)),
+        rgba(255, 255, 255, 0.035);
+}
+
+.insights-command-center__metric {
+    display: grid;
+    align-content: space-between;
+    gap: 0.45rem;
+    min-height: 7.3rem;
+    padding: 0.9rem;
+}
+
+.insights-command-center__metric svg {
+    color: #8ecaff;
+}
+
+.insights-command-center__metric--accuracy svg {
+    color: #7ee198;
+}
+
+.insights-command-center__metric--best svg {
+    color: #ffd60a;
+}
+
+.insights-command-center__metric--sessions svg {
+    color: #ff9f0a;
+}
+
+.insights-command-center__metric span,
+.insights-command-center__radar-metrics span {
+    color: var(--text-dim);
+    font-size: 0.78rem;
+    font-weight: 650;
+}
+
+.insights-command-center__metric strong {
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: 1.55rem;
+    line-height: 1.05;
+    letter-spacing: 0;
+}
+
+.insights-command-center__coach {
+    grid-area: coach;
+    display: grid;
+    align-content: start;
+    gap: 0.85rem;
+    min-width: 0;
+    padding: 1rem;
+}
+
+.insights-command-center__coach h2,
+.insights-command-center__radar h2 {
+    margin: 0;
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: 1.55rem;
+    line-height: 1.12;
+    letter-spacing: 0;
+    text-wrap: balance;
+}
+
+.insights-command-center__coach p,
+.insights-command-center__radar p {
+    margin: 0;
+    color: var(--text-dim);
+    line-height: 1.55;
+}
+
+.insights-command-center__signal {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.42rem;
+    justify-self: start;
+    min-height: 2rem;
+    padding: 0.36rem 0.62rem;
+    border-radius: 999px;
+    border: 1px solid rgba(52, 199, 89, 0.18);
+    background: rgba(52, 199, 89, 0.1);
+    color: var(--text-strong);
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.insights-command-center__signal svg {
+    color: #7ee198;
+}
+
+.insights-command-center__radar {
+    grid-area: radar;
+    display: grid;
+    gap: 0.85rem;
+    min-width: 0;
+    padding: 1rem;
+}
+
+.insights-command-center__radar .panel-badge {
+    justify-self: start;
+    max-width: 100%;
+    white-space: normal;
+}
+
+.insights-command-center__radar-metrics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.55rem;
+}
+
+.insights-command-center__radar-metrics div {
+    display: grid;
+    gap: 0.22rem;
+    min-width: 0;
+    padding: 0.7rem;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.045);
+}
+
+.insights-command-center__radar-metrics strong {
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: 1.04rem;
+}
+
+.insights-trend-panel {
+    display: grid;
+    gap: 0.95rem;
+}
+
+.insights-trend-panel__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.52fr);
+    gap: 1rem;
+    align-items: start;
+}
+
+.insights-trend-panel .mini-series {
+    gap: 0.55rem;
+}
+
+.insights-trend-panel .mini-series__row {
+    min-height: 3.35rem;
+    padding: 0.68rem 0.82rem;
+    border: 1px solid var(--panel-stroke);
+    border-radius: 8px;
+    background: var(--bg-soft);
+}
+
+body[data-theme='serika-light'] .insights-command-center {
+    border-color: rgba(60, 60, 67, 0.12);
+    background:
+        linear-gradient(135deg, rgba(0, 122, 255, 0.08), transparent 38%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 249, 252, 0.86));
+}
+
+body[data-theme='serika-light'] .insights-command-center::before {
+    background:
+        radial-gradient(circle at 80% 18%, rgba(52, 199, 89, 0.1), transparent 26%),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.72), transparent 36%);
+}
+
+body[data-theme='serika-light'] .insights-command-center__metric,
+body[data-theme='serika-light'] .insights-command-center__coach,
+body[data-theme='serika-light'] .insights-command-center__radar,
+body[data-theme='serika-light'] .insights-command-center__radar-metrics div,
+body[data-theme='serika-light'] .insights-trend-panel .mini-series__row {
+    border-color: rgba(60, 60, 67, 0.1);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 255, 0.76)),
+        rgba(255, 255, 255, 0.86);
+}
+
+body[data-theme='serika-light'] .insights-command-center h1,
+body[data-theme='serika-light'] .insights-command-center h2,
+body[data-theme='serika-light'] .insights-command-center__metric strong,
+body[data-theme='serika-light'] .insights-command-center__radar-metrics strong {
+    color: #1d1d1f;
+}
+
+body[data-theme='serika-light'] .insights-command-center__lead .muted-text,
+body[data-theme='serika-light'] .insights-command-center__coach p,
+body[data-theme='serika-light'] .insights-command-center__radar p {
+    color: rgba(29, 29, 31, 0.68);
+}
+
 @media (max-width: 980px) {
     .insights-empty-panel {
+        grid-template-columns: 1fr;
+    }
+
+    .insights-command-center {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "lead"
+            "metrics"
+            "coach"
+            "radar";
+    }
+
+    .insights-trend-panel__body {
         grid-template-columns: 1fr;
     }
 }
@@ -5985,6 +6264,98 @@ body[data-theme='serika-light'] .insights-empty-preview {
     .insights-stat-card {
         min-height: 4.7rem;
         padding: 0.72rem;
+    }
+
+    .insights-command-center {
+        gap: 0.68rem;
+        padding: 0.78rem;
+    }
+
+    .insights-command-center__lead {
+        grid-template-columns: 1fr;
+        padding: 0.1rem 0;
+        gap: 0.75rem;
+    }
+
+    .insights-command-center h1 {
+        font-size: 2.7rem;
+        line-height: 0.98;
+    }
+
+    .insights-command-center__lead .action-btn {
+        width: 100%;
+    }
+
+    .insights-command-center__metrics {
+        gap: 0.5rem;
+    }
+
+    .insights-command-center__metric {
+        min-height: 5.45rem;
+        padding: 0.68rem;
+    }
+
+    .insights-command-center__metric strong {
+        font-size: 1.12rem;
+    }
+
+    .insights-command-center__coach,
+    .insights-command-center__radar {
+        gap: 0.62rem;
+        padding: 0.78rem;
+    }
+
+    .insights-command-center__coach h2,
+    .insights-command-center__radar h2 {
+        font-size: 1.28rem;
+    }
+
+    .insights-command-center__coach p {
+        line-height: 1.42;
+    }
+
+    .insights-command-center__radar {
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: start;
+    }
+
+    .insights-command-center__radar p {
+        display: none;
+    }
+
+    .insights-command-center__radar .panel-badge {
+        justify-self: end;
+        max-width: 8.8rem;
+        font-size: 0.68rem;
+        line-height: 1.18;
+    }
+
+    .insights-command-center__radar-metrics {
+        grid-column: 1 / -1;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.4rem;
+    }
+
+    .insights-command-center__radar-metrics div {
+        padding: 0.52rem 0.45rem;
+    }
+
+    .insights-command-center__radar-metrics span {
+        font-size: 0.66rem;
+        line-height: 1.15;
+    }
+
+    .insights-command-center__radar-metrics strong {
+        font-size: 0.9rem;
+    }
+
+    .insights-trend-panel__body {
+        gap: 0.72rem;
+    }
+
+    .insights-trend-panel .mini-series__row {
+        min-height: 3.05rem;
+        padding: 0.62rem 0.72rem;
     }
 }
 
