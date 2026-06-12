@@ -1,6 +1,6 @@
 ﻿import { useState } from 'react';
 import { StoredSettingsSchema } from '@typemaster/contracts/storage';
-import { Cloud, Download, Eye, Globe2, Keyboard, Palette, Type, Upload, UserRound, Volume2, X } from 'lucide-react';
+import { CheckCircle2, Cloud, Download, Eye, Globe2, Keyboard, Palette, ShieldCheck, Type, Upload, UserRound, Volume2, X } from 'lucide-react';
 import { SUPPORTED_KEYBOARD_LAYOUTS, SUPPORTED_LANGUAGES, getKeyboardLayoutLabel } from '@typemaster/domain';
 import { getCopy } from '../../../i18n';
 import type { CurrentUserSnapshot } from '../../account/api/use-current-user-query';
@@ -72,6 +72,13 @@ export function SettingsDrawer({
     const [importPayload, setImportPayload] = useState('');
     const [importNotice, setImportNotice] = useState('');
     const trainingCopy = getTrainingCopy(settings.language);
+    const languageLabel = SUPPORTED_LANGUAGES.find((language) => language.id === settings.language)?.label || settings.language;
+    const themeLabel = settings.theme === 'serika-light' ? copy.settings.themeLight : copy.settings.themeDark;
+    const focusLabel = settings.focusMode ? copy.settings.focusOn : copy.settings.focusOff;
+    const soundLabel = settings.soundEffects ? copy.settings.focusOn : copy.settings.focusOff;
+    const layoutLabel = getKeyboardLayoutLabel(settings.keyboardLayout, settings.language);
+    const accountLabel = account?.displayName || trainingCopy.account.idle;
+    const accountBadge = trainingCopy.account[accountStatus] || trainingCopy.account.idle;
 
     if (!isOpen) {
         return null;
@@ -116,9 +123,37 @@ export function SettingsDrawer({
                 </div>
 
                 <div className="settings-drawer__scroll">
-                    {/* General settings group */}
+                    <section className="settings-summary-card" aria-label={copy.settings.summaryTitle}>
+                        <div className="settings-summary-card__head">
+                            <span className="settings-summary-card__icon" aria-hidden="true">
+                                <ShieldCheck size={22} strokeWidth={2.25} />
+                            </span>
+                            <div>
+                                <p className="panel-kicker">{copy.settings.summaryTitle}</p>
+                                <h3>{accountLabel}</h3>
+                            </div>
+                            <span className={`panel-badge badge-${account ? 'success' : accountStatus === 'loading' ? 'loading' : 'idle'}`}>
+                                {accountBadge}
+                            </span>
+                        </div>
+                        <div className="settings-summary-card__grid">
+                            <span>
+                                <small>{copy.settings.language}</small>
+                                <strong>{languageLabel}</strong>
+                            </span>
+                            <span>
+                                <small>{copy.settings.theme}</small>
+                                <strong>{themeLabel}</strong>
+                            </span>
+                            <span>
+                                <small>{trainingCopy.practice.layoutLabel}</small>
+                                <strong>{layoutLabel}</strong>
+                            </span>
+                        </div>
+                    </section>
+
                     <section className="settings-group">
-                        <p className="settings-group__label">{copy.settings.kicker}</p>
+                        <p className="settings-group__label">{copy.settings.preferencesTitle}</p>
                         <div className="settings-group__items">
                             <div className="settings-row">
                                 <span className="settings-row__main">
@@ -185,14 +220,16 @@ export function SettingsDrawer({
                         </div>
                     </section>
 
-                    {/* Toggle settings group */}
                     <section className="settings-group">
-                        <p className="settings-group__label">{trainingCopy.practice.taskKicker}</p>
+                        <p className="settings-group__label">{copy.settings.sessionTitle}</p>
                         <div className="settings-group__items">
                             <div className="settings-row">
                                 <span className="settings-row__main">
                                     <SettingsIcon icon={Eye} tone="indigo" />
-                                    <span className="settings-row__label">{copy.settings.focusMode}</span>
+                                    <span className="settings-row__stack">
+                                        <span className="settings-row__label">{copy.settings.focusMode}</span>
+                                        <span className="settings-row__hint">{focusLabel}</span>
+                                    </span>
                                 </span>
                                 <AppleToggle
                                     checked={settings.focusMode}
@@ -204,7 +241,10 @@ export function SettingsDrawer({
                             <div className="settings-row">
                                 <span className="settings-row__main">
                                     <SettingsIcon icon={Volume2} tone="pink" />
-                                    <span className="settings-row__label">{copy.settings.sound}</span>
+                                    <span className="settings-row__stack">
+                                        <span className="settings-row__label">{copy.settings.sound}</span>
+                                        <span className="settings-row__hint">{soundLabel}</span>
+                                    </span>
                                 </span>
                                 <AppleToggle
                                     checked={settings.soundEffects}
@@ -215,7 +255,6 @@ export function SettingsDrawer({
                         </div>
                     </section>
 
-                    {/* Account section */}
                     <section className="settings-group">
                         <p className="settings-group__label">{trainingCopy.account.title}</p>
                         <div className="settings-group__items">
@@ -267,11 +306,17 @@ export function SettingsDrawer({
                         </div>
                     </section>
 
-                    {/* Data section */}
                     <section className="settings-group">
-                        <p className="settings-group__label">{trainingCopy.account.export}</p>
+                        <p className="settings-group__label">{copy.settings.dataTitle}</p>
                         <div className="settings-group__items">
                             <div className="settings-data">
+                                <div className="settings-data__summary">
+                                    <CheckCircle2 aria-hidden="true" size={18} strokeWidth={2.25} />
+                                    <div>
+                                        <strong>{copy.settings.dataSummaryTitle}</strong>
+                                        <p>{copy.settings.dataSummaryBody}</p>
+                                    </div>
+                                </div>
                                 <div className="results-actions settings-data__actions">
                                     <button type="button" className="action-btn" onClick={handleExport}>
                                         <Download aria-hidden="true" size={17} strokeWidth={2.2} />

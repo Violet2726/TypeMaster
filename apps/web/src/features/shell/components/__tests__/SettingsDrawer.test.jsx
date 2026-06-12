@@ -14,6 +14,12 @@ const baseCopy = {
         focusMode: 'Focus mode',
         sound: 'Sound',
         soundComingSoon: 'unused',
+        summaryTitle: 'Workspace',
+        preferencesTitle: 'Preferences',
+        sessionTitle: 'Session behavior',
+        dataTitle: 'Data maintenance',
+        dataSummaryTitle: 'Local workspace data',
+        dataSummaryBody: 'Export a backup or paste a bundle to restore this training state.',
         themeDark: 'Dark',
         themeLight: 'Light',
         fontSm: 'Compact',
@@ -58,6 +64,10 @@ describe('SettingsDrawer', () => {
         await user.type(screen.getByPlaceholderText(/Enter a display name/i), 'Alice');
 
         expect(screen.getByText(/Account sync/i)).toBeInTheDocument();
+        expect(screen.getByLabelText(/Workspace/i)).toBeInTheDocument();
+        expect(screen.getByText(/Preferences/i)).toBeInTheDocument();
+        expect(screen.getByText(/Session behavior/i)).toBeInTheDocument();
+        expect(screen.getByText(/Local workspace data/i)).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /Sign in and sync/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /Export data/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /Import data/i })).toBeInTheDocument();
