@@ -85,116 +85,118 @@ export function ResultPage() {
 
     return (
         <div className="page-stack result-page">
-            <section className="panel result-summary result-summary-hero">
-                <div className="result-summary__scores">
-                    <div className="result-big result-score-card result-score-card--speed">
-                        <span className="result-label">{copy.common.wpm}</span>
-                        <span className="result-value">{session.result.wpm}</span>
-                    </div>
-                    <div className="result-big result-score-card result-score-card--accuracy">
-                        <span className="result-label">{copy.common.accuracy}</span>
-                        <span className="result-value">{session.result.accuracy}<span className="result-unit">%</span></span>
-                    </div>
-                </div>
-
-                <div className="result-copy">
-                    <p className="panel-kicker">{copy.result.heroKicker}</p>
-                    <h2>{comparison.summary}</h2>
-                    <p className="muted-text">
-                        {session.sourceTextMeta?.label || copy.common.emptyValue}{summarySeparator}{copy.common.consistency} {session.result.consistency}%
-                    </p>
-                    <div className="result-summary__chips" aria-label={copy.result.metricsTitle}>
-                        <span>{copy.common.duration} {session.result.durationSeconds}s</span>
-                        <span>{copy.common.rawWpm} {session.result.rawWpm}</span>
-                        <span>{copy.common.characterStats} {session.result.correctChars}/{session.result.incorrectChars}</span>
-                    </div>
-                </div>
-            </section>
-
-            <section className="result-metrics-strip result-kpi-strip" aria-label={copy.result.metricsTitle}>
-                <div className="result-item result-kpi-item">
-                    <Gauge aria-hidden="true" size={18} strokeWidth={2.2} />
-                    <span className="result-item-label">{copy.common.rawWpm}</span>
-                    <span className="result-item-value">{session.result.rawWpm}</span>
-                </div>
-                <div className="result-item result-kpi-item">
-                    <Target aria-hidden="true" size={18} strokeWidth={2.2} />
-                    <span className="result-item-label">{copy.common.consistency}</span>
-                    <span className="result-item-value">{session.result.consistency}%</span>
-                </div>
-                <div className="result-item result-kpi-item">
-                    <Clock3 aria-hidden="true" size={18} strokeWidth={2.2} />
-                    <span className="result-item-label">{copy.common.duration}</span>
-                    <span className="result-item-value">{session.result.durationSeconds}s</span>
-                </div>
-                <div className="result-item result-kpi-item">
-                    <Hash aria-hidden="true" size={18} strokeWidth={2.2} />
-                    <span className="result-item-label">{copy.common.characterStats}</span>
-                    <span className="result-item-value">
-                        {session.result.correctChars}/{session.result.incorrectChars}/{session.result.extraChars}/{session.result.missedChars}
-                    </span>
-                </div>
-            </section>
-
-            <section className="panel result-decision-panel" aria-labelledby="result-decision-title">
-                <div className="panel-head">
-                    <div>
-                        <p className="panel-kicker">{trainingCopy.result.planTitle}</p>
-                        <h2 id="result-decision-title">{resultDecision.headline}</h2>
-                    </div>
-                    <span className={`panel-badge badge-${resultDecision.badgeTone || 'ready'}`}>
-                        <Sparkles aria-hidden="true" size={14} strokeWidth={2.2} />
-                        {resultDecision.badge}
-                    </span>
-                </div>
-
-                <div className="result-decision-panel__body">
-                    <p className="lead-text">{resultDecision.body}</p>
-                    <div className="result-decision-signal">
-                        <span className="summary-label">{resultDecision.signalLabel}</span>
-                        <strong>{resultDecision.signal}</strong>
-                    </div>
-                </div>
-
-                {resultPrescription && (
-                    <div className="result-prescription" aria-label={resultPrescription.title}>
-                        <div className="result-prescription__head">
-                            <strong>{resultPrescription.title}</strong>
-                            <span>{resultPrescription.body}</span>
+            <section className="panel result-completion-stage" aria-labelledby="result-summary-title">
+                <div className="result-summary result-summary-hero result-completion-stage__summary">
+                    <div className="result-summary__scores">
+                        <div className="result-big result-score-card result-score-card--speed">
+                            <span className="result-label">{copy.common.wpm}</span>
+                            <span className="result-value">{session.result.wpm}</span>
                         </div>
-                        <div className="result-prescription__grid">
-                            {resultPrescription.items.map((item) => (
-                                <div key={item.id} className={`result-prescription__item result-prescription__item--${item.tone}`}>
-                                    <span className="summary-label">{item.label}</span>
-                                    <strong>{item.value}</strong>
-                                    <p>{item.note}</p>
-                                </div>
-                            ))}
+                        <div className="result-big result-score-card result-score-card--accuracy">
+                            <span className="result-label">{copy.common.accuracy}</span>
+                            <span className="result-value">{session.result.accuracy}<span className="result-unit">%</span></span>
                         </div>
                     </div>
-                )}
 
-                <div className="results-actions">
-                    <button
-                        type="button"
-                        className="action-btn primary"
-                        onClick={() => handleDecisionAction(resultDecision.primaryAction)}
-                        disabled={resultDecision.isLoading}
-                    >
-                        <DecisionActionIcon action={resultDecision.primaryAction} />
-                        {resultDecision.isLoading ? copy.common.loading : resultDecision.primaryLabel}
-                    </button>
-                    {resultDecision.secondaryActions.map((action) => (
+                    <div className="result-copy">
+                        <p className="panel-kicker">{copy.result.heroKicker}</p>
+                        <h2 id="result-summary-title">{comparison.summary}</h2>
+                        <p className="muted-text">
+                            {session.sourceTextMeta?.label || copy.common.emptyValue}{summarySeparator}{copy.common.consistency} {session.result.consistency}%
+                        </p>
+                        <div className="result-summary__chips" aria-label={copy.result.metricsTitle}>
+                            <span>{copy.common.duration} {session.result.durationSeconds}s</span>
+                            <span>{copy.common.rawWpm} {session.result.rawWpm}</span>
+                            <span>{copy.common.characterStats} {session.result.correctChars}/{session.result.incorrectChars}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="result-decision-panel result-completion-stage__decision" aria-labelledby="result-decision-title">
+                    <div className="panel-head">
+                        <div>
+                            <p className="panel-kicker">{trainingCopy.result.planTitle}</p>
+                            <h2 id="result-decision-title">{resultDecision.headline}</h2>
+                        </div>
+                        <span className={`panel-badge badge-${resultDecision.badgeTone || 'ready'}`}>
+                            <Sparkles aria-hidden="true" size={14} strokeWidth={2.2} />
+                            {resultDecision.badge}
+                        </span>
+                    </div>
+
+                    <div className="result-decision-panel__body">
+                        <p className="lead-text">{resultDecision.body}</p>
+                        <div className="result-decision-signal">
+                            <span className="summary-label">{resultDecision.signalLabel}</span>
+                            <strong>{resultDecision.signal}</strong>
+                        </div>
+                    </div>
+
+                    <div className="results-actions">
                         <button
-                            key={action.action}
                             type="button"
-                            className="action-btn"
-                            onClick={() => handleDecisionAction(action.action)}
+                            className="action-btn primary"
+                            onClick={() => handleDecisionAction(resultDecision.primaryAction)}
+                            disabled={resultDecision.isLoading}
                         >
-                            <DecisionActionIcon action={action.action} />
-                            {action.label}
+                            <DecisionActionIcon action={resultDecision.primaryAction} />
+                            {resultDecision.isLoading ? copy.common.loading : resultDecision.primaryLabel}
                         </button>
-                    ))}
+                        {resultDecision.secondaryActions.map((action) => (
+                            <button
+                                key={action.action}
+                                type="button"
+                                className="action-btn"
+                                onClick={() => handleDecisionAction(action.action)}
+                            >
+                                <DecisionActionIcon action={action.action} />
+                                {action.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    {resultPrescription && (
+                        <div className="result-prescription" aria-label={resultPrescription.title}>
+                            <div className="result-prescription__head">
+                                <strong>{resultPrescription.title}</strong>
+                                <span>{resultPrescription.body}</span>
+                            </div>
+                            <div className="result-prescription__grid">
+                                {resultPrescription.items.map((item) => (
+                                    <div key={item.id} className={`result-prescription__item result-prescription__item--${item.tone}`}>
+                                        <span className="summary-label">{item.label}</span>
+                                        <strong>{item.value}</strong>
+                                        <p>{item.note}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                <div className="result-metrics-strip result-kpi-strip result-completion-stage__metrics" aria-label={copy.result.metricsTitle}>
+                    <div className="result-item result-kpi-item">
+                        <Gauge aria-hidden="true" size={18} strokeWidth={2.2} />
+                        <span className="result-item-label">{copy.common.rawWpm}</span>
+                        <span className="result-item-value">{session.result.rawWpm}</span>
+                    </div>
+                    <div className="result-item result-kpi-item">
+                        <Target aria-hidden="true" size={18} strokeWidth={2.2} />
+                        <span className="result-item-label">{copy.common.consistency}</span>
+                        <span className="result-item-value">{session.result.consistency}%</span>
+                    </div>
+                    <div className="result-item result-kpi-item">
+                        <Clock3 aria-hidden="true" size={18} strokeWidth={2.2} />
+                        <span className="result-item-label">{copy.common.duration}</span>
+                        <span className="result-item-value">{session.result.durationSeconds}s</span>
+                    </div>
+                    <div className="result-item result-kpi-item">
+                        <Hash aria-hidden="true" size={18} strokeWidth={2.2} />
+                        <span className="result-item-label">{copy.common.characterStats}</span>
+                        <span className="result-item-value">
+                            {session.result.correctChars}/{session.result.incorrectChars}/{session.result.extraChars}/{session.result.missedChars}
+                        </span>
+                    </div>
                 </div>
             </section>
 
