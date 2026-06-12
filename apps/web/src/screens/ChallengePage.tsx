@@ -1,6 +1,6 @@
 'use client';
 
-import { BarChart3, Trophy } from 'lucide-react';
+import { BarChart3, Gauge, Medal, ShieldCheck, Trophy } from 'lucide-react';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { useChallengePageModel } from '../features/challenge/use-challenge-page-model';
 import { ChallengeTrendChart } from '../features/challenge/components/ChallengeTrendChart';
@@ -21,6 +21,15 @@ function buildChallengeFacts(challenge, copy) {
         config.includeNumbers ? copy.common.numbers : null,
         config.includePunctuation ? copy.common.punctuation : null
     ].filter(Boolean);
+}
+
+function ChallengeMetricPill({ icon: Icon, children, tone = 'speed' }) {
+    return (
+        <span className={`challenge-metric-pill challenge-metric-pill--${tone}`}>
+            <Icon aria-hidden="true" size={15} strokeWidth={2.25} />
+            {children}
+        </span>
+    );
 }
 
 export function ChallengePage() {
@@ -127,15 +136,20 @@ export function ChallengePage() {
                     </div>
                     {peerLeaderboard.length ? (
                         <div className="history-table">
-                            {peerLeaderboard.slice(0, 3).map((entry) => (
-                                <div key={entry.id} className="history-row">
-                                    <div className="history-row__meta">
-                                        <strong>{entry.displayName}</strong>
-                                        <p className="muted-text">{new Date(entry.createdAt).toLocaleString(language)}</p>
+                            {peerLeaderboard.slice(0, 3).map((entry, index) => (
+                                <div key={entry.id} className="history-row challenge-score-row">
+                                    <div className="challenge-row-main">
+                                        <span className={`challenge-rank-chip${index === 0 ? ' challenge-rank-chip--top' : ''}`}>
+                                            #{index + 1}
+                                        </span>
+                                        <div className="history-row__meta">
+                                            <strong>{entry.displayName}</strong>
+                                            <p className="muted-text">{new Date(entry.createdAt).toLocaleString(language)}</p>
+                                        </div>
                                     </div>
                                     <div className="history-metrics">
-                                        <span>{entry.wpm} WPM</span>
-                                        <span>{entry.accuracy}%</span>
+                                        <ChallengeMetricPill icon={Gauge}>{entry.wpm} {copy.common.wpm}</ChallengeMetricPill>
+                                        <ChallengeMetricPill icon={ShieldCheck} tone="accuracy">{entry.accuracy}%</ChallengeMetricPill>
                                     </div>
                                 </div>
                             ))}
@@ -172,17 +186,25 @@ export function ChallengePage() {
                 {challengeSessions.length ? (
                     <div className="history-table">
                         {challengeSessions.slice(0, 5).map((session, index) => (
-                            <div key={session.id} className="history-row">
-                                <div className="history-row__meta">
-                                    <strong>{index === 0 ? trainingCopy.challenge.latestBadge : `${trainingCopy.challenge.attemptsLabel} #${challengeSessions.length - index}`}</strong>
-                                    <p className="muted-text">{new Date(session.result.completedAt).toLocaleString(language)}</p>
+                            <div key={session.id} className="history-row challenge-score-row">
+                                <div className="challenge-row-main">
+                                    <span className={`challenge-rank-chip${index === 0 ? ' challenge-rank-chip--latest' : ''}`}>
+                                        #{challengeSessions.length - index}
+                                    </span>
+                                    <div className="history-row__meta">
+                                        <strong>{index === 0 ? trainingCopy.challenge.latestBadge : `${trainingCopy.challenge.attemptsLabel} #${challengeSessions.length - index}`}</strong>
+                                        <p className="muted-text">{new Date(session.result.completedAt).toLocaleString(language)}</p>
+                                    </div>
                                 </div>
                                 <div className="history-metrics">
                                     {personalBest?.bestSession?.id === session.id && (
-                                        <span className="panel-badge badge-success">{trainingCopy.challenge.bestBadge}</span>
+                                        <span className="panel-badge badge-success challenge-best-badge">
+                                            <Trophy aria-hidden="true" size={14} strokeWidth={2.25} />
+                                            {trainingCopy.challenge.bestBadge}
+                                        </span>
                                     )}
-                                    <span>{session.result.wpm} {copy.common.wpm}</span>
-                                    <span>{session.result.accuracy}%</span>
+                                    <ChallengeMetricPill icon={Gauge}>{session.result.wpm} {copy.common.wpm}</ChallengeMetricPill>
+                                    <ChallengeMetricPill icon={ShieldCheck} tone="accuracy">{session.result.accuracy}%</ChallengeMetricPill>
                                 </div>
                             </div>
                         ))}
@@ -206,15 +228,20 @@ export function ChallengePage() {
 
                 {leaderboard.length ? (
                     <div className="history-table">
-                        {leaderboard.map((entry) => (
-                            <div key={entry.id} className="history-row">
-                                <div className="history-row__meta">
-                                    <strong>{entry.displayName}</strong>
-                                    <p className="muted-text">{new Date(entry.createdAt).toLocaleString(language)}</p>
+                        {leaderboard.map((entry, index) => (
+                            <div key={entry.id} className="history-row challenge-score-row">
+                                <div className="challenge-row-main">
+                                    <span className={`challenge-rank-chip${index === 0 ? ' challenge-rank-chip--top' : ''}`}>
+                                        {index === 0 ? <Medal aria-hidden="true" size={15} strokeWidth={2.25} /> : `#${index + 1}`}
+                                    </span>
+                                    <div className="history-row__meta">
+                                        <strong>{entry.displayName}</strong>
+                                        <p className="muted-text">{new Date(entry.createdAt).toLocaleString(language)}</p>
+                                    </div>
                                 </div>
                                 <div className="history-metrics">
-                                    <span>{entry.wpm} WPM</span>
-                                    <span>{entry.accuracy}%</span>
+                                    <ChallengeMetricPill icon={Gauge}>{entry.wpm} {copy.common.wpm}</ChallengeMetricPill>
+                                    <ChallengeMetricPill icon={ShieldCheck} tone="accuracy">{entry.accuracy}%</ChallengeMetricPill>
                                 </div>
                             </div>
                         ))}
