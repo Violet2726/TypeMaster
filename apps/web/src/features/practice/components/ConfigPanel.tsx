@@ -1,3 +1,4 @@
+import { SlidersHorizontal } from 'lucide-react';
 import { getTrainingCopy } from '../../../training/copy';
 
 const timeOptions = [15, 30, 60, 120];
@@ -87,6 +88,7 @@ export function ConfigPanel({ copy, language, config, onConfigChange, showAdvanc
 
             <div className="config-strip__actions">
                 <button type="button" className="ghost-btn ghost-btn--small" onClick={onToggleAdvanced}>
+                    <SlidersHorizontal aria-hidden="true" size={16} strokeWidth={2.2} />
                     {showAdvanced ? copy.practice.settingsHide : copy.practice.settingsToggle}
                 </button>
             </div>

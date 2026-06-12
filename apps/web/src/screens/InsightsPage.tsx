@@ -1,5 +1,6 @@
 'use client';
 
+import { Keyboard, LineChart, Target, Trophy } from 'lucide-react';
 import { formatDateTime, formatShortDate, getInlineSeparator } from '../i18n';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { useInsightsPageModel } from '../features/insights/use-insights-page-model';
@@ -99,6 +100,48 @@ function TargetedProgress({ copy, trend }) {
     );
 }
 
+function EmptyInsightsPreview({ copy, trainingCopy, onStart }) {
+    const previewItems = [
+        { icon: Trophy, label: copy.insights.bestWpm, value: copy.common.emptyValue },
+        { icon: LineChart, label: copy.insights.recentTrend, value: copy.common.emptyValue },
+        { icon: Target, label: copy.insights.targetedTitle, value: copy.common.emptyValue },
+        { icon: Keyboard, label: copy.insights.keyboardZonesTitle, value: copy.common.emptyValue }
+    ];
+
+    return (
+        <section className="panel empty-panel insights-empty-panel">
+            <div className="insights-empty-panel__copy">
+                <p className="panel-kicker">{copy.nav.insights}</p>
+                <h2>{copy.insights.emptyTitle}</h2>
+                <p className="muted-text">{copy.insights.emptyBody}</p>
+                <button type="button" className="action-btn primary" onClick={onStart}>
+                    <Keyboard aria-hidden="true" size={18} strokeWidth={2.2} />
+                    {copy.insights.emptyAction}
+                </button>
+            </div>
+
+            <div className="insights-empty-preview" aria-label={copy.nav.insights}>
+                <div className="insights-empty-preview__orb" aria-hidden="true">
+                    <LineChart aria-hidden="true" size={30} strokeWidth={2.1} />
+                </div>
+                <div className="insights-empty-preview__grid">
+                    {previewItems.map(({ icon: Icon, label, value }) => (
+                        <div key={label} className="insights-empty-preview__item">
+                            <Icon aria-hidden="true" size={17} strokeWidth={2.1} />
+                            <span>{label}</span>
+                            <strong>{value}</strong>
+                        </div>
+                    ))}
+                </div>
+                <div className="insights-empty-preview__footer">
+                    <span className="summary-label">{trainingCopy.insights.radarTitle}</span>
+                    <strong>{trainingCopy.insights.weekGoal}</strong>
+                </div>
+            </div>
+        </section>
+    );
+}
+
 export function InsightsPage() {
     const navigate = useAppNavigate();
     const store = useInsightsPageStore();
@@ -122,44 +165,37 @@ export function InsightsPage() {
     });
 
     if (!sessions.length) {
-        return (
-            <section className="panel empty-panel">
-                <h2>{copy.insights.emptyTitle}</h2>
-                <p className="muted-text">{copy.insights.emptyBody}</p>
-                <button type="button" className="action-btn primary" onClick={() => navigate('/practice')}>
-                    {copy.insights.emptyAction}
-                </button>
-            </section>
-        );
+        return <EmptyInsightsPreview copy={copy} trainingCopy={trainingCopy} onStart={() => navigate('/practice')} />;
     }
 
     return (
-        <div className="page-stack">
-            <section className="panel insights-header">
+        <div className="page-stack insights-page">
+            <section className="panel insights-header insights-hero">
                 <div className="insights-header__body">
                     <p className="panel-kicker">{copy.nav.insights}</p>
                     <h1>{copy.insights.title}</h1>
                     <p className="muted-text">{copy.insights.body}</p>
                 </div>
                 <button type="button" className="action-btn primary" onClick={() => navigate('/practice')}>
+                    <Keyboard aria-hidden="true" size={18} strokeWidth={2.2} />
                     {copy.home.primaryCta}
                 </button>
             </section>
 
-            <section className="home-stats-strip" aria-label={copy.insights.recentTrend}>
-                <div className="metric-card">
+            <section className="home-stats-strip insights-stats-strip" aria-label={copy.insights.recentTrend}>
+                <div className="metric-card insights-stat-card">
                     <span>{copy.insights.bestWpm}</span>
                     <strong>{insights.bestWpmOverall} {copy.common.wpm}</strong>
                 </div>
-                <div className="metric-card">
+                <div className="metric-card insights-stat-card">
                     <span>{copy.insights.avgAccuracy}</span>
                     <strong>{Math.round(insights.avgAccuracyOverall)}%</strong>
                 </div>
-                <div className="metric-card">
+                <div className="metric-card insights-stat-card">
                     <span>{copy.insights.recentAvgWpm}</span>
                     <strong>{insights.recent7.avgWpm} {copy.common.wpm}</strong>
                 </div>
-                <div className="metric-card">
+                <div className="metric-card insights-stat-card">
                     <span>{copy.common.sessions}</span>
                     <strong>{insights.totalSessions}</strong>
                 </div>

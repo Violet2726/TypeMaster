@@ -1,8 +1,21 @@
 'use client';
 
+import { CheckCircle2, Clock, Gauge, Play, Sparkles } from 'lucide-react';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { useDiagnosticPageModel } from '../features/diagnostic/use-diagnostic-page-model';
 import { useDiagnosticPageStore } from '../store/app-state-selectors';
+
+function getStepTone(step, index, activeJourney) {
+    if (step.status === 'complete') {
+        return 'complete';
+    }
+
+    if (activeJourney && index === activeJourney.currentStepIndex) {
+        return 'active';
+    }
+
+    return 'pending';
+}
 
 export function DiagnosticPage() {
     const navigate = useAppNavigate();
@@ -11,53 +24,96 @@ export function DiagnosticPage() {
         ...store,
         navigate
     });
+    const completedSteps = previewJourney.steps.filter((step) => step.status === 'complete').length;
+    const currentStepIndex = activeJourney?.currentStepIndex ?? 0;
+    const activeStep = previewJourney.steps[currentStepIndex] || previewJourney.steps[0];
+    const totalDurationSeconds = previewJourney.steps.reduce((total, step) => total + (step.config?.durationSeconds || 0), 0);
+    const totalDurationMinutes = Math.max(1, Math.round(totalDurationSeconds / 60));
+    const isChinese = store.language === 'zh-CN';
+    const durationLabel = isChinese ? `${totalDurationMinutes} 分钟` : `${totalDurationMinutes} min`;
+    const stepCountLabel = isChinese ? `${previewJourney.steps.length} 个步骤` : `${previewJourney.steps.length} steps`;
 
     return (
-        <div className="page-stack">
-            <section className="panel insights-header">
+        <div className="page-stack diagnostic-page">
+            <section className="panel diagnostic-hero">
                 <div className="insights-header__body">
                     <p className="panel-kicker">{trainingCopy.diagnostic.kicker}</p>
                     <h1>{trainingCopy.diagnostic.title}</h1>
                     <p className="muted-text">{trainingCopy.diagnostic.body}</p>
+                    <div className="diagnostic-hero__meta" aria-label={trainingCopy.diagnostic.stepTitle}>
+                        <span>
+                            <Clock aria-hidden="true" size={16} strokeWidth={2.2} />
+                            {durationLabel}
+                        </span>
+                        <span>
+                            <Sparkles aria-hidden="true" size={16} strokeWidth={2.2} />
+                            {stepCountLabel}
+                        </span>
+                    </div>
                 </div>
-                <button type="button" className="action-btn primary" onClick={handleStart}>
-                    {activeJourney ? trainingCopy.diagnostic.resume : trainingCopy.diagnostic.start}
-                </button>
+                <div className="diagnostic-hero__action">
+                    <div className="diagnostic-progress-ring" aria-label={trainingCopy.diagnostic.activeTitle}>
+                        <strong>{completedSteps}/{previewJourney.steps.length}</strong>
+                        <span>{trainingCopy.diagnostic.activeTitle}</span>
+                    </div>
+                    <button type="button" className="action-btn primary" onClick={handleStart}>
+                        <Play aria-hidden="true" size={18} strokeWidth={2.4} />
+                        {activeJourney ? trainingCopy.diagnostic.resume : trainingCopy.diagnostic.start}
+                    </button>
+                </div>
             </section>
 
-            <section className="insights-overview-grid">
-                <div className="panel">
+            <section className="diagnostic-layout">
+                <div className="panel diagnostic-steps-card">
                     <div className="panel-head">
                         <div>
                             <p className="panel-kicker">{trainingCopy.diagnostic.stepTitle}</p>
                             <h2>{activeJourney?.title || trainingCopy.diagnostic.title}</h2>
                         </div>
                     </div>
-                    <div className="history-table">
-                        {previewJourney.steps.map((step) => (
-                            <div key={step.id} className="history-row">
-                                <div className="history-row__meta">
-                                    <strong>{step.title}</strong>
-                                    <p className="muted-text">{step.summary}</p>
+                    <div className="diagnostic-step-list">
+                        {previewJourney.steps.map((step, index) => {
+                            const tone = getStepTone(step, index, activeJourney);
+                            const statusLabel = tone === 'complete'
+                                ? trainingCopy.diagnostic.done
+                                : tone === 'active'
+                                    ? trainingCopy.diagnostic.activeTitle
+                                    : trainingCopy.diagnostic.pending;
+
+                            return (
+                                <div key={step.id} className={`diagnostic-step diagnostic-step--${tone}`}>
+                                    <span className="diagnostic-step__index" aria-hidden="true">
+                                        {tone === 'complete'
+                                            ? <CheckCircle2 size={17} strokeWidth={2.35} />
+                                            : step.order || index + 1}
+                                    </span>
+                                    <div className="diagnostic-step__content">
+                                        <div className="diagnostic-step__title-row">
+                                            <strong>{step.title}</strong>
+                                            <div className="diagnostic-step__badges">
+                                                <span className={`diagnostic-step__status diagnostic-step__status--${tone}`}>{statusLabel}</span>
+                                                <span className="diagnostic-step__duration">{step.config.durationSeconds}s</span>
+                                            </div>
+                                        </div>
+                                        <p className="muted-text">{step.summary}</p>
+                                    </div>
                                 </div>
-                                <div className="history-metrics">
-                                    <span>{step.config.durationSeconds}s</span>
-                                    <span>{step.status === 'complete' ? trainingCopy.diagnostic.done : trainingCopy.diagnostic.pending}</span>
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
 
-                <div className="panel insights-latest-card">
+                <div className="panel diagnostic-profile-card">
+                    <div className="diagnostic-profile-card__icon" aria-hidden="true">
+                        <Gauge size={24} strokeWidth={2.2} />
+                    </div>
                     <p className="panel-kicker">{trainingCopy.diagnostic.activeTitle}</p>
-                    <h2>{skillProfile?.level?.label || trainingCopy.diagnostic.title}</h2>
-                    <p className="lead-text">{skillProfile?.summary || trainingCopy.diagnostic.body}</p>
-                    <p className="muted-text">
-                        {activeJourney
-                            ? `${trainingCopy.diagnostic.activeTitle}: ${activeJourney.currentStepIndex + 1}/${activeJourney.steps.length}`
-                            : trainingCopy.diagnostic.body}
-                    </p>
+                    <h2>{skillProfile?.level?.label || activeStep?.title || trainingCopy.diagnostic.title}</h2>
+                    <p className="lead-text">{skillProfile?.summary || previewJourney.summary || trainingCopy.diagnostic.body}</p>
+                    <div className="diagnostic-profile-card__focus">
+                        <span>{activeJourney ? `${activeJourney.currentStepIndex + 1}/${activeJourney.steps.length}` : `${completedSteps}/${previewJourney.steps.length}`}</span>
+                        <strong>{activeStep?.title || trainingCopy.diagnostic.stepTitle}</strong>
+                    </div>
                 </div>
             </section>
         </div>

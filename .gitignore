@@ -24,6 +24,7 @@ playwright-report
 data
 !packages/domain/src/data/
 !packages/domain/src/data/words.js
+apps/web/.codex-screens/
 
 docs/*
 !docs/ai-iteration/

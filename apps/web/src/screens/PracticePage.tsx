@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import { RotateCcw } from 'lucide-react';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { AIWorkshop } from '../features/practice/components/AIWorkshop';
 import { ConfigPanel } from '../features/practice/components/ConfigPanel';
@@ -180,6 +181,7 @@ export function PracticePage() {
                         <h2>{sourceLabel}</h2>
                     </div>
                     <button type="button" className="ghost-btn ghost-btn--small" onClick={handleReset}>
+                        <RotateCcw aria-hidden="true" size={16} strokeWidth={2.2} />
                         {store.copy.common.resetRound}
                     </button>
                 </div>

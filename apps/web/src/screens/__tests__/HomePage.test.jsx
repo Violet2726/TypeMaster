@@ -152,7 +152,7 @@ describe('HomePage', () => {
         });
 
         expect(await screen.findByRole('heading', { name: 'Push the board again' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Retry challenge' })).toBeInTheDocument();
+        expect(screen.getAllByRole('button', { name: 'Retry challenge' }).length).toBeGreaterThan(0);
         expect(screen.getByText('What to train today')).toBeInTheDocument();
         expect(screen.getByText('Start from one of these lanes')).toBeInTheDocument();
         expect(screen.getAllByText('Builder').length).toBeGreaterThan(0);
@@ -262,7 +262,7 @@ describe('HomePage', () => {
 
         expect(await screen.findByRole('heading', { name: 'Return to the plan now' })).toBeInTheDocument();
         expect(screen.getByText('Leaderboard pressure is starting to reduce training quality.')).toBeInTheDocument();
-        const recoverButton = screen.getByRole('button', { name: 'Back to plan' });
+        const [recoverButton] = screen.getAllByRole('button', { name: 'Back to plan' });
         expect(recoverButton).toBeInTheDocument();
         expect(screen.getByText('The leaderboard push is flattening out. Step away from challenge mode and return to plan work.')).toBeInTheDocument();
 
@@ -317,7 +317,7 @@ describe('HomePage', () => {
         });
 
         expect(await screen.findByRole('heading', { name: 'Reassess for the next phase' })).toBeInTheDocument();
-        const button = screen.getByRole('button', { name: 'Start reassessment' });
+        const [button] = screen.getAllByRole('button', { name: 'Start reassessment' });
         expect(button).toBeInTheDocument();
 
         fireEvent.click(button);

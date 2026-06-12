@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { RotateCcw } from 'lucide-react';
 import { buildRenderedWords } from '@typemaster/domain';
 
 function getSessionStatusText(copy, status) {
@@ -204,7 +205,10 @@ export function TypingArea({
                     </span>
                 </div>
 
-                <button type="button" className="ghost-btn ghost-btn--small" onClick={onReset}>{copy.common.resetRound}</button>
+                <button type="button" className="ghost-btn ghost-btn--small" onClick={onReset}>
+                    <RotateCcw aria-hidden="true" size={16} strokeWidth={2.2} />
+                    {copy.common.resetRound}
+                </button>
             </div>
 
             {status === 'paused' && (
