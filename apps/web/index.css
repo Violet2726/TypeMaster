@@ -5775,3 +5775,263 @@ body[data-theme='serika-light'] .typing-stage .words-shell {
         white-space: nowrap;
     }
 }
+
+/* Settings drawer polish refresh */
+.settings-overlay {
+    background: rgba(0, 0, 0, 0.48);
+    backdrop-filter: saturate(180%) blur(24px);
+    -webkit-backdrop-filter: saturate(180%) blur(24px);
+}
+
+.settings-drawer {
+    top: 0.55rem;
+    right: 0.55rem;
+    width: min(430px, calc(100vw - 1.1rem));
+    height: calc(100% - 1.1rem);
+    padding: 1.08rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 24px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025)),
+        rgba(24, 24, 27, 0.88);
+    box-shadow:
+        0 30px 90px rgba(0, 0, 0, 0.42),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+}
+
+.settings-drawer__header {
+    align-items: center;
+    min-height: 5.15rem;
+    padding: 0.35rem 0.28rem 1rem;
+    border-bottom: 0;
+}
+
+.settings-drawer__header h2 {
+    font-size: 2.18rem;
+    letter-spacing: 0;
+}
+
+.settings-drawer__close {
+    display: inline-grid;
+    place-items: center;
+    width: 2.35rem;
+    height: 2.35rem;
+    border: 1px solid var(--panel-stroke);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-strong);
+    cursor: pointer;
+    transition:
+        background-color 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
+        transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.settings-drawer__close:hover {
+    background: rgba(255, 255, 255, 0.13);
+    transform: translateY(-1px);
+}
+
+.settings-drawer__scroll {
+    gap: 1.1rem;
+    max-height: calc(100vh - 7rem);
+    margin-top: 0;
+    padding: 0 0.22rem 0.4rem 0;
+    scrollbar-width: none;
+}
+
+.settings-drawer__scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.settings-group__label {
+    margin-bottom: 0.48rem;
+    padding-inline: 0.32rem;
+    color: var(--text-dim);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.settings-group__items {
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.02)),
+        rgba(255, 255, 255, 0.035);
+}
+
+.settings-row {
+    min-height: 3.35rem;
+    padding: 0.68rem 0.78rem;
+}
+
+.settings-row__main {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.72rem;
+    min-width: 0;
+}
+
+.settings-row__icon {
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 1.95rem;
+    height: 1.95rem;
+    border-radius: 8px;
+    color: #ffffff;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 8px 20px rgba(0, 0, 0, 0.18);
+}
+
+.settings-row__icon--blue {
+    background: linear-gradient(135deg, #0a84ff, #5ac8fa);
+}
+
+.settings-row__icon--purple {
+    background: linear-gradient(135deg, #bf5af2, #5e5ce6);
+}
+
+.settings-row__icon--orange {
+    background: linear-gradient(135deg, #ff9f0a, #ff6b35);
+}
+
+.settings-row__icon--green {
+    background: linear-gradient(135deg, #34c759, #30d158);
+}
+
+.settings-row__icon--indigo {
+    background: linear-gradient(135deg, #5e5ce6, #64d2ff);
+}
+
+.settings-row__icon--pink {
+    background: linear-gradient(135deg, #ff375f, #ff9f0a);
+}
+
+.settings-row__label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 650;
+}
+
+.settings-row__select {
+    min-height: 2rem;
+    max-width: 44%;
+    color: var(--text-color);
+}
+
+.settings-account,
+.settings-data {
+    padding: 0.95rem;
+}
+
+.settings-account__hero {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.76rem;
+}
+
+.settings-account__avatar {
+    display: inline-grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0a84ff, #64d2ff);
+    color: #ffffff;
+    box-shadow: 0 14px 32px rgba(10, 132, 255, 0.22);
+}
+
+.settings-account__info {
+    justify-content: space-between;
+    min-width: 0;
+}
+
+.settings-account__info strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.settings-account__form .action-btn,
+.settings-data__actions .action-btn {
+    min-height: 2.55rem;
+}
+
+.settings-data__actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.62rem;
+}
+
+.settings-data textarea {
+    min-height: 7.2rem;
+    resize: vertical;
+}
+
+body[data-theme='serika-light'] .settings-overlay {
+    background: rgba(245, 245, 247, 0.62);
+}
+
+body[data-theme='serika-light'] .settings-drawer {
+    border-color: rgba(0, 0, 0, 0.08);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(248, 250, 255, 0.78)),
+        rgba(245, 245, 247, 0.9);
+    box-shadow:
+        0 30px 90px rgba(0, 0, 0, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+body[data-theme='serika-light'] .settings-drawer__close,
+body[data-theme='serika-light'] .settings-group__items {
+    background: rgba(255, 255, 255, 0.72);
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+@media (max-width: 720px) {
+    .settings-drawer {
+        inset: 0;
+        width: 100vw;
+        height: 100%;
+        padding: 0.95rem 0.8rem 5.2rem;
+        border-radius: 0;
+        border-inline: 0;
+    }
+
+    .settings-drawer__header {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        min-height: 4.4rem;
+        padding-bottom: 0.72rem;
+        background: inherit;
+    }
+
+    .settings-drawer__header h2 {
+        font-size: 1.9rem;
+    }
+
+    .settings-drawer__scroll {
+        max-height: calc(100vh - 5.6rem);
+        padding-bottom: 1.4rem;
+    }
+
+    .settings-row {
+        padding-inline: 0.7rem;
+    }
+
+    .settings-row__select {
+        max-width: 42%;
+        font-size: 0.84rem;
+    }
+
+    .settings-data__actions {
+        grid-template-columns: 1fr;
+    }
+}
