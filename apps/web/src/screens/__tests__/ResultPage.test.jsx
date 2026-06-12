@@ -218,6 +218,28 @@ describe('ResultPage', () => {
         Object.assign(mockStore, baseStore);
     });
 
+    test('shows a recovery-focused empty state before the first result', () => {
+        Object.assign(mockStore, {
+            ...baseStore,
+            sessions: [],
+            lastCompletedSession: null,
+            dailyChallenge: null
+        });
+        setMockNavigation({ route: '/result' });
+
+        render(<ResultPage />);
+
+        expect(screen.getByRole('heading', { name: 'No result to show yet' })).toBeInTheDocument();
+        expect(screen.getByLabelText('Key metrics')).toBeInTheDocument();
+        expect(screen.getByText('Next focus')).toBeInTheDocument();
+        expect(screen.getByText('Try another round')).toBeInTheDocument();
+        expect(screen.getByText('Accuracy')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Go practice' }));
+
+        expect(mockRouterPush).toHaveBeenCalledWith('/practice');
+    });
+
     test('shows challenge standing feedback for challenge sessions', async () => {
         render(<ResultPage />);
 

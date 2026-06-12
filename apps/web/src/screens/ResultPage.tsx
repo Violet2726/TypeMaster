@@ -63,18 +63,56 @@ export function ResultPage() {
     if (!session) {
         return (
             <section className="panel empty-panel result-empty-panel">
-                <div className="result-empty-panel__icon" aria-hidden="true">
-                    <Sparkles size={26} strokeWidth={2.2} />
+                <div className="result-empty-panel__copy">
+                    <span className="result-empty-panel__icon" aria-hidden="true">
+                        <Sparkles size={26} strokeWidth={2.2} />
+                    </span>
+                    <div>
+                        <p className="panel-kicker">{copy.result.heroKicker}</p>
+                        <h2>{copy.result.emptyTitle}</h2>
+                        <p className="muted-text">{copy.result.emptyBody}</p>
+                    </div>
+                    <button type="button" className="action-btn primary" onClick={() => navigate('/practice')}>
+                        <Keyboard aria-hidden="true" size={18} strokeWidth={2.3} />
+                        {copy.result.emptyAction}
+                    </button>
                 </div>
-                <div>
-                    <p className="panel-kicker">{copy.result.heroKicker}</p>
-                    <h2>{copy.result.emptyTitle}</h2>
-                    <p className="muted-text">{copy.result.emptyBody}</p>
+
+                <div className="result-empty-preview" aria-label={copy.result.metricsTitle}>
+                    <div className="result-empty-preview__header">
+                        <span className="result-empty-preview__glyph" aria-hidden="true">
+                            <BarChart3 size={20} strokeWidth={2.3} />
+                        </span>
+                        <div>
+                            <span>{copy.result.adviceTitle}</span>
+                            <strong>{copy.common.nextDrill}</strong>
+                        </div>
+                    </div>
+
+                    <div className="result-empty-preview__metrics">
+                        <span className="result-empty-preview__metric">
+                            <Gauge aria-hidden="true" size={18} strokeWidth={2.2} />
+                            <small>{copy.common.wpm}</small>
+                            <strong>{copy.common.emptyValue}</strong>
+                        </span>
+                        <span className="result-empty-preview__metric result-empty-preview__metric--accuracy">
+                            <Target aria-hidden="true" size={18} strokeWidth={2.2} />
+                            <small>{copy.common.accuracy}</small>
+                            <strong>{copy.common.emptyValue}</strong>
+                        </span>
+                        <span className="result-empty-preview__metric result-empty-preview__metric--consistency">
+                            <Sparkles aria-hidden="true" size={18} strokeWidth={2.2} />
+                            <small>{copy.common.consistency}</small>
+                            <strong>{copy.common.emptyValue}</strong>
+                        </span>
+                    </div>
+
+                    <div className="result-empty-preview__rail" aria-hidden="true">
+                        <span />
+                        <span />
+                        <span />
+                    </div>
                 </div>
-                <button type="button" className="action-btn primary" onClick={() => navigate('/practice')}>
-                    <Keyboard aria-hidden="true" size={18} strokeWidth={2.3} />
-                    {copy.result.emptyAction}
-                </button>
             </section>
         );
     }
