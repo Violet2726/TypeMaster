@@ -1,9 +1,51 @@
 'use client';
 
+import { CalendarClock, Gauge, Keyboard, ShieldCheck, Trophy } from 'lucide-react';
 import { formatDateTime } from '../i18n';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { useHomePageModel } from '../features/home/use-home-page-model';
 import { useHomePageStore } from '../store/app-state-selectors';
+
+function getHomeSessionTone(session) {
+    return session.trainingMeta?.type || 'free';
+}
+
+function getHomeSessionLabel(session, trainingCopy) {
+    if (session.trainingMeta?.type === 'challenge') {
+        return trainingCopy.practice.challengeBadge;
+    }
+
+    if (session.trainingMeta?.type === 'plan') {
+        return trainingCopy.practice.planBadge;
+    }
+
+    if (session.trainingMeta?.type === 'diagnostic') {
+        return trainingCopy.practice.diagnosticBadge;
+    }
+
+    return trainingCopy.home.freePractice;
+}
+
+function HomeSessionIcon({ tone }) {
+    const Icon = tone === 'challenge'
+        ? Trophy
+        : tone === 'plan'
+            ? CalendarClock
+            : tone === 'diagnostic'
+                ? Gauge
+                : Keyboard;
+
+    return <Icon aria-hidden="true" size={15} strokeWidth={2.25} />;
+}
+
+function HomeRecordPill({ icon: Icon, children, tone = 'speed' }) {
+    return (
+        <span className={`home-record-pill home-record-pill--${tone}`}>
+            <Icon aria-hidden="true" size={15} strokeWidth={2.25} />
+            {children}
+        </span>
+    );
+}
 
 export function HomePage() {
     const navigate = useAppNavigate();
@@ -299,18 +341,28 @@ export function HomePage() {
 
                 {recentSessions.length ? (
                     <div className="history-table">
-                        {recentSessions.map((session) => (
-                            <div key={session.id} className="history-row">
-                                <div className="history-row__meta">
-                                    <strong>{session.trainingMeta?.title || session.sourceTextMeta?.label || copy.common.emptyValue}</strong>
-                                    <p className="muted-text">{formatDateTime(session.result.completedAt, language)}</p>
+                        {recentSessions.map((session) => {
+                            const tone = getHomeSessionTone(session);
+
+                            return (
+                                <div key={session.id} className={`history-row home-record-row home-record-row--${tone}`}>
+                                    <div className="home-record-row__main">
+                                        <span className={`home-record-type home-record-type--${tone}`}>
+                                            <HomeSessionIcon tone={tone} />
+                                            {getHomeSessionLabel(session, trainingCopy)}
+                                        </span>
+                                        <div className="history-row__meta">
+                                            <strong>{session.trainingMeta?.title || session.sourceTextMeta?.label || copy.common.emptyValue}</strong>
+                                            <p className="muted-text">{formatDateTime(session.result.completedAt, language)}</p>
+                                        </div>
+                                    </div>
+                                    <div className="history-metrics">
+                                        <HomeRecordPill icon={Gauge}>{session.result.wpm} {copy.common.wpm}</HomeRecordPill>
+                                        <HomeRecordPill icon={ShieldCheck} tone="accuracy">{session.result.accuracy}%</HomeRecordPill>
+                                    </div>
                                 </div>
-                                <div className="history-metrics">
-                                    <span>{session.result.wpm} {copy.common.wpm}</span>
-                                    <span>{session.result.accuracy}%</span>
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 ) : (
                     <p className="muted-text">{copy.home.recentEmpty}</p>
@@ -327,7 +379,10 @@ export function HomePage() {
                 {unlockedAchievements.length ? (
                     <div className="tag-list">
                         {unlockedAchievements.map((achievement) => (
-                            <span key={achievement.id} className="tag-pill">{achievement.title}</span>
+                            <span key={achievement.id} className="tag-pill home-achievement-pill">
+                                <Trophy aria-hidden="true" size={15} strokeWidth={2.25} />
+                                {achievement.title}
+                            </span>
                         ))}
                     </div>
                 ) : (
