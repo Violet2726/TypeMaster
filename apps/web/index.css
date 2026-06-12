@@ -2930,12 +2930,31 @@ body[data-theme='serika-light'] .home-product-visual__keyboard {
 }
 
 .home-action-grid {
+    grid-template-columns: minmax(0, 1.34fr) minmax(20rem, 0.76fr);
+    grid-template-areas:
+        "primary challenge"
+        "primary free";
     gap: 0.9rem;
+    align-items: stretch;
 }
 
 .home-action-card {
     overflow: hidden;
     min-height: 18rem;
+}
+
+.home-action-card--primary {
+    grid-area: primary;
+    grid-column: auto;
+}
+
+.home-action-card--challenge {
+    grid-area: challenge;
+}
+
+.home-action-card--free {
+    grid-area: free;
+    min-height: 0;
 }
 
 .home-action-card--primary,
@@ -6668,6 +6687,17 @@ body[data-theme='serika-light'] .home-achievement-pill {
 }
 
 @media (max-width: 980px) {
+    .home-action-grid {
+        grid-template-columns: 1fr;
+        grid-template-areas: none;
+    }
+
+    .home-action-card--primary,
+    .home-action-card--challenge,
+    .home-action-card--free {
+        grid-area: auto;
+    }
+
     .home-launch {
         min-height: auto;
         padding: 1rem 0 0.45rem;

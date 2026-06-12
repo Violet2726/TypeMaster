@@ -107,6 +107,7 @@ export function HomePage() {
     });
     const hasSessions = insights.totalSessions > 0;
     const hasChallengeRun = challengeSessions.length > 0;
+    const hasDashboardEvidence = Boolean(skillProfile || trainingPlan || hasSessions || unlockedAchievements.length);
     const pendingLabel = trainingCopy.diagnostic.pending;
     const homeLevelLabel = skillProfile?.level?.label || pendingLabel;
     const homeStreakLabel = sessionStreak || pendingLabel;
@@ -349,6 +350,8 @@ export function HomePage() {
                 </div>
             </section>
 
+            {hasDashboardEvidence && (
+                <>
             <section className="insights-overview-grid">
                 <div className="panel insights-latest-card">
                     <p className="panel-kicker">{trainingCopy.insights.radarTitle}</p>
@@ -455,6 +458,8 @@ export function HomePage() {
                     </div>
                 )}
             </section>
+                </>
+            )}
         </div>
     );
 }

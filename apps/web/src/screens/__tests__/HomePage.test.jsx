@@ -10,7 +10,7 @@ describe('HomePage', () => {
         resetMockNavigation();
     });
 
-    test('shows an intentional achievement empty state and clean latest mode label', async () => {
+    test('keeps the starter home clean before the first evidence exists', async () => {
         renderWithProvider(<HomePage />, {
             storageState: {
                 'typemaster:v5:preferences': {
@@ -29,13 +29,15 @@ describe('HomePage', () => {
             }
         });
 
-        expect(await screen.findByText('Make the training relationship visible, not just the raw numbers.')).toBeInTheDocument();
+        expect(await screen.findByRole('heading', { name: 'Start with a 3-minute assessment' })).toBeInTheDocument();
         expect(screen.getAllByText('Built-in · Time 30s').length).toBeGreaterThan(0);
         expect(screen.getAllByRole('button', { name: 'Start assessment' }).length).toBeGreaterThan(0);
         expect(screen.queryByText('--')).not.toBeInTheDocument();
         expect(screen.queryByText('0 WPM')).not.toBeInTheDocument();
         expect(screen.getAllByText('Pending').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Ready').length).toBeGreaterThan(0);
+        expect(screen.queryByRole('heading', { name: 'Achievement wall' })).not.toBeInTheDocument();
+        expect(screen.queryByText('No sessions yet. Start your first round.')).not.toBeInTheDocument();
     });
 
     test('shows the training dashboard when skill profile and plan exist', async () => {
