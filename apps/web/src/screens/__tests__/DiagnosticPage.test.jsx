@@ -69,6 +69,7 @@ describe('DiagnosticPage', () => {
         });
 
         expect(await screen.findByRole('heading', { name: 'Use 3 minutes to define the first training path' })).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'Assessment steps' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Resume assessment' })).toBeInTheDocument();
         expect(screen.getByText('1/3')).toBeInTheDocument();
         expect(screen.getAllByText('Rhythm pulse').length).toBeGreaterThan(0);

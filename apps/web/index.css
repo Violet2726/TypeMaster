@@ -4969,6 +4969,85 @@ body[data-theme='serika-light'] .diagnostic-profile-card__stats span {
     }
 }
 
+/* Diagnostic onboarding refinement */
+.diagnostic-hero,
+.diagnostic-steps-card,
+.diagnostic-profile-card {
+    backdrop-filter: saturate(180%) blur(22px);
+    -webkit-backdrop-filter: saturate(180%) blur(22px);
+}
+
+.diagnostic-steps-card .panel-head h2 {
+    letter-spacing: 0;
+}
+
+@media (max-width: 720px) {
+    .diagnostic-hero {
+        padding: 1rem;
+    }
+
+    .diagnostic-hero h1 {
+        max-width: 9.5ch;
+        font-size: clamp(1.94rem, 9.2vw, 2.42rem);
+        line-height: 1.01;
+    }
+
+    .diagnostic-hero .muted-text {
+        font-size: 0.92rem;
+        line-height: 1.45;
+    }
+
+    .diagnostic-hero__meta {
+        margin-top: 0.78rem;
+    }
+
+    .diagnostic-hero__action {
+        grid-template-columns: 4.35rem minmax(0, 1fr);
+        align-items: center;
+    }
+
+    .diagnostic-progress-ring {
+        width: 4.35rem;
+        height: 4.35rem;
+    }
+
+    .diagnostic-hero__cta {
+        gap: 0.5rem;
+        min-width: 0;
+    }
+
+    .diagnostic-hero__next {
+        min-height: 3.28rem;
+    }
+
+    .diagnostic-steps-card .panel-head h2 {
+        font-size: 1.5rem;
+    }
+
+    .diagnostic-step {
+        gap: 0.68rem;
+        padding: 0.74rem;
+    }
+
+    .diagnostic-step__index {
+        width: 2.18rem;
+        height: 2.18rem;
+    }
+
+    .diagnostic-step__title-row strong {
+        font-size: 0.98rem;
+    }
+
+    .diagnostic-step__content .muted-text {
+        font-size: 0.84rem;
+        line-height: 1.38;
+    }
+
+    .diagnostic-profile-card {
+        padding: 1rem;
+    }
+}
+
 /* ============================================
    Challenge Page
    ============================================ */

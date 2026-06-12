@@ -78,8 +78,8 @@ export function DiagnosticPage() {
                 <div className="panel diagnostic-steps-card">
                     <div className="panel-head">
                         <div>
-                            <p className="panel-kicker">{trainingCopy.diagnostic.stepTitle}</p>
-                            <h2>{activeJourney?.title || trainingCopy.diagnostic.title}</h2>
+                            <p className="panel-kicker">{trainingCopy.diagnostic.kicker}</p>
+                            <h2>{trainingCopy.diagnostic.stepTitle}</h2>
                         </div>
                     </div>
                     <div className="diagnostic-step-list">
