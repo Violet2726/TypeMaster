@@ -176,81 +176,87 @@ export function PracticePage() {
                 </section>
             )}
 
-            <section className="panel practice-toolbar">
-                <div className="practice-toolbar__row">
-                    <div>
-                        <p className="panel-kicker">{store.copy.practice.configTitle}</p>
-                        <h2>{sourceLabel}</h2>
-                    </div>
-                    <button type="button" className="ghost-btn ghost-btn--small" onClick={handleReset}>
-                        <RotateCcw aria-hidden="true" size={16} strokeWidth={2.2} />
-                        {store.copy.common.resetRound}
-                    </button>
+            <div className="practice-workbench">
+                <div className="practice-workbench__primary">
+                    <TypingArea
+                        copy={store.copy}
+                        words={typingSession.words}
+                        typedHistory={typingSession.typedHistory}
+                        currentInput={typingSession.currentInput}
+                        currentWordIndex={typingSession.currentWordIndex}
+                        isFocused={typingSession.isFocused}
+                        status={typingSession.status}
+                        liveMetrics={typingSession.liveMetrics}
+                        timerDisplay={typingSession.timerDisplay}
+                        mode={store.config.mode}
+                        sourceLabel={sourceLabel}
+                        inputRef={typingSession.inputRef}
+                        onInputChange={typingSession.handleInputChange}
+                        onKeyDown={typingSession.handleKeyDown}
+                        onCompositionStart={typingSession.handleCompositionStart}
+                        onCompositionEnd={typingSession.handleCompositionEnd}
+                        onFocus={typingSession.handleFocus}
+                        onBlur={typingSession.handleBlur}
+                        onActivate={typingSession.focusInput}
+                        onReset={handleReset}
+                        isLocked={(store.config.source === 'ai' && aiPracticeStatus !== 'ready') || isCustomEmpty}
+                        lockTitle={lockTitle}
+                        lockBody={lockBody}
+                    />
                 </div>
 
-                <ConfigPanel
-                    copy={store.copy}
-                    language={store.language}
-                    config={store.config}
-                    onConfigChange={handleConfigChange}
-                    showAdvanced={controlsOpen}
-                    onToggleAdvanced={() => setControlsOpen((value) => !value)}
-                />
+                <aside className="practice-workbench__rail" aria-label={store.copy.practice.configTitle}>
+                    <section className="panel practice-toolbar">
+                        <div className="practice-toolbar__row">
+                            <div>
+                                <p className="panel-kicker">{store.copy.practice.configTitle}</p>
+                                <h2>{sourceLabel}</h2>
+                            </div>
+                            <button type="button" className="ghost-btn ghost-btn--small" onClick={handleReset}>
+                                <RotateCcw aria-hidden="true" size={16} strokeWidth={2.2} />
+                                {store.copy.common.resetRound}
+                            </button>
+                        </div>
 
-                {controlsOpen && store.config.source === 'ai' && (
-                    <AIWorkshop
-                        copy={store.copy}
-                        language={store.language}
-                        config={store.config}
-                        currentDraft={currentDraft}
-                        aiPracticeStatus={aiPracticeStatus}
-                        practiceError={practiceError}
-                        onConfigChange={handleConfigChange}
-                        onGenerate={handleGenerateAi}
-                        onRestoreConfig={restoreAiDraftConfig}
-                        onUseBuiltin={handleUseBuiltin}
-                    />
-                )}
+                        <ConfigPanel
+                            copy={store.copy}
+                            language={store.language}
+                            config={store.config}
+                            onConfigChange={handleConfigChange}
+                            showAdvanced={controlsOpen}
+                            onToggleAdvanced={() => setControlsOpen((value) => !value)}
+                        />
 
-                {controlsOpen && store.config.source === 'builtin' && (
-                    <p className="muted-text practice-toolbar__hint">{store.copy.practice.builtInReady}</p>
-                )}
+                        {controlsOpen && store.config.source === 'ai' && (
+                            <AIWorkshop
+                                copy={store.copy}
+                                language={store.language}
+                                config={store.config}
+                                currentDraft={currentDraft}
+                                aiPracticeStatus={aiPracticeStatus}
+                                practiceError={practiceError}
+                                onConfigChange={handleConfigChange}
+                                onGenerate={handleGenerateAi}
+                                onRestoreConfig={restoreAiDraftConfig}
+                                onUseBuiltin={handleUseBuiltin}
+                            />
+                        )}
 
-                {store.config.source === 'custom' && (
-                    <CustomTextWorkshop
-                        language={store.language}
-                        value={customText}
-                        onChange={setCustomText}
-                        onApply={handleApplyCustomText}
-                    />
-                )}
-            </section>
+                        {controlsOpen && store.config.source === 'builtin' && (
+                            <p className="muted-text practice-toolbar__hint">{store.copy.practice.builtInReady}</p>
+                        )}
 
-            <TypingArea
-                copy={store.copy}
-                words={typingSession.words}
-                typedHistory={typingSession.typedHistory}
-                currentInput={typingSession.currentInput}
-                currentWordIndex={typingSession.currentWordIndex}
-                isFocused={typingSession.isFocused}
-                status={typingSession.status}
-                liveMetrics={typingSession.liveMetrics}
-                timerDisplay={typingSession.timerDisplay}
-                mode={store.config.mode}
-                sourceLabel={sourceLabel}
-                inputRef={typingSession.inputRef}
-                onInputChange={typingSession.handleInputChange}
-                onKeyDown={typingSession.handleKeyDown}
-                onCompositionStart={typingSession.handleCompositionStart}
-                onCompositionEnd={typingSession.handleCompositionEnd}
-                onFocus={typingSession.handleFocus}
-                onBlur={typingSession.handleBlur}
-                onActivate={typingSession.focusInput}
-                onReset={handleReset}
-                isLocked={(store.config.source === 'ai' && aiPracticeStatus !== 'ready') || isCustomEmpty}
-                lockTitle={lockTitle}
-                lockBody={lockBody}
-            />
+                        {store.config.source === 'custom' && (
+                            <CustomTextWorkshop
+                                language={store.language}
+                                value={customText}
+                                onChange={setCustomText}
+                                onApply={handleApplyCustomText}
+                            />
+                        )}
+                    </section>
+                </aside>
+            </div>
 
             <div className="sticky-action-bar">
                 <div>

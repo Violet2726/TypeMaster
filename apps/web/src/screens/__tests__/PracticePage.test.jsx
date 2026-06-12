@@ -247,6 +247,17 @@ describe('PracticePage', () => {
         expect(mockTypingSession.focusInput).toHaveBeenCalledTimes(1);
     });
 
+    test('keeps the typing surface ahead of practice controls in the workbench', () => {
+        render(<PracticePage />);
+
+        const typingArea = screen.getByTestId('typing-area');
+        const configPanel = screen.getByTestId('config-panel');
+        const controlsRail = screen.getByLabelText(baseStore.copy.practice.configTitle);
+
+        expect(controlsRail).toContainElement(configPanel);
+        expect(typingArea.compareDocumentPosition(configPanel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    });
+
     test('shows the custom word bank workshop immediately when custom source is selected', () => {
         Object.assign(mockStore, {
             config: {
