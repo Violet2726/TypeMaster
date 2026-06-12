@@ -1,11 +1,32 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
+import { ArrowRight, BarChart3, Clock3, Gauge, Hash, Keyboard, RotateCw, Sparkles, Target, Trophy } from 'lucide-react';
 import { getErrorMessage } from '../i18n';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { TrendChart } from '../features/result/components/TrendChart';
 import { useResultPageModel, getCoachBadgeLabel } from '../features/result/use-result-page-model';
 import { useResultPageStore } from '../store/app-state-selectors';
+
+function DecisionActionIcon({ action }) {
+    if (action === 'diagnostic') {
+        return <RotateCw aria-hidden="true" size={18} strokeWidth={2.3} />;
+    }
+
+    if (action === 'leaderboard') {
+        return <Trophy aria-hidden="true" size={18} strokeWidth={2.3} />;
+    }
+
+    if (action === 'insights') {
+        return <BarChart3 aria-hidden="true" size={18} strokeWidth={2.3} />;
+    }
+
+    if (action === 'free' || action === 'nextDrill' || action === 'plan') {
+        return <Keyboard aria-hidden="true" size={18} strokeWidth={2.3} />;
+    }
+
+    return <ArrowRight aria-hidden="true" size={18} strokeWidth={2.3} />;
+}
 
 export function ResultPage() {
     const searchParams = useSearchParams();
@@ -41,10 +62,17 @@ export function ResultPage() {
 
     if (!session) {
         return (
-            <section className="panel empty-panel">
-                <h2>{copy.result.emptyTitle}</h2>
-                <p className="muted-text">{copy.result.emptyBody}</p>
+            <section className="panel empty-panel result-empty-panel">
+                <div className="result-empty-panel__icon" aria-hidden="true">
+                    <Sparkles size={26} strokeWidth={2.2} />
+                </div>
+                <div>
+                    <p className="panel-kicker">{copy.result.heroKicker}</p>
+                    <h2>{copy.result.emptyTitle}</h2>
+                    <p className="muted-text">{copy.result.emptyBody}</p>
+                </div>
                 <button type="button" className="action-btn primary" onClick={() => navigate('/practice')}>
+                    <Keyboard aria-hidden="true" size={18} strokeWidth={2.3} />
                     {copy.result.emptyAction}
                 </button>
             </section>
@@ -56,14 +84,14 @@ export function ResultPage() {
         : previewChallengeStanding || null;
 
     return (
-        <div className="page-stack">
-            <section className="panel result-summary">
+        <div className="page-stack result-page">
+            <section className="panel result-summary result-summary-hero">
                 <div className="result-summary__scores">
-                    <div className="result-big">
+                    <div className="result-big result-score-card result-score-card--speed">
                         <span className="result-label">{copy.common.wpm}</span>
                         <span className="result-value">{session.result.wpm}</span>
                     </div>
-                    <div className="result-big">
+                    <div className="result-big result-score-card result-score-card--accuracy">
                         <span className="result-label">{copy.common.accuracy}</span>
                         <span className="result-value">{session.result.accuracy}<span className="result-unit">%</span></span>
                     </div>
@@ -75,23 +103,32 @@ export function ResultPage() {
                     <p className="muted-text">
                         {session.sourceTextMeta?.label || copy.common.emptyValue}{summarySeparator}{copy.common.consistency} {session.result.consistency}%
                     </p>
+                    <div className="result-summary__chips" aria-label={copy.result.metricsTitle}>
+                        <span>{copy.common.duration} {session.result.durationSeconds}s</span>
+                        <span>{copy.common.rawWpm} {session.result.rawWpm}</span>
+                        <span>{copy.common.characterStats} {session.result.correctChars}/{session.result.incorrectChars}</span>
+                    </div>
                 </div>
             </section>
 
-            <section className="result-metrics-strip" aria-label={copy.result.metricsTitle}>
-                <div className="result-item">
+            <section className="result-metrics-strip result-kpi-strip" aria-label={copy.result.metricsTitle}>
+                <div className="result-item result-kpi-item">
+                    <Gauge aria-hidden="true" size={18} strokeWidth={2.2} />
                     <span className="result-item-label">{copy.common.rawWpm}</span>
                     <span className="result-item-value">{session.result.rawWpm}</span>
                 </div>
-                <div className="result-item">
+                <div className="result-item result-kpi-item">
+                    <Target aria-hidden="true" size={18} strokeWidth={2.2} />
                     <span className="result-item-label">{copy.common.consistency}</span>
                     <span className="result-item-value">{session.result.consistency}%</span>
                 </div>
-                <div className="result-item">
+                <div className="result-item result-kpi-item">
+                    <Clock3 aria-hidden="true" size={18} strokeWidth={2.2} />
                     <span className="result-item-label">{copy.common.duration}</span>
                     <span className="result-item-value">{session.result.durationSeconds}s</span>
                 </div>
-                <div className="result-item">
+                <div className="result-item result-kpi-item">
+                    <Hash aria-hidden="true" size={18} strokeWidth={2.2} />
                     <span className="result-item-label">{copy.common.characterStats}</span>
                     <span className="result-item-value">
                         {session.result.correctChars}/{session.result.incorrectChars}/{session.result.extraChars}/{session.result.missedChars}
@@ -105,7 +142,10 @@ export function ResultPage() {
                         <p className="panel-kicker">{trainingCopy.result.planTitle}</p>
                         <h2 id="result-decision-title">{resultDecision.headline}</h2>
                     </div>
-                    <span className={`panel-badge badge-${resultDecision.badgeTone || 'ready'}`}>{resultDecision.badge}</span>
+                    <span className={`panel-badge badge-${resultDecision.badgeTone || 'ready'}`}>
+                        <Sparkles aria-hidden="true" size={14} strokeWidth={2.2} />
+                        {resultDecision.badge}
+                    </span>
                 </div>
 
                 <div className="result-decision-panel__body">
@@ -141,6 +181,7 @@ export function ResultPage() {
                         onClick={() => handleDecisionAction(resultDecision.primaryAction)}
                         disabled={resultDecision.isLoading}
                     >
+                        <DecisionActionIcon action={resultDecision.primaryAction} />
                         {resultDecision.isLoading ? copy.common.loading : resultDecision.primaryLabel}
                     </button>
                     {resultDecision.secondaryActions.map((action) => (
@@ -150,6 +191,7 @@ export function ResultPage() {
                             className="action-btn"
                             onClick={() => handleDecisionAction(action.action)}
                         >
+                            <DecisionActionIcon action={action.action} />
                             {action.label}
                         </button>
                     ))}
