@@ -279,6 +279,44 @@ export const zhCNMessages = {
             noErrors: '样本还太少，暂时看不出明确热点。',
             noCoach: '还没有完整建议。完成第一轮后，最新总结会保留在这里。'
         },
+        coach: {
+            kicker: 'AI 教练',
+            title: '教练简报',
+            body: '把最新一轮训练整理成一条清晰的下一步，不再从一堆模式里重新选择。',
+            latestTitle: '当前推荐',
+            emptyTitle: '还没有教练信号',
+            emptyBody: '完成一轮后，教练会把结果整理成一条更聚焦的跟进训练。',
+            readyBadge: '就绪',
+            emptyBadge: '等待',
+            primaryAction: '开始一轮',
+            secondaryAction: '查看洞察',
+            signalTitle: '教练信号',
+            latestRoundLabel: '最近一轮',
+            profileLabel: '技能画像',
+            weekGoalLabel: '周目标',
+            weekSessionsLabel: '本周会话',
+            noSession: '还没有回合',
+            noSignal: '完成一轮后，这里会显示与上一轮的对比。',
+            nextDrillEmpty: '先完成一轮新的练习，教练才能准备更聚焦的跟进训练。',
+            profilePending: '尚未画像',
+            profileEmpty: '完成 3 分钟评估，或继续积累回合，让画像更可靠。',
+            pathKicker: '教练循环',
+            pathTitle: '把循环保持得更小',
+            pathSteps: [
+                {
+                    title: '完成一轮',
+                    body: '先记录速度、准确率和节奏，再决定下一步。'
+                },
+                {
+                    title: '查看信号',
+                    body: '用最新建议和对比，选出最窄、最有用的训练重点。'
+                },
+                {
+                    title: '执行跟进',
+                    body: '减少重新设置的负担，用更清楚的目标进入下一轮。'
+                }
+            ]
+        },
         settings: {
             kicker: '设置',
             title: '设置',

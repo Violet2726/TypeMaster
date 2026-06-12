@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation';
+import CoachPage from '../../src/screens/CoachPage';
 
 export default function Page() {
-    redirect('/insights');
+    return <CoachPage />;
 }

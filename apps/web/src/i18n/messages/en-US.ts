@@ -279,6 +279,44 @@ export const enUSMessages = {
             noErrors: 'The sample is still too small to reveal clear hotspots.',
             noCoach: 'No full advice yet. After the first completed round, the latest summary stays here.'
         },
+        coach: {
+            kicker: 'AI coach',
+            title: 'Coach briefing',
+            body: 'A quiet place to turn the latest round into one clear next action.',
+            latestTitle: 'Current recommendation',
+            emptyTitle: 'No coaching signal yet',
+            emptyBody: 'Finish one round and the coach will turn the result into a focused follow-up.',
+            readyBadge: 'Ready',
+            emptyBadge: 'Waiting',
+            primaryAction: 'Start a round',
+            secondaryAction: 'Open insights',
+            signalTitle: 'Coach signals',
+            latestRoundLabel: 'Latest round',
+            profileLabel: 'Skill profile',
+            weekGoalLabel: 'Weekly goal',
+            weekSessionsLabel: 'This week',
+            noSession: 'No round yet',
+            noSignal: 'The next comparison will appear after a completed round.',
+            nextDrillEmpty: 'Complete a fresh round so the coach can prepare a focused follow-up.',
+            profilePending: 'Not mapped yet',
+            profileEmpty: 'Run the 3-minute assessment or finish more rounds to build a reliable profile.',
+            pathKicker: 'Coach loop',
+            pathTitle: 'Keep the loop small',
+            pathSteps: [
+                {
+                    title: 'Finish one round',
+                    body: 'Capture speed, accuracy, and rhythm before choosing the next move.'
+                },
+                {
+                    title: 'Review the signal',
+                    body: 'Use the latest advice and comparison to pick the narrowest useful focus.'
+                },
+                {
+                    title: 'Run the follow-up',
+                    body: 'Start the next round with less setup work and a clearer target.'
+                }
+            ]
+        },
         settings: {
             kicker: 'Settings',
             title: 'Settings',
