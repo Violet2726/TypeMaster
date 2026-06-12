@@ -6546,6 +6546,13 @@ body[data-theme='serika-light'] .settings-group__items {
         linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
 }
 
+.training-plan-hero--empty {
+    grid-template-columns: minmax(0, 1fr) minmax(19rem, 0.46fr);
+    background:
+        linear-gradient(135deg, rgba(10, 132, 255, 0.12), transparent 42%),
+        linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
+}
+
 .training-plan-hero h1 {
     max-width: 43rem;
     font-size: 4.35rem;
@@ -6588,6 +6595,65 @@ body[data-theme='serika-light'] .settings-group__items {
     align-items: center;
     justify-content: flex-end;
     gap: 0.85rem;
+}
+
+.training-plan-hero--empty .training-plan-hero__action {
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: stretch;
+    min-width: 17.5rem;
+}
+
+.training-plan-start-preview {
+    display: grid;
+    gap: 0.72rem;
+    min-height: 9.4rem;
+    padding: 0.9rem;
+    border: 1px solid var(--panel-stroke);
+    border-radius: 8px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02)),
+        rgba(255, 255, 255, 0.035);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.training-plan-start-preview__icon {
+    display: inline-grid;
+    width: 2.55rem;
+    height: 2.55rem;
+    place-items: center;
+    border: 1px solid rgba(10, 132, 255, 0.28);
+    border-radius: 8px;
+    background: rgba(10, 132, 255, 0.14);
+    color: #8ecaff;
+}
+
+.training-plan-start-preview strong {
+    display: block;
+    margin-top: 0.18rem;
+    color: var(--text-strong);
+    font-size: 1.02rem;
+}
+
+.training-plan-start-preview__rail {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.42rem;
+    align-self: end;
+}
+
+.training-plan-start-preview__rail span {
+    height: 0.4rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.training-plan-start-preview__rail span:first-child {
+    background: rgba(10, 132, 255, 0.72);
+}
+
+.training-plan-start-preview__rail span:nth-child(2) {
+    background: rgba(153, 242, 192, 0.56);
 }
 
 .training-plan-ring {
@@ -6651,6 +6717,75 @@ body[data-theme='serika-light'] .settings-group__items {
 
 .training-plan-stat svg {
     color: #7ee198;
+}
+
+.training-plan-onboarding {
+    display: grid;
+    gap: 0.9rem;
+    overflow: hidden;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.016)),
+        var(--bg-panel);
+}
+
+.training-plan-onboarding__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.68rem;
+}
+
+.training-plan-onboarding__item {
+    position: relative;
+    display: grid;
+    gap: 0.32rem;
+    min-height: 6rem;
+    align-content: end;
+    padding: 0.78rem;
+    overflow: hidden;
+    border: 1px solid var(--panel-stroke);
+    border-radius: 8px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.058), rgba(255, 255, 255, 0.018)),
+        var(--bg-soft);
+}
+
+.training-plan-onboarding__item::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 0.18rem;
+    background: #0a84ff;
+}
+
+.training-plan-onboarding__item:nth-child(2)::before {
+    background: #99f2c0;
+}
+
+.training-plan-onboarding__item:nth-child(3)::before {
+    background: #ffd66b;
+}
+
+.training-plan-onboarding__item svg {
+    color: #8ecaff;
+}
+
+.training-plan-onboarding__item:nth-child(2) svg {
+    color: #99f2c0;
+}
+
+.training-plan-onboarding__item:nth-child(3) svg {
+    color: #ffd66b;
+}
+
+.training-plan-onboarding__item span {
+    color: var(--text-dim);
+    font-size: 0.76rem;
+}
+
+.training-plan-onboarding__item strong {
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: 1rem;
 }
 
 .training-plan-board {
@@ -6808,6 +6943,7 @@ body[data-theme='serika-light'] .settings-group__items {
 }
 
 body[data-theme='serika-light'] .training-plan-hero,
+body[data-theme='serika-light'] .training-plan-onboarding,
 body[data-theme='serika-light'] .training-plan-step,
 body[data-theme='serika-light'] .training-plan-empty {
     background:
@@ -6815,17 +6951,29 @@ body[data-theme='serika-light'] .training-plan-empty {
         var(--bg-panel);
 }
 
+body[data-theme='serika-light'] .training-plan-start-preview,
+body[data-theme='serika-light'] .training-plan-onboarding__item {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 255, 0.76)),
+        #ffffff;
+}
+
 body[data-theme='serika-light'] .training-plan-ring::after {
     background: #ffffff;
 }
 
 @media (max-width: 900px) {
-    .training-plan-hero {
+    .training-plan-hero,
+    .training-plan-hero--empty {
         grid-template-columns: 1fr;
     }
 
     .training-plan-hero__action {
         justify-content: space-between;
+    }
+
+    .training-plan-hero--empty .training-plan-hero__action {
+        min-width: 0;
     }
 }
 
@@ -6842,6 +6990,11 @@ body[data-theme='serika-light'] .training-plan-ring::after {
 
     .training-plan-hero h1 {
         font-size: 3.05rem;
+    }
+
+    .training-plan-hero--empty h1 {
+        font-size: 2.58rem;
+        line-height: 1.04;
     }
 
     .training-plan-hero__action {
@@ -6866,6 +7019,31 @@ body[data-theme='serika-light'] .training-plan-ring::after {
 
     .training-plan-ring span {
         font-size: 0.56rem;
+    }
+
+    .training-plan-start-preview {
+        min-height: 8.4rem;
+        padding: 0.82rem;
+    }
+
+    .training-plan-onboarding__grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.5rem;
+    }
+
+    .training-plan-onboarding__item {
+        min-height: 5.5rem;
+        padding: 0.62rem;
+    }
+
+    .training-plan-onboarding__item span {
+        font-size: 0.68rem;
+        line-height: 1.2;
+    }
+
+    .training-plan-onboarding__item strong {
+        font-size: 0.86rem;
+        line-height: 1.22;
     }
 
     .training-plan-stats {
@@ -6920,6 +7098,12 @@ body[data-theme='serika-light'] .training-plan-ring::after {
     }
 
     .training-plan-focus {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 360px) {
+    .training-plan-onboarding__grid {
         grid-template-columns: 1fr;
     }
 }

@@ -10,6 +10,40 @@ describe('TrainingPlanPage', () => {
         resetMockNavigation();
     });
 
+    test('starts the diagnostic flow instead of showing empty plan metrics', async () => {
+        renderWithProvider(<TrainingPlanPage />, {
+            route: '/plan',
+            storageState: {
+                'typemaster:v5:preferences': {
+                    language: 'en-US',
+                    lastConfig: {
+                        source: 'builtin',
+                        mode: 'time',
+                        durationSeconds: 30,
+                        wordCount: 25,
+                        includePunctuation: false,
+                        includeNumbers: false,
+                        aiTemplate: 'daily',
+                        difficulty: 'medium'
+                    }
+                }
+            }
+        });
+
+        expect(await screen.findByRole('heading', { name: 'Start with a 3-minute assessment' })).toBeInTheDocument();
+        expect(screen.queryByText('0/0')).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Start assessment' }));
+
+        await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith('/practice'));
+        await waitFor(() => {
+            expect(loadActiveSessionContext()).toMatchObject({
+                type: 'diagnostic',
+                stepId: 'diagnostic-accuracy'
+            });
+        });
+    });
+
     test('routes completed plans into a fresh reassessment flow', async () => {
         renderWithProvider(<TrainingPlanPage />, {
             route: '/plan',
