@@ -1,6 +1,6 @@
 'use client';
 
-import { Keyboard, LineChart, Target, Trophy } from 'lucide-react';
+import { CalendarClock, Gauge, Keyboard, LineChart, ShieldCheck, Target, Trophy } from 'lucide-react';
 import { formatDateTime, formatShortDate, getInlineSeparator } from '../i18n';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { useInsightsPageModel } from '../features/insights/use-insights-page-model';
@@ -35,10 +35,16 @@ function KeyboardHotspots({ copy, hotspots, language, onStartDrill }) {
     return (
         <div className="keyboard-hotspots">
             <div className="keyboard-hotspots__primary">
-                <span className="summary-label">{copy.insights.keyboardPrimary}</span>
-                <strong>{labels[primary.id] || primary.id}</strong>
-                <p>{copy.insights.keyboardTotal}: {hotspots.total}</p>
+                <span className="keyboard-hotspots__icon" aria-hidden="true">
+                    <Keyboard size={20} strokeWidth={2.25} />
+                </span>
+                <div>
+                    <span className="summary-label">{copy.insights.keyboardPrimary}</span>
+                    <strong>{labels[primary.id] || primary.id}</strong>
+                    <p>{copy.insights.keyboardTotal}: {hotspots.total}</p>
+                </div>
                 <button type="button" className="action-btn primary" onClick={onStartDrill}>
+                    <Target aria-hidden="true" size={18} strokeWidth={2.25} />
                     {copy.insights.keyboardPracticeAction}
                 </button>
             </div>
@@ -49,11 +55,23 @@ function KeyboardHotspots({ copy, hotspots, language, onStartDrill }) {
                             <strong>{labels[zone.id] || zone.id}</strong>
                             <span>{formatZoneChars(zone.chars, language) || copy.common.emptyValue}</span>
                         </div>
-                        <span>{zone.share}%</span>
+                        <span className="keyboard-zone-row__share">{zone.share}%</span>
+                        <span className="keyboard-zone-row__bar" aria-hidden="true">
+                            <span style={{ width: `${zone.share}%` }} />
+                        </span>
                     </div>
                 ))}
             </div>
         </div>
+    );
+}
+
+function HistoryMetric({ icon: Icon, children }) {
+    return (
+        <span className="history-metric-pill">
+            <Icon aria-hidden="true" size={15} strokeWidth={2.25} />
+            {children}
+        </span>
     );
 }
 
@@ -283,7 +301,7 @@ export function InsightsPage() {
                 <TargetedProgress copy={copy} trend={targetedTrend} />
             </section>
 
-            <section className="panel">
+            <section className="panel insights-keyboard-panel">
                 <div className="panel-head">
                     <div>
                         <p className="panel-kicker">{copy.insights.keyboardZonesTitle}</p>
@@ -335,7 +353,7 @@ export function InsightsPage() {
                 </div>
             </section>
 
-            <section className="panel home-records-panel">
+            <section className="panel home-records-panel insights-history-panel">
                 <div className="panel-head">
                     <div>
                         <p className="panel-kicker">{copy.insights.recentHistory}</p>
@@ -351,9 +369,9 @@ export function InsightsPage() {
                                 <p className="muted-text">{formatDateTime(session.result.completedAt, language)}</p>
                             </div>
                             <div className="history-metrics">
-                                <span>{session.result.wpm} {copy.common.wpm}</span>
-                                <span>{session.result.accuracy}%</span>
-                                <span>{session.result.consistency}%</span>
+                                <HistoryMetric icon={Gauge}>{session.result.wpm} {copy.common.wpm}</HistoryMetric>
+                                <HistoryMetric icon={ShieldCheck}>{session.result.accuracy}%</HistoryMetric>
+                                <HistoryMetric icon={CalendarClock}>{session.result.consistency}%</HistoryMetric>
                             </div>
                         </div>
                     ))}
