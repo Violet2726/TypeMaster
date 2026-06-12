@@ -4,6 +4,35 @@ import ChallengePage from '../ChallengePage';
 import { renderWithProvider } from '../../test/render-with-provider';
 
 describe('ChallengePage', () => {
+    test('renders a first-run challenge dashboard without placeholder metrics', async () => {
+        renderWithProvider(<ChallengePage />, {
+            storageState: {
+                'typemaster:v5:preferences': {
+                    language: 'en-US',
+                    lastConfig: {
+                        source: 'builtin',
+                        mode: 'time',
+                        durationSeconds: 30,
+                        wordCount: 25,
+                        includePunctuation: false,
+                        includeNumbers: false,
+                        aiTemplate: 'daily',
+                        difficulty: 'medium'
+                    }
+                },
+                'typemaster:v5:sessions-cache': []
+            }
+        });
+
+        expect((await screen.findAllByText('Your challenge status')).length).toBeGreaterThanOrEqual(1);
+        expect(screen.getAllByText('No result posted yet. Finish one round and your rank plus best status will appear here.').length).toBeGreaterThanOrEqual(1);
+        expect(screen.getAllByText('No same-level results yet. You can leave the first one.').length).toBeGreaterThanOrEqual(1);
+        expect(screen.queryByText('--')).not.toBeInTheDocument();
+        expect(screen.queryByText('0 WPM')).not.toBeInTheDocument();
+        expect(screen.queryByText('0%')).not.toBeInTheDocument();
+        expect(screen.getAllByRole('button', { name: 'Start challenge' }).length).toBeGreaterThan(1);
+    });
+
     test('renders daily challenge controls and leaderboard section', async () => {
         const challengeId = `daily-${new Date().toISOString().slice(0, 10)}`;
 
