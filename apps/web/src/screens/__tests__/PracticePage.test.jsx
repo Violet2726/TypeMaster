@@ -128,11 +128,38 @@ const idleTypingSession = {
 };
 
 describe('PracticePage', () => {
+    const originalMatchMedia = window.matchMedia;
+
+    function mockViewport(isMobile) {
+        window.matchMedia = vi.fn().mockImplementation((query) => ({
+            matches: query === '(max-width: 720px)' ? isMobile : false,
+            media: query,
+            onchange: null,
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn(),
+            addListener: vi.fn(),
+            removeListener: vi.fn(),
+            dispatchEvent: vi.fn()
+        }));
+    }
+
     beforeEach(() => {
+        vi.useRealTimers();
         resetMockNavigation();
         setMockNavigation({ route: '/practice' });
         Object.assign(mockStore, baseStore);
         Object.assign(mockTypingSession, idleTypingSession);
+        Object.values(mockTypingSession).forEach((value) => {
+            if (typeof value?.mockClear === 'function') {
+                value.mockClear();
+            }
+        });
+        window.matchMedia = originalMatchMedia;
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
+        window.matchMedia = originalMatchMedia;
     });
 
     test('carries the last result prescription into the next practice setup', () => {
@@ -193,5 +220,25 @@ describe('PracticePage', () => {
         expect(screen.getByText('This text repeats recent misses so the next round can clean up accuracy before adding pressure.')).toBeInTheDocument();
         expect(screen.getByText('92% Accuracy')).toBeInTheDocument();
         expect(screen.getByText('alpha / again')).toBeInTheDocument();
+    });
+
+    test('does not auto focus the typing input on mobile before the user starts', () => {
+        vi.useFakeTimers();
+        mockViewport(true);
+
+        render(<PracticePage />);
+        vi.advanceTimersByTime(200);
+
+        expect(mockTypingSession.focusInput).not.toHaveBeenCalled();
+    });
+
+    test('keeps desktop auto focus for ready built-in practice text', () => {
+        vi.useFakeTimers();
+        mockViewport(false);
+
+        render(<PracticePage />);
+        vi.advanceTimersByTime(200);
+
+        expect(mockTypingSession.focusInput).toHaveBeenCalledTimes(1);
     });
 });

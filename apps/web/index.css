@@ -8865,3 +8865,188 @@ body[data-theme='serika-light'] .history-metric-pill {
         font-size: 0.68rem;
     }
 }
+
+/* Practice mobile focus refinement */
+.practice-toolbar,
+.typing-stage {
+    border-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: saturate(180%) blur(22px);
+    -webkit-backdrop-filter: saturate(180%) blur(22px);
+}
+
+.practice-toolbar {
+    background:
+        linear-gradient(135deg, rgba(10, 132, 255, 0.1), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.068), rgba(255, 255, 255, 0.024)),
+        rgba(28, 28, 30, 0.76);
+}
+
+.typing-stage {
+    background:
+        linear-gradient(135deg, rgba(10, 132, 255, 0.09), transparent 38%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.062), rgba(255, 255, 255, 0.02)),
+        rgba(22, 22, 24, 0.8);
+}
+
+body[data-theme='serika-light'] .practice-toolbar,
+body[data-theme='serika-light'] .typing-stage {
+    border-color: rgba(60, 60, 67, 0.1);
+    background:
+        linear-gradient(135deg, rgba(0, 113, 227, 0.08), transparent 38%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 250, 255, 0.78)),
+        rgba(255, 255, 255, 0.86);
+}
+
+.practice-toolbar .segmented-group {
+    min-height: 2.62rem;
+    border-color: rgba(255, 255, 255, 0.08);
+    background: rgba(118, 118, 128, 0.18);
+}
+
+body[data-theme='serika-light'] .practice-toolbar .segmented-group {
+    border-color: rgba(60, 60, 67, 0.08);
+    background: rgba(118, 118, 128, 0.12);
+}
+
+.practice-toolbar .segment-btn {
+    min-height: 2.12rem;
+    border-radius: 999px;
+    transition:
+        background-color 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
+        color 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
+        transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.practice-toolbar .segment-btn.active,
+.practice-toolbar .segment-btn[aria-pressed='true'] {
+    background: rgba(255, 255, 255, 0.18);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.18),
+        0 8px 22px rgba(0, 0, 0, 0.14);
+}
+
+body[data-theme='serika-light'] .practice-toolbar .segment-btn.active,
+body[data-theme='serika-light'] .practice-toolbar .segment-btn[aria-pressed='true'] {
+    background: rgba(255, 255, 255, 0.86);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.92),
+        0 8px 18px rgba(0, 0, 0, 0.06);
+}
+
+.typing-stage .words-shell {
+    border-color: rgba(10, 132, 255, 0.32);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.012)),
+        rgba(7, 7, 9, 0.46);
+}
+
+.typing-stage .words-shell::before {
+    background: linear-gradient(180deg, rgba(13, 14, 17, 0.94), transparent);
+}
+
+.typing-stage .words-shell::after {
+    background: linear-gradient(0deg, rgba(13, 14, 17, 0.94), transparent);
+}
+
+.typing-stage .live-stat,
+.typing-ready-card {
+    border-color: rgba(255, 255, 255, 0.1);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02)),
+        rgba(118, 118, 128, 0.12);
+}
+
+body[data-theme='serika-light'] .typing-stage .words-shell,
+body[data-theme='serika-light'] .typing-stage .live-stat,
+body[data-theme='serika-light'] .typing-ready-card {
+    border-color: rgba(60, 60, 67, 0.1);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 255, 0.78)),
+        rgba(255, 255, 255, 0.82);
+}
+
+@media (max-width: 720px) {
+    .practice-page {
+        padding-top: clamp(2.2rem, 8vw, 2.9rem);
+    }
+
+    .practice-toolbar {
+        padding: 1rem;
+    }
+
+    .practice-toolbar__row {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 0.62rem;
+        align-items: start;
+    }
+
+    .practice-toolbar__row .ghost-btn {
+        width: auto;
+        min-height: 2.48rem;
+        padding-inline: 0.82rem;
+        white-space: nowrap;
+    }
+
+    .practice-toolbar .control-label {
+        padding-inline: 0.15rem;
+        font-size: 0.72rem;
+    }
+
+    .practice-toolbar .segmented-group {
+        min-height: 3rem;
+        padding: 0.24rem;
+    }
+
+    .practice-toolbar .segment-btn {
+        min-height: 2.46rem;
+        padding-inline: 0.92rem;
+    }
+
+    .typing-stage {
+        gap: 0.92rem;
+        padding: 1rem;
+    }
+
+    .typing-stage__head {
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .typing-stage .ghost-btn {
+        width: auto;
+        min-height: 2.48rem;
+        padding-inline: 0.82rem;
+        white-space: nowrap;
+    }
+
+    .typing-stage__head > .ghost-btn {
+        grid-column: 2;
+        grid-row: 1;
+        justify-self: end;
+        align-self: start;
+    }
+
+    .typing-stage .words-shell {
+        padding: 0.86rem;
+    }
+
+    .typing-stage .words-container {
+        height: calc(var(--typing-size) * var(--typing-line-height) * 3);
+    }
+
+    .typing-stage__footer {
+        gap: 0.72rem;
+    }
+
+    .typing-stage .live-stats {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .practice-page .sticky-action-bar {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 0.82rem;
+    }
+
+    .practice-page .sticky-action-bar .action-btn {
+        width: 100%;
+    }
+}

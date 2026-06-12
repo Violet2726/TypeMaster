@@ -167,6 +167,13 @@ export function usePracticePageModel({
 
     useEffect(() => {
         if ((config.source === 'builtin' || aiPracticeStatus === 'ready') && displayDraft?.id) {
+            const isMobileViewport = typeof window.matchMedia === 'function'
+                && window.matchMedia('(max-width: 720px)').matches;
+
+            if (isMobileViewport) {
+                return undefined;
+            }
+
             const timer = window.setTimeout(() => {
                 typingSession.focusInput();
             }, 120);
