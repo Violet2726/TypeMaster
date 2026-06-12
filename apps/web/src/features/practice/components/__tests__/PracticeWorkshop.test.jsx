@@ -38,6 +38,9 @@ describe('Practice workshop panels', () => {
             />
         );
 
+        expect(screen.getByText(copy.common.currentText)).toBeInTheDocument();
+        expect(screen.getByText(copy.practice.aiIdle)).toBeInTheDocument();
+
         fireEvent.change(screen.getByLabelText(copy.practice.templateLabel), {
             target: { value: 'business' }
         });

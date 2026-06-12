@@ -31,9 +31,13 @@ export function AIWorkshop({
     onUseBuiltin
 }) {
     const errorCopy = practiceError ? getErrorMessage(language, practiceError.code) : null;
+    const selectedTemplate = AI_TEMPLATES.find((template) => template.id === config.aiTemplate);
+    const selectedDifficulty = DIFFICULTY_OPTIONS.find((difficulty) => difficulty.id === config.difficulty);
+    const draftLabel = currentDraft?.sourceTextMeta?.source === 'ai' ? currentDraft.sourceTextMeta.label : copy.common.emptyValue;
+    const statusLabel = getStatusLabel(copy, aiPracticeStatus);
 
     return (
-        <section className="ai-custom-panel ai-custom-panel--ai">
+        <section className={`ai-custom-panel ai-custom-panel--ai ai-custom-panel--${aiPracticeStatus}`}>
             <div className="ai-custom-panel__head">
                 <span className="ai-custom-panel__icon" aria-hidden="true">
                     <Bot size={20} strokeWidth={2.25} />
@@ -41,53 +45,64 @@ export function AIWorkshop({
                 <div>
                     <p className="panel-kicker">{copy.practice.customTitle}</p>
                     <strong>{copy.practice.customTitle}</strong>
+                    <p className="muted-text">{copy.practice.customBody}</p>
                 </div>
                 <span className={`panel-badge badge-${aiPracticeStatus}`}>
                     <Sparkles aria-hidden="true" size={14} strokeWidth={2.2} />
-                    {getStatusLabel(copy, aiPracticeStatus)}
+                    {statusLabel}
                 </span>
             </div>
 
-            <p className="muted-text">{copy.practice.customBody}</p>
+            <div className="ai-custom-panel__body">
+                <div className="ai-custom-panel__spec">
+                    <div className="workshop-grid">
+                        <label className="field workshop-field">
+                            <span>
+                                <WandSparkles aria-hidden="true" size={15} strokeWidth={2.25} />
+                                {copy.practice.templateLabel}
+                            </span>
+                            <select value={config.aiTemplate} onChange={(event) => onConfigChange({ aiTemplate: event.target.value, source: 'ai' }, { risky: true, intent: 'config' })}>
+                                {AI_TEMPLATES.map((template) => (
+                                    <option key={template.id} value={template.id}>{getTemplateLabel(template, language)}</option>
+                                ))}
+                            </select>
+                        </label>
 
-            <div className="workshop-grid">
-                <label className="field workshop-field">
-                    <span>
-                        <WandSparkles aria-hidden="true" size={15} strokeWidth={2.25} />
-                        {copy.practice.templateLabel}
-                    </span>
-                    <select value={config.aiTemplate} onChange={(event) => onConfigChange({ aiTemplate: event.target.value, source: 'ai' }, { risky: true, intent: 'config' })}>
-                        {AI_TEMPLATES.map((template) => (
-                            <option key={template.id} value={template.id}>{getTemplateLabel(template, language)}</option>
-                        ))}
-                    </select>
-                </label>
-
-                <label className="field workshop-field">
-                    <span>
-                        <CircleCheck aria-hidden="true" size={15} strokeWidth={2.25} />
-                        {copy.practice.difficultyLabel}
-                    </span>
-                    <select value={config.difficulty} onChange={(event) => onConfigChange({ difficulty: event.target.value, source: 'ai' }, { risky: true, intent: 'config' })}>
-                        {DIFFICULTY_OPTIONS.map((difficulty) => (
-                            <option key={difficulty.id} value={difficulty.id}>{getDifficultyLabel(difficulty, language)}</option>
-                        ))}
-                    </select>
-                </label>
-            </div>
-
-            <div className="status-card status-card--workshop">
-                <div className="status-card__row">
-                    <div>
-                        <p className="summary-label">{copy.common.currentText}</p>
-                        <strong>{currentDraft?.sourceTextMeta?.source === 'ai' ? currentDraft.sourceTextMeta.label : copy.common.emptyValue}</strong>
-                    </div>
-                    <div>
-                        <p className="summary-label">{copy.common.status}</p>
-                        <strong>{getStatusLabel(copy, aiPracticeStatus)}</strong>
+                        <label className="field workshop-field">
+                            <span>
+                                <CircleCheck aria-hidden="true" size={15} strokeWidth={2.25} />
+                                {copy.practice.difficultyLabel}
+                            </span>
+                            <select value={config.difficulty} onChange={(event) => onConfigChange({ difficulty: event.target.value, source: 'ai' }, { risky: true, intent: 'config' })}>
+                                {DIFFICULTY_OPTIONS.map((difficulty) => (
+                                    <option key={difficulty.id} value={difficulty.id}>{getDifficultyLabel(difficulty, language)}</option>
+                                ))}
+                            </select>
+                        </label>
                     </div>
                 </div>
-                <p className="muted-text">{getStatusBody(copy, aiPracticeStatus)}</p>
+
+                <div className="ai-custom-panel__state" aria-live="polite">
+                    <div>
+                        <p className="summary-label">{copy.common.currentText}</p>
+                        <strong>{draftLabel}</strong>
+                        <span>{getStatusBody(copy, aiPracticeStatus)}</span>
+                    </div>
+                    <div className="ai-custom-panel__state-grid">
+                        <span>
+                            <small>{copy.common.status}</small>
+                            <strong>{statusLabel}</strong>
+                        </span>
+                        <span>
+                            <small>{copy.practice.templateLabel}</small>
+                            <strong>{selectedTemplate ? getTemplateLabel(selectedTemplate, language) : copy.common.emptyValue}</strong>
+                        </span>
+                        <span>
+                            <small>{copy.practice.difficultyLabel}</small>
+                            <strong>{selectedDifficulty ? getDifficultyLabel(selectedDifficulty, language) : copy.common.emptyValue}</strong>
+                        </span>
+                    </div>
+                </div>
             </div>
 
             {errorCopy && (
