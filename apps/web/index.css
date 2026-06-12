@@ -9012,8 +9012,27 @@ body[data-theme='serika-light'] .segment-btn:hover {
         0 20px 60px rgba(10, 132, 255, 0.11);
 }
 
+.typing-stage--unavailable .words-shell {
+    border-color: rgba(255, 214, 10, 0.24);
+    background:
+        linear-gradient(135deg, rgba(255, 214, 10, 0.08), transparent 48%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.048), rgba(255, 255, 255, 0.014)),
+        rgba(0, 0, 0, 0.24);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.055),
+        0 16px 46px rgba(255, 214, 10, 0.06);
+}
+
 body[data-theme='serika-light'] .typing-stage .words-shell {
     background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 255, 0.74)),
+        #ffffff;
+}
+
+body[data-theme='serika-light'] .typing-stage--unavailable .words-shell {
+    border-color: rgba(255, 159, 10, 0.22);
+    background:
+        linear-gradient(135deg, rgba(255, 159, 10, 0.08), transparent 48%),
         linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 255, 0.74)),
         #ffffff;
 }
@@ -9030,86 +9049,6 @@ body[data-theme='serika-light'] .typing-stage .words-shell {
 .typing-stage .live-stats {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.58rem;
-}
-
-.typing-ready-panel {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.58rem;
-}
-
-.typing-ready-card {
-    position: relative;
-    display: grid;
-    align-content: end;
-    gap: 0.2rem;
-    min-height: 4.75rem;
-    padding: 0.78rem 0.82rem;
-    overflow: hidden;
-    border: 1px solid var(--panel-stroke);
-    border-radius: 8px;
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.02)),
-        rgba(255, 255, 255, 0.035);
-}
-
-.typing-ready-card::before {
-    content: '';
-    position: absolute;
-    inset: 0 0 auto 0;
-    height: 0.18rem;
-    background: #ffd60a;
-}
-
-.typing-ready-card--source::before {
-    background: #8ecaff;
-}
-
-.typing-ready-card--action::before {
-    background: #99f2c0;
-}
-
-.typing-ready-card__icon {
-    position: absolute;
-    top: 0.72rem;
-    right: 0.76rem;
-    display: inline-grid;
-    width: 1.8rem;
-    height: 1.8rem;
-    place-items: center;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.07);
-    color: #ffd60a;
-}
-
-.typing-ready-card--source .typing-ready-card__icon {
-    color: #8ecaff;
-}
-
-.typing-ready-card--action .typing-ready-card__icon {
-    color: #99f2c0;
-}
-
-.typing-ready-card__value {
-    min-width: 0;
-    overflow-wrap: anywhere;
-    color: var(--text-strong);
-    font-family: var(--font-display);
-    font-size: 1rem;
-    font-weight: 760;
-    line-height: 1.15;
-}
-
-.typing-ready-card__label {
-    color: var(--text-dim);
-    font-size: 0.72rem;
-    font-weight: 720;
-}
-
-body[data-theme='serika-light'] .typing-ready-card {
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 255, 0.76)),
-        #ffffff;
 }
 
 .typing-stage .live-stat {
@@ -9244,36 +9183,6 @@ body[data-theme='serika-light'] .typing-ready-card {
 
     .typing-stage .live-stats {
         gap: 0.48rem;
-    }
-
-    .typing-ready-panel {
-        grid-template-columns: 1fr;
-        gap: 0.48rem;
-    }
-
-    .typing-ready-card {
-        min-height: 4.1rem;
-        padding: 0.62rem 0.58rem;
-    }
-
-    .typing-ready-card__icon {
-        top: 0.52rem;
-        right: 0.52rem;
-        width: 1.46rem;
-        height: 1.46rem;
-    }
-
-    .typing-ready-card__icon svg {
-        width: 0.88rem;
-        height: 0.88rem;
-    }
-
-    .typing-ready-card__value {
-        font-size: 0.9rem;
-    }
-
-    .typing-ready-card__label {
-        font-size: 0.66rem;
     }
 
     .typing-empty-state {
@@ -9945,8 +9854,7 @@ body[data-theme='serika-light'] .practice-toolbar .segment-btn[aria-pressed='tru
     background: linear-gradient(0deg, rgba(13, 14, 17, 0.94), transparent);
 }
 
-.typing-stage .live-stat,
-.typing-ready-card {
+.typing-stage .live-stat {
     border-color: rgba(255, 255, 255, 0.1);
     background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02)),
@@ -9954,8 +9862,7 @@ body[data-theme='serika-light'] .practice-toolbar .segment-btn[aria-pressed='tru
 }
 
 body[data-theme='serika-light'] .typing-stage .words-shell,
-body[data-theme='serika-light'] .typing-stage .live-stat,
-body[data-theme='serika-light'] .typing-ready-card {
+body[data-theme='serika-light'] .typing-stage .live-stat {
     border-color: rgba(60, 60, 67, 0.1);
     background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 255, 0.78)),

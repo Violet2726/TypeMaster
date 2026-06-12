@@ -34,17 +34,18 @@ function renderTypingArea(overrides = {}) {
         ...overrides
     };
 
-    render(<TypingArea {...props} />);
+    const result = render(<TypingArea {...props} />);
 
-    return { copy, props };
+    return { copy, props, ...result };
 }
 
 describe('TypingArea', () => {
     test('shows a preparation panel instead of live scores while text is locked', () => {
-        const { copy } = renderTypingArea();
+        const { container, copy } = renderTypingArea();
 
         expect(screen.getByText(copy.practice.wordsLockedTitle)).toBeInTheDocument();
         expect(screen.getAllByText(copy.practice.textPendingLabel).length).toBeGreaterThan(0);
+        expect(container.querySelector('.typing-ready-panel')).toBeNull();
         expect(screen.queryByText('100%')).not.toBeInTheDocument();
         expect(screen.queryByText('30')).not.toBeInTheDocument();
         expect(screen.queryByText(copy.common.wpm)).not.toBeInTheDocument();

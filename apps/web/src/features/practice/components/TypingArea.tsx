@@ -55,6 +55,7 @@ export function TypingArea({
     const isTypingUnavailable = isLocked || !words.length;
     const unavailableTitle = lockTitle || copy.practice.wordsLockedTitle;
     const unavailableBody = lockBody || copy.practice.wordsLockedBody;
+    const textAvailabilityLabel = isTypingUnavailable ? copy.practice.textPendingLabel : copy.practice.textReadyLabel;
     const liveStatItems = [
         {
             key: 'wpm',
@@ -78,32 +79,7 @@ export function TypingArea({
             label: mode === 'time' ? copy.practice.timeRemaining : copy.practice.timeElapsed
         }
     ];
-    const readyStateItems = [
-        {
-            key: 'status',
-            className: 'typing-ready-card--status',
-            icon: ShieldCheck,
-            value: isLocked ? copy.practice.textPendingLabel : copy.practice.textReadyLabel,
-            label: copy.common.status
-        },
-        {
-            key: 'source',
-            className: 'typing-ready-card--source',
-            icon: Gauge,
-            value: sourceLabel || copy.common.emptyValue,
-            label: copy.common.currentText
-        },
-        {
-            key: 'action',
-            className: 'typing-ready-card--action',
-            icon: Clock3,
-            value: mode === 'time' ? copy.common.timeMode : copy.common.wordsMode,
-            label: copy.practice.modeTitle
-        }
-    ];
-    const footerHint = isTypingUnavailable
-        ? unavailableBody
-        : getHintText(copy, status);
+    const footerHint = getHintText(copy, status);
 
     const renderedWords = useMemo(
         () => buildRenderedWords(words, typedHistory, currentInput, currentWordIndex),
@@ -241,7 +217,7 @@ export function TypingArea({
     }, [currentInput, currentWordIndex, isFocused, isLocked, layoutVersion, renderedWords, status, words]);
 
     return (
-        <section className="panel typing-stage">
+        <section className={`panel typing-stage ${isTypingUnavailable ? 'typing-stage--unavailable' : ''}`}>
             <div className="typing-stage__head">
                 <div className="typing-stage__source">
                     <span className="summary-label">{copy.common.currentText}</span>
@@ -252,8 +228,8 @@ export function TypingArea({
                     <span className={`panel-badge badge-${getBadgeStatus(status)}`}>
                         {copy.practice.sessionLabel}: {getSessionStatusText(copy, status)}
                     </span>
-                    <span className={`panel-badge badge-${isLocked ? 'stale' : 'ready'}`}>
-                        {isLocked ? copy.practice.textPendingLabel : copy.practice.textReadyLabel}
+                    <span className={`panel-badge badge-${isTypingUnavailable ? 'stale' : 'ready'}`}>
+                        {textAvailabilityLabel}
                     </span>
                 </div>
 
@@ -375,21 +351,9 @@ export function TypingArea({
                 )}
             </div>
 
-            <div className="typing-stage__footer">
-                <p className="muted-text typing-stage__hint">{footerHint}</p>
-                {isTypingUnavailable ? (
-                    <div className="typing-ready-panel">
-                        {readyStateItems.map(({ key, className, icon: Icon, value, label }) => (
-                            <div key={key} className={`typing-ready-card ${className}`}>
-                                <span className="typing-ready-card__icon" aria-hidden="true">
-                                    <Icon size={17} strokeWidth={2.25} />
-                                </span>
-                                <span className="typing-ready-card__value">{value}</span>
-                                <span className="typing-ready-card__label">{label}</span>
-                            </div>
-                        ))}
-                    </div>
-                ) : (
+            {!isTypingUnavailable && (
+                <div className="typing-stage__footer">
+                    <p className="muted-text typing-stage__hint">{footerHint}</p>
                     <div className="live-stats">
                         {liveStatItems.map(({ key, className, icon: Icon, value, label }) => (
                             <div key={key} className={`live-stat ${className}`}>
@@ -401,8 +365,8 @@ export function TypingArea({
                             </div>
                         ))}
                     </div>
-                )}
-            </div>
+                </div>
+            )}
         </section>
     );
 }
