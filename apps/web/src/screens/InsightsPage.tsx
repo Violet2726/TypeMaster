@@ -119,11 +119,30 @@ function TargetedProgress({ copy, trend }) {
 }
 
 function EmptyInsightsPreview({ copy, trainingCopy, onStart }) {
-    const previewItems = [
-        { icon: Trophy, label: copy.insights.bestWpm, value: copy.common.emptyValue, tone: 'best' },
-        { icon: LineChart, label: copy.insights.recentTrend, value: copy.common.emptyValue, tone: 'trend' },
-        { icon: Target, label: copy.insights.targetedTitle, value: copy.common.emptyValue, tone: 'target' },
-        { icon: Keyboard, label: copy.insights.keyboardZonesTitle, value: copy.common.emptyValue, tone: 'keyboard' }
+    const previewMetrics = [
+        { label: copy.insights.bestWpm, value: copy.common.emptyValue },
+        { label: copy.insights.recentTrend, value: copy.common.emptyValue },
+        { label: trainingCopy.insights.weekGoal, value: copy.common.emptyValue }
+    ];
+    const unlockItems = [
+        {
+            icon: LineChart,
+            label: trainingCopy.insights.radarTitle,
+            body: trainingCopy.insights.radarBody,
+            tone: 'radar'
+        },
+        {
+            icon: Keyboard,
+            label: copy.insights.keyboardZonesTitle,
+            body: copy.insights.keyboardZonesBody,
+            tone: 'keyboard'
+        },
+        {
+            icon: Trophy,
+            label: trainingCopy.insights.achievementsTitle,
+            body: trainingCopy.insights.achievementsBody,
+            tone: 'achievement'
+        }
     ];
 
     return (
@@ -148,19 +167,27 @@ function EmptyInsightsPreview({ copy, trainingCopy, onStart }) {
                         <strong>{trainingCopy.insights.weekGoal}</strong>
                     </div>
                 </div>
-                <div className="insights-empty-preview__grid">
-                    {previewItems.map(({ icon: Icon, label, value, tone }) => (
-                        <div key={label} className={`insights-empty-preview__item insights-empty-preview__item--${tone}`}>
-                            <Icon aria-hidden="true" size={17} strokeWidth={2.1} />
-                            <span>{label}</span>
-                            <strong>{value}</strong>
+                <div className="insights-empty-preview__metrics" aria-label={copy.insights.recentTrend}>
+                    {previewMetrics.map((item) => (
+                        <div key={item.label} className="insights-empty-preview__metric">
+                            <span>{item.label}</span>
+                            <strong>{item.value}</strong>
                         </div>
                     ))}
                 </div>
-                <div className="insights-empty-preview__rail" aria-hidden="true">
-                    <span />
-                    <span />
-                    <span />
+                <div className="insights-empty-preview__unlock-list">
+                    {unlockItems.map(({ icon: Icon, label, body, tone }, index) => (
+                        <div key={label} className={`insights-empty-preview__unlock insights-empty-preview__unlock--${tone}`}>
+                            <span className="insights-empty-preview__unlock-index">{String(index + 1).padStart(2, '0')}</span>
+                            <span className="insights-empty-preview__unlock-icon" aria-hidden="true">
+                                <Icon size={18} strokeWidth={2.2} />
+                            </span>
+                            <div>
+                                <strong>{label}</strong>
+                                <p>{body}</p>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
         </section>

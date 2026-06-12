@@ -33,8 +33,10 @@ describe('InsightsPage', () => {
         });
 
         expect(await screen.findByRole('heading', { name: 'No session history yet' })).toBeInTheDocument();
-        expect(screen.getByText('Weekly goal')).toBeInTheDocument();
+        expect(screen.getAllByText('Weekly goal').length).toBeGreaterThanOrEqual(1);
+        expect(screen.getAllByText('Growth radar').length).toBeGreaterThanOrEqual(1);
         expect(screen.getByText('Keyboard pressure')).toBeInTheDocument();
+        expect(screen.getByText('Achievement wall')).toBeInTheDocument();
 
         fireEvent.click(screen.getByRole('button', { name: 'Start practice' }));
 
