@@ -1,3 +1,4 @@
+import { Bot, CircleCheck, FileText, RefreshCw, Sparkles, WandSparkles } from 'lucide-react';
 import { AI_TEMPLATES, DIFFICULTY_OPTIONS, getDifficultyLabel, getTemplateLabel } from '@typemaster/domain';
 import { getErrorMessage } from '../../../i18n';
 
@@ -32,20 +33,29 @@ export function AIWorkshop({
     const errorCopy = practiceError ? getErrorMessage(language, practiceError.code) : null;
 
     return (
-        <section className="ai-custom-panel">
+        <section className="ai-custom-panel ai-custom-panel--ai">
             <div className="ai-custom-panel__head">
+                <span className="ai-custom-panel__icon" aria-hidden="true">
+                    <Bot size={20} strokeWidth={2.25} />
+                </span>
                 <div>
                     <p className="panel-kicker">{copy.practice.customTitle}</p>
                     <strong>{copy.practice.customTitle}</strong>
                 </div>
-                <span className={`panel-badge badge-${aiPracticeStatus}`}>{getStatusLabel(copy, aiPracticeStatus)}</span>
+                <span className={`panel-badge badge-${aiPracticeStatus}`}>
+                    <Sparkles aria-hidden="true" size={14} strokeWidth={2.2} />
+                    {getStatusLabel(copy, aiPracticeStatus)}
+                </span>
             </div>
 
             <p className="muted-text">{copy.practice.customBody}</p>
 
             <div className="workshop-grid">
-                <label className="field">
-                    <span>{copy.practice.templateLabel}</span>
+                <label className="field workshop-field">
+                    <span>
+                        <WandSparkles aria-hidden="true" size={15} strokeWidth={2.25} />
+                        {copy.practice.templateLabel}
+                    </span>
                     <select value={config.aiTemplate} onChange={(event) => onConfigChange({ aiTemplate: event.target.value, source: 'ai' }, { risky: true, intent: 'config' })}>
                         {AI_TEMPLATES.map((template) => (
                             <option key={template.id} value={template.id}>{getTemplateLabel(template, language)}</option>
@@ -53,8 +63,11 @@ export function AIWorkshop({
                     </select>
                 </label>
 
-                <label className="field">
-                    <span>{copy.practice.difficultyLabel}</span>
+                <label className="field workshop-field">
+                    <span>
+                        <CircleCheck aria-hidden="true" size={15} strokeWidth={2.25} />
+                        {copy.practice.difficultyLabel}
+                    </span>
                     <select value={config.difficulty} onChange={(event) => onConfigChange({ difficulty: event.target.value, source: 'ai' }, { risky: true, intent: 'config' })}>
                         {DIFFICULTY_OPTIONS.map((difficulty) => (
                             <option key={difficulty.id} value={difficulty.id}>{getDifficultyLabel(difficulty, language)}</option>
@@ -63,7 +76,7 @@ export function AIWorkshop({
                 </label>
             </div>
 
-            <div className="status-card">
+            <div className="status-card status-card--workshop">
                 <div className="status-card__row">
                     <div>
                         <p className="summary-label">{copy.common.currentText}</p>
@@ -91,6 +104,7 @@ export function AIWorkshop({
                     onClick={onGenerate}
                     disabled={aiPracticeStatus === 'loading'}
                 >
+                    <WandSparkles aria-hidden="true" size={18} strokeWidth={2.25} />
                     {aiPracticeStatus === 'stale'
                         ? copy.common.reGenerateAiText
                         : aiPracticeStatus === 'loading'
@@ -99,11 +113,13 @@ export function AIWorkshop({
                 </button>
                 {aiPracticeStatus === 'stale' && (
                     <button type="button" className="action-btn" onClick={onRestoreConfig}>
+                        <RefreshCw aria-hidden="true" size={18} strokeWidth={2.25} />
                         {copy.common.restoreLastConfig}
                     </button>
                 )}
                 {aiPracticeStatus === 'error' && (
                     <button type="button" className="action-btn" onClick={onUseBuiltin}>
+                        <FileText aria-hidden="true" size={18} strokeWidth={2.25} />
                         {copy.common.useBuiltIn}
                     </button>
                 )}
