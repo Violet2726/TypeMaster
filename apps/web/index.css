@@ -6600,12 +6600,14 @@ body[data-theme='serika-light'] .typing-stage .words-shell {
 
 /* Settings drawer polish refresh */
 .settings-overlay {
+    z-index: 80;
     background: rgba(0, 0, 0, 0.48);
     backdrop-filter: saturate(180%) blur(24px);
     -webkit-backdrop-filter: saturate(180%) blur(24px);
 }
 
 .settings-drawer {
+    z-index: 81;
     top: 0.55rem;
     right: 0.55rem;
     width: min(430px, calc(100vw - 1.1rem));
@@ -6820,8 +6822,8 @@ body[data-theme='serika-light'] .settings-group__items {
     .settings-drawer {
         inset: 0;
         width: 100vw;
-        height: 100%;
-        padding: 0.95rem 0.8rem 5.2rem;
+        height: 100dvh;
+        padding: 0.95rem 0.8rem calc(1.2rem + env(safe-area-inset-bottom, 0));
         border-radius: 0;
         border-inline: 0;
     }
@@ -6840,8 +6842,8 @@ body[data-theme='serika-light'] .settings-group__items {
     }
 
     .settings-drawer__scroll {
-        max-height: calc(100vh - 5.6rem);
-        padding-bottom: 1.4rem;
+        max-height: calc(100dvh - 5.6rem);
+        padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0));
     }
 
     .settings-row {
@@ -6855,6 +6857,10 @@ body[data-theme='serika-light'] .settings-group__items {
 
     .settings-data__actions {
         grid-template-columns: 1fr;
+    }
+
+    .app-shell.is-settings-open .mobile-tab-bar {
+        display: none;
     }
 }
 

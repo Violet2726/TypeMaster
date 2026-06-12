@@ -50,7 +50,7 @@ export function AppFrame({ children }: AppFrameProps) {
     ), [copy, isFocusedLayout, settings.language]);
 
     return (
-        <div className={`app-shell ${isFocusedLayout ? 'is-focus-layout' : ''}`}>
+        <div className={`app-shell ${isFocusedLayout ? 'is-focus-layout' : ''} ${settingsOpen ? 'is-settings-open' : ''}`}>
             <Header
                 settings={settings}
                 copy={copy}
