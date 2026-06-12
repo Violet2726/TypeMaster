@@ -10,6 +10,37 @@ describe('InsightsPage', () => {
         resetMockNavigation();
     });
 
+    test('renders the empty insights preview and starts a practice round', async () => {
+        renderWithProvider(<InsightsPage />, {
+            route: '/insights',
+            storageState: {
+                'typemaster:v5:preferences': {
+                    language: 'en-US',
+                    keyboardLayout: 'qwerty',
+                    lastConfig: {
+                        source: 'builtin',
+                        mode: 'time',
+                        durationSeconds: 30,
+                        wordCount: 25,
+                        includePunctuation: false,
+                        includeNumbers: false,
+                        aiTemplate: 'daily',
+                        difficulty: 'medium'
+                    }
+                },
+                'typemaster:v5:sessions-cache': []
+            }
+        });
+
+        expect(await screen.findByRole('heading', { name: 'No session history yet' })).toBeInTheDocument();
+        expect(screen.getByText('Weekly goal')).toBeInTheDocument();
+        expect(screen.getByText('Keyboard pressure')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Start practice' }));
+
+        await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith('/practice'));
+    });
+
     test('groups frequent error characters by keyboard area', async () => {
         renderWithProvider(<InsightsPage />, {
             route: '/insights',

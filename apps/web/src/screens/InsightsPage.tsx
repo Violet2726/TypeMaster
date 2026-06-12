@@ -120,10 +120,10 @@ function TargetedProgress({ copy, trend }) {
 
 function EmptyInsightsPreview({ copy, trainingCopy, onStart }) {
     const previewItems = [
-        { icon: Trophy, label: copy.insights.bestWpm, value: copy.common.emptyValue },
-        { icon: LineChart, label: copy.insights.recentTrend, value: copy.common.emptyValue },
-        { icon: Target, label: copy.insights.targetedTitle, value: copy.common.emptyValue },
-        { icon: Keyboard, label: copy.insights.keyboardZonesTitle, value: copy.common.emptyValue }
+        { icon: Trophy, label: copy.insights.bestWpm, value: copy.common.emptyValue, tone: 'best' },
+        { icon: LineChart, label: copy.insights.recentTrend, value: copy.common.emptyValue, tone: 'trend' },
+        { icon: Target, label: copy.insights.targetedTitle, value: copy.common.emptyValue, tone: 'target' },
+        { icon: Keyboard, label: copy.insights.keyboardZonesTitle, value: copy.common.emptyValue, tone: 'keyboard' }
     ];
 
     return (
@@ -139,21 +139,28 @@ function EmptyInsightsPreview({ copy, trainingCopy, onStart }) {
             </div>
 
             <div className="insights-empty-preview" aria-label={copy.nav.insights}>
-                <div className="insights-empty-preview__orb" aria-hidden="true">
-                    <LineChart aria-hidden="true" size={30} strokeWidth={2.1} />
+                <div className="insights-empty-preview__header">
+                    <span className="insights-empty-preview__icon" aria-hidden="true">
+                        <LineChart aria-hidden="true" size={20} strokeWidth={2.2} />
+                    </span>
+                    <div>
+                        <span className="summary-label">{trainingCopy.insights.radarTitle}</span>
+                        <strong>{trainingCopy.insights.weekGoal}</strong>
+                    </div>
                 </div>
                 <div className="insights-empty-preview__grid">
-                    {previewItems.map(({ icon: Icon, label, value }) => (
-                        <div key={label} className="insights-empty-preview__item">
+                    {previewItems.map(({ icon: Icon, label, value, tone }) => (
+                        <div key={label} className={`insights-empty-preview__item insights-empty-preview__item--${tone}`}>
                             <Icon aria-hidden="true" size={17} strokeWidth={2.1} />
                             <span>{label}</span>
                             <strong>{value}</strong>
                         </div>
                     ))}
                 </div>
-                <div className="insights-empty-preview__footer">
-                    <span className="summary-label">{trainingCopy.insights.radarTitle}</span>
-                    <strong>{trainingCopy.insights.weekGoal}</strong>
+                <div className="insights-empty-preview__rail" aria-hidden="true">
+                    <span />
+                    <span />
+                    <span />
                 </div>
             </div>
         </section>
