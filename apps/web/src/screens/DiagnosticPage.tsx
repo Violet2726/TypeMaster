@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckCircle2, Clock, Gauge, Play, Sparkles } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Clock, Gauge, Play, Sparkles } from 'lucide-react';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { useDiagnosticPageModel } from '../features/diagnostic/use-diagnostic-page-model';
 import { useDiagnosticPageStore } from '../store/app-state-selectors';
@@ -29,9 +29,14 @@ export function DiagnosticPage() {
     const activeStep = previewJourney.steps[currentStepIndex] || previewJourney.steps[0];
     const totalDurationSeconds = previewJourney.steps.reduce((total, step) => total + (step.config?.durationSeconds || 0), 0);
     const totalDurationMinutes = Math.max(1, Math.round(totalDurationSeconds / 60));
+    const remainingSteps = Math.max(0, previewJourney.steps.length - completedSteps);
+    const activeDurationSeconds = activeStep?.config?.durationSeconds || 0;
+    const progressStep = Math.min(previewJourney.steps.length, Math.max(0, completedSteps));
     const isChinese = store.language === 'zh-CN';
     const durationLabel = isChinese ? `${totalDurationMinutes} 分钟` : `${totalDurationMinutes} min`;
     const stepCountLabel = isChinese ? `${previewJourney.steps.length} 个步骤` : `${previewJourney.steps.length} steps`;
+    const activeDurationLabel = isChinese ? `${activeDurationSeconds} 秒` : `${activeDurationSeconds}s`;
+    const remainingLabel = isChinese ? `剩余 ${remainingSteps} 步` : `${remainingSteps} left`;
 
     return (
         <div className="page-stack diagnostic-page">
@@ -52,14 +57,20 @@ export function DiagnosticPage() {
                     </div>
                 </div>
                 <div className="diagnostic-hero__action">
-                    <div className="diagnostic-progress-ring" aria-label={trainingCopy.diagnostic.activeTitle}>
+                    <div className={`diagnostic-progress-ring diagnostic-progress-ring--step-${progressStep}`} aria-label={trainingCopy.diagnostic.activeTitle}>
                         <strong>{completedSteps}/{previewJourney.steps.length}</strong>
                         <span>{trainingCopy.diagnostic.activeTitle}</span>
                     </div>
-                    <button type="button" className="action-btn primary" onClick={handleStart}>
-                        <Play aria-hidden="true" size={18} strokeWidth={2.4} />
-                        {activeJourney ? trainingCopy.diagnostic.resume : trainingCopy.diagnostic.start}
-                    </button>
+                    <div className="diagnostic-hero__cta">
+                        <button type="button" className="action-btn primary" onClick={handleStart}>
+                            <Play aria-hidden="true" size={18} strokeWidth={2.4} />
+                            {activeJourney ? trainingCopy.diagnostic.resume : trainingCopy.diagnostic.start}
+                        </button>
+                        <div className="diagnostic-hero__next">
+                            <span>{trainingCopy.diagnostic.activeTitle}</span>
+                            <strong>{activeStep?.title || trainingCopy.diagnostic.stepTitle}</strong>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -113,6 +124,17 @@ export function DiagnosticPage() {
                     <div className="diagnostic-profile-card__focus">
                         <span>{activeJourney ? `${activeJourney.currentStepIndex + 1}/${activeJourney.steps.length}` : `${completedSteps}/${previewJourney.steps.length}`}</span>
                         <strong>{activeStep?.title || trainingCopy.diagnostic.stepTitle}</strong>
+                        <ArrowRight aria-hidden="true" size={18} strokeWidth={2.25} />
+                    </div>
+                    <div className="diagnostic-profile-card__stats" aria-label={trainingCopy.diagnostic.activeTitle}>
+                        <span>
+                            <Clock aria-hidden="true" size={15} strokeWidth={2.2} />
+                            {activeDurationLabel}
+                        </span>
+                        <span>
+                            <Sparkles aria-hidden="true" size={15} strokeWidth={2.2} />
+                            {remainingLabel}
+                        </span>
                     </div>
                 </div>
             </section>

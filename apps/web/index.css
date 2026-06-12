@@ -4509,6 +4509,7 @@ body[data-theme='serika-light'] .home-action-card::after {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
+    gap: 1.25rem;
     min-height: 12rem;
     padding: 1.45rem;
     overflow: hidden;
@@ -4518,10 +4519,11 @@ body[data-theme='serika-light'] .home-action-card::after {
 }
 
 .diagnostic-hero h1 {
-    max-width: 49rem;
-    font-size: clamp(2.75rem, 5.4vw, 4.7rem);
-    line-height: 0.96;
+    max-width: 52rem;
+    font-size: 3.85rem;
+    line-height: 1;
     letter-spacing: 0;
+    text-wrap: balance;
 }
 
 .diagnostic-hero .muted-text {
@@ -4561,7 +4563,34 @@ body[data-theme='serika-light'] .home-action-card::after {
     gap: 0.8rem;
 }
 
+.diagnostic-hero__cta {
+    display: grid;
+    gap: 0.62rem;
+    min-width: 11.5rem;
+}
+
+.diagnostic-hero__next {
+    display: grid;
+    gap: 0.16rem;
+    padding: 0.62rem 0.72rem;
+    border: 1px solid var(--panel-stroke);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.045);
+}
+
+.diagnostic-hero__next span {
+    color: var(--text-dim);
+    font-size: 0.68rem;
+    font-weight: 720;
+}
+
+.diagnostic-hero__next strong {
+    color: var(--text-strong);
+    font-size: 0.84rem;
+}
+
 .diagnostic-progress-ring {
+    --diagnostic-progress: 0%;
     display: grid;
     place-items: center;
     width: 6.3rem;
@@ -4570,10 +4599,22 @@ body[data-theme='serika-light'] .home-action-card::after {
     border: 1px solid rgba(10, 132, 255, 0.34);
     background:
         radial-gradient(circle at 50% 50%, var(--bg-panel) 58%, transparent 59%),
-        conic-gradient(var(--main-color) 0 14%, rgba(255, 255, 255, 0.12) 14% 100%);
+        conic-gradient(var(--main-color) 0 var(--diagnostic-progress), rgba(255, 255, 255, 0.12) var(--diagnostic-progress) 100%);
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.09),
         0 18px 46px rgba(10, 132, 255, 0.18);
+}
+
+.diagnostic-progress-ring--step-1 {
+    --diagnostic-progress: 34%;
+}
+
+.diagnostic-progress-ring--step-2 {
+    --diagnostic-progress: 67%;
+}
+
+.diagnostic-progress-ring--step-3 {
+    --diagnostic-progress: 100%;
 }
 
 .diagnostic-progress-ring strong {
@@ -4607,6 +4648,7 @@ body[data-theme='serika-light'] .home-action-card::after {
 }
 
 .diagnostic-step {
+    position: relative;
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
     align-items: center;
@@ -4618,6 +4660,27 @@ body[data-theme='serika-light'] .home-action-card::after {
     background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018)),
         var(--bg-soft);
+    transition:
+        background-color 0.18s ease,
+        border-color 0.18s ease,
+        transform 0.18s ease;
+}
+
+.diagnostic-step::before {
+    content: '';
+    position: absolute;
+    inset: 0.86rem auto 0.86rem 0;
+    width: 0.18rem;
+    border-radius: 999px;
+    background: var(--panel-stroke);
+    opacity: 0.62;
+}
+
+.diagnostic-step:hover {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.072), rgba(255, 255, 255, 0.025)),
+        var(--bg-soft);
+    transform: translateY(-1px);
 }
 
 .diagnostic-step__index {
@@ -4634,9 +4697,18 @@ body[data-theme='serika-light'] .home-action-card::after {
     font-variant-numeric: tabular-nums;
 }
 
+.diagnostic-step__content {
+    min-width: 0;
+}
+
 .diagnostic-step--active {
     border-color: rgba(10, 132, 255, 0.42);
     box-shadow: 0 16px 44px rgba(10, 132, 255, 0.1);
+}
+
+.diagnostic-step--active::before {
+    background: var(--main-color);
+    opacity: 1;
 }
 
 .diagnostic-step--active .diagnostic-step__index,
@@ -4653,6 +4725,11 @@ body[data-theme='serika-light'] .home-action-card::after {
     color: #7ee198;
 }
 
+.diagnostic-step--complete::before {
+    background: #34c759;
+    opacity: 0.95;
+}
+
 .diagnostic-step__title-row {
     display: flex;
     align-items: center;
@@ -4664,11 +4741,13 @@ body[data-theme='serika-light'] .home-action-card::after {
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    flex-wrap: wrap;
     gap: 0.45rem;
     flex: 0 0 auto;
 }
 
 .diagnostic-step__title-row strong {
+    min-width: 0;
     color: var(--text-strong);
     font-size: 1.02rem;
 }
@@ -4685,7 +4764,7 @@ body[data-theme='serika-light'] .home-action-card::after {
 .diagnostic-profile-card {
     display: grid;
     align-content: start;
-    gap: 0.72rem;
+    gap: 0.76rem;
     overflow: hidden;
     background:
         linear-gradient(145deg, rgba(10, 132, 255, 0.12), transparent 52%),
@@ -4705,14 +4784,15 @@ body[data-theme='serika-light'] .home-action-card::after {
 }
 
 .diagnostic-profile-card h2 {
-    font-size: clamp(1.75rem, 3vw, 2.45rem);
+    font-size: 2.2rem;
     line-height: 1.02;
     letter-spacing: 0;
+    text-wrap: balance;
 }
 
 .diagnostic-profile-card__focus {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
     gap: 0.7rem;
     margin-top: 0.25rem;
@@ -4738,6 +4818,36 @@ body[data-theme='serika-light'] .home-action-card::after {
     color: var(--text-strong);
 }
 
+.diagnostic-profile-card__focus svg {
+    color: var(--text-dim);
+}
+
+.diagnostic-profile-card__stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.52rem;
+}
+
+.diagnostic-profile-card__stats span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.34rem;
+    min-height: 2.2rem;
+    padding: 0.4rem 0.58rem;
+    border: 1px solid var(--panel-stroke);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.045);
+    color: var(--text-strong);
+    font-size: 0.76rem;
+    font-weight: 730;
+    white-space: nowrap;
+}
+
+.diagnostic-profile-card__stats svg {
+    color: #8ecaff;
+}
+
 body[data-theme='serika-light'] .diagnostic-hero,
 body[data-theme='serika-light'] .diagnostic-step,
 body[data-theme='serika-light'] .diagnostic-profile-card {
@@ -4751,6 +4861,12 @@ body[data-theme='serika-light'] .diagnostic-step__index {
     border-color: rgba(10, 132, 255, 0.18);
 }
 
+body[data-theme='serika-light'] .diagnostic-hero__next,
+body[data-theme='serika-light'] .diagnostic-profile-card__focus,
+body[data-theme='serika-light'] .diagnostic-profile-card__stats span {
+    background: rgba(255, 255, 255, 0.76);
+}
+
 @media (max-width: 900px) {
     .diagnostic-hero,
     .diagnostic-layout {
@@ -4759,6 +4875,10 @@ body[data-theme='serika-light'] .diagnostic-step__index {
 
     .diagnostic-hero__action {
         justify-content: space-between;
+    }
+
+    .diagnostic-hero__cta {
+        min-width: min(15rem, 100%);
     }
 }
 
@@ -4771,10 +4891,12 @@ body[data-theme='serika-light'] .diagnostic-step__index {
     .diagnostic-hero {
         min-height: auto;
         padding: 1rem;
+        gap: 0.92rem;
     }
 
     .diagnostic-hero h1 {
-        font-size: clamp(2.35rem, 12vw, 3.05rem);
+        font-size: 2.55rem;
+        line-height: 1.04;
     }
 
     .diagnostic-hero__action {
@@ -4786,6 +4908,10 @@ body[data-theme='serika-light'] .diagnostic-step__index {
     .diagnostic-hero__action .action-btn {
         width: 100%;
         min-height: 2.85rem;
+    }
+
+    .diagnostic-hero__next {
+        padding: 0.56rem 0.64rem;
     }
 
     .diagnostic-progress-ring {
@@ -4832,6 +4958,14 @@ body[data-theme='serika-light'] .diagnostic-step__index {
         min-height: 1.9rem;
         padding-inline: 0.55rem;
         font-size: 0.68rem;
+    }
+
+    .diagnostic-profile-card h2 {
+        font-size: 1.72rem;
+    }
+
+    .diagnostic-profile-card__stats {
+        grid-template-columns: 1fr;
     }
 }
 
