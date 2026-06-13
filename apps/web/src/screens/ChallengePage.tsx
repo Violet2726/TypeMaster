@@ -1,6 +1,6 @@
 'use client';
 
-import { BarChart3, Gauge, Medal, ShieldCheck, Trophy } from 'lucide-react';
+import { ArrowRight, BarChart3, Gauge, Medal, ShieldCheck, Sparkles, Trophy } from 'lucide-react';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { useChallengePageModel } from '../features/challenge/use-challenge-page-model';
 import { ChallengeTrendChart } from '../features/challenge/components/ChallengeTrendChart';
@@ -89,6 +89,60 @@ function ChallengeFirstRunPanel({ title, headline, body, items }) {
     );
 }
 
+function ChallengeStarterPanel({ challenge, facts, onStart, trainingCopy, items }) {
+    return (
+        <section className="panel challenge-starter-panel" aria-label={trainingCopy.challenge.kicker}>
+            <div className="challenge-starter-panel__copy">
+                <span className="challenge-starter-panel__mark" aria-hidden="true">
+                    <Trophy size={24} strokeWidth={2.25} />
+                </span>
+                <p className="panel-kicker">{trainingCopy.challenge.kicker}</p>
+                <h1>{challenge?.title || trainingCopy.challenge.title}</h1>
+                <p className="lead-text">{challenge?.summary || trainingCopy.challenge.body}</p>
+                {facts.length > 0 && (
+                    <div className="challenge-hero__facts" aria-label={trainingCopy.challenge.kicker}>
+                        {facts.map((fact) => (
+                            <span key={fact} className="challenge-fact">{fact}</span>
+                        ))}
+                    </div>
+                )}
+                <button type="button" className="action-btn primary challenge-starter-panel__cta" onClick={onStart}>
+                    {trainingCopy.challenge.cta}
+                    <ArrowRight aria-hidden="true" size={18} strokeWidth={2.2} />
+                </button>
+            </div>
+
+            <aside className="challenge-starter-brief" aria-label={trainingCopy.challenge.statusTitle}>
+                <div className="challenge-starter-brief__head">
+                    <span className="challenge-starter-brief__icon" aria-hidden="true">
+                        <Sparkles size={20} strokeWidth={2.25} />
+                    </span>
+                    <div>
+                        <p className="summary-label">{trainingCopy.challenge.statusTitle}</p>
+                        <strong>{trainingCopy.challenge.statusPreviewTitle}</strong>
+                        <span>{trainingCopy.challenge.strategyIdle}</span>
+                    </div>
+                </div>
+
+                <div className="challenge-starter-unlocks">
+                    {items.map(({ body, icon: Icon, label, value }) => (
+                        <div key={label} className="challenge-starter-unlock-row">
+                            <span aria-hidden="true">
+                                <Icon size={16} strokeWidth={2.25} />
+                            </span>
+                            <div>
+                                <small>{label}</small>
+                                <strong>{value}</strong>
+                                <p>{body}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </aside>
+        </section>
+    );
+}
+
 export function ChallengePage() {
     const navigate = useAppNavigate();
     const store = useChallengePageStore();
@@ -118,6 +172,7 @@ export function ChallengePage() {
     const hasChallengeResult = Boolean(latestChallengeSession);
     const hasPeerResults = peerLeaderboard.length > 0;
     const hasReplay = challengeSessions.length > 0;
+    const isChallengeStarter = !hasChallengeResult && !hasPeerResults && !hasReplay && leaderboard.length === 0;
     const challengeEmptyItems = [
         { label: copy.result.challengeRankLabel, value: trainingCopy.challenge.leaderboard },
         { label: copy.result.challengeBestLabel, value: trainingCopy.challenge.bestRunLabel },
@@ -153,27 +208,37 @@ export function ChallengePage() {
     ];
 
     return (
-        <div className="page-stack challenge-page">
-            <section className="panel insights-header challenge-hero">
-                <div className="insights-header__body">
-                    <p className="panel-kicker">{trainingCopy.challenge.kicker}</p>
-                    <h1>{dailyChallenge?.title || trainingCopy.challenge.title}</h1>
-                    <p className="muted-text">{dailyChallenge?.summary || trainingCopy.challenge.body}</p>
-                    {challengeFacts.length > 0 && (
-                        <div className="challenge-hero__facts" aria-label={trainingCopy.challenge.kicker}>
-                            {challengeFacts.map((fact) => (
-                                <span key={fact} className="challenge-fact">{fact}</span>
-                            ))}
-                        </div>
-                    )}
-                </div>
-                <button type="button" className="action-btn primary" onClick={handleStart}>
-                    <Trophy aria-hidden="true" size={18} strokeWidth={2.2} />
-                    {latestChallengeSession ? trainingCopy.challenge.retryCta : trainingCopy.challenge.cta}
-                </button>
-            </section>
+        <div className={`page-stack challenge-page${isChallengeStarter ? ' challenge-page--starter' : ''}`}>
+            {isChallengeStarter ? (
+                <ChallengeStarterPanel
+                    challenge={dailyChallenge}
+                    facts={challengeFacts}
+                    items={firstRunItems}
+                    onStart={handleStart}
+                    trainingCopy={trainingCopy}
+                />
+            ) : (
+                <section className="panel insights-header challenge-hero">
+                    <div className="insights-header__body">
+                        <p className="panel-kicker">{trainingCopy.challenge.kicker}</p>
+                        <h1>{dailyChallenge?.title || trainingCopy.challenge.title}</h1>
+                        <p className="muted-text">{dailyChallenge?.summary || trainingCopy.challenge.body}</p>
+                        {challengeFacts.length > 0 && (
+                            <div className="challenge-hero__facts" aria-label={trainingCopy.challenge.kicker}>
+                                {challengeFacts.map((fact) => (
+                                    <span key={fact} className="challenge-fact">{fact}</span>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    <button type="button" className="action-btn primary" onClick={handleStart}>
+                        <Trophy aria-hidden="true" size={18} strokeWidth={2.2} />
+                        {latestChallengeSession ? trainingCopy.challenge.retryCta : trainingCopy.challenge.cta}
+                    </button>
+                </section>
+            )}
 
-            {!hasChallengeResult && !hasPeerResults ? (
+            {!isChallengeStarter && (!hasChallengeResult && !hasPeerResults ? (
                 <ChallengeFirstRunPanel
                     title={trainingCopy.challenge.statusTitle}
                     headline={trainingCopy.challenge.statusPreviewTitle}
@@ -181,108 +246,109 @@ export function ChallengePage() {
                     items={firstRunItems}
                 />
             ) : (
-            <section className="insights-overview-grid">
-                <div className="panel insights-latest-card challenge-status-card">
-                    <p className="panel-kicker">{trainingCopy.challenge.statusTitle}</p>
-                    <h2>{account?.displayName || 'Guest'}</h2>
-                    <p className="lead-text">{latestChallengeSession ? trainingCopy.challenge.statusReady : trainingCopy.challenge.statusEmpty}</p>
-                    {hasChallengeResult ? (
-                        <>
-                            <div className="result-metrics-strip challenge-metrics-grid" aria-label={trainingCopy.challenge.statusTitle}>
-                                <div className="result-item challenge-metric">
-                                    <span className="result-item-label">{copy.result.challengeRankLabel}</span>
-                                    <span className="result-item-value">{personalStanding ? `#${personalStanding.rank}` : copy.common.emptyValue}</span>
-                                </div>
-                                <div className="result-item challenge-metric">
-                                    <span className="result-item-label">{copy.result.challengeEntriesLabel}</span>
-                                    <span className="result-item-value">{leaderboard.length}</span>
-                                </div>
-                                <div className="result-item challenge-metric">
-                                    <span className="result-item-label">{copy.result.challengeBeatLabel}</span>
-                                    <span className="result-item-value">{personalStanding ? `${personalStanding.beatPercent}%` : copy.common.emptyValue}</span>
-                                </div>
-                                <div className="result-item challenge-metric">
-                                    <span className="result-item-label">{copy.result.challengeBestLabel}</span>
-                                    <span className="result-item-value">
-                                        {personalBest.isPersonalBest
-                                            ? copy.result.challengeBestFresh
-                                            : personalBest.gapWpm > 0
-                                                ? `-${personalBest.gapWpm} ${copy.common.wpm}`
-                                                : personalBest.gapAccuracy > 0
-                                                    ? `-${personalBest.gapAccuracy}%`
-                                                    : copy.common.emptyValue}
-                                    </span>
-                                </div>
-                            </div>
-                            <p className="muted-text">{personalNote}</p>
-                            <div className="results-actions">
-                                <button type="button" className="action-btn" onClick={() => navigate('/insights')}>
-                                    <BarChart3 aria-hidden="true" size={17} strokeWidth={2.2} />
-                                    {copy.common.viewInsights}
-                                </button>
-                            </div>
-                        </>
-                    ) : (
-                        <ChallengeEmptyStatus
-                            title={trainingCopy.challenge.statusTitle}
-                            headline={trainingCopy.challenge.statusPreviewTitle}
-                            body={trainingCopy.challenge.statusEmpty}
-                            icon={Trophy}
-                            items={challengeEmptyItems}
-                        />
-                    )}
-                </div>
-
-                <div className="panel insights-latest-card challenge-status-card">
-                    <p className="panel-kicker">{trainingCopy.challenge.peerTitle}</p>
-                    <h2>{skillProfile?.level?.label || trainingCopy.challenge.peerTitle}</h2>
-                    <p className="lead-text">{trainingCopy.challenge.peerBody}</p>
-                    {hasPeerResults ? (
-                        <>
-                            <div className="result-metrics-strip challenge-metrics-grid challenge-metrics-grid--peer" aria-label={trainingCopy.challenge.peerTitle}>
-                                <div className="result-item challenge-metric">
-                                    <span className="result-item-label">{copy.result.challengeRankLabel}</span>
-                                    <span className="result-item-value">{peerStanding ? `#${peerStanding.rank}` : copy.common.emptyValue}</span>
-                                </div>
-                                <div className="result-item challenge-metric">
-                                    <span className="result-item-label">{copy.result.challengeEntriesLabel}</span>
-                                    <span className="result-item-value">{peerLeaderboard.length}</span>
-                                </div>
-                            </div>
-                        <div className="history-table">
-                            {peerLeaderboard.slice(0, 3).map((entry, index) => (
-                                <div key={entry.id} className="history-row challenge-score-row">
-                                    <div className="challenge-row-main">
-                                        <span className={`challenge-rank-chip${index === 0 ? ' challenge-rank-chip--top' : ''}`}>
-                                            #{index + 1}
+                <section className="insights-overview-grid">
+                    <div className="panel insights-latest-card challenge-status-card">
+                        <p className="panel-kicker">{trainingCopy.challenge.statusTitle}</p>
+                        <h2>{account?.displayName || 'Guest'}</h2>
+                        <p className="lead-text">{latestChallengeSession ? trainingCopy.challenge.statusReady : trainingCopy.challenge.statusEmpty}</p>
+                        {hasChallengeResult ? (
+                            <>
+                                <div className="result-metrics-strip challenge-metrics-grid" aria-label={trainingCopy.challenge.statusTitle}>
+                                    <div className="result-item challenge-metric">
+                                        <span className="result-item-label">{copy.result.challengeRankLabel}</span>
+                                        <span className="result-item-value">{personalStanding ? `#${personalStanding.rank}` : copy.common.emptyValue}</span>
+                                    </div>
+                                    <div className="result-item challenge-metric">
+                                        <span className="result-item-label">{copy.result.challengeEntriesLabel}</span>
+                                        <span className="result-item-value">{leaderboard.length}</span>
+                                    </div>
+                                    <div className="result-item challenge-metric">
+                                        <span className="result-item-label">{copy.result.challengeBeatLabel}</span>
+                                        <span className="result-item-value">{personalStanding ? `${personalStanding.beatPercent}%` : copy.common.emptyValue}</span>
+                                    </div>
+                                    <div className="result-item challenge-metric">
+                                        <span className="result-item-label">{copy.result.challengeBestLabel}</span>
+                                        <span className="result-item-value">
+                                            {personalBest.isPersonalBest
+                                                ? copy.result.challengeBestFresh
+                                                : personalBest.gapWpm > 0
+                                                    ? `-${personalBest.gapWpm} ${copy.common.wpm}`
+                                                    : personalBest.gapAccuracy > 0
+                                                        ? `-${personalBest.gapAccuracy}%`
+                                                        : copy.common.emptyValue}
                                         </span>
-                                        <div className="history-row__meta">
-                                            <strong>{entry.displayName}</strong>
-                                            <p className="muted-text">{new Date(entry.createdAt).toLocaleString(language)}</p>
+                                    </div>
+                                </div>
+                                <p className="muted-text">{personalNote}</p>
+                                <div className="results-actions">
+                                    <button type="button" className="action-btn" onClick={() => navigate('/insights')}>
+                                        <BarChart3 aria-hidden="true" size={17} strokeWidth={2.2} />
+                                        {copy.common.viewInsights}
+                                    </button>
+                                </div>
+                            </>
+                        ) : (
+                            <ChallengeEmptyStatus
+                                title={trainingCopy.challenge.statusTitle}
+                                headline={trainingCopy.challenge.statusPreviewTitle}
+                                body={trainingCopy.challenge.statusEmpty}
+                                icon={Trophy}
+                                items={challengeEmptyItems}
+                            />
+                        )}
+                    </div>
+
+                    <div className="panel insights-latest-card challenge-status-card">
+                        <p className="panel-kicker">{trainingCopy.challenge.peerTitle}</p>
+                        <h2>{skillProfile?.level?.label || trainingCopy.challenge.peerTitle}</h2>
+                        <p className="lead-text">{trainingCopy.challenge.peerBody}</p>
+                        {hasPeerResults ? (
+                            <>
+                                <div className="result-metrics-strip challenge-metrics-grid challenge-metrics-grid--peer" aria-label={trainingCopy.challenge.peerTitle}>
+                                    <div className="result-item challenge-metric">
+                                        <span className="result-item-label">{copy.result.challengeRankLabel}</span>
+                                        <span className="result-item-value">{peerStanding ? `#${peerStanding.rank}` : copy.common.emptyValue}</span>
+                                    </div>
+                                    <div className="result-item challenge-metric">
+                                        <span className="result-item-label">{copy.result.challengeEntriesLabel}</span>
+                                        <span className="result-item-value">{peerLeaderboard.length}</span>
+                                    </div>
+                                </div>
+                            <div className="history-table">
+                                {peerLeaderboard.slice(0, 3).map((entry, index) => (
+                                    <div key={entry.id} className="history-row challenge-score-row">
+                                        <div className="challenge-row-main">
+                                            <span className={`challenge-rank-chip${index === 0 ? ' challenge-rank-chip--top' : ''}`}>
+                                                #{index + 1}
+                                            </span>
+                                            <div className="history-row__meta">
+                                                <strong>{entry.displayName}</strong>
+                                                <p className="muted-text">{new Date(entry.createdAt).toLocaleString(language)}</p>
+                                            </div>
+                                        </div>
+                                        <div className="history-metrics">
+                                            <ChallengeMetricPill icon={Gauge}>{entry.wpm} {copy.common.wpm}</ChallengeMetricPill>
+                                            <ChallengeMetricPill icon={ShieldCheck} tone="accuracy">{entry.accuracy}%</ChallengeMetricPill>
                                         </div>
                                     </div>
-                                    <div className="history-metrics">
-                                        <ChallengeMetricPill icon={Gauge}>{entry.wpm} {copy.common.wpm}</ChallengeMetricPill>
-                                        <ChallengeMetricPill icon={ShieldCheck} tone="accuracy">{entry.accuracy}%</ChallengeMetricPill>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                        </>
-                    ) : (
-                        <ChallengeEmptyStatus
-                            title={trainingCopy.challenge.peerTitle}
-                            headline={trainingCopy.challenge.peerPreviewTitle}
-                            body={trainingCopy.challenge.peerEmpty}
-                            icon={Medal}
-                            tone="peer"
-                            items={peerEmptyItems}
-                        />
-                    )}
-                </div>
-            </section>
-            )}
+                                ))}
+                            </div>
+                            </>
+                        ) : (
+                            <ChallengeEmptyStatus
+                                title={trainingCopy.challenge.peerTitle}
+                                headline={trainingCopy.challenge.peerPreviewTitle}
+                                body={trainingCopy.challenge.peerEmpty}
+                                icon={Medal}
+                                tone="peer"
+                                items={peerEmptyItems}
+                            />
+                        )}
+                    </div>
+                </section>
+            ))}
 
+            {!isChallengeStarter && (
             <section className="panel challenge-replay-section">
                 <div className="panel-head">
                     <div>
@@ -352,7 +418,9 @@ export function ChallengePage() {
                     </div>
                 )}
             </section>
+            )}
 
+            {!isChallengeStarter && (
             <section className="panel">
                 <div className="panel-head">
                     <div>
@@ -391,6 +459,7 @@ export function ChallengePage() {
                     <p className="muted-text">{trainingCopy.challenge.empty}</p>
                 )}
             </section>
+            )}
         </div>
     );
 }

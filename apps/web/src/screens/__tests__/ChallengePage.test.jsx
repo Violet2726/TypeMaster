@@ -24,10 +24,10 @@ describe('ChallengePage', () => {
             }
         });
 
-        const firstRunPanel = await screen.findByLabelText('Your challenge status');
+        const starterPanel = await screen.findByLabelText('Daily challenge');
 
-        expect(firstRunPanel).toHaveClass('challenge-first-run-panel');
-        expect(screen.getAllByText('Your challenge status')).toHaveLength(1);
+        expect(starterPanel).toHaveClass('challenge-starter-panel');
+        expect(screen.getByText('Your challenge status')).toBeInTheDocument();
         expect(screen.getAllByText('No result posted yet. Finish one round and your rank plus best status will appear here.').length).toBeGreaterThanOrEqual(1);
         expect(screen.getAllByText('No same-level results yet. You can leave the first one.').length).toBeGreaterThanOrEqual(1);
         expect(screen.getByText('Waiting for your first mark')).toBeInTheDocument();
@@ -36,6 +36,8 @@ describe('ChallengePage', () => {
         expect(screen.queryByText('0 WPM')).not.toBeInTheDocument();
         expect(screen.queryByText('0%')).not.toBeInTheDocument();
         expect(screen.getAllByRole('button', { name: 'Start challenge' })).toHaveLength(1);
+        expect(screen.queryByRole('heading', { name: 'Today\'s replay' })).not.toBeInTheDocument();
+        expect(screen.queryByRole('heading', { name: 'Leaderboard' })).not.toBeInTheDocument();
     });
 
     test('renders daily challenge controls and leaderboard section', async () => {
