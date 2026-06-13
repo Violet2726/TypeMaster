@@ -15,6 +15,60 @@ function CoachSignal({ icon: Icon, label, value, tone }) {
     );
 }
 
+function CoachStarterPanel({ copy, onStart, onInsights }) {
+    const starterSteps = copy.coach.pathSteps.slice(0, 3);
+
+    return (
+        <section className="panel coach-starter-panel" aria-label={copy.coach.title}>
+            <div className="coach-starter-panel__copy">
+                <span className="coach-hero__icon" aria-hidden="true">
+                    <Sparkles size={26} strokeWidth={2.2} />
+                </span>
+                <p className="panel-kicker">{copy.coach.kicker}</p>
+                <h1>{copy.coach.title}</h1>
+                <p className="lead-text">{copy.coach.body}</p>
+                <div className="coach-hero__actions">
+                    <button type="button" className="action-btn primary" onClick={onStart}>
+                        <Keyboard aria-hidden="true" size={18} strokeWidth={2.25} />
+                        {copy.coach.primaryAction}
+                    </button>
+                    <button type="button" className="action-btn secondary" onClick={onInsights}>
+                        <LineChart aria-hidden="true" size={18} strokeWidth={2.25} />
+                        {copy.coach.secondaryAction}
+                    </button>
+                </div>
+            </div>
+
+            <aside className="coach-starter-brief" aria-label={copy.coach.latestTitle}>
+                <div className="coach-starter-brief__head">
+                    <span className="coach-brief-card__glyph" aria-hidden="true">
+                        <BarChart3 size={20} strokeWidth={2.3} />
+                    </span>
+                    <span className="panel-badge badge-stale">
+                        {copy.coach.emptyBadge}
+                    </span>
+                </div>
+                <div>
+                    <p className="panel-kicker">{copy.coach.latestTitle}</p>
+                    <h2>{copy.coach.emptyTitle}</h2>
+                    <p>{copy.coach.emptyBody}</p>
+                </div>
+                <div className="coach-starter-steps" aria-label={copy.coach.pathTitle}>
+                    {starterSteps.map((step, index) => (
+                        <div key={step.title} className="coach-starter-step">
+                            <span aria-hidden="true">{index + 1}</span>
+                            <div>
+                                <strong>{step.title}</strong>
+                                <p>{step.body}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </aside>
+        </section>
+    );
+}
+
 export function CoachPage() {
     const navigate = useAppNavigate();
     const {
@@ -42,6 +96,20 @@ export function CoachPage() {
         : copy.coach.noSession;
     const profileValue = skillProfile?.level?.label || copy.coach.profilePending;
     const profileBody = skillProfile?.summary || copy.coach.profileEmpty;
+    const handleStartRound = () => navigate('/practice');
+    const handleOpenInsights = () => navigate('/insights');
+
+    if (!hasAdvice) {
+        return (
+            <div className="page-stack coach-page coach-page--starter">
+                <CoachStarterPanel
+                    copy={copy}
+                    onInsights={handleOpenInsights}
+                    onStart={handleStartRound}
+                />
+            </div>
+        );
+    }
 
     return (
         <div className="page-stack coach-page">
@@ -56,11 +124,11 @@ export function CoachPage() {
                         <p className="muted-text">{copy.coach.body}</p>
                     </div>
                     <div className="coach-hero__actions">
-                        <button type="button" className="action-btn primary" onClick={() => navigate('/practice')}>
+                        <button type="button" className="action-btn primary" onClick={handleStartRound}>
                             <Keyboard aria-hidden="true" size={18} strokeWidth={2.25} />
                             {copy.coach.primaryAction}
                         </button>
-                        <button type="button" className="action-btn secondary" onClick={() => navigate('/insights')}>
+                        <button type="button" className="action-btn secondary" onClick={handleOpenInsights}>
                             <LineChart aria-hidden="true" size={18} strokeWidth={2.25} />
                             {copy.coach.secondaryAction}
                         </button>

@@ -60,10 +60,18 @@ describe('CoachPage', () => {
             }
         });
 
-        expect(await screen.findByRole('heading', { name: 'Coach briefing' })).toBeInTheDocument();
+        const starterPanel = await screen.findByLabelText('Coach briefing');
+
+        expect(starterPanel).toHaveClass('coach-starter-panel');
+        expect(screen.getByRole('heading', { name: 'Coach briefing' })).toBeInTheDocument();
         expect(screen.getByRole('heading', { name: 'No coaching signal yet' })).toBeInTheDocument();
-        expect(screen.getByText('Complete a fresh round so the coach can prepare a focused follow-up.')).toBeInTheDocument();
-        expect(screen.getByText('Keep the loop small')).toBeInTheDocument();
+        expect(screen.getByText('Finish one round and the coach will turn the result into a focused follow-up.')).toBeInTheDocument();
+        expect(screen.getByText('Finish one round')).toBeInTheDocument();
+        expect(screen.getByText('Review the signal')).toBeInTheDocument();
+        expect(screen.getByText('Run the follow-up')).toBeInTheDocument();
+        expect(screen.queryByText('Latest round')).not.toBeInTheDocument();
+        expect(screen.queryByText('Weekly goal')).not.toBeInTheDocument();
+        expect(screen.queryByText('Keep the loop small')).not.toBeInTheDocument();
 
         fireEvent.click(screen.getByRole('button', { name: 'Start a round' }));
         await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith('/practice'));
