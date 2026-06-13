@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, CalendarDays, CheckCircle2, Clock3, ListChecks, RefreshCw, Route, Sparkles, Target } from 'lucide-react';
+import { ArrowRight, CalendarDays, CheckCircle2, Clock3, Gauge, Keyboard, ListChecks, RefreshCw, Route, ShieldCheck, Sparkles, Target } from 'lucide-react';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { useTrainingPlanPageModel } from '../features/training-plan/use-training-plan-page-model';
 import { useTrainingPlanPageStore } from '../store/app-state-selectors';
@@ -53,6 +53,7 @@ export function TrainingPlanPage() {
     const activeStepStatusLabel = activeStepTone === 'complete'
         ? trainingCopy.diagnostic.done
         : trainingCopy.result.decisionBadge;
+    const gatewayCopy = trainingCopy.planGateway;
     const planMetrics = hasPlan ? [
         {
             icon: Route,
@@ -70,21 +71,55 @@ export function TrainingPlanPage() {
             value: activeStep ? getStepDose(activeStep) : '--'
         }
     ] : [];
-    const onboardingItems = [
+    const gatewaySignals = [
+        {
+            icon: ShieldCheck,
+            label: gatewayCopy.profileSignal,
+            value: gatewayCopy.profileValue
+        },
+        {
+            icon: Gauge,
+            label: gatewayCopy.rhythmSignal,
+            value: gatewayCopy.rhythmValue
+        },
+        {
+            icon: Keyboard,
+            label: gatewayCopy.symbolSignal,
+            value: gatewayCopy.symbolValue
+        }
+    ];
+    const gatewayPathItems = [
         {
             icon: ListChecks,
-            label: trainingCopy.diagnostic.stepTitle,
-            value: '3'
+            label: gatewayCopy.stepAccuracy,
+            value: gatewayCopy.stepAccuracyBody
         },
         {
             icon: Target,
-            label: trainingCopy.diagnostic.kicker,
-            value: trainingCopy.diagnostic.activeTitle
+            label: gatewayCopy.stepRhythm,
+            value: gatewayCopy.stepRhythmBody
         },
         {
             icon: CalendarDays,
-            label: trainingCopy.home.planLabel,
-            value: trainingCopy.result.continuePlan
+            label: gatewayCopy.stepSymbols,
+            value: gatewayCopy.stepSymbolsBody
+        }
+    ];
+    const gatewayUnlockItems = [
+        {
+            icon: Target,
+            label: gatewayCopy.unlockProfile,
+            value: gatewayCopy.unlockProfileBody
+        },
+        {
+            icon: Route,
+            label: gatewayCopy.unlockPlan,
+            value: gatewayCopy.unlockPlanBody
+        },
+        {
+            icon: ArrowRight,
+            label: gatewayCopy.unlockFlow,
+            value: gatewayCopy.unlockFlowBody
         }
     ];
 
@@ -168,15 +203,26 @@ export function TrainingPlanPage() {
                             </div>
                         </>
                     ) : (
-                        <div className="training-plan-start-preview" aria-hidden="true">
-                            <span className="training-plan-start-preview__icon">
-                                <Sparkles size={20} strokeWidth={2.25} />
-                            </span>
-                            <div>
-                                <span className="summary-label">{trainingCopy.diagnostic.kicker}</span>
-                                <strong>{trainingCopy.diagnostic.stepTitle}</strong>
+                        <div className="training-plan-gateway" aria-label={gatewayCopy.previewTitle}>
+                            <div className="training-plan-gateway__top">
+                                <span className="training-plan-gateway__glyph" aria-hidden="true">
+                                    <Sparkles size={20} strokeWidth={2.25} />
+                                </span>
+                                <div>
+                                    <span className="summary-label">{gatewayCopy.previewKicker}</span>
+                                    <strong>{gatewayCopy.previewTitle}</strong>
+                                </div>
                             </div>
-                            <div className="training-plan-start-preview__rail">
+                            <div className="training-plan-gateway__signals">
+                                {gatewaySignals.map(({ icon: Icon, label, value }) => (
+                                    <div key={label} className="training-plan-gateway__signal">
+                                        <Icon aria-hidden="true" size={16} strokeWidth={2.25} />
+                                        <span>{label}</span>
+                                        <strong>{value}</strong>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="training-plan-gateway__rail" aria-hidden="true">
                                 <span />
                                 <span />
                                 <span />
@@ -209,23 +255,51 @@ export function TrainingPlanPage() {
             )}
 
             {!hasPlan && (
-                <section className="panel training-plan-onboarding" aria-label={trainingCopy.diagnostic.kicker}>
+                <section className="panel training-plan-onboarding training-plan-onboarding--gateway" aria-label={gatewayCopy.routeKicker}>
                     <div className="panel-head">
                         <div>
-                            <p className="panel-kicker">{trainingCopy.diagnostic.kicker}</p>
-                            <h2>{trainingCopy.diagnostic.title}</h2>
+                            <p className="panel-kicker">{gatewayCopy.routeKicker}</p>
+                            <h2>{gatewayCopy.routeTitle}</h2>
                         </div>
                         <span className="panel-badge badge-idle">{trainingCopy.diagnostic.pending}</span>
                     </div>
-                    <div className="training-plan-onboarding__grid">
-                        {onboardingItems.map(({ icon: Icon, label, value }) => (
-                            <div key={label} className="training-plan-onboarding__item">
-                                <Icon aria-hidden="true" size={18} strokeWidth={2.25} />
-                                <span>{label}</span>
-                                <strong>{value}</strong>
+                    <div className="training-plan-onboarding__layout">
+                        <div className="training-plan-route-map" aria-label={trainingCopy.diagnostic.stepTitle}>
+                            {gatewayPathItems.map(({ icon: Icon, label, value }, index) => (
+                                <div key={label} className="training-plan-route-map__item">
+                                    <span className="training-plan-route-map__index" aria-hidden="true">
+                                        {index + 1}
+                                    </span>
+                                    <Icon aria-hidden="true" size={18} strokeWidth={2.25} />
+                                    <div>
+                                        <strong>{label}</strong>
+                                        <p className="muted-text">{value}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="training-plan-unlock-panel" aria-label={gatewayCopy.unlockTitle}>
+                            <div>
+                                <p className="summary-label">{gatewayCopy.unlockKicker}</p>
+                                <strong>{gatewayCopy.unlockTitle}</strong>
+                                <p className="muted-text">{gatewayCopy.unlockBody}</p>
                             </div>
-                        ))}
+                            <div className="training-plan-unlock-panel__list">
+                                {gatewayUnlockItems.map(({ icon: Icon, label, value }) => (
+                                    <div key={label} className="training-plan-unlock-panel__item">
+                                        <span aria-hidden="true">
+                                            <Icon size={15} strokeWidth={2.3} />
+                                        </span>
+                                        <div>
+                                            <strong>{label}</strong>
+                                            <p className="muted-text">{value}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
+                    <p className="muted-text training-plan-onboarding__note">{gatewayCopy.routeBody}</p>
                 </section>
             )}
 
@@ -277,7 +351,7 @@ export function TrainingPlanPage() {
                     ) : (
                         <div className="training-plan-empty">
                             <div className="training-plan-empty__icon" aria-hidden="true">
-                                <Sparkles size={24} strokeWidth={2.2} />
+                                <Sparkles size={20} strokeWidth={2.25} />
                             </div>
                             <div>
                                 <strong>{trainingCopy.result.planTitle}</strong>

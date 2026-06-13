@@ -31,6 +31,11 @@ describe('TrainingPlanPage', () => {
         });
 
         expect(await screen.findByRole('heading', { name: 'Start with a 3-minute assessment' })).toBeInTheDocument();
+        expect(screen.getByLabelText('Profile first, plan next')).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'Three short passes before the plan starts' })).toBeInTheDocument();
+        expect(screen.getByLabelText('The next screen stops asking you to choose')).toBeInTheDocument();
+        expect(screen.getByText('Accuracy pass')).toBeInTheDocument();
+        expect(screen.getByText('7-day starter route')).toBeInTheDocument();
         expect(screen.queryByText('0/0')).not.toBeInTheDocument();
 
         fireEvent.click(screen.getByRole('button', { name: 'Start assessment' }));
