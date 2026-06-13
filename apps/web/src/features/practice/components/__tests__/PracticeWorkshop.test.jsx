@@ -66,6 +66,7 @@ describe('Practice workshop panels', () => {
 
         expect(screen.getByRole('button', { name: trainingCopy.practice.customApply })).toBeDisabled();
         expect(screen.getAllByText(copy.common.aiNeedsGenerate).length).toBeGreaterThan(0);
+        expect(screen.getAllByText(copy.common.status).length).toBeGreaterThan(0);
 
         rerender(
             <CustomTextWorkshop

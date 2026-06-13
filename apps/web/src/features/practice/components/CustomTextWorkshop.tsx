@@ -60,7 +60,7 @@ export function CustomTextWorkshop({
 
                 <div className="ai-custom-panel__state custom-text-workshop__summary" aria-live="polite">
                     <div>
-                        <p className="summary-label">{copy.common.currentText}</p>
+                        <p className="summary-label">{copy.common.status}</p>
                         <strong>{statusLabel}</strong>
                         <span>{hasText ? trainingCopy.practice.customBody : trainingCopy.practice.customPlaceholder}</span>
                     </div>

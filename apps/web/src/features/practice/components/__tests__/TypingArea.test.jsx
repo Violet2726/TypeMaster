@@ -45,6 +45,9 @@ describe('TypingArea', () => {
 
         expect(screen.getByText(copy.practice.wordsLockedTitle)).toBeInTheDocument();
         expect(screen.getAllByText(copy.practice.textPendingLabel).length).toBeGreaterThan(0);
+        expect(screen.getByText(copy.practice.sourceTitle)).toBeInTheDocument();
+        expect(screen.getByText(copy.practice.sessionLabel)).toBeInTheDocument();
+        expect(container.querySelector('.typing-empty-state__preflight')).not.toBeNull();
         expect(container.querySelector('.typing-ready-panel')).toBeNull();
         expect(screen.queryByText('100%')).not.toBeInTheDocument();
         expect(screen.queryByText('30')).not.toBeInTheDocument();

@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Clock3, Gauge, RotateCcw, ShieldCheck } from 'lucide-react';
+import { Clock3, FileText, Gauge, Keyboard, RotateCcw, ShieldCheck } from 'lucide-react';
 import { buildRenderedWords } from '@typemaster/domain';
 
 function getSessionStatusText(copy, status) {
@@ -56,6 +56,26 @@ export function TypingArea({
     const unavailableTitle = lockTitle || copy.practice.wordsLockedTitle;
     const unavailableBody = lockBody || copy.practice.wordsLockedBody;
     const textAvailabilityLabel = isTypingUnavailable ? copy.practice.textPendingLabel : copy.practice.textReadyLabel;
+    const preparationItems = [
+        {
+            key: 'source',
+            icon: FileText,
+            label: copy.practice.sourceTitle,
+            value: sourceLabel || copy.common.emptyValue
+        },
+        {
+            key: 'status',
+            icon: ShieldCheck,
+            label: copy.common.status,
+            value: textAvailabilityLabel
+        },
+        {
+            key: 'session',
+            icon: Keyboard,
+            label: copy.practice.sessionLabel,
+            value: getSessionStatusText(copy, status)
+        }
+    ];
     const liveStatItems = [
         {
             key: 'wpm',
@@ -283,12 +303,34 @@ export function TypingArea({
                 <div className="words-container">
                     {isTypingUnavailable ? (
                         <div className="typing-empty-state">
-                            <span className="typing-empty-state__icon" aria-hidden="true">
-                                <ShieldCheck size={22} strokeWidth={2.25} />
-                            </span>
-                            <span className="summary-label">{copy.common.status}</span>
-                            <strong>{unavailableTitle}</strong>
-                            <p>{unavailableBody}</p>
+                            <div className="typing-empty-state__copy">
+                                <span className="typing-empty-state__icon" aria-hidden="true">
+                                    <ShieldCheck size={22} strokeWidth={2.25} />
+                                </span>
+                                <span className="summary-label">{copy.common.status}</span>
+                                <strong>{unavailableTitle}</strong>
+                                <p>{unavailableBody}</p>
+                            </div>
+
+                            <div className="typing-empty-state__preflight" aria-label={unavailableTitle}>
+                                {preparationItems.map(({ key, icon: Icon, label, value }) => (
+                                    <div key={key} className="typing-empty-state__step">
+                                        <span aria-hidden="true">
+                                            <Icon size={16} strokeWidth={2.2} />
+                                        </span>
+                                        <div>
+                                            <small>{label}</small>
+                                            <strong>{value}</strong>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="typing-empty-state__preview" aria-hidden="true">
+                                <span />
+                                <span />
+                                <span />
+                            </div>
                         </div>
                     ) : (
                         <div className="words-wrapper" ref={wrapperRef}>

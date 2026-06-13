@@ -10009,14 +10009,33 @@ body[data-theme='serika-light'] .typing-stage--unavailable .words-shell {
 }
 
 .typing-empty-state {
+    display: grid;
+    grid-template-columns: minmax(0, 0.92fr) minmax(16rem, 0.58fr);
+    grid-template-areas:
+        "copy preflight"
+        "preview preflight";
+    gap: 0.9rem;
     align-content: center;
-    justify-items: center;
+    align-items: center;
+    width: min(100%, 48rem);
+    min-height: 100%;
+    margin-inline: auto;
     font-family: var(--font-ui);
     font-size: 1rem;
     line-height: 1.35;
+    place-items: stretch;
+    text-align: left;
 }
 
-.typing-empty-state strong {
+.typing-empty-state__copy {
+    display: grid;
+    grid-area: copy;
+    gap: 0.56rem;
+    justify-items: start;
+    min-width: 0;
+}
+
+.typing-empty-state__copy > strong {
     max-width: 18rem;
     color: var(--text-strong);
     font-family: var(--font-display);
@@ -10026,11 +10045,117 @@ body[data-theme='serika-light'] .typing-stage--unavailable .words-shell {
     letter-spacing: 0;
 }
 
-.typing-empty-state p {
+.typing-empty-state__copy p {
     max-width: 24rem;
     color: var(--text-dim);
     font-size: 0.9rem;
     line-height: 1.42;
+}
+
+.typing-empty-state__preflight {
+    display: grid;
+    grid-area: preflight;
+    gap: 1px;
+    overflow: hidden;
+    border: 1px solid var(--panel-stroke);
+    border-radius: 8px;
+    background: var(--panel-stroke);
+}
+
+.typing-empty-state__step {
+    display: grid;
+    grid-template-columns: 2.1rem minmax(0, 1fr);
+    align-items: center;
+    gap: 0.62rem;
+    min-height: 4.05rem;
+    padding: 0.72rem;
+    background: rgba(255, 255, 255, 0.045);
+}
+
+.typing-empty-state__step > span {
+    display: grid;
+    width: 2.1rem;
+    height: 2.1rem;
+    place-items: center;
+    border-radius: 8px;
+    color: #8ecaff;
+    background: rgba(10, 132, 255, 0.12);
+    border: 1px solid rgba(142, 202, 255, 0.2);
+}
+
+.typing-empty-state__step div {
+    display: grid;
+    gap: 0.1rem;
+    min-width: 0;
+}
+
+.typing-empty-state__step small {
+    overflow: hidden;
+    color: var(--text-dim);
+    font-size: 0.68rem;
+    font-weight: 750;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.typing-empty-state__step strong {
+    overflow: hidden;
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: 0.92rem;
+    line-height: 1.18;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.typing-empty-state__preview {
+    display: grid;
+    grid-area: preview;
+    gap: 0.42rem;
+    padding: 0.8rem;
+    border: 1px solid var(--panel-stroke);
+    border-radius: 8px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018)),
+        rgba(255, 255, 255, 0.025);
+}
+
+.typing-empty-state__preview span {
+    display: block;
+    height: 0.46rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.typing-empty-state__preview span:nth-child(1) {
+    width: 84%;
+    background: rgba(10, 132, 255, 0.45);
+}
+
+.typing-empty-state__preview span:nth-child(2) {
+    width: 68%;
+    background: rgba(153, 242, 192, 0.34);
+}
+
+.typing-empty-state__preview span:nth-child(3) {
+    width: 52%;
+}
+
+body[data-theme='serika-light'] .typing-empty-state__step,
+body[data-theme='serika-light'] .typing-empty-state__preview {
+    background: rgba(255, 255, 255, 0.82);
+}
+
+body[data-theme='serika-light'] .typing-empty-state__preview span {
+    background: rgba(60, 60, 67, 0.14);
+}
+
+body[data-theme='serika-light'] .typing-empty-state__preview span:nth-child(1) {
+    background: rgba(0, 113, 227, 0.38);
+}
+
+body[data-theme='serika-light'] .typing-empty-state__preview span:nth-child(2) {
+    background: rgba(52, 199, 89, 0.3);
 }
 
 .typing-stage .live-stat-value {
@@ -10098,8 +10223,13 @@ body[data-theme='serika-light'] .typing-stage--unavailable .words-shell {
     }
 
     .typing-empty-state {
-        gap: 0.44rem;
-        padding: 0.7rem;
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "copy"
+            "preflight"
+            "preview";
+        gap: 0.62rem;
+        padding: 0.2rem;
     }
 
     .typing-empty-state__icon {
@@ -10107,12 +10237,25 @@ body[data-theme='serika-light'] .typing-stage--unavailable .words-shell {
         height: 2.45rem;
     }
 
-    .typing-empty-state strong {
+    .typing-empty-state__copy > strong {
         font-size: 1.08rem;
     }
 
-    .typing-empty-state p {
+    .typing-empty-state__copy p {
         font-size: 0.78rem;
+    }
+
+    .typing-empty-state__preflight {
+        grid-template-columns: 1fr;
+    }
+
+    .typing-empty-state__step {
+        min-height: 3.65rem;
+        padding: 0.62rem;
+    }
+
+    .typing-empty-state__preview {
+        padding: 0.68rem;
     }
 
     .typing-stage .live-stat {
@@ -10477,7 +10620,9 @@ body[data-theme='serika-light'] .custom-text-workshop__editor {
 }
 
 .custom-text-workshop__summary {
-    min-height: 100%;
+    grid-template-columns: minmax(0, 1fr);
+    min-height: auto;
+    align-content: start;
 }
 
 .custom-text-workshop__stats strong {
@@ -11078,6 +11223,20 @@ body[data-theme='serika-light'] .practice-workbench__rail .ai-custom-panel {
     min-height: 7.1rem;
 }
 
+.practice-workbench__rail .custom-text-workshop__summary {
+    gap: 0.62rem;
+    padding: 0.72rem;
+}
+
+.practice-workbench__rail .custom-text-workshop__summary > div:first-child span {
+    display: none;
+}
+
+.practice-workbench__rail .custom-text-workshop__stats span {
+    min-height: 3rem;
+    padding: 0.5rem;
+}
+
 .practice-workbench__rail .ai-custom-panel__state {
     min-height: auto;
 }
@@ -11118,6 +11277,11 @@ body[data-theme='serika-light'] .practice-workbench__rail .ai-custom-panel {
 
     .practice-workbench__primary .typing-stage .words-container {
         height: calc(var(--typing-size) * var(--typing-line-height) * 3);
+    }
+
+    .practice-workbench__primary .typing-stage--unavailable .words-container {
+        height: auto;
+        min-height: 28rem;
     }
 
     .practice-workbench__rail .practice-toolbar {
