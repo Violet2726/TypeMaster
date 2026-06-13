@@ -31,12 +31,18 @@ vi.mock('../../features/practice/components/ConfigPanel', () => ({
 }));
 
 vi.mock('../../features/practice/components/CustomTextWorkshop', () => ({
-    CustomTextWorkshop: () => <div data-testid="custom-workshop" />
+    CustomTextWorkshop: ({ value = '', onApply }) => (
+        <div data-testid="custom-workshop">
+            <button type="button" onClick={onApply} disabled={!value.trim()}>
+                Use this text
+            </button>
+        </div>
+    )
 }));
 
 vi.mock('../../features/practice/components/TypingArea', () => ({
-    TypingArea: ({ isLocked, sourceLabel, status }) => (
-        <div data-testid="typing-area" data-locked={String(isLocked)}>
+    TypingArea: ({ isLocked, showReset, sourceLabel, status }) => (
+        <div data-testid="typing-area" data-locked={String(isLocked)} data-show-reset={String(showReset)}>
             {sourceLabel} {status}
         </div>
     )
@@ -270,6 +276,10 @@ describe('PracticePage', () => {
         render(<PracticePage />);
 
         expect(screen.getByTestId('custom-workshop')).toBeInTheDocument();
+        expect(document.querySelector('.practice-page--compose')).toBeInTheDocument();
+        expect(document.querySelector('.practice-workbench--compose')).toBeInTheDocument();
+        expect(screen.getByTestId('typing-area')).toHaveAttribute('data-show-reset', 'false');
+        expect(screen.queryByText(baseStore.copy.practice.helperTitle)).not.toBeInTheDocument();
     });
 
     test('locks custom practice when the current draft belongs to another source', () => {
@@ -286,7 +296,7 @@ describe('PracticePage', () => {
         expect(screen.getByTestId('typing-area')).toHaveTextContent('Custom bank');
     });
 
-    test('keeps the mobile action aligned with an empty custom word bank', () => {
+    test('keeps the custom compose action disabled until text exists', () => {
         const trainingCopy = getTrainingCopy('en-US');
 
         Object.assign(mockStore, {
@@ -299,11 +309,11 @@ describe('PracticePage', () => {
 
         render(<PracticePage />);
 
-        expect(screen.getByText(trainingCopy.practice.customPlaceholder)).toBeInTheDocument();
         expect(screen.getByRole('button', { name: trainingCopy.practice.customApply })).toBeDisabled();
+        expect(screen.queryByText(baseStore.copy.practice.helperTitle)).not.toBeInTheDocument();
     });
 
-    test('lets the mobile action apply a drafted custom word bank', () => {
+    test('lets the custom compose action apply a drafted custom word bank', () => {
         const trainingCopy = getTrainingCopy('en-US');
         mockStore.applyCustomWordBank.mockClear();
 

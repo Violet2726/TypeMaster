@@ -43,7 +43,8 @@ export function TypingArea({
     onReset,
     isLocked = false,
     lockTitle,
-    lockBody
+    lockBody,
+    showReset = true
 }) {
     const shellRef = useRef(null);
     const wrapperRef = useRef(null);
@@ -253,10 +254,12 @@ export function TypingArea({
                     </span>
                 </div>
 
-                <button type="button" className="ghost-btn ghost-btn--small" onClick={onReset}>
-                    <RotateCcw aria-hidden="true" size={16} strokeWidth={2.2} />
-                    {copy.common.resetRound}
-                </button>
+                {showReset && (
+                    <button type="button" className="ghost-btn ghost-btn--small" onClick={onReset}>
+                        <RotateCcw aria-hidden="true" size={16} strokeWidth={2.2} />
+                        {copy.common.resetRound}
+                    </button>
+                )}
             </div>
 
             {status === 'paused' && (

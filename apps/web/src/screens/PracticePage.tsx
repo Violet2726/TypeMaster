@@ -54,6 +54,7 @@ export function PracticePage() {
         ...store,
         navigate
     });
+    const isCustomComposeMode = store.config.source === 'custom' && isCustomEmpty;
 
     useEffect(() => {
         window.addEventListener('beforeunload', handleBeforeUnload);
@@ -113,7 +114,7 @@ export function PracticePage() {
     }, [pathname]);
 
     return (
-        <div className="page-stack practice-page">
+        <div className={`page-stack practice-page ${isCustomComposeMode ? 'practice-page--compose' : ''}`}>
             {nextRoundBrief && (
                 <section className="panel practice-brief-panel" aria-labelledby="practice-brief-title">
                     <div className="panel-head">
@@ -176,7 +177,7 @@ export function PracticePage() {
                 </section>
             )}
 
-            <div className="practice-workbench">
+            <div className={`practice-workbench ${isCustomComposeMode ? 'practice-workbench--compose' : ''}`}>
                 <div className="practice-workbench__primary">
                     <TypingArea
                         copy={store.copy}
@@ -202,6 +203,7 @@ export function PracticePage() {
                         isLocked={(store.config.source === 'ai' && aiPracticeStatus !== 'ready') || isCustomEmpty}
                         lockTitle={lockTitle}
                         lockBody={lockBody}
+                        showReset={!isCustomComposeMode}
                     />
                 </div>
 
@@ -258,20 +260,22 @@ export function PracticePage() {
                 </aside>
             </div>
 
-            <div className="sticky-action-bar">
-                <div>
-                    <span className="summary-label">{store.copy.practice.helperTitle}</span>
-                    <strong>{primaryActionHint}</strong>
+            {!isCustomComposeMode && (
+                <div className="sticky-action-bar">
+                    <div>
+                        <span className="summary-label">{store.copy.practice.helperTitle}</span>
+                        <strong>{primaryActionHint}</strong>
+                    </div>
+                    <button
+                        type="button"
+                        className="action-btn primary"
+                        onClick={handlePrimaryAction}
+                        disabled={isPrimaryActionDisabled}
+                    >
+                        {primaryActionLabel}
+                    </button>
                 </div>
-                <button
-                    type="button"
-                    className="action-btn primary"
-                    onClick={handlePrimaryAction}
-                    disabled={isPrimaryActionDisabled}
-                >
-                    {primaryActionLabel}
-                </button>
-            </div>
+            )}
 
             <ConfirmDialog
                 isOpen={Boolean(confirmState)}

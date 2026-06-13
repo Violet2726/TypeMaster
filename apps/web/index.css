@@ -11422,9 +11422,116 @@ body[data-theme='serika-light'] .practice-workbench__rail .ai-custom-panel {
     width: 100%;
 }
 
+.practice-workbench--compose {
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.58fr);
+    align-items: stretch;
+}
+
+.practice-workbench--compose .practice-workbench__rail {
+    order: -1;
+}
+
+.practice-workbench--compose .practice-workbench__rail .practice-toolbar {
+    min-height: 100%;
+}
+
+.practice-workbench--compose .practice-workbench__rail .practice-toolbar__row {
+    align-items: center;
+}
+
+.practice-workbench--compose .practice-workbench__rail .config-strip__main {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: end;
+}
+
+.practice-workbench--compose .practice-workbench__rail .config-strip__main .control-group:first-child {
+    grid-column: 1 / -1;
+}
+
+.practice-workbench--compose .practice-workbench__rail .config-strip__actions {
+    max-width: 18rem;
+}
+
+.practice-workbench--compose .practice-workbench__rail .ai-custom-panel {
+    margin-top: 0.18rem;
+    padding-top: 0.9rem;
+}
+
+.practice-workbench--compose .practice-workbench__rail .ai-custom-panel__head {
+    grid-template-columns: auto minmax(0, 1fr) minmax(12rem, auto);
+    align-items: center;
+}
+
+.practice-workbench--compose .practice-workbench__rail .ai-custom-panel__command {
+    grid-column: auto;
+}
+
+.practice-workbench--compose .practice-workbench__rail .custom-text-workshop__body {
+    grid-template-columns: minmax(0, 1fr) minmax(12.5rem, 0.38fr);
+}
+
+.practice-workbench--compose .practice-workbench__rail .custom-text-workshop__editor textarea {
+    min-height: clamp(12rem, 32vh, 18rem);
+}
+
+.practice-workbench--compose .practice-workbench__primary .typing-stage {
+    min-height: 100%;
+}
+
+.practice-workbench--compose .practice-workbench__primary .typing-stage__head {
+    grid-template-columns: 1fr;
+}
+
+.practice-workbench--compose .practice-workbench__primary .typing-stage .words-container,
+.practice-workbench--compose .practice-workbench__primary .typing-stage--unavailable .words-container {
+    height: auto;
+    min-height: clamp(18rem, 34vh, 24rem);
+}
+
+.practice-workbench--compose .typing-empty-state {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+        "copy"
+        "preflight"
+        "preview";
+    align-content: start;
+    gap: 0.7rem;
+    width: 100%;
+}
+
+.practice-workbench--compose .typing-empty-state__copy > strong {
+    max-width: 100%;
+}
+
+.practice-workbench--compose .typing-empty-state__copy p {
+    max-width: 100%;
+}
+
 @media (max-width: 1100px) {
     .practice-workbench {
         grid-template-columns: minmax(0, 1fr) minmax(20rem, 23rem);
+    }
+
+    .practice-workbench--compose {
+        grid-template-columns: 1fr;
+    }
+
+    .practice-workbench--compose .practice-workbench__primary {
+        order: 0;
+    }
+
+    .practice-workbench--compose .practice-workbench__rail .config-strip__main,
+    .practice-workbench--compose .practice-workbench__rail .custom-text-workshop__body {
+        grid-template-columns: 1fr;
+    }
+
+    .practice-workbench--compose .practice-workbench__rail .ai-custom-panel__head {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .practice-workbench--compose .practice-workbench__rail .ai-custom-panel__command {
+        grid-column: 1 / -1;
     }
 }
 
@@ -11454,6 +11561,10 @@ body[data-theme='serika-light'] .practice-workbench__rail .ai-custom-panel {
     .practice-workbench__primary .typing-stage--unavailable .words-container {
         height: auto;
         min-height: 28rem;
+    }
+
+    .practice-workbench--compose .practice-workbench__primary .typing-stage--unavailable .words-container {
+        min-height: 18rem;
     }
 
     .practice-workbench__rail .practice-toolbar {
