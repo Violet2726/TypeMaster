@@ -1,6 +1,6 @@
 'use client';
 
-import { CalendarClock, Gauge, Keyboard, ShieldCheck, Trophy } from 'lucide-react';
+import { ArrowRight, CalendarClock, Gauge, Keyboard, ShieldCheck, Trophy } from 'lucide-react';
 import { formatDateTime } from '../i18n';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { useHomePageModel } from '../features/home/use-home-page-model';
@@ -108,6 +108,7 @@ export function HomePage() {
     const hasSessions = insights.totalSessions > 0;
     const hasChallengeRun = challengeSessions.length > 0;
     const hasDashboardEvidence = Boolean(skillProfile || trainingPlan || hasSessions || unlockedAchievements.length);
+    const isStarterHome = !hasDashboardEvidence;
     const pendingLabel = trainingCopy.diagnostic.pending;
     const homeLevelLabel = skillProfile?.level?.label || pendingLabel;
     const homeStreakLabel = sessionStreak || pendingLabel;
@@ -126,7 +127,7 @@ export function HomePage() {
     ];
 
     return (
-        <div className="page-stack page-stack--home">
+        <div className={`page-stack page-stack--home ${isStarterHome ? 'page-stack--home-starter' : ''}`}>
             <section className="home-launch">
                 <div className="home-launch__copy">
                     <p className="hero-kicker">{trainingCopy.home.todayKicker}</p>
@@ -134,23 +135,25 @@ export function HomePage() {
                     <p className="hero-body">
                         {skillProfile ? trainingCopy.home.dashboardBody : trainingCopy.home.diagnosticBody}
                     </p>
-                    <div className="home-launch__actions">
-                        <button
-                            type="button"
-                            className="action-btn primary"
-                            onClick={() => handleDecisionAction(homeDecision.primaryAction)}
-                            disabled={isLaunchingChallenge && homeDecision.primaryAction === 'challenge'}
-                        >
-                            {homeDecision.primaryAction === 'challenge' && isLaunchingChallenge
-                                ? copy.common.loading
-                                : homeDecision.primaryLabel}
-                        </button>
-                        {homeDecision.primaryAction !== 'free' && (
-                            <button type="button" className="action-btn" onClick={() => handleDecisionAction('free')}>
-                                {trainingCopy.home.freePractice}
+                    {!isStarterHome && (
+                        <div className="home-launch__actions">
+                            <button
+                                type="button"
+                                className="action-btn primary"
+                                onClick={() => handleDecisionAction(homeDecision.primaryAction)}
+                                disabled={isLaunchingChallenge && homeDecision.primaryAction === 'challenge'}
+                            >
+                                {homeDecision.primaryAction === 'challenge' && isLaunchingChallenge
+                                    ? copy.common.loading
+                                    : homeDecision.primaryLabel}
                             </button>
-                        )}
-                    </div>
+                            {homeDecision.primaryAction !== 'free' && (
+                                <button type="button" className="action-btn" onClick={() => handleDecisionAction('free')}>
+                                    {trainingCopy.home.freePractice}
+                                </button>
+                            )}
+                        </div>
+                    )}
                 </div>
                 <div className="home-product-visual" aria-hidden="true">
                     <div className="home-product-visual__window">
@@ -186,26 +189,98 @@ export function HomePage() {
                 </div>
             </section>
 
-            <section className="home-stats-strip" aria-label={copy.home.statsTitle}>
-                <div className="metric-card">
-                    <span>{trainingCopy.home.levelLabel}</span>
-                    <strong>{homeLevelLabel}</strong>
-                </div>
-                <div className="metric-card">
-                    <span>{trainingCopy.home.streakLabel}</span>
-                    <strong>{homeStreakLabel}</strong>
-                </div>
-                <div className="metric-card">
-                    <span>{trainingCopy.home.planLabel}</span>
-                    <strong>{homePlanLabel}</strong>
-                </div>
-                <div className="metric-card">
-                    <span>{trainingCopy.home.weekLabel}</span>
-                    <strong>{weeklyGoal.completed}/{weeklyGoal.target} {trainingCopy.home.weekGoalSuffix}</strong>
-                </div>
-            </section>
+            {!isStarterHome && (
+                <section className="home-stats-strip" aria-label={copy.home.statsTitle}>
+                    <div className="metric-card">
+                        <span>{trainingCopy.home.levelLabel}</span>
+                        <strong>{homeLevelLabel}</strong>
+                    </div>
+                    <div className="metric-card">
+                        <span>{trainingCopy.home.streakLabel}</span>
+                        <strong>{homeStreakLabel}</strong>
+                    </div>
+                    <div className="metric-card">
+                        <span>{trainingCopy.home.planLabel}</span>
+                        <strong>{homePlanLabel}</strong>
+                    </div>
+                    <div className="metric-card">
+                        <span>{trainingCopy.home.weekLabel}</span>
+                        <strong>{weeklyGoal.completed}/{weeklyGoal.target} {trainingCopy.home.weekGoalSuffix}</strong>
+                    </div>
+                </section>
+            )}
 
-            <section className="home-action-section" aria-label={trainingCopy.home.todayFlowTitle}>
+            {isStarterHome ? (
+                <section className="home-starter-hub" aria-label={trainingCopy.home.todayFlowTitle}>
+                    <article className="panel home-starter-card home-starter-card--primary">
+                        <div>
+                            <p className="panel-kicker">{trainingCopy.home.todayFlowTitle}</p>
+                            <h2>{homeDecision.headline}</h2>
+                            <p className="lead-text">{homeDecision.body}</p>
+                        </div>
+                        <div className="home-starter-card__chips">
+                            <span className={`panel-badge badge-${homeDecision.badgeTone || 'ready'}`}>{homeDecision.badge}</span>
+                            <span className="home-action-chip">{homeDecision.signalLabel}</span>
+                            <span className="home-action-chip">{homeLevelLabel}</span>
+                        </div>
+                        <div className="home-starter-signal">
+                            <span className="summary-label">{homeDecision.signalLabel}</span>
+                            <p>{homeDecision.signal}</p>
+                        </div>
+                        <button
+                            type="button"
+                            className="action-btn primary"
+                            onClick={() => handleDecisionAction(homeDecision.primaryAction)}
+                            disabled={isLaunchingChallenge && homeDecision.primaryAction === 'challenge'}
+                        >
+                            <ArrowRight aria-hidden="true" size={18} strokeWidth={2.3} />
+                            {homeDecision.primaryAction === 'challenge' && isLaunchingChallenge
+                                ? copy.common.loading
+                                : homeDecision.primaryLabel}
+                        </button>
+                    </article>
+
+                    <article className="panel home-starter-card home-starter-card--challenge">
+                        <div>
+                            <p className="panel-kicker">{trainingCopy.challenge.kicker}</p>
+                            <h2>{store.dailyChallenge?.title || trainingCopy.challenge.title}</h2>
+                            <p className="muted-text">{challengeStrategyModel.note}</p>
+                        </div>
+                        <div className="home-starter-card__chips">
+                            {challengeFacts.map((fact) => (
+                                <span key={fact} className="home-action-chip">{fact}</span>
+                            ))}
+                            <span className="home-action-chip">{trainingCopy.challenge.trendFirstLabel}</span>
+                        </div>
+                        <button
+                            type="button"
+                            className="action-btn"
+                            onClick={() => handleDecisionAction(challengeDecisionModel?.primaryAction || challengeStrategyModel.primaryAction)}
+                            disabled={isLaunchingChallenge && (challengeDecisionModel?.primaryAction || challengeStrategyModel.primaryAction) === 'challenge'}
+                        >
+                            {isLaunchingChallenge && (challengeDecisionModel?.primaryAction || challengeStrategyModel.primaryAction) === 'challenge'
+                                ? copy.common.loading
+                                : challengeDecisionModel?.primaryLabel || challengeStrategyModel.primaryLabel}
+                        </button>
+                    </article>
+
+                    <article className="panel home-starter-card home-starter-card--free">
+                        <div>
+                            <p className="panel-kicker">{trainingCopy.home.freePracticeKicker}</p>
+                            <h2>{trainingCopy.home.freePractice}</h2>
+                            <p className="muted-text">{trainingCopy.home.freePracticeBody}</p>
+                        </div>
+                        <div className="home-starter-card__chips">
+                            <span className="home-action-chip">{latestModeLabel}</span>
+                            <span className="home-action-chip">{copy.statuses.ready}</span>
+                        </div>
+                        <button type="button" className="action-btn" onClick={() => handleDecisionAction('free')}>
+                            {trainingCopy.home.freePractice}
+                        </button>
+                    </article>
+                </section>
+            ) : (
+                <section className="home-action-section" aria-label={trainingCopy.home.todayFlowTitle}>
                 <div className="panel-head home-action-section__head">
                     <div>
                         <p className="panel-kicker">{trainingCopy.home.todayKicker}</p>
@@ -349,6 +424,7 @@ export function HomePage() {
                     </article>
                 </div>
             </section>
+            )}
 
             {hasDashboardEvidence && (
                 <>

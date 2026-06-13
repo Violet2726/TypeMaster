@@ -31,7 +31,9 @@ describe('HomePage', () => {
 
         expect(await screen.findByRole('heading', { name: 'Start with a 3-minute assessment' })).toBeInTheDocument();
         expect(screen.getAllByText('Built-in · Time 30s').length).toBeGreaterThan(0);
-        expect(screen.getAllByRole('button', { name: 'Start assessment' }).length).toBeGreaterThan(0);
+        expect(screen.getAllByRole('button', { name: 'Start assessment' })).toHaveLength(1);
+        expect(screen.getAllByRole('button', { name: 'Start challenge' })).toHaveLength(1);
+        expect(screen.getAllByRole('button', { name: 'Free practice' })).toHaveLength(1);
         expect(screen.queryByText('--')).not.toBeInTheDocument();
         expect(screen.queryByText('0 WPM')).not.toBeInTheDocument();
         expect(screen.getAllByText('Pending').length).toBeGreaterThan(0);
