@@ -135,25 +135,24 @@ export function HomePage() {
                     <p className="hero-body">
                         {skillProfile ? trainingCopy.home.dashboardBody : trainingCopy.home.diagnosticBody}
                     </p>
-                    {!isStarterHome && (
-                        <div className="home-launch__actions">
-                            <button
-                                type="button"
-                                className="action-btn primary"
-                                onClick={() => handleDecisionAction(homeDecision.primaryAction)}
-                                disabled={isLaunchingChallenge && homeDecision.primaryAction === 'challenge'}
-                            >
-                                {homeDecision.primaryAction === 'challenge' && isLaunchingChallenge
-                                    ? copy.common.loading
-                                    : homeDecision.primaryLabel}
+                    <div className="home-launch__actions">
+                        <button
+                            type="button"
+                            className="action-btn primary"
+                            onClick={() => handleDecisionAction(homeDecision.primaryAction)}
+                            disabled={isLaunchingChallenge && homeDecision.primaryAction === 'challenge'}
+                        >
+                            {isStarterHome && <ArrowRight aria-hidden="true" size={18} strokeWidth={2.3} />}
+                            {homeDecision.primaryAction === 'challenge' && isLaunchingChallenge
+                                ? copy.common.loading
+                                : homeDecision.primaryLabel}
+                        </button>
+                        {homeDecision.primaryAction !== 'free' && (
+                            <button type="button" className="action-btn" onClick={() => handleDecisionAction('free')}>
+                                {trainingCopy.home.freePractice}
                             </button>
-                            {homeDecision.primaryAction !== 'free' && (
-                                <button type="button" className="action-btn" onClick={() => handleDecisionAction('free')}>
-                                    {trainingCopy.home.freePractice}
-                                </button>
-                            )}
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
                 <div className="home-product-visual" aria-hidden="true">
                     <div className="home-product-visual__window">

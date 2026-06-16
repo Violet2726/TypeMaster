@@ -12544,3 +12544,181 @@ body[data-theme='serika-light'] .practice-workbench__rail .ai-custom-panel {
         padding-inline: 0.9rem;
     }
 }
+
+/* Home starter refinement */
+.page-stack--home-starter {
+    gap: 0.72rem;
+}
+
+.page-stack--home-starter .home-launch {
+    grid-template-columns: minmax(0, 0.88fr) minmax(300px, 0.56fr);
+    min-height: clamp(300px, 40vh, 390px);
+    padding: 0.5rem 0 0.15rem;
+    gap: clamp(1.25rem, 4vw, 3rem);
+}
+
+.page-stack--home-starter .home-launch__copy {
+    gap: 0.84rem;
+}
+
+.page-stack--home-starter .home-launch .hero-body {
+    max-width: 32rem;
+}
+
+.page-stack--home-starter .home-launch__actions {
+    margin-top: 0.18rem;
+}
+
+.page-stack--home-starter .home-launch__actions .action-btn {
+    min-height: 2.72rem;
+    padding-inline: 1.18rem;
+}
+
+.page-stack--home-starter .home-product-visual {
+    min-height: 218px;
+    transform: translateY(0.35rem);
+}
+
+.page-stack--home-starter .home-product-visual__window {
+    width: min(100%, 330px);
+    box-shadow:
+        0 24px 64px rgba(0, 0, 0, 0.32),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.page-stack--home-starter .home-product-visual__screen {
+    gap: 0.7rem;
+    padding: 0.86rem;
+}
+
+.page-stack--home-starter .home-product-visual__metrics {
+    min-height: 4.85rem;
+    padding: 0.78rem;
+}
+
+.page-stack--home-starter .home-product-visual__metrics strong {
+    font-size: 2rem;
+}
+
+.page-stack--home-starter .home-product-visual__rail {
+    height: 4.35rem;
+}
+
+.page-stack--home-starter .home-product-visual__copy {
+    padding: 0.78rem;
+}
+
+.page-stack--home-starter .home-product-visual__keyboard {
+    width: min(78%, 270px);
+    margin-top: 0.6rem;
+}
+
+.page-stack--home-starter .home-starter-hub {
+    grid-template-columns: minmax(0, 1.08fr) minmax(17rem, 0.42fr);
+    gap: 0.72rem;
+}
+
+.page-stack--home-starter .home-starter-card {
+    min-height: 8.75rem;
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.page-stack--home-starter .home-starter-card--primary {
+    min-height: 18.4rem;
+    padding: 1.08rem;
+}
+
+.page-stack--home-starter .home-starter-card h2 {
+    font-size: 1.45rem;
+    line-height: 1.08;
+}
+
+.page-stack--home-starter .home-starter-card--primary h2 {
+    max-width: 11ch;
+    font-size: 2.48rem;
+    line-height: 1;
+}
+
+.page-stack--home-starter .home-starter-card .lead-text,
+.page-stack--home-starter .home-starter-card .muted-text {
+    line-height: 1.44;
+}
+
+.page-stack--home-starter .home-starter-card__chips {
+    gap: 0.38rem;
+}
+
+.page-stack--home-starter .home-action-chip,
+.page-stack--home-starter .panel-badge {
+    padding: 0.34rem 0.58rem;
+    font-size: 0.76rem;
+}
+
+.page-stack--home-starter .home-starter-signal {
+    padding: 0.68rem;
+    border-radius: 8px;
+}
+
+.page-stack--home-starter .home-starter-card .action-btn {
+    min-height: 2.5rem;
+    min-width: 8.6rem;
+}
+
+@media (max-width: 980px) {
+    .page-stack--home-starter .home-launch {
+        grid-template-columns: 1fr;
+        min-height: auto;
+        padding-top: 0.7rem;
+    }
+
+    .page-stack--home-starter .home-product-visual {
+        transform: none;
+    }
+
+    .page-stack--home-starter .home-starter-hub {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 720px) {
+    .page-stack--home-starter .home-launch {
+        gap: 0.8rem;
+        padding-top: 0.55rem;
+    }
+
+    .page-stack--home-starter .home-launch__copy {
+        gap: 0.68rem;
+    }
+
+    .page-stack--home-starter .home-launch h1 {
+        font-size: 2.36rem;
+        line-height: 1.02;
+    }
+
+    .page-stack--home-starter .home-product-visual {
+        min-height: 142px;
+    }
+
+    .page-stack--home-starter .home-product-visual__window {
+        width: min(100%, 300px);
+    }
+
+    .page-stack--home-starter .home-product-visual__metrics {
+        min-height: 4.2rem;
+    }
+
+    .page-stack--home-starter .home-product-visual__rail {
+        height: 3.1rem;
+    }
+
+    .page-stack--home-starter .home-starter-card--primary,
+    .page-stack--home-starter .home-starter-card {
+        min-height: auto;
+    }
+
+    .page-stack--home-starter .home-starter-card--primary h2 {
+        max-width: 100%;
+        font-size: 1.9rem;
+    }
+}
