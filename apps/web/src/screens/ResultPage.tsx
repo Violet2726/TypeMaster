@@ -120,6 +120,30 @@ export function ResultPage() {
     const visibleChallengeStanding = challengeStanding?.standing
         ? challengeStanding
         : previewChallengeStanding || null;
+    const challengeAfterRunSteps = isChallengeSession
+        ? [
+            {
+                id: 'score',
+                index: '01',
+                title: copy.result.metricsTitle,
+                value: `${session.result.wpm} ${copy.common.wpm} / ${session.result.accuracy}%`
+            },
+            {
+                id: 'standing',
+                index: '02',
+                title: copy.result.challengeStandingTitle,
+                value: visibleChallengeStanding?.standing
+                    ? `#${visibleChallengeStanding.standing.rank}/${visibleChallengeStanding.standing.total}`
+                    : trainingCopy.challenge.leaderboard
+            },
+            {
+                id: 'next',
+                index: '03',
+                title: copy.result.adviceTitle,
+                value: resultDecision.primaryLabel
+            }
+        ]
+        : [];
 
     return (
         <div className="page-stack result-page">
@@ -278,6 +302,16 @@ export function ResultPage() {
                         <strong>{trainingCopy.challenge.trendFocusTitle}</strong>
                         <p>{challengeFocusNote}</p>
                         {challengeFocusDelta && <p className="muted-text">{challengeFocusDelta}</p>}
+                    </div>
+
+                    <div className="result-challenge-route" aria-label={copy.result.challengeStandingTitle}>
+                        {challengeAfterRunSteps.map((step) => (
+                            <div key={step.id} className="result-challenge-route__item">
+                                <span>{step.index}</span>
+                                <strong>{step.title}</strong>
+                                <em>{step.value}</em>
+                            </div>
+                        ))}
                     </div>
 
                     {challengeState === 'loading' && (

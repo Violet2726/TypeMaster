@@ -249,6 +249,8 @@ describe('ResultPage', () => {
         expect(screen.getByText('Add controlled speed')).toBeInTheDocument();
         expect(screen.getByText('10 words')).toBeInTheDocument();
         expect(await screen.findByRole('heading', { name: 'Daily challenge standing' })).toBeInTheDocument();
+        expect(screen.getByText('82 WPM / 98%')).toBeInTheDocument();
+        expect(screen.getAllByText('#2/2').length).toBeGreaterThan(0);
         expect(screen.getByText('#2')).toBeInTheDocument();
         expect(screen.getByText('Current rank')).toBeInTheDocument();
         expect(screen.getByText('Run focus')).toBeInTheDocument();
