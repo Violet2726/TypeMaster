@@ -38,6 +38,29 @@ export function DiagnosticPage() {
     const activeDurationLabel = isChinese ? `${activeDurationSeconds} 秒` : `${activeDurationSeconds}s`;
     const remainingLabel = isChinese ? `剩余 ${remainingSteps} 步` : `${remainingSteps} left`;
 
+    const assessmentSignals = [
+        {
+            icon: Gauge,
+            label: trainingCopy.planGateway.profileSignal,
+            value: trainingCopy.planGateway.profileValue
+        },
+        {
+            icon: Sparkles,
+            label: trainingCopy.planGateway.rhythmSignal,
+            value: trainingCopy.planGateway.rhythmValue
+        },
+        {
+            icon: CheckCircle2,
+            label: trainingCopy.planGateway.symbolSignal,
+            value: trainingCopy.planGateway.symbolValue
+        }
+    ];
+    const routeSteps = [
+        trainingCopy.planGateway.stepAccuracy,
+        trainingCopy.planGateway.stepRhythm,
+        trainingCopy.planGateway.stepSymbols
+    ];
+
     return (
         <div className="page-stack diagnostic-page">
             <section className="panel diagnostic-hero">
@@ -55,21 +78,40 @@ export function DiagnosticPage() {
                             {stepCountLabel}
                         </span>
                     </div>
+                    <div className="diagnostic-hero__signals" aria-label={trainingCopy.planGateway.previewTitle}>
+                        {assessmentSignals.map(({ icon: Icon, label, value }) => (
+                            <span key={label}>
+                                <Icon aria-hidden="true" size={16} strokeWidth={2.25} />
+                                <small>{label}</small>
+                                <strong>{value}</strong>
+                            </span>
+                        ))}
+                    </div>
                 </div>
                 <div className="diagnostic-hero__action">
-                    <div className={`diagnostic-progress-ring diagnostic-progress-ring--step-${progressStep}`} aria-label={trainingCopy.diagnostic.activeTitle}>
-                        <strong>{completedSteps}/{previewJourney.steps.length}</strong>
-                        <span>{trainingCopy.diagnostic.activeTitle}</span>
-                    </div>
-                    <div className="diagnostic-hero__cta">
-                        <button type="button" className="action-btn primary" onClick={handleStart}>
-                            <Play aria-hidden="true" size={18} strokeWidth={2.4} />
-                            {activeJourney ? trainingCopy.diagnostic.resume : trainingCopy.diagnostic.start}
-                        </button>
-                        <div className="diagnostic-hero__next">
+                    <div className="diagnostic-hero__control">
+                        <div className={`diagnostic-progress-ring diagnostic-progress-ring--step-${progressStep}`} aria-label={trainingCopy.diagnostic.activeTitle}>
+                            <strong>{completedSteps}/{previewJourney.steps.length}</strong>
                             <span>{trainingCopy.diagnostic.activeTitle}</span>
-                            <strong>{activeStep?.title || trainingCopy.diagnostic.stepTitle}</strong>
                         </div>
+                        <div className="diagnostic-hero__cta">
+                            <button type="button" className="action-btn primary" onClick={handleStart}>
+                                <Play aria-hidden="true" size={18} strokeWidth={2.4} />
+                                {activeJourney ? trainingCopy.diagnostic.resume : trainingCopy.diagnostic.start}
+                            </button>
+                            <div className="diagnostic-hero__next">
+                                <span>{trainingCopy.diagnostic.activeTitle}</span>
+                                <strong>{activeStep?.title || trainingCopy.diagnostic.stepTitle}</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="diagnostic-hero__route" aria-label={trainingCopy.planGateway.routeKicker}>
+                        {routeSteps.map((step, index) => (
+                            <span key={step}>
+                                <small>{String(index + 1).padStart(2, '0')}</small>
+                                <strong>{step}</strong>
+                            </span>
+                        ))}
                     </div>
                 </div>
             </section>

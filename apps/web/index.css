@@ -4540,8 +4540,8 @@ body[data-theme='serika-light'] .home-action-card::after {
 
 .diagnostic-hero {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.4fr);
+    align-items: stretch;
     gap: 1.25rem;
     min-height: 12rem;
     padding: 1.45rem;
@@ -4571,6 +4571,51 @@ body[data-theme='serika-light'] .home-action-card::after {
     margin-top: 0.95rem;
 }
 
+.diagnostic-hero__signals {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.55rem;
+    max-width: 37rem;
+    margin-top: 0.98rem;
+}
+
+.diagnostic-hero__signals span {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.12rem 0.42rem;
+    min-width: 0;
+    min-height: 4rem;
+    padding: 0.68rem;
+    border: 1px solid var(--panel-stroke);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.045);
+}
+
+.diagnostic-hero__signals svg {
+    grid-row: span 2;
+    color: #8ecaff;
+}
+
+.diagnostic-hero__signals small {
+    overflow: hidden;
+    color: var(--text-dim);
+    font-size: 0.7rem;
+    font-weight: 730;
+    line-height: 1.15;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.diagnostic-hero__signals strong {
+    overflow: hidden;
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    line-height: 1.16;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .diagnostic-hero__meta span,
 .diagnostic-step__status,
 .diagnostic-step__duration {
@@ -4590,9 +4635,18 @@ body[data-theme='serika-light'] .home-action-card::after {
 }
 
 .diagnostic-hero__action {
-    display: flex;
+    display: grid;
+    align-content: center;
+    gap: 0.8rem;
+    min-width: 0;
+    padding-left: 1.1rem;
+    border-left: 1px solid var(--panel-stroke);
+}
+
+.diagnostic-hero__control {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
     align-items: center;
-    justify-content: flex-end;
     gap: 0.8rem;
 }
 
@@ -4620,6 +4674,40 @@ body[data-theme='serika-light'] .home-action-card::after {
 .diagnostic-hero__next strong {
     color: var(--text-strong);
     font-size: 0.84rem;
+}
+
+.diagnostic-hero__route {
+    display: grid;
+    gap: 0.42rem;
+}
+
+.diagnostic-hero__route span {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+    min-height: 2.45rem;
+    padding: 0.48rem 0.58rem;
+    border: 1px solid var(--panel-stroke);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.035);
+}
+
+.diagnostic-hero__route small {
+    color: var(--text-dim);
+    font-size: 0.68rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.diagnostic-hero__route strong {
+    overflow: hidden;
+    color: var(--text-strong);
+    font-size: 0.78rem;
+    line-height: 1.16;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .diagnostic-progress-ring {
@@ -4896,7 +4984,9 @@ body[data-theme='serika-light'] .diagnostic-step__index {
 
 body[data-theme='serika-light'] .diagnostic-hero__next,
 body[data-theme='serika-light'] .diagnostic-profile-card__focus,
-body[data-theme='serika-light'] .diagnostic-profile-card__stats span {
+body[data-theme='serika-light'] .diagnostic-profile-card__stats span,
+body[data-theme='serika-light'] .diagnostic-hero__signals span,
+body[data-theme='serika-light'] .diagnostic-hero__route span {
     background: rgba(255, 255, 255, 0.76);
 }
 
@@ -4907,7 +4997,8 @@ body[data-theme='serika-light'] .diagnostic-profile-card__stats span {
     }
 
     .diagnostic-hero__action {
-        justify-content: space-between;
+        padding-left: 0;
+        border-left: 0;
     }
 
     .diagnostic-hero__cta {
@@ -4934,8 +5025,11 @@ body[data-theme='serika-light'] .diagnostic-profile-card__stats span {
 
     .diagnostic-hero__action {
         display: grid;
-        grid-template-columns: auto minmax(0, 1fr);
         gap: 0.72rem;
+    }
+
+    .diagnostic-hero__control {
+        grid-template-columns: auto minmax(0, 1fr);
     }
 
     .diagnostic-hero__action .action-btn {
@@ -5000,6 +5094,10 @@ body[data-theme='serika-light'] .diagnostic-profile-card__stats span {
     .diagnostic-profile-card__stats {
         grid-template-columns: 1fr;
     }
+
+    .diagnostic-hero__signals {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Diagnostic onboarding refinement */
@@ -5035,8 +5133,11 @@ body[data-theme='serika-light'] .diagnostic-profile-card__stats span {
     }
 
     .diagnostic-hero__action {
-        grid-template-columns: 4.35rem minmax(0, 1fr);
         align-items: center;
+    }
+
+    .diagnostic-hero__control {
+        grid-template-columns: 4.35rem minmax(0, 1fr);
     }
 
     .diagnostic-progress-ring {
