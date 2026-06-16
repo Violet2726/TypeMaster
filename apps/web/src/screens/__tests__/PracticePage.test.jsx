@@ -1,5 +1,5 @@
 /** @vitest-environment jsdom */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { vi } from 'vitest';
 import { getCopy } from '../../i18n';
 import { getTrainingCopy } from '../../training/copy';
@@ -31,8 +31,9 @@ vi.mock('../../features/practice/components/ConfigPanel', () => ({
 }));
 
 vi.mock('../../features/practice/components/CustomTextWorkshop', () => ({
-    CustomTextWorkshop: ({ value = '', onApply }) => (
+    CustomTextWorkshop: ({ editorRef, value = '', onApply }) => (
         <div data-testid="custom-workshop">
+            <textarea aria-label="Custom editor" ref={editorRef} defaultValue={value} />
             <button type="button" onClick={onApply} disabled={!value.trim()}>
                 Use this text
             </button>
@@ -41,9 +42,29 @@ vi.mock('../../features/practice/components/CustomTextWorkshop', () => ({
 }));
 
 vi.mock('../../features/practice/components/TypingArea', () => ({
-    TypingArea: ({ isLocked, showReset, sourceLabel, status }) => (
+    TypingArea: ({
+        isLocked,
+        lockedPrimaryActionDisabled,
+        lockedPrimaryActionLabel,
+        lockedSecondaryActionLabel,
+        onLockedPrimaryAction,
+        onLockedSecondaryAction,
+        showReset,
+        sourceLabel,
+        status
+    }) => (
         <div data-testid="typing-area" data-locked={String(isLocked)} data-show-reset={String(showReset)}>
             {sourceLabel} {status}
+            {lockedPrimaryActionLabel && (
+                <button type="button" onClick={onLockedPrimaryAction} disabled={lockedPrimaryActionDisabled}>
+                    {lockedPrimaryActionLabel}
+                </button>
+            )}
+            {lockedSecondaryActionLabel && (
+                <button type="button" onClick={onLockedSecondaryAction}>
+                    {lockedSecondaryActionLabel}
+                </button>
+            )}
         </div>
     )
 }));
@@ -313,6 +334,27 @@ describe('PracticePage', () => {
         expect(screen.queryByText(baseStore.copy.practice.helperTitle)).not.toBeInTheDocument();
     });
 
+    test('lets the locked custom typing surface focus the custom editor first', () => {
+        const trainingCopy = getTrainingCopy('en-US');
+
+        Object.assign(mockStore, {
+            config: {
+                ...baseStore.config,
+                source: 'custom'
+            },
+            currentDraft: null
+        });
+
+        render(<PracticePage />);
+
+        const focusButton = screen.getByRole('button', { name: trainingCopy.practice.customFocusEditor });
+        expect(focusButton).toBeEnabled();
+
+        fireEvent.click(focusButton);
+
+        expect(screen.getByLabelText('Custom editor')).toHaveFocus();
+    });
+
     test('lets the custom compose action apply a drafted custom word bank', () => {
         const trainingCopy = getTrainingCopy('en-US');
         mockStore.applyCustomWordBank.mockClear();
@@ -331,11 +373,35 @@ describe('PracticePage', () => {
 
         render(<PracticePage />);
 
-        const applyButton = screen.getByRole('button', { name: trainingCopy.practice.customApply });
+        const applyButton = within(screen.getByTestId('custom-workshop')).getByRole('button', { name: trainingCopy.practice.customApply });
         expect(applyButton).toBeEnabled();
 
         fireEvent.click(applyButton);
 
         expect(mockStore.applyCustomWordBank).toHaveBeenCalledWith('alpha beta');
+    });
+
+    test('lets the locked custom typing surface apply drafted text directly', () => {
+        const trainingCopy = getTrainingCopy('en-US');
+        mockStore.applyCustomWordBank.mockClear();
+
+        Object.assign(mockStore, {
+            config: {
+                ...baseStore.config,
+                source: 'custom'
+            },
+            currentDraft: null,
+            settings: {
+                ...baseStore.settings,
+                customWordBankText: 'alpha beta'
+            }
+        });
+
+        render(<PracticePage />);
+
+        fireEvent.click(screen.getAllByRole('button', { name: trainingCopy.practice.customApply })[0]);
+
+        expect(mockStore.applyCustomWordBank).toHaveBeenCalledWith('alpha beta');
+        expect(screen.getByRole('button', { name: trainingCopy.practice.customEditText })).toBeEnabled();
     });
 });

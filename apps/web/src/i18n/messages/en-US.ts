@@ -466,6 +466,8 @@ export const enUSMessages = {
                 customTitle: 'Bring your own word bank into the plan',
                 customBody: 'Paste words, sentences, or a paragraph and this round will train directly on that text.',
                 customPlaceholder: 'Paste your glossary, phrases, or repeatable text here.',
+                customFocusEditor: 'Paste text',
+                customEditText: 'Edit text',
                 customApply: 'Use this text',
                 layoutLabel: 'Keyboard layout'
             },

@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Clock3, FileText, Gauge, Keyboard, RotateCcw, ShieldCheck } from 'lucide-react';
+import { Clock3, FileText, Gauge, Keyboard, RotateCcw, ShieldCheck, WandSparkles } from 'lucide-react';
 import { buildRenderedWords } from '@typemaster/domain';
 
 function getSessionStatusText(copy, status) {
@@ -44,7 +44,14 @@ export function TypingArea({
     isLocked = false,
     lockTitle,
     lockBody,
-    showReset = true
+    showReset = true,
+    lockedPrimaryActionLabel,
+    lockedPrimaryActionIcon: LockedPrimaryActionIcon = WandSparkles,
+    lockedPrimaryActionDisabled = false,
+    onLockedPrimaryAction,
+    lockedSecondaryActionLabel,
+    lockedSecondaryActionIcon: LockedSecondaryActionIcon = FileText,
+    onLockedSecondaryAction
 }) {
     const shellRef = useRef(null);
     const wrapperRef = useRef(null);
@@ -57,6 +64,8 @@ export function TypingArea({
     const unavailableTitle = lockTitle || copy.practice.wordsLockedTitle;
     const unavailableBody = lockBody || copy.practice.wordsLockedBody;
     const textAvailabilityLabel = isTypingUnavailable ? copy.practice.textPendingLabel : copy.practice.textReadyLabel;
+    const hasLockedPrimaryAction = Boolean(lockedPrimaryActionLabel && onLockedPrimaryAction);
+    const hasLockedSecondaryAction = Boolean(lockedSecondaryActionLabel && onLockedSecondaryAction);
     const preparationItems = [
         {
             key: 'source',
@@ -313,6 +322,27 @@ export function TypingArea({
                                 <span className="summary-label">{copy.common.status}</span>
                                 <strong>{unavailableTitle}</strong>
                                 <p>{unavailableBody}</p>
+                                {(hasLockedPrimaryAction || hasLockedSecondaryAction) && (
+                                    <div className="typing-empty-state__actions">
+                                        {hasLockedPrimaryAction && (
+                                            <button
+                                                type="button"
+                                                className="action-btn primary"
+                                                onClick={onLockedPrimaryAction}
+                                                disabled={lockedPrimaryActionDisabled}
+                                            >
+                                                <LockedPrimaryActionIcon aria-hidden="true" size={18} strokeWidth={2.25} />
+                                                {lockedPrimaryActionLabel}
+                                            </button>
+                                        )}
+                                        {hasLockedSecondaryAction && (
+                                            <button type="button" className="action-btn" onClick={onLockedSecondaryAction}>
+                                                <LockedSecondaryActionIcon aria-hidden="true" size={18} strokeWidth={2.25} />
+                                                {lockedSecondaryActionLabel}
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
                             </div>
 
                             <div className="typing-empty-state__preflight" aria-label={unavailableTitle}>

@@ -6,7 +6,8 @@ export function CustomTextWorkshop({
     language,
     value,
     onChange,
-    onApply
+    onApply,
+    editorRef
 }) {
     const copy = getCopy(language);
     const trainingCopy = getTrainingCopy(language);
@@ -51,6 +52,7 @@ export function CustomTextWorkshop({
                         {trainingCopy.practice.customSource}
                     </span>
                     <textarea
+                        ref={editorRef}
                         value={value}
                         rows={8}
                         placeholder={trainingCopy.practice.customPlaceholder}

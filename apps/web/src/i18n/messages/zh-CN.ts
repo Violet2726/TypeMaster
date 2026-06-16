@@ -466,6 +466,8 @@ export const zhCNMessages = {
                 customTitle: '把自己的词库带入计划',
                 customBody: '粘贴单词、句子或段落，本轮会直接用这段文本训练。',
                 customPlaceholder: '粘贴术语、短语或想反复练习的段落。',
+                customFocusEditor: '粘贴文本',
+                customEditText: '编辑文本',
                 customApply: '使用这段文本',
                 layoutLabel: '键盘布局'
             },

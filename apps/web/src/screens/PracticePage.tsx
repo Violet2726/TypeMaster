@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { RotateCcw } from 'lucide-react';
+import { BadgeCheck, FileText, PencilLine, RotateCcw, WandSparkles } from 'lucide-react';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { AIWorkshop } from '../features/practice/components/AIWorkshop';
 import { ConfigPanel } from '../features/practice/components/ConfigPanel';
@@ -17,6 +17,7 @@ export function PracticePage() {
     const pathname = usePathname();
     const navigate = useAppNavigate();
     const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
+    const customTextEditorRef = useRef<HTMLTextAreaElement | null>(null);
     const store = usePracticePageStore();
     const {
         aiPracticeStatus,
@@ -55,6 +56,59 @@ export function PracticePage() {
         navigate
     });
     const isCustomComposeMode = store.config.source === 'custom' && isCustomEmpty;
+    const isAiTextPending = store.config.source === 'ai' && aiPracticeStatus !== 'ready';
+    const isCustomTextPending = store.config.source === 'custom' && isCustomEmpty;
+    const hasCustomTextDraft = Boolean(customText.trim());
+    const focusCustomTextEditor = useCallback(() => {
+        setControlsOpen(true);
+
+        const focusEditor = () => {
+            customTextEditorRef.current?.focus();
+            customTextEditorRef.current?.scrollIntoView?.({
+                block: 'center',
+                behavior: 'smooth'
+            });
+        };
+
+        focusEditor();
+        if (typeof window.requestAnimationFrame === 'function') {
+            window.requestAnimationFrame(focusEditor);
+        }
+    }, [setControlsOpen]);
+    const lockedPrimaryActionLabel = isAiTextPending
+        ? aiPracticeStatus === 'stale'
+            ? store.copy.common.reGenerateAiText
+            : aiPracticeStatus === 'loading'
+                ? store.copy.common.loading
+                : store.copy.common.generateAiText
+        : isCustomTextPending
+            ? hasCustomTextDraft
+                ? trainingCopy.practice.customApply
+                : trainingCopy.practice.customFocusEditor
+            : undefined;
+    const lockedPrimaryActionIcon = isAiTextPending
+        ? WandSparkles
+        : hasCustomTextDraft
+            ? BadgeCheck
+            : PencilLine;
+    const lockedSecondaryActionLabel = isAiTextPending && aiPracticeStatus === 'error'
+        ? store.copy.common.useBuiltIn
+        : isCustomTextPending && hasCustomTextDraft
+            ? trainingCopy.practice.customEditText
+            : undefined;
+    const lockedSecondaryActionIcon = isAiTextPending ? FileText : PencilLine;
+    const onLockedPrimaryAction = isAiTextPending
+        ? handleGenerateAi
+        : isCustomTextPending
+            ? hasCustomTextDraft
+                ? handleApplyCustomText
+                : focusCustomTextEditor
+            : undefined;
+    const onLockedSecondaryAction = isAiTextPending && lockedSecondaryActionLabel
+        ? handleUseBuiltin
+        : isCustomTextPending && lockedSecondaryActionLabel
+            ? focusCustomTextEditor
+            : undefined;
 
     useEffect(() => {
         window.addEventListener('beforeunload', handleBeforeUnload);
@@ -177,7 +231,7 @@ export function PracticePage() {
                 </section>
             )}
 
-            <div className={`practice-workbench ${isCustomComposeMode ? 'practice-workbench--compose' : ''}`}>
+            <div className={`practice-workbench ${isCustomComposeMode ? 'practice-workbench--compose' : ''} ${isAiTextPending ? 'practice-workbench--ai-pending' : ''}`}>
                 <div className="practice-workbench__primary">
                     <TypingArea
                         copy={store.copy}
@@ -204,6 +258,13 @@ export function PracticePage() {
                         lockTitle={lockTitle}
                         lockBody={lockBody}
                         showReset={!isCustomComposeMode}
+                        lockedPrimaryActionLabel={lockedPrimaryActionLabel}
+                        lockedPrimaryActionIcon={lockedPrimaryActionIcon}
+                        lockedPrimaryActionDisabled={isAiTextPending && aiPracticeStatus === 'loading'}
+                        onLockedPrimaryAction={onLockedPrimaryAction}
+                        lockedSecondaryActionLabel={lockedSecondaryActionLabel}
+                        lockedSecondaryActionIcon={lockedSecondaryActionIcon}
+                        onLockedSecondaryAction={onLockedSecondaryAction}
                     />
                 </div>
 
@@ -252,6 +313,7 @@ export function PracticePage() {
                             <CustomTextWorkshop
                                 language={store.language}
                                 value={customText}
+                                editorRef={customTextEditorRef}
                                 onChange={setCustomText}
                                 onApply={handleApplyCustomText}
                             />
