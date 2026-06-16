@@ -35,12 +35,19 @@ describe('InsightsPage', () => {
         expect(await screen.findByRole('heading', { name: 'No session history yet' })).toBeInTheDocument();
         expect(screen.getAllByText('Weekly goal').length).toBeGreaterThanOrEqual(1);
         expect(screen.getAllByText('Growth radar').length).toBeGreaterThanOrEqual(1);
+        expect(screen.getByText('Unlocked after one round')).toBeInTheDocument();
+        expect(screen.getByText('Speed baseline')).toBeInTheDocument();
+        expect(screen.getByText('Create signal')).toBeInTheDocument();
         expect(screen.getByText('Keyboard pressure')).toBeInTheDocument();
         expect(screen.getByText('Achievement wall')).toBeInTheDocument();
 
         fireEvent.click(screen.getByRole('button', { name: 'Start practice' }));
 
         await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith('/practice'));
+
+        fireEvent.click(screen.getByRole('button', { name: 'Run 3-minute assessment' }));
+
+        await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith('/diagnostic'));
     });
 
     test('groups frequent error characters by keyboard area', async () => {

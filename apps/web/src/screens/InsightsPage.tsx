@@ -118,11 +118,28 @@ function TargetedProgress({ copy, trend }) {
     );
 }
 
-function EmptyInsightsPreview({ copy, trainingCopy, onStart }) {
+function EmptyInsightsPreview({ copy, trainingCopy, onStart, onAssess }) {
     const previewMetrics = [
         { label: copy.insights.bestWpm, value: copy.common.emptyValue },
         { label: copy.insights.recentTrend, value: copy.common.emptyValue },
         { label: trainingCopy.insights.weekGoal, value: copy.common.emptyValue }
+    ];
+    const firstRoundSignals = [
+        {
+            icon: Gauge,
+            label: copy.insights.emptySignalSpeed,
+            value: copy.common.wpm
+        },
+        {
+            icon: ShieldCheck,
+            label: copy.insights.emptySignalAccuracy,
+            value: copy.common.accuracy
+        },
+        {
+            icon: Target,
+            label: copy.insights.emptySignalFocus,
+            value: copy.insights.targetedLatestLabel
+        }
     ];
     const unlockItems = [
         {
@@ -151,13 +168,32 @@ function EmptyInsightsPreview({ copy, trainingCopy, onStart }) {
                 <p className="panel-kicker">{copy.nav.insights}</p>
                 <h2>{copy.insights.emptyTitle}</h2>
                 <p className="muted-text">{copy.insights.emptyBody}</p>
-                <button type="button" className="action-btn primary" onClick={onStart}>
-                    <Keyboard aria-hidden="true" size={18} strokeWidth={2.2} />
-                    {copy.insights.emptyAction}
-                </button>
+                <div className="insights-empty-panel__signals" aria-label={copy.insights.emptySignalsTitle}>
+                    {firstRoundSignals.map(({ icon: Icon, label, value }) => (
+                        <span key={label}>
+                            <Icon aria-hidden="true" size={15} strokeWidth={2.25} />
+                            <small>{label}</small>
+                            <strong>{value}</strong>
+                        </span>
+                    ))}
+                </div>
+                <div className="insights-empty-panel__actions">
+                    <button type="button" className="action-btn primary" onClick={onStart}>
+                        <Keyboard aria-hidden="true" size={18} strokeWidth={2.2} />
+                        {copy.insights.emptyAction}
+                    </button>
+                    <button type="button" className="ghost-btn" onClick={onAssess}>
+                        <Target aria-hidden="true" size={17} strokeWidth={2.2} />
+                        {copy.insights.emptyAssessmentAction}
+                    </button>
+                </div>
             </div>
 
             <div className="insights-empty-preview" aria-label={copy.nav.insights}>
+                <div className="insights-empty-preview__eyebrow">
+                    <span>{copy.insights.emptyPreviewKicker}</span>
+                    <strong>{copy.insights.emptyPreviewStatus}</strong>
+                </div>
                 <div className="insights-empty-preview__header">
                     <span className="insights-empty-preview__icon" aria-hidden="true">
                         <LineChart aria-hidden="true" size={20} strokeWidth={2.2} />
@@ -189,6 +225,11 @@ function EmptyInsightsPreview({ copy, trainingCopy, onStart }) {
                         </div>
                     ))}
                 </div>
+                <div className="insights-empty-preview__route" aria-label={copy.insights.emptyRouteTitle}>
+                    <span>{copy.insights.emptyRouteStepOne}</span>
+                    <span>{copy.insights.emptyRouteStepTwo}</span>
+                    <span>{copy.insights.emptyRouteStepThree}</span>
+                </div>
             </div>
         </section>
     );
@@ -217,7 +258,14 @@ export function InsightsPage() {
     });
 
     if (!sessions.length) {
-        return <EmptyInsightsPreview copy={copy} trainingCopy={trainingCopy} onStart={() => navigate('/practice')} />;
+        return (
+            <EmptyInsightsPreview
+                copy={copy}
+                trainingCopy={trainingCopy}
+                onStart={() => navigate('/practice')}
+                onAssess={() => navigate('/diagnostic')}
+            />
+        );
     }
 
     const overviewMetrics = [
