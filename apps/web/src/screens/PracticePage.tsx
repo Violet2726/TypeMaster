@@ -97,6 +97,22 @@ export function PracticePage() {
             ? trainingCopy.practice.customEditText
             : undefined;
     const lockedSecondaryActionIcon = isAiTextPending ? FileText : PencilLine;
+    const activeModeLabel = store.config.mode === 'time' ? store.copy.common.timeMode : store.copy.common.wordsMode;
+    const activeVolumeLabel = store.config.mode === 'time' ? `${store.config.durationSeconds}s` : `${store.config.wordCount}`;
+    const toolbarHighlights = [
+        {
+            label: store.copy.practice.sourceTitle,
+            value: sourceLabel
+        },
+        {
+            label: store.copy.practice.modeTitle,
+            value: activeModeLabel
+        },
+        {
+            label: store.copy.practice.volumeTitle,
+            value: activeVolumeLabel
+        }
+    ];
     const onLockedPrimaryAction = isAiTextPending
         ? handleGenerateAi
         : isCustomTextPending
@@ -274,7 +290,17 @@ export function PracticePage() {
                             <div>
                                 <p className="panel-kicker">{store.copy.practice.configTitle}</p>
                                 <h2>{sourceLabel}</h2>
+                                <p className="muted-text practice-toolbar__meta">{activeModeLabel} · {activeVolumeLabel}</p>
                             </div>
+                        </div>
+
+                        <div className="practice-toolbar__snapshot">
+                            {toolbarHighlights.map((item) => (
+                                <div key={item.label} className="practice-toolbar__snapshot-item">
+                                    <small>{item.label}</small>
+                                    <strong>{item.value}</strong>
+                                </div>
+                            ))}
                         </div>
 
                         <ConfigPanel
@@ -287,32 +313,38 @@ export function PracticePage() {
                         />
 
                         {controlsOpen && store.config.source === 'ai' && (
-                            <AIWorkshop
-                                copy={store.copy}
-                                language={store.language}
-                                config={store.config}
-                                currentDraft={currentDraft}
-                                aiPracticeStatus={aiPracticeStatus}
-                                practiceError={practiceError}
-                                onConfigChange={handleConfigChange}
-                                onGenerate={handleGenerateAi}
-                                onRestoreConfig={restoreAiDraftConfig}
-                                onUseBuiltin={handleUseBuiltin}
-                            />
+                            <div className="practice-toolbar__studio">
+                                <AIWorkshop
+                                    copy={store.copy}
+                                    language={store.language}
+                                    config={store.config}
+                                    currentDraft={currentDraft}
+                                    aiPracticeStatus={aiPracticeStatus}
+                                    practiceError={practiceError}
+                                    onConfigChange={handleConfigChange}
+                                    onGenerate={handleGenerateAi}
+                                    onRestoreConfig={restoreAiDraftConfig}
+                                    onUseBuiltin={handleUseBuiltin}
+                                />
+                            </div>
                         )}
 
                         {controlsOpen && store.config.source === 'builtin' && (
-                            <p className="muted-text practice-toolbar__hint">{store.copy.practice.builtInReady}</p>
+                            <div className="practice-toolbar__support-note" role="note">
+                                <p className="muted-text practice-toolbar__hint">{store.copy.practice.builtInReady}</p>
+                            </div>
                         )}
 
                         {store.config.source === 'custom' && (
-                            <CustomTextWorkshop
-                                language={store.language}
-                                value={customText}
-                                editorRef={customTextEditorRef}
-                                onChange={setCustomText}
-                                onApply={handleApplyCustomText}
-                            />
+                            <div className="practice-toolbar__studio">
+                                <CustomTextWorkshop
+                                    language={store.language}
+                                    value={customText}
+                                    editorRef={customTextEditorRef}
+                                    onChange={setCustomText}
+                                    onApply={handleApplyCustomText}
+                                />
+                            </div>
                         )}
                     </section>
                 </aside>

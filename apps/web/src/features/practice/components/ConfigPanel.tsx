@@ -1,8 +1,9 @@
-import { Bot, Clock3, Hash, Library, PencilLine, SlidersHorizontal, Timer } from 'lucide-react';
+import { Bot, ChevronDown, Clock3, Hash, Library, PencilLine, SlidersHorizontal, Timer } from 'lucide-react';
 import { getTrainingCopy } from '../../../training/copy';
 
 const timeOptions = [15, 30, 60, 120];
 const wordOptions = [10, 25, 50, 100];
+const advancedPanelId = 'practice-config-advanced';
 
 function SegmentedButton({ active, children, icon: Icon = null, onClick }) {
     return (
@@ -18,16 +19,46 @@ function SegmentedButton({ active, children, icon: Icon = null, onClick }) {
     );
 }
 
+function ConfigSection({ label, value, children }) {
+    return (
+        <section className="config-section">
+            <div className="config-section__head">
+                <span className="control-label">{label}</span>
+                <strong className="config-section__value">{value}</strong>
+            </div>
+            {children}
+        </section>
+    );
+}
+
+function getSourceValue(copy, trainingCopy, source) {
+    if (source === 'custom') return trainingCopy.practice.customSource;
+    if (source === 'ai') return copy.practice.sourceAi;
+    return copy.practice.sourceBuiltin;
+}
+
+function getModeValue(copy, mode) {
+    return mode === 'time' ? copy.common.timeMode : copy.common.wordsMode;
+}
+
+function getVolumeValue(config) {
+    return config.mode === 'time' ? `${config.durationSeconds}s` : `${config.wordCount}`;
+}
+
 export function ConfigPanel({ copy, language, config, onConfigChange, showAdvanced, onToggleAdvanced }) {
     const trainingCopy = getTrainingCopy(language);
+    const sourceValue = getSourceValue(copy, trainingCopy, config.source);
+    const modeValue = getModeValue(copy, config.mode);
+    const volumeValue = getVolumeValue(config);
+    const activeOptions = [
+        config.includePunctuation ? copy.common.punctuation : null,
+        config.includeNumbers ? copy.common.numbers : null
+    ].filter(Boolean).join(' / ') || copy.common.emptyValue;
 
     return (
         <div className="config-strip">
             <div className="config-strip__main">
-                <div className="control-group">
-                    <div className="control-label-row">
-                        <span className="control-label">{copy.practice.sourceTitle}</span>
-                    </div>
+                <ConfigSection label={copy.practice.sourceTitle} value={sourceValue}>
                     <div className="segmented-group">
                         <SegmentedButton icon={Library} active={config.source === 'builtin'} onClick={() => onConfigChange({ source: 'builtin' }, { risky: true, intent: 'config' })}>
                             {copy.practice.sourceBuiltin}
@@ -39,12 +70,9 @@ export function ConfigPanel({ copy, language, config, onConfigChange, showAdvanc
                             {copy.practice.sourceAi}
                         </SegmentedButton>
                     </div>
-                </div>
+                </ConfigSection>
 
-                <div className="control-group">
-                    <div className="control-label-row">
-                        <span className="control-label">{copy.practice.modeTitle}</span>
-                    </div>
+                <ConfigSection label={copy.practice.modeTitle} value={modeValue}>
                     <div className="segmented-group">
                         <SegmentedButton icon={Timer} active={config.mode === 'time'} onClick={() => onConfigChange({ mode: 'time' }, { risky: true, intent: 'config' })}>
                             {copy.common.timeMode}
@@ -53,13 +81,9 @@ export function ConfigPanel({ copy, language, config, onConfigChange, showAdvanc
                             {copy.common.wordsMode}
                         </SegmentedButton>
                     </div>
-                </div>
+                </ConfigSection>
 
-                <div className="control-group">
-                    <div className="control-label-row">
-                        <span className="control-label">{copy.practice.volumeTitle}</span>
-                    </div>
-
+                <ConfigSection label={copy.practice.volumeTitle} value={volumeValue}>
                     {config.mode === 'time' ? (
                         <div className="segmented-group">
                             {timeOptions.map((value) => (
@@ -87,22 +111,33 @@ export function ConfigPanel({ copy, language, config, onConfigChange, showAdvanc
                             ))}
                         </div>
                     )}
-                </div>
+                </ConfigSection>
             </div>
 
             <div className="config-strip__actions">
-                <button type="button" className="ghost-btn ghost-btn--small" onClick={onToggleAdvanced}>
-                    <SlidersHorizontal aria-hidden="true" size={16} strokeWidth={2.2} />
-                    {showAdvanced ? copy.practice.settingsHide : copy.practice.settingsToggle}
+                <button
+                    type="button"
+                    className="ghost-btn ghost-btn--small"
+                    aria-expanded={showAdvanced}
+                    aria-controls={advancedPanelId}
+                    onClick={onToggleAdvanced}
+                >
+                    <span className="ghost-btn__label">
+                        <SlidersHorizontal aria-hidden="true" size={16} strokeWidth={2.2} />
+                        {showAdvanced ? copy.practice.settingsHide : copy.practice.settingsToggle}
+                    </span>
+                    <ChevronDown
+                        aria-hidden="true"
+                        className={`ghost-btn__chevron ${showAdvanced ? 'is-open' : ''}`}
+                        size={16}
+                        strokeWidth={2.2}
+                    />
                 </button>
             </div>
 
             {showAdvanced && (
-                <div className="config-strip__advanced">
-                    <div className="control-group">
-                        <div className="control-label-row">
-                            <span className="control-label">{copy.practice.optionsTitle}</span>
-                        </div>
+                <div className="config-strip__advanced" id={advancedPanelId}>
+                    <ConfigSection label={copy.practice.optionsTitle} value={activeOptions}>
                         <div className="segmented-group">
                             <SegmentedButton active={config.includePunctuation} onClick={() => onConfigChange({ includePunctuation: !config.includePunctuation }, { risky: true, intent: 'config' })}>
                                 {copy.common.punctuation}
@@ -111,7 +146,7 @@ export function ConfigPanel({ copy, language, config, onConfigChange, showAdvanc
                                 {copy.common.numbers}
                             </SegmentedButton>
                         </div>
-                    </div>
+                    </ConfigSection>
                 </div>
             )}
         </div>
