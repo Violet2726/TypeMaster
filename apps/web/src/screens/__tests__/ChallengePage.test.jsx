@@ -31,6 +31,8 @@ describe('ChallengePage', () => {
         expect(screen.getAllByText('No result posted yet. Finish one round and your rank plus best status will appear here.').length).toBeGreaterThanOrEqual(1);
         expect(screen.getAllByText('No same-level results yet. You can leave the first one.').length).toBeGreaterThanOrEqual(1);
         expect(screen.getByText('Waiting for your first mark')).toBeInTheDocument();
+        expect(screen.getByText('Best speed')).toBeInTheDocument();
+        expect(screen.getAllByText('Daily challenge').length).toBeGreaterThan(0);
         expect(screen.getByText('Peer board opens after one run')).toBeInTheDocument();
         expect(screen.queryByText('--')).not.toBeInTheDocument();
         expect(screen.queryByText('0 WPM')).not.toBeInTheDocument();

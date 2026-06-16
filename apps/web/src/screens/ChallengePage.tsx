@@ -90,6 +90,24 @@ function ChallengeFirstRunPanel({ title, headline, body, items }) {
 }
 
 function ChallengeStarterPanel({ challenge, facts, onStart, trainingCopy, items }) {
+    const routeSteps = [
+        {
+            label: '01',
+            title: trainingCopy.challenge.kicker,
+            value: facts[0] || trainingCopy.challenge.trendFirstLabel
+        },
+        {
+            label: '02',
+            title: trainingCopy.challenge.trendFirstLabel,
+            value: trainingCopy.challenge.bestRunLabel
+        },
+        {
+            label: '03',
+            title: trainingCopy.challenge.leaderboard,
+            value: trainingCopy.challenge.peerTitle
+        }
+    ];
+
     return (
         <section className="panel challenge-starter-panel" aria-label={trainingCopy.challenge.kicker}>
             <div className="challenge-starter-panel__copy">
@@ -122,6 +140,16 @@ function ChallengeStarterPanel({ challenge, facts, onStart, trainingCopy, items 
                         <strong>{trainingCopy.challenge.statusPreviewTitle}</strong>
                         <span>{trainingCopy.challenge.strategyIdle}</span>
                     </div>
+                </div>
+
+                <div className="challenge-starter-route" aria-label={trainingCopy.challenge.statusTitle}>
+                    {routeSteps.map((step) => (
+                        <span key={step.label}>
+                            <small>{step.label}</small>
+                            <strong>{step.title}</strong>
+                            <em>{step.value}</em>
+                        </span>
+                    ))}
                 </div>
 
                 <div className="challenge-starter-unlocks">
