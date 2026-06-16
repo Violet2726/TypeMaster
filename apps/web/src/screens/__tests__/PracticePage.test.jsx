@@ -43,18 +43,25 @@ vi.mock('../../features/practice/components/CustomTextWorkshop', () => ({
 
 vi.mock('../../features/practice/components/TypingArea', () => ({
     TypingArea: ({
+        copy,
         isLocked,
         lockedPrimaryActionDisabled,
         lockedPrimaryActionLabel,
         lockedSecondaryActionLabel,
         onLockedPrimaryAction,
         onLockedSecondaryAction,
+        onReset,
         showReset,
         sourceLabel,
         status
     }) => (
         <div data-testid="typing-area" data-locked={String(isLocked)} data-show-reset={String(showReset)}>
             {sourceLabel} {status}
+            {showReset && (
+                <button type="button" onClick={onReset}>
+                    {copy.common.resetRound}
+                </button>
+            )}
             {lockedPrimaryActionLabel && (
                 <button type="button" onClick={onLockedPrimaryAction} disabled={lockedPrimaryActionDisabled}>
                     {lockedPrimaryActionLabel}
@@ -285,6 +292,12 @@ describe('PracticePage', () => {
         expect(typingArea.compareDocumentPosition(configPanel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     });
 
+    test('keeps only one reset action in built-in practice mode', () => {
+        render(<PracticePage />);
+
+        expect(screen.getAllByRole('button', { name: baseStore.copy.common.resetRound })).toHaveLength(1);
+    });
+
     test('shows the custom word bank workshop immediately when custom source is selected', () => {
         Object.assign(mockStore, {
             config: {
@@ -300,6 +313,7 @@ describe('PracticePage', () => {
         expect(document.querySelector('.practice-page--compose')).toBeInTheDocument();
         expect(document.querySelector('.practice-workbench--compose')).toBeInTheDocument();
         expect(screen.getByTestId('typing-area')).toHaveAttribute('data-show-reset', 'false');
+        expect(screen.queryByRole('button', { name: baseStore.copy.common.resetRound })).not.toBeInTheDocument();
         expect(screen.queryByText(baseStore.copy.practice.helperTitle)).not.toBeInTheDocument();
     });
 
