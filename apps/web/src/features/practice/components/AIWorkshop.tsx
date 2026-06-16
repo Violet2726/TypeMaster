@@ -1,6 +1,7 @@
 import { Bot, CircleCheck, FileText, RefreshCw, WandSparkles } from 'lucide-react';
 import { AI_TEMPLATES, DIFFICULTY_OPTIONS, getDifficultyLabel, getTemplateLabel } from '@typemaster/domain';
 import { getErrorMessage } from '../../../i18n';
+import { PracticeWorkshopField, PracticeWorkshopSnapshot } from './PracticeWorkshopBlocks';
 import { PracticeWorkshopShell } from './PracticeWorkshopShell';
 
 function getStatusLabel(copy, status) {
@@ -40,11 +41,11 @@ export function AIWorkshop({
         && aiDraftName !== copy.common.emptyValue
         && aiPracticeStatus !== 'idle'
         && aiPracticeStatus !== 'error';
-    const draftLabel = hasNamedAiDraft ? aiDraftName : statusLabel;
-    const headline = hasNamedAiDraft ? draftLabel : copy.common.generateAiText;
+    const draftLabel = hasNamedAiDraft ? aiDraftName : copy.common.emptyValue;
     const statusBody = getStatusBody(copy, aiPracticeStatus);
     const templateLabel = selectedTemplate ? getTemplateLabel(selectedTemplate, language) : copy.common.emptyValue;
     const difficultyLabel = selectedDifficulty ? getDifficultyLabel(selectedDifficulty, language) : copy.common.emptyValue;
+    const headline = hasNamedAiDraft ? aiDraftName : copy.practice.customTitle;
     const primaryActionLabel = aiPracticeStatus === 'stale'
         ? copy.common.reGenerateAiText
         : aiPracticeStatus === 'loading'
@@ -56,7 +57,7 @@ export function AIWorkshop({
             variant="ai"
             statusTone={aiPracticeStatus}
             icon={Bot}
-            kicker={copy.practice.customTitle}
+            kicker={copy.common.generateAiText}
             title={headline}
             description={statusBody}
             statusCaption={copy.common.status}
@@ -87,52 +88,41 @@ export function AIWorkshop({
                 </>
             )}
         >
-            <div className="ai-custom-panel__body">
-                <div className="ai-custom-panel__spec">
+            <div className="ai-custom-panel__body practice-workshop-grid practice-workshop-grid--balanced">
+                <div className="practice-workshop-grid__main">
                     <div className="workshop-grid">
-                        <label className="field workshop-field">
-                            <span>
-                                <WandSparkles aria-hidden="true" size={15} strokeWidth={2.25} />
-                                {copy.practice.templateLabel}
-                            </span>
+                        <PracticeWorkshopField icon={WandSparkles} label={copy.practice.templateLabel}>
                             <select value={config.aiTemplate} onChange={(event) => onConfigChange({ aiTemplate: event.target.value, source: 'ai' }, { risky: true, intent: 'config' })}>
                                 {AI_TEMPLATES.map((template) => (
                                     <option key={template.id} value={template.id}>{getTemplateLabel(template, language)}</option>
                                 ))}
                             </select>
-                        </label>
+                        </PracticeWorkshopField>
 
-                        <label className="field workshop-field">
-                            <span>
-                                <CircleCheck aria-hidden="true" size={15} strokeWidth={2.25} />
-                                {copy.practice.difficultyLabel}
-                            </span>
+                        <PracticeWorkshopField icon={CircleCheck} label={copy.practice.difficultyLabel}>
                             <select value={config.difficulty} onChange={(event) => onConfigChange({ difficulty: event.target.value, source: 'ai' }, { risky: true, intent: 'config' })}>
                                 {DIFFICULTY_OPTIONS.map((difficulty) => (
                                     <option key={difficulty.id} value={difficulty.id}>{getDifficultyLabel(difficulty, language)}</option>
                                 ))}
                             </select>
-                        </label>
+                        </PracticeWorkshopField>
                     </div>
                 </div>
 
-                <div className="ai-custom-panel__state" aria-live="polite">
-                    <div>
-                        <p className="summary-label">{copy.common.currentText}</p>
-                        <strong>{draftLabel}</strong>
-                        <span>{copy.practice.customBody}</span>
-                    </div>
-                    <div className="ai-custom-panel__state-grid">
-                        <span>
-                            <small>{copy.practice.templateLabel}</small>
-                            <strong>{templateLabel}</strong>
-                        </span>
-                        <span>
-                            <small>{copy.practice.difficultyLabel}</small>
-                            <strong>{difficultyLabel}</strong>
-                        </span>
-                    </div>
-                </div>
+                <PracticeWorkshopSnapshot
+                    eyebrow={copy.common.currentText}
+                    title={draftLabel}
+                    metrics={[
+                        {
+                            label: copy.practice.templateLabel,
+                            value: templateLabel
+                        },
+                        {
+                            label: copy.practice.difficultyLabel,
+                            value: difficultyLabel
+                        }
+                    ]}
+                />
             </div>
 
             {errorCopy && (

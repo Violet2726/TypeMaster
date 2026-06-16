@@ -11550,16 +11550,30 @@ body[data-theme='serika-light'] .ai-custom-panel--custom {
     color: #ff9a92;
 }
 
-.ai-custom-panel__body {
+.practice-workshop-grid {
     display: grid;
-    grid-template-columns: minmax(0, 0.92fr) minmax(17rem, 0.72fr);
     gap: 0.72rem;
     align-items: stretch;
+    min-width: 0;
 }
 
-.ai-custom-panel__spec {
+.practice-workshop-grid--balanced {
+    grid-template-columns: minmax(0, 0.92fr) minmax(17rem, 0.72fr);
+}
+
+.practice-workshop-grid--editor {
+    grid-template-columns: minmax(0, 1.05fr) minmax(15rem, 0.58fr);
+}
+
+.practice-workshop-grid__main {
     display: grid;
+    gap: 0.72rem;
     align-content: start;
+    min-width: 0;
+}
+
+.practice-workshop-grid__main--editor {
+    min-height: 100%;
 }
 
 .ai-custom-panel .workshop-grid {
@@ -11656,18 +11670,19 @@ body[data-theme='serika-light'] .ai-custom-panel__state {
     background: #ff453a;
 }
 
-.ai-custom-panel__state > div:first-child {
+.practice-workshop-snapshot__copy {
     display: grid;
     gap: 0.24rem;
     align-content: start;
+    min-width: 0;
 }
 
-.ai-custom-panel__state > div:first-child strong {
+.practice-workshop-snapshot__copy strong {
     font-size: 1.02rem;
     overflow-wrap: anywhere;
 }
 
-.ai-custom-panel__state > div:first-child span {
+.practice-workshop-snapshot__copy span {
     color: var(--text-dim);
     font-size: 0.83rem;
     line-height: 1.45;
@@ -11716,13 +11731,6 @@ body[data-theme='serika-light'] .ai-custom-panel__state-grid span {
     gap: 0.86rem;
 }
 
-.custom-text-workshop__body {
-    display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(15rem, 0.58fr);
-    gap: 0.72rem;
-    align-items: stretch;
-}
-
 .custom-text-workshop__editor {
     min-height: 100%;
     padding: 0.74rem;
@@ -11750,7 +11758,7 @@ body[data-theme='serika-light'] .custom-text-workshop__editor {
     align-content: start;
 }
 
-.custom-text-workshop__stats strong {
+.custom-text-workshop__summary .ai-custom-panel__state-grid strong {
     font-size: 1.04rem;
 }
 
@@ -11805,8 +11813,7 @@ body[data-theme='serika-light'] .custom-text-workshop__editor {
         justify-content: center;
     }
 
-    .ai-custom-panel__body,
-    .custom-text-workshop__body,
+    .practice-workshop-grid,
     .ai-custom-panel .workshop-grid,
     .status-card--workshop .status-card__row {
         grid-template-columns: 1fr;

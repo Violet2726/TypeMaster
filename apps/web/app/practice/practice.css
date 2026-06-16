@@ -264,8 +264,7 @@ body[data-theme='serika-light'] .practice-workbench__rail .ai-custom-panel {
     justify-content: center;
 }
 
-.practice-workbench__rail .custom-text-workshop__body,
-.practice-workbench__rail .ai-custom-panel__body,
+.practice-workbench__rail .practice-workshop-grid,
 .practice-workbench__rail .ai-custom-panel .workshop-grid,
 .practice-workbench__rail .status-card--workshop .status-card__row {
     grid-template-columns: 1fr;
@@ -284,11 +283,11 @@ body[data-theme='serika-light'] .practice-workbench__rail .ai-custom-panel {
     padding: 0.72rem;
 }
 
-.practice-workbench__rail .custom-text-workshop__summary > div:first-child span {
+.practice-workbench__rail .custom-text-workshop__summary .practice-workshop-snapshot__copy span {
     display: none;
 }
 
-.practice-workbench__rail .custom-text-workshop__stats span {
+.practice-workbench__rail .custom-text-workshop__summary .ai-custom-panel__state-grid span {
     min-height: 3rem;
     padding: 0.5rem;
 }
