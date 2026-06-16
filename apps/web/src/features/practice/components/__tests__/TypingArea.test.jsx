@@ -74,4 +74,20 @@ describe('TypingArea', () => {
         expect(screen.getByText(copy.common.wpm)).toBeInTheDocument();
         expect(screen.getByText(copy.common.accuracy)).toBeInTheDocument();
     });
+
+    test('renders recovery actions when locked actions are available', () => {
+        const copy = getCopy('en-US');
+
+        renderTypingArea({
+            lockedPrimaryActionLabel: copy.common.generateAiText,
+            lockedPrimaryActionDisabled: true,
+            onLockedPrimaryAction: vi.fn(),
+            lockedSecondaryActionLabel: copy.common.useBuiltIn,
+            onLockedSecondaryAction: vi.fn()
+        });
+
+        expect(screen.getByRole('button', { name: copy.common.generateAiText })).toBeDisabled();
+        expect(screen.getByRole('button', { name: copy.common.useBuiltIn })).toBeInTheDocument();
+        expect(screen.getAllByRole('listitem')).toHaveLength(3);
+    });
 });

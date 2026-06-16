@@ -13,6 +13,32 @@
     align-content: start;
 }
 
+.practice-workbench__primary .typing-stage__head {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+}
+
+.practice-workbench__primary .typing-stage__summary {
+    display: grid;
+    gap: 0.56rem;
+    min-width: 0;
+}
+
+.practice-workbench__primary .typing-stage__summary .typing-stage__source,
+.practice-workbench__primary .typing-stage__summary .typing-stage__status {
+    min-width: 0;
+}
+
+.practice-workbench__primary .typing-stage__summary .typing-stage__status {
+    justify-content: flex-start;
+}
+
+.practice-workbench__primary .typing-empty-state__preflight {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
 .practice-workbench__primary .typing-stage {
     min-height: clamp(33rem, calc(100dvh - 9.5rem), 43rem);
 }
@@ -287,6 +313,10 @@ body[data-theme='serika-light'] .practice-workbench__rail .ai-custom-panel {
 @media (max-width: 720px) {
     .practice-workbench {
         gap: 0.82rem;
+    }
+
+    .practice-workbench__primary .typing-stage__summary {
+        gap: 0.48rem;
     }
 
     .practice-workbench__primary .typing-stage .words-container {

@@ -1,6 +1,9 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Clock3, FileText, Gauge, Keyboard, RotateCcw, ShieldCheck, WandSparkles } from 'lucide-react';
 import { buildRenderedWords } from '@typemaster/domain';
+import { TypingAreaEmptyState } from './TypingAreaEmptyState';
+import { TypingAreaLiveStats } from './TypingAreaLiveStats';
+import { TypingWordStream } from './TypingWordStream';
 
 function getSessionStatusText(copy, status) {
     return copy.statuses[status] || copy.statuses.idle;
@@ -249,18 +252,20 @@ export function TypingArea({
     return (
         <section className={`panel typing-stage ${isTypingUnavailable ? 'typing-stage--unavailable' : ''}`}>
             <div className="typing-stage__head">
-                <div className="typing-stage__source">
-                    <span className="summary-label">{copy.common.currentText}</span>
-                    <strong>{sourceLabel || copy.common.emptyValue}</strong>
-                </div>
+                <div className="typing-stage__summary">
+                    <div className="typing-stage__source">
+                        <span className="summary-label">{copy.common.currentText}</span>
+                        <strong>{sourceLabel || copy.common.emptyValue}</strong>
+                    </div>
 
-                <div className="typing-stage__status">
-                    <span className={`panel-badge badge-${getBadgeStatus(status)}`}>
-                        {copy.practice.sessionLabel}: {getSessionStatusText(copy, status)}
-                    </span>
-                    <span className={`panel-badge badge-${isTypingUnavailable ? 'stale' : 'ready'}`}>
-                        {textAvailabilityLabel}
-                    </span>
+                    <div className="typing-stage__status">
+                        <span className={`panel-badge badge-${getBadgeStatus(status)}`}>
+                            {copy.practice.sessionLabel}: {getSessionStatusText(copy, status)}
+                        </span>
+                        <span className={`panel-badge badge-${isTypingUnavailable ? 'stale' : 'ready'}`}>
+                            {textAvailabilityLabel}
+                        </span>
+                    </div>
                 </div>
 
                 {showReset && (
@@ -314,110 +319,31 @@ export function TypingArea({
                 )}
                 <div className="words-container">
                     {isTypingUnavailable ? (
-                        <div className="typing-empty-state">
-                            <div className="typing-empty-state__copy">
-                                <span className="typing-empty-state__icon" aria-hidden="true">
-                                    <ShieldCheck size={22} strokeWidth={2.25} />
-                                </span>
-                                <span className="summary-label">{copy.common.status}</span>
-                                <strong>{unavailableTitle}</strong>
-                                <p>{unavailableBody}</p>
-                                {(hasLockedPrimaryAction || hasLockedSecondaryAction) && (
-                                    <div className="typing-empty-state__actions">
-                                        {hasLockedPrimaryAction && (
-                                            <button
-                                                type="button"
-                                                className="action-btn primary"
-                                                onClick={onLockedPrimaryAction}
-                                                disabled={lockedPrimaryActionDisabled}
-                                            >
-                                                <LockedPrimaryActionIcon aria-hidden="true" size={18} strokeWidth={2.25} />
-                                                {lockedPrimaryActionLabel}
-                                            </button>
-                                        )}
-                                        {hasLockedSecondaryAction && (
-                                            <button type="button" className="action-btn" onClick={onLockedSecondaryAction}>
-                                                <LockedSecondaryActionIcon aria-hidden="true" size={18} strokeWidth={2.25} />
-                                                {lockedSecondaryActionLabel}
-                                            </button>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="typing-empty-state__preflight" aria-label={unavailableTitle}>
-                                {preparationItems.map(({ key, icon: Icon, label, value }) => (
-                                    <div key={key} className="typing-empty-state__step">
-                                        <span aria-hidden="true">
-                                            <Icon size={16} strokeWidth={2.2} />
-                                        </span>
-                                        <div>
-                                            <small>{label}</small>
-                                            <strong>{value}</strong>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="typing-empty-state__preview" aria-hidden="true">
-                                <span />
-                                <span />
-                                <span />
-                            </div>
-                        </div>
+                        <TypingAreaEmptyState
+                            copy={copy}
+                            unavailableTitle={unavailableTitle}
+                            unavailableBody={unavailableBody}
+                            preparationItems={preparationItems}
+                            hasLockedPrimaryAction={hasLockedPrimaryAction}
+                            lockedPrimaryActionLabel={lockedPrimaryActionLabel}
+                            LockedPrimaryActionIcon={LockedPrimaryActionIcon}
+                            lockedPrimaryActionDisabled={lockedPrimaryActionDisabled}
+                            onLockedPrimaryAction={onLockedPrimaryAction}
+                            hasLockedSecondaryAction={hasLockedSecondaryAction}
+                            lockedSecondaryActionLabel={lockedSecondaryActionLabel}
+                            LockedSecondaryActionIcon={LockedSecondaryActionIcon}
+                            onLockedSecondaryAction={onLockedSecondaryAction}
+                        />
                     ) : (
-                        <div className="words-wrapper" ref={wrapperRef}>
-                            <div className={`caret ${status === 'running' ? 'active' : ''}`} style={caretStyle} />
-                            <div className="words">
-                                {renderedWords.map((word) => (
-                                    <div
-                                        key={`${word.wordIndex}-${word.word}`}
-                                        className={`word ${word.isCurrent ? 'current' : ''} word-${word.phase}`}
-                                        ref={(node) => {
-                                            if (node) {
-                                                wordRefs.current.set(word.wordIndex, node);
-                                            } else {
-                                                wordRefs.current.delete(word.wordIndex);
-                                            }
-                                        }}
-                                    >
-                                        {word.chars.map((char) => (
-                                            <span
-                                                key={`${word.wordIndex}-${char.index}`}
-                                                className={`letter ${char.status}`}
-                                                ref={(node) => {
-                                                    const key = `${word.wordIndex}-${char.index}`;
-                                                    if (node) {
-                                                        charRefs.current.set(key, node);
-                                                    } else {
-                                                        charRefs.current.delete(key);
-                                                    }
-                                                }}
-                                            >
-                                                {char.char}
-                                            </span>
-                                        ))}
-
-                                        {word.extraChars.map((char) => (
-                                            <span
-                                                key={`extra-${word.wordIndex}-${char.index}`}
-                                                className={`letter ${char.status}`}
-                                                ref={(node) => {
-                                                    const key = `${word.wordIndex}-${char.index}`;
-                                                    if (node) {
-                                                        extraRefs.current.set(key, node);
-                                                    } else {
-                                                        extraRefs.current.delete(key);
-                                                    }
-                                                }}
-                                            >
-                                                {char.char}
-                                            </span>
-                                        ))}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                        <TypingWordStream
+                            renderedWords={renderedWords}
+                            wrapperRef={wrapperRef}
+                            wordRefs={wordRefs}
+                            charRefs={charRefs}
+                            extraRefs={extraRefs}
+                            caretStyle={caretStyle}
+                            status={status}
+                        />
                     )}
                 </div>
 
@@ -429,17 +355,7 @@ export function TypingArea({
             {!isTypingUnavailable && (
                 <div className="typing-stage__footer">
                     <p className="muted-text typing-stage__hint">{footerHint}</p>
-                    <div className="live-stats">
-                        {liveStatItems.map(({ key, className, icon: Icon, value, label }) => (
-                            <div key={key} className={`live-stat ${className}`}>
-                                <span className="live-stat__icon" aria-hidden="true">
-                                    <Icon size={17} strokeWidth={2.25} />
-                                </span>
-                                <span className="live-stat-value">{value}</span>
-                                <span className="live-stat-label">{label}</span>
-                            </div>
-                        ))}
-                    </div>
+                    <TypingAreaLiveStats items={liveStatItems} ariaLabel={copy.practice.sessionLabel} />
                 </div>
             )}
         </section>
