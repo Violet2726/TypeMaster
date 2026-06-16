@@ -1,6 +1,7 @@
-import { BadgeCheck, FileText, PencilLine, Sparkles } from 'lucide-react';
+import { BadgeCheck, FileText, PencilLine } from 'lucide-react';
 import { getCopy } from '../../../i18n';
 import { getTrainingCopy } from '../../../training/copy';
+import { PracticeWorkshopShell } from './PracticeWorkshopShell';
 
 export function CustomTextWorkshop({
     language,
@@ -20,31 +21,22 @@ export function CustomTextWorkshop({
     const statusLabel = hasText ? copy.common.aiReady : copy.common.aiNeedsGenerate;
 
     return (
-        <section className={`ai-custom-panel ai-custom-panel--custom ai-custom-panel--${statusVariant} custom-text-workshop`}>
-            <div className="ai-custom-panel__head">
-                <span className="ai-custom-panel__icon" aria-hidden="true">
-                    <PencilLine size={20} strokeWidth={2.25} />
-                </span>
-                <div>
-                    <p className="panel-kicker">{trainingCopy.practice.customSource}</p>
-                    <strong>{trainingCopy.practice.customTitle}</strong>
-                    <p className="muted-text">{trainingCopy.practice.customBody}</p>
-                </div>
-                <div className="ai-custom-panel__command">
-                    <span className={`ai-custom-panel__status-pill ai-custom-panel__status-pill--${statusVariant}`} aria-live="polite">
-                        <Sparkles aria-hidden="true" size={14} strokeWidth={2.2} />
-                        <small>{copy.common.status}</small>
-                        <strong>{statusLabel}</strong>
-                    </span>
-                    <div className="workshop-actions">
-                        <button type="button" className="action-btn primary" onClick={onApply} disabled={!hasText}>
-                            <BadgeCheck aria-hidden="true" size={18} strokeWidth={2.25} />
-                            {trainingCopy.practice.customApply}
-                        </button>
-                    </div>
-                </div>
-            </div>
-
+        <PracticeWorkshopShell
+            variant="custom"
+            statusTone={statusVariant}
+            icon={PencilLine}
+            kicker={trainingCopy.practice.customSource}
+            title={trainingCopy.practice.customTitle}
+            description={trainingCopy.practice.customBody}
+            statusCaption={copy.common.status}
+            statusLabel={statusLabel}
+            actions={(
+                <button type="button" className="action-btn primary" onClick={onApply} disabled={!hasText}>
+                    <BadgeCheck aria-hidden="true" size={18} strokeWidth={2.25} />
+                    {trainingCopy.practice.customApply}
+                </button>
+            )}
+        >
             <div className="custom-text-workshop__body">
                 <label className="field workshop-field workshop-field--textarea custom-text-workshop__editor">
                     <span>
@@ -78,6 +70,6 @@ export function CustomTextWorkshop({
                     </div>
                 </div>
             </div>
-        </section>
+        </PracticeWorkshopShell>
     );
 }

@@ -1,6 +1,7 @@
-import { Bot, CircleCheck, FileText, RefreshCw, Sparkles, WandSparkles } from 'lucide-react';
+import { Bot, CircleCheck, FileText, RefreshCw, WandSparkles } from 'lucide-react';
 import { AI_TEMPLATES, DIFFICULTY_OPTIONS, getDifficultyLabel, getTemplateLabel } from '@typemaster/domain';
 import { getErrorMessage } from '../../../i18n';
+import { PracticeWorkshopShell } from './PracticeWorkshopShell';
 
 function getStatusLabel(copy, status) {
     if (status === 'loading') return copy.common.aiGenerating;
@@ -51,48 +52,41 @@ export function AIWorkshop({
             : copy.common.generateAiText;
 
     return (
-        <section className={`ai-custom-panel ai-custom-panel--ai ai-custom-panel--${aiPracticeStatus}`}>
-            <div className="ai-custom-panel__head">
-                <span className="ai-custom-panel__icon" aria-hidden="true">
-                    <Bot size={20} strokeWidth={2.25} />
-                </span>
-                <div>
-                    <p className="panel-kicker">{copy.practice.customTitle}</p>
-                    <strong>{headline}</strong>
-                    <p className="muted-text">{statusBody}</p>
-                </div>
-                <div className="ai-custom-panel__command">
-                    <span className={`ai-custom-panel__status-pill ai-custom-panel__status-pill--${aiPracticeStatus}`} aria-live="polite">
-                        <Sparkles aria-hidden="true" size={14} strokeWidth={2.2} />
-                        <small>{copy.common.status}</small>
-                        <strong>{statusLabel}</strong>
-                    </span>
-                    <div className="workshop-actions">
-                        <button
-                            type="button"
-                            className="action-btn primary"
-                            onClick={onGenerate}
-                            disabled={aiPracticeStatus === 'loading'}
-                        >
-                            <WandSparkles aria-hidden="true" size={18} strokeWidth={2.25} />
-                            {primaryActionLabel}
+        <PracticeWorkshopShell
+            variant="ai"
+            statusTone={aiPracticeStatus}
+            icon={Bot}
+            kicker={copy.practice.customTitle}
+            title={headline}
+            description={statusBody}
+            statusCaption={copy.common.status}
+            statusLabel={statusLabel}
+            actions={(
+                <>
+                    <button
+                        type="button"
+                        className="action-btn primary"
+                        onClick={onGenerate}
+                        disabled={aiPracticeStatus === 'loading'}
+                    >
+                        <WandSparkles aria-hidden="true" size={18} strokeWidth={2.25} />
+                        {primaryActionLabel}
+                    </button>
+                    {aiPracticeStatus === 'stale' && (
+                        <button type="button" className="action-btn" onClick={onRestoreConfig}>
+                            <RefreshCw aria-hidden="true" size={18} strokeWidth={2.25} />
+                            {copy.common.restoreLastConfig}
                         </button>
-                        {aiPracticeStatus === 'stale' && (
-                            <button type="button" className="action-btn" onClick={onRestoreConfig}>
-                                <RefreshCw aria-hidden="true" size={18} strokeWidth={2.25} />
-                                {copy.common.restoreLastConfig}
-                            </button>
-                        )}
-                        {aiPracticeStatus === 'error' && (
-                            <button type="button" className="action-btn" onClick={onUseBuiltin}>
-                                <FileText aria-hidden="true" size={18} strokeWidth={2.25} />
-                                {copy.common.useBuiltIn}
-                            </button>
-                        )}
-                    </div>
-                </div>
-            </div>
-
+                    )}
+                    {aiPracticeStatus === 'error' && (
+                        <button type="button" className="action-btn" onClick={onUseBuiltin}>
+                            <FileText aria-hidden="true" size={18} strokeWidth={2.25} />
+                            {copy.common.useBuiltIn}
+                        </button>
+                    )}
+                </>
+            )}
+        >
             <div className="ai-custom-panel__body">
                 <div className="ai-custom-panel__spec">
                     <div className="workshop-grid">
@@ -147,6 +141,6 @@ export function AIWorkshop({
                     <p>{errorCopy.description}</p>
                 </div>
             )}
-        </section>
+        </PracticeWorkshopShell>
     );
 }

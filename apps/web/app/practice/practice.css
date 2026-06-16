@@ -249,6 +249,12 @@ body[data-theme='serika-light'] .practice-workbench__rail .ai-custom-panel {
     line-height: 1.38;
 }
 
+.practice-workbench__rail .practice-workshop-shell__copy {
+    display: grid;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
 .practice-workbench__rail .ai-custom-panel__command {
     grid-column: 1 / -1;
     justify-items: stretch;
