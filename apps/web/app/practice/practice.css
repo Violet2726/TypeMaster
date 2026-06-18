@@ -1,8 +1,8 @@
 /* Practice route workbench refinement */
 .practice-workbench {
     display: grid;
-    grid-template-columns: minmax(0, 1.16fr) minmax(19.5rem, 24rem);
-    gap: clamp(0.95rem, 1.2vw, 1.15rem);
+    grid-template-columns: minmax(0, 1fr) clamp(18rem, 25vw, 21.5rem);
+    gap: clamp(0.82rem, 1vw, 1rem);
     align-items: start;
 }
 
@@ -40,11 +40,11 @@
 }
 
 .practice-workbench__primary .typing-stage {
-    min-height: clamp(33rem, calc(100dvh - 9.5rem), 43rem);
+    min-height: clamp(34rem, calc(100dvh - 8.7rem), 44rem);
 }
 
 .practice-workbench__primary .typing-stage .words-container {
-    height: clamp(15rem, 37vh, 22rem);
+    height: clamp(16.5rem, 39vh, 23.5rem);
 }
 
 .practice-workbench__primary .typing-stage .words-shell,
@@ -59,16 +59,17 @@
 
 .practice-workbench__rail .practice-toolbar {
     position: sticky;
-    top: 5.2rem;
-    gap: 0.8rem;
-    max-height: calc(100dvh - 6.3rem);
-    padding: 1rem;
+    top: 5rem;
+    gap: 0.68rem;
+    max-height: calc(100dvh - 5.8rem);
+    padding: 0.86rem;
     overflow: auto;
     scrollbar-width: thin;
     box-shadow:
-        0 18px 48px rgba(0, 0, 0, 0.18),
+        0 14px 34px rgba(0, 0, 0, 0.14),
         inset 0 1px 0 rgba(255, 255, 255, 0.06);
-    backdrop-filter: blur(18px);
+    backdrop-filter: saturate(160%) blur(22px);
+    -webkit-backdrop-filter: saturate(160%) blur(22px);
 }
 
 body[data-theme='serika-light'] .practice-workbench__rail .practice-toolbar {
@@ -453,5 +454,236 @@ body[data-theme='serika-light'] .practice-workbench__rail .ai-custom-panel {
         min-width: max-content;
         min-height: 2.46rem;
         padding-inline: 0.9rem;
+    }
+}
+
+/* Practice focus deck iteration */
+.practice-page {
+    gap: clamp(0.8rem, 1vw, 1rem);
+}
+
+.practice-workbench__primary .typing-stage {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    background:
+        linear-gradient(135deg, rgba(10, 132, 255, 0.1), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.078), rgba(255, 255, 255, 0.026)),
+        var(--bg-panel);
+    box-shadow:
+        0 18px 46px rgba(0, 0, 0, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.practice-workbench__primary .typing-stage::after {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    content: '';
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 28%),
+        linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.026), transparent);
+    mask-image: linear-gradient(180deg, black, transparent 72%);
+}
+
+.practice-workbench__primary .typing-stage > * {
+    position: relative;
+    z-index: 1;
+}
+
+.practice-workbench__primary .typing-stage__head {
+    gap: 0.9rem;
+    padding-bottom: 0.72rem;
+    border-bottom: 1px solid var(--panel-stroke);
+}
+
+.practice-workbench__primary .typing-stage__source strong {
+    font-family: var(--font-display);
+    font-size: clamp(1.16rem, 1.8vw, 1.46rem);
+    letter-spacing: 0;
+}
+
+.practice-workbench__primary .typing-stage .words-shell {
+    border-radius: 8px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.012)),
+        rgba(255, 255, 255, 0.026);
+}
+
+.practice-workbench__primary .typing-stage .words-shell.is-focused {
+    border-color: rgba(10, 132, 255, 0.42);
+    box-shadow:
+        inset 0 0 0 1px rgba(10, 132, 255, 0.16),
+        0 0 0 4px rgba(10, 132, 255, 0.08);
+}
+
+.practice-workbench__primary .typing-stage--unavailable .words-shell {
+    align-content: stretch;
+}
+
+.practice-workbench__primary .typing-empty-state {
+    min-height: 100%;
+    align-content: center;
+}
+
+.practice-workbench__primary .typing-empty-state__step,
+.practice-workbench__primary .typing-empty-state__preview {
+    border-radius: 8px;
+    box-shadow: none;
+}
+
+.practice-workbench__rail .practice-toolbar {
+    border-radius: 8px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.074), rgba(255, 255, 255, 0.024)),
+        rgba(22, 22, 24, 0.7);
+}
+
+.practice-workbench__rail .practice-toolbar__row {
+    padding-bottom: 0.64rem;
+    border-bottom: 1px solid var(--panel-stroke);
+}
+
+.practice-workbench__rail .practice-toolbar__meta {
+    color: var(--text-muted);
+}
+
+.practice-workbench__rail .practice-toolbar__snapshot {
+    grid-template-columns: 1fr;
+    gap: 0.34rem;
+    border: 0;
+    background: transparent;
+}
+
+.practice-workbench__rail .practice-toolbar__snapshot-item {
+    grid-template-columns: minmax(0, 0.78fr) minmax(0, 1fr);
+    align-items: center;
+    min-height: 2.34rem;
+    padding: 0.54rem 0.62rem;
+    border: 1px solid var(--panel-stroke);
+    border-radius: 8px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.052), rgba(255, 255, 255, 0.018)),
+        rgba(255, 255, 255, 0.026);
+}
+
+.practice-workbench__rail .practice-toolbar__snapshot-item + .practice-toolbar__snapshot-item {
+    border-left: 1px solid var(--panel-stroke);
+}
+
+.practice-workbench__rail .practice-toolbar__snapshot-item strong {
+    text-align: right;
+}
+
+.practice-workbench__rail .config-section {
+    gap: 0.36rem;
+    padding: 0.68rem 0;
+}
+
+.practice-workbench__rail .segmented-group {
+    min-height: 2.22rem;
+    border-radius: 8px;
+}
+
+.practice-workbench__rail .segment-btn {
+    min-height: 1.82rem;
+    border-radius: 7px;
+}
+
+.practice-workbench__rail .config-strip__actions .ghost-btn {
+    min-height: 2.2rem;
+    border-radius: 8px;
+}
+
+.practice-workbench__rail .practice-toolbar__studio {
+    padding-top: 0.66rem;
+}
+
+.practice-page .sticky-action-bar {
+    border-radius: 8px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.036)),
+        rgba(22, 22, 24, 0.78);
+    backdrop-filter: saturate(160%) blur(22px);
+    -webkit-backdrop-filter: saturate(160%) blur(22px);
+}
+
+.practice-workbench--compose {
+    grid-template-columns: minmax(0, 1fr) clamp(18rem, 24vw, 20.5rem);
+}
+
+.practice-workbench--compose .practice-workbench__rail .config-strip__main {
+    grid-template-columns: 1fr;
+}
+
+.practice-workbench--compose .practice-workbench__rail .config-strip__actions {
+    max-width: none;
+}
+
+.practice-workbench--compose .practice-workbench__rail .practice-toolbar {
+    min-height: clamp(32rem, calc(100dvh - 5.8rem), 40rem);
+}
+
+body[data-theme='serika-light'] .practice-workbench__primary .typing-stage,
+body[data-theme='serika-light'] .practice-workbench__rail .practice-toolbar,
+body[data-theme='serika-light'] .practice-page .sticky-action-bar {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 255, 0.78)),
+        rgba(255, 255, 255, 0.88);
+}
+
+body[data-theme='serika-light'] .practice-workbench__primary .typing-stage .words-shell,
+body[data-theme='serika-light'] .practice-workbench__rail .practice-toolbar__snapshot-item {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(248, 250, 255, 0.58)),
+        rgba(255, 255, 255, 0.74);
+}
+
+@media (max-width: 1100px) {
+    .practice-workbench {
+        grid-template-columns: minmax(0, 1fr) clamp(17.5rem, 27vw, 19.5rem);
+    }
+}
+
+@media (max-width: 860px) {
+    .practice-workbench,
+    .practice-workbench--compose {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+
+    .practice-workbench__rail .practice-toolbar__snapshot {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .practice-workbench__rail .practice-toolbar__snapshot-item {
+        grid-template-columns: 1fr;
+        align-content: end;
+    }
+
+    .practice-workbench__rail .practice-toolbar__snapshot-item strong {
+        text-align: left;
+    }
+}
+
+@media (max-width: 720px) {
+    .practice-workbench__primary .typing-stage__head {
+        gap: 0.7rem;
+    }
+
+    .practice-workbench__primary .typing-stage .words-container {
+        height: calc(var(--typing-size) * var(--typing-line-height) * 3.35);
+    }
+
+    .practice-workbench__rail .practice-toolbar__snapshot {
+        grid-template-columns: 1fr;
+    }
+
+    .practice-workbench__rail .practice-toolbar__snapshot-item {
+        grid-template-columns: minmax(0, 0.78fr) minmax(0, 1fr);
+    }
+
+    .practice-workbench__rail .practice-toolbar__snapshot-item strong {
+        text-align: right;
     }
 }
