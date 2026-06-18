@@ -139,6 +139,7 @@ export function HomePage() {
                         <button
                             type="button"
                             className="action-btn primary"
+                            aria-label={`Primary action: ${homeDecision.primaryLabel}`}
                             onClick={() => handleDecisionAction(homeDecision.primaryAction)}
                             disabled={isLaunchingChallenge && homeDecision.primaryAction === 'challenge'}
                         >
@@ -148,20 +149,24 @@ export function HomePage() {
                                 : homeDecision.primaryLabel}
                         </button>
                         {homeDecision.primaryAction !== 'free' && (
-                            <button type="button" className="action-btn" onClick={() => handleDecisionAction('free')}>
+                            <button
+                                type="button"
+                                className="action-btn"
+                                aria-label={`Secondary action: ${trainingCopy.home.freePractice}`}
+                                onClick={() => handleDecisionAction('free')}
+                            >
                                 {trainingCopy.home.freePractice}
                             </button>
                         )}
                     </div>
                 </div>
                 <div className="home-product-visual" aria-hidden="true">
-                    <div className="home-product-visual__window">
-                        <div className="home-product-visual__chrome">
-                            <span />
-                            <span />
-                            <span />
+                    <div className="home-product-visual__stage">
+                        <div className="home-product-visual__status">
+                            <span>{trainingCopy.home.levelLabel}</span>
+                            <strong>{homeLevelLabel}</strong>
                         </div>
-                        <div className="home-product-visual__screen">
+                        <div className="home-product-visual__window">
                             <div className="home-product-visual__metrics">
                                 <span>WPM</span>
                                 <strong>{insights.recent7.avgWpm || 82}</strong>
@@ -173,17 +178,20 @@ export function HomePage() {
                             <div className="home-product-visual__rail">
                                 <span />
                             </div>
-                            <div className="home-product-visual__copy">
-                                <span />
-                                <span />
-                                <span />
+                            <div className="home-product-visual__readiness">
+                                <span>{trainingCopy.home.planLabel}</span>
+                                <strong>{homePlanLabel}</strong>
+                            </div>
+                            <div className="home-product-visual__readiness">
+                                <span>{trainingCopy.home.weekLabel}</span>
+                                <strong>{weeklyGoal.completed}/{weeklyGoal.target}</strong>
                             </div>
                         </div>
-                    </div>
-                    <div className="home-product-visual__keyboard">
-                        {Array.from({ length: 18 }).map((_, index) => (
-                            <span key={index} />
-                        ))}
+                        <div className="home-product-visual__keyboard">
+                            {Array.from({ length: 18 }).map((_, index) => (
+                                <span key={index} />
+                            ))}
+                        </div>
                     </div>
                 </div>
             </section>
