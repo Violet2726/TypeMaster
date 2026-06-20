@@ -100,46 +100,9 @@ export function useAppStateEnvironment() {
         (next) => updateCurrentUserQueryData(queryClient, next)
     ), [queryClient]);
 
-    return {
-        achievements,
-        account,
-        activeSessionContext,
-        aiPracticeStatus,
-        coachAdviceRecords,
-        coachIssueBySessionId,
-        coachStatusBySessionId,
-        config,
-        currentDraft,
-        dailyChallengeState,
-        diagnosticJourney,
-        hydrateHistoryUiState,
-        hydrateRuntimeState,
-        hydrateSettings,
-        hydrateTrainingFlowState,
-        lastCompletedSession,
-        practiceError,
-        sessionStreak,
-        sessions,
-        settings,
-        skillProfile,
-        trainingPlan,
-        weeklyGoal,
-        setAccountStatus,
-        setActiveSessionContext,
-        setAiPracticeStatus,
-        setCoachAdviceRecords,
-        setCoachIssueBySessionId,
-        setCoachStatusBySessionId,
-        setConfigState,
-        setCurrentDraft,
-        setDailyChallenge,
-        setDiagnosticJourney,
-        setLastCompletedSession,
-        setPracticeError,
-        setSessions,
-        setSettingsState,
-        setSkillProfile,
-        setTrainingPlan,
-        updateCurrentUser
-    };
+    return useMemo(() => ({
+        achievements, account, activeSessionContext, aiPracticeStatus, coachAdviceRecords, coachIssueBySessionId, coachStatusBySessionId, config, currentDraft, dailyChallengeState, diagnosticJourney, hydrateHistoryUiState, hydrateRuntimeState, hydrateSettings, hydrateTrainingFlowState, lastCompletedSession, practiceError, sessionStreak, sessions, settings, skillProfile, trainingPlan, weeklyGoal, setAccountStatus, setActiveSessionContext, setAiPracticeStatus, setCoachAdviceRecords, setCoachIssueBySessionId, setCoachStatusBySessionId, setConfigState, setCurrentDraft, setDailyChallenge, setDiagnosticJourney, setLastCompletedSession, setPracticeError, setSessions, setSettingsState, setSkillProfile, setTrainingPlan, updateCurrentUser
+    }), [
+        achievements, account, activeSessionContext, aiPracticeStatus, coachAdviceRecords, coachIssueBySessionId, coachStatusBySessionId, config, currentDraft, dailyChallengeState, diagnosticJourney, hydrateHistoryUiState, hydrateRuntimeState, hydrateSettings, hydrateTrainingFlowState, lastCompletedSession, practiceError, sessionStreak, sessions, settings, skillProfile, trainingPlan, weeklyGoal, setAccountStatus, setActiveSessionContext, setAiPracticeStatus, setCoachAdviceRecords, setCoachIssueBySessionId, setCoachStatusBySessionId, setConfigState, setCurrentDraft, setDailyChallenge, setDiagnosticJourney, setLastCompletedSession, setPracticeError, setSessions, setSettingsState, setSkillProfile, setTrainingPlan, updateCurrentUser
+    ]);
 }

@@ -134,9 +134,6 @@ body[data-theme='serika-light'] .focus-overlay {
     font-size: 1.5rem;
 }
 
-.result-prescription,
-.result-prescription__item {
-
 /* --- Insights header --- */
 .insights-header {
     align-items: center;

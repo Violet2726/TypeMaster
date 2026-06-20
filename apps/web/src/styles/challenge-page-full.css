@@ -430,7 +430,8 @@
 
 .challenge-metric {
     min-height: 5rem;
-    padding: 0.8rem 0.85rem;`n    border-radius: var(--radius-sm);
+    padding: 0.8rem 0.85rem;
+    border-radius: var(--radius-sm);
 }
 
 .challenge-metric .result-item-value {
@@ -524,7 +525,8 @@
 }
 
 .challenge-replay-section .replay-summary-card,
-.challenge-replay-section .replay-inspect {`n}
+.challenge-replay-section .replay-inspect {
+}
 
 .challenge-replay-empty {
     display: grid;
