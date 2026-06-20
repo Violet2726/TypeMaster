@@ -923,7 +923,38 @@ body[data-theme='serika-light'] .home-starter-signal {
     }
 }
 
-/* Mobile lane grid fix */
+
+/* Activity section (replaces summary-band + secondary-grid) */
+.home-activity-section {
+    display: grid;
+    gap: 0.85rem;
+}
+
+.home-activity-section__head {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.6rem;
+}
+
+.home-activity-section__head h2 {
+    margin: 0;
+    margin-top: 0.18rem;
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: clamp(1.2rem, 1.8vw, 1.6rem);
+    letter-spacing: -0.015em;
+}
+
+.home-achievements-inline {
+    display: grid;
+    gap: 0.45rem;
+}
+
+.home-achievements-inline__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}/* Mobile lane grid fix */
 @media (max-width: 720px) {
     .home-lanes__grid,
     .home-lanes__grid--starter {

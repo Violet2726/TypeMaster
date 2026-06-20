@@ -377,102 +377,46 @@ export function HomePage() {
             {/* Dashboard Evidence */}
             {hasDashboardEvidence ? (
                 <>
-                    <section className="home-summary-band">
-                        <article className="panel home-summary-band__feature">
-                            <div className="home-summary-band__title">
-                                <p className="panel-kicker">{trainingCopy.insights.radarTitle}</p>
-                                <h2>{skillProfile?.level?.label || homeDecision.headline}</h2>
-                            </div>
-                            <p className="lead-text">{skillProfile?.summary || homeDecision.body}</p>
-                            <div className="home-summary-band__feature-row">
-                                <span className="home-chip">{currentWeakness}</span>
-                                <span className="home-chip">{trainingCopy.home.weekLabel} {weeklyGoal.completed}/{weeklyGoal.target}</span>
-                                <span className="home-chip">{trainingCopy.home.streakLabel} {homeStreakLabel}</span>
-                            </div>
-                            {trainingPlan ? (
-                                <div className="results-actions">
-                                    <button type="button" className="action-btn" onClick={() => handleDecisionAction('planRoute')}>
-                                        {trainingCopy.home.planLabel}
-                                    </button>
-                                </div>
-                            ) : null}
-                        </article>
 
-                        <article className="panel home-summary-band__stats">
-                            <div className="home-summary-band__title">
-                                <p className="panel-kicker">{copy.home.statsTitle}</p>
-                                <h2>{copy.home.recentHistoryTitle}</h2>
-                            </div>
-                            <div className="home-summary-band__stat-grid">
-                                <div className="metric-card">
-                                    <span>{copy.home.avgWpm}</span>
-                                    <strong>{homeAverageWpmLabel}</strong>
-                                </div>
-                                <div className="metric-card">
-                                    <span>{copy.home.bestAccuracy}</span>
-                                    <strong>{homeBestAccuracyLabel}</strong>
-                                </div>
-                                <div className="metric-card">
-                                    <span>{copy.common.sessions}</span>
-                                    <strong>{homeSessionsLabel}</strong>
-                                </div>
-                                <div className="metric-card">
-                                    <span>{copy.home.latestMode}</span>
-                                    <strong>{latestModeLabel}</strong>
-                                </div>
-                            </div>
-                        </article>
-                    </section>
+                    <section className="home-activity-section">
+                        <div className="home-activity-section__head">
+                            <p className="panel-kicker">{copy.home.statsTitle}</p>
+                            <h2>{copy.home.recentHistoryTitle}</h2>
+                        </div>
 
-                    <section className="home-secondary-grid">
-                        <article className="panel home-records-panel">
-                            <div className="panel-head">
-                                <div>
-                                    <p className="panel-kicker">{copy.insights.recentHistory}</p>
-                                    <h2>{copy.home.recentHistoryTitle}</h2>
-                                </div>
-                            </div>
+                        {recentSessions.length ? (
+                            <div className="history-table">
+                                {recentSessions.map((session: any) => {
+                                    const tone = getHomeSessionTone(session);
 
-                            {recentSessions.length ? (
-                                <div className="history-table">
-                                    {recentSessions.map((session: any) => {
-                                        const tone = getHomeSessionTone(session);
-
-                                        return (
-                                            <div key={session.id} className={`history-row home-record-row home-record-row--${tone}`}>
-                                                <div className="home-record-row__main">
-                                                    <span className={`home-record-type home-record-type--${tone}`}>
-                                                        <HomeSessionIcon tone={tone} />
-                                                        {getHomeSessionLabel(session, trainingCopy)}
-                                                    </span>
-                                                    <div className="history-row__meta">
-                                                        <strong>{session.trainingMeta?.title || session.sourceTextMeta?.label || copy.common.emptyValue}</strong>
-                                                        <p className="muted-text">{formatDateTime(session.result.completedAt, language)}</p>
-                                                    </div>
-                                                </div>
-                                                <div className="history-metrics">
-                                                    <HomeRecordPill icon={Gauge}>{session.result.wpm} {copy.common.wpm}</HomeRecordPill>
-                                                    <HomeRecordPill icon={ShieldCheck} tone="accuracy">{session.result.accuracy}%</HomeRecordPill>
+                                    return (
+                                        <div key={session.id} className={`history-row home-record-row home-record-row--${tone}`}>
+                                            <div className="home-record-row__main">
+                                                <span className={`home-record-type home-record-type--${tone}`}>
+                                                    <HomeSessionIcon tone={tone} />
+                                                    {getHomeSessionLabel(session, trainingCopy)}
+                                                </span>
+                                                <div className="history-row__meta">
+                                                    <strong>{session.trainingMeta?.title || session.sourceTextMeta?.label || copy.common.emptyValue}</strong>
+                                                    <p className="muted-text">{formatDateTime(session.result.completedAt, language)}</p>
                                                 </div>
                                             </div>
-                                        );
-                                    })}
-                                </div>
-                            ) : (
-                                <p className="muted-text">{copy.home.recentEmpty}</p>
-                            )}
-                        </article>
-
-                        <article className="panel home-achievements-panel">
-                            <div className="panel-head">
-                                <div>
-                                    <p className="panel-kicker">{trainingCopy.insights.achievementsTitle}</p>
-                                    <h2>{trainingCopy.insights.achievementsTitle}</h2>
-                                </div>
+                                            <div className="history-metrics">
+                                                <HomeRecordPill icon={Gauge}>{session.result.wpm} {copy.common.wpm}</HomeRecordPill>
+                                                <HomeRecordPill icon={ShieldCheck} tone="accuracy">{session.result.accuracy}%</HomeRecordPill>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
+                        ) : (
+                            <p className="muted-text">{copy.home.recentEmpty}</p>
+                        )}
 
-                            {unlockedAchievements.length ? (
-                                <div className="home-achievements-panel__list">
+                        {unlockedAchievements.length ? (
+                            <div className="home-achievements-inline">
+                                <p className="panel-kicker">{trainingCopy.insights.achievementsTitle}</p>
+                                <div className="home-achievements-inline__list">
                                     {unlockedAchievements.map((achievement: any) => (
                                         <span key={achievement.id} className="tag-pill home-achievement-pill">
                                             <Trophy aria-hidden="true" size={14} strokeWidth={2.2} />
@@ -480,19 +424,11 @@ export function HomePage() {
                                         </span>
                                     ))}
                                 </div>
-                            ) : (
-                                <div className="home-achievements-panel__empty">
-                                    <div className="home-achievements-panel__empty-icon" aria-hidden="true">
-                                        <Sparkles size={16} strokeWidth={2.2} />
-                                    </div>
-                                    <p className="muted-text">{trainingCopy.insights.achievementsBody}</p>
-                                    <button type="button" className="action-btn" onClick={() => handleDecisionAction(homeDecision.primaryAction)}>
-                                        {homeDecision.primaryLabel}
-                                    </button>
-                                </div>
-                            )}
-                        </article>
+                            </div>
+                        ) : null}
                     </section>
+
+
                 </>
             ) : null}
         </div>
