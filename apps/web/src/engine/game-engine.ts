@@ -16,7 +16,7 @@ import { ParticleSystem, ScreenShake } from "./particle-system";
 import { ScorePopupSystem } from "./score-popup";
 import { COLORS } from "../components/game/colors";
 import { drawGlassPanel, drawProgressRing } from "../components/game/draw-helpers";
-import { initSound, playClickSound, playKillSound, playErrorSound, playComboSound } from "../components/game/sound-engine";
+import { initSound, playClickSound, playKillSound, playErrorSound, playComboSound, playChainSound, playPowerUpSound, playShieldBreakSound, playWaveClearSound, playGameOverSound, playAchievementSound, setSfxEnabled } from "../components/game/sound-engine";
 import { getBlendedTheme, drawThemedBackground } from "./environment-theme";
 import { initGameOver, renderGameOver, clearGameOver } from "./game-over";
 import { createMusicEngine } from "./music-engine";
@@ -171,6 +171,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                     } else {
                         particles.emit({ x: leaked.x, y: canvasHeight - 20, count: 15, color: COLORS.error, spread: Math.PI, speed: 2, gravity: 3, turbulence: 0.5, trail: true });
                         shake.trigger(8);
+                playWaveClearSound();
                     }
                 }
             }
@@ -231,6 +232,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                 shake.trigger(12);
                 initGameOver(buildGameResult(state));
                 music.setPlaying(false);
+                playGameOverSound();
                 const result = buildGameResult(state);
                 saveGameRecord({ score: result.score, wave: result.wave, wpm: result.wpm, accuracy: result.accuracy, maxCombo: result.maxCombo, date: new Date().toLocaleDateString() });
             }
@@ -560,6 +562,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
             const s = getSettings();
             music.setVolume(s.volume / 100);
             music.setPlaying(s.musicEnabled);
+            setSfxEnabled(s.sfxEnabled);
             startTime = performance.now();
             state = transitionGameMode(state, "start");
             state = startWave(state, pool, { canvasWidth, canvasHeight, kps: state.kps });
@@ -687,13 +690,14 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                             enemiesDefeated: state.enemiesDefeated - 1,
                         };
                         enemyVariants.set(evt.enemyId, { ...killedVariant, shieldActive: false });
+                        playShieldBreakSound();
                         shake.trigger(4);
                         particles.emit({ x: 0, y: 0, count: 15, color: "#0a84ff", speed: 3, size: 3, glow: 0.8 });
                         return; // skip normal kill effects
                     }
-                    playKillSound();
-                    playComboSound(state.combo);
                     const enemy = state.enemies.find((en: any) => en.id === evt.enemyId);
+                    playKillSound(enemy?.type);
+                    playComboSound(state.combo);
                     if (enemy) {
                         const color = (COLORS as any)[enemy.type] || COLORS.normal;
                         // Scale particles by chain count
@@ -702,6 +706,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                         particles.emit({ x: enemy.x, y: enemy.y, count: 8 + chainBonus * 2, color: "#ffffff", speed: 2, size: 2, lifetime: 0.4 });
                         shake.trigger(4 + chainBonus * 2);
                         triggerComboFlash(state.combo);
+                        if (chainCount > 1) playChainSound(chainCount);
 
                         // Chain kill tracking
                         const now = Date.now();
@@ -765,6 +770,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                 }
                 if (evt.type === "achievement_unlocked") {
                     enqueueAchievement(evt.achievementId);
+                    playAchievementSound();
                 }
             });
         }
