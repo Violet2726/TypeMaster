@@ -25,6 +25,7 @@ import { openSettings, closeSettings, isSettingsOpen, handleSettingsKey, renderS
 import { showTutorial, isTutorialShowing, handleTutorialKey, updateTutorial, renderTutorial } from "./tutorial-overlay";
 import { handlePauseMenuKey, renderPauseMenu, resetPauseMenu } from "./pause-menu";
 import { triggerComboFlash, updateComboFx, drawComboFx, resetComboFx } from "./combo-fx";
+import { updateHud, drawEnhancedHud, resetHud } from "./hud-overlay";
 import { shouldSpawnVariant, createVariantState, updateVariant, processShieldInput, drawVariantOverlay, drawVariantBadge } from "./enemy-variant";
 import type { VariantState, VariantType } from "./enemy-variant";
 import { shouldDropPowerUp, createPowerUp, updatePowerUps, processPowerUpInput, drawPowerUp, drawActivePowerUps, getPowerUpConfig } from "./power-up";
@@ -241,6 +242,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         updateAchievementModal(performance.now());
         updateTutorial(performance.now());
         updateComboFx(dt, state.combo);
+        updateHud(dt, state.score, state.lives, state.combo);
 
         // Update power-ups
         powerUps = updatePowerUps(powerUps, dt);
@@ -433,126 +435,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     // --- HUD ---
 
     function drawHUD(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
-        ctx.save();
-
-        // Top glass bar
-        drawGlassPanel(ctx, 20, 16, w - 40, 48, 16);
-
-        // Score
-        ctx.font = "600 18px -apple-system, SF Pro Display, system-ui, sans-serif";
-        ctx.fillStyle = COLORS.text;
-        ctx.textAlign = "left";
-        ctx.textBaseline = "middle";
-        ctx.fillText(copy.score + " " + state.score, 40, 40);
-
-        // Wave with countdown ring
-        ctx.fillStyle = COLORS.textSecondary;
-        ctx.textAlign = "center";
-        ctx.fillText(copy.wave + " " + state.wave, w / 2, 40);
-
-        // Lives as glowing dots instead of emoji
-        ctx.textAlign = "right";
-        for (let i = 0; i < state.maxLives; i++) {
-            const lx = w - 40 - (state.maxLives - 1 - i) * 20;
-            const alive = i < state.lives;
-            const pulse = alive ? Math.sin(time * 0.004 + i) * 0.15 + 0.85 : 0.3;
-            ctx.fillStyle = alive ? COLORS.error : COLORS.textTertiary;
-            ctx.globalAlpha = pulse;
-            ctx.beginPath();
-            ctx.arc(lx, 40, 5, 0, Math.PI * 2);
-            ctx.fill();
-            if (alive) {
-                ctx.shadowColor = COLORS.error;
-                ctx.shadowBlur = 6;
-                ctx.fill();
-                ctx.shadowBlur = 0;
-            }
-            ctx.globalAlpha = 1;
-        }
-
-        // KPS
-        if (state.kps > 0) {
-            ctx.save();
-            ctx.font = "400 12px -apple-system, SF Pro Text, system-ui, sans-serif";
-            ctx.fillStyle = COLORS.textTertiary;
-            ctx.textAlign = "center";
-            ctx.textBaseline = "bottom";
-            ctx.fillText((Math.round(state.kps * 10) / 10) + " kps", w / 2, 70);
-            ctx.restore();
-        }
-
-        // Combo with fire trail effect
-        if (state.combo >= 3) {
-            const comboScale = 1 + Math.sin(time * 0.005) * 0.08;
-            ctx.save();
-            ctx.translate(w / 2, 85);
-            ctx.scale(comboScale, comboScale);
-
-            // Fire gradient behind combo text
-            const fireAlpha = Math.min(1, state.combo / 10) * 0.15;
-            const fireGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, 60);
-            fireGrad.addColorStop(0, "rgba(255,159,10," + fireAlpha + ")");
-            fireGrad.addColorStop(1, "rgba(255,69,58,0)");
-            ctx.fillStyle = fireGrad;
-            ctx.beginPath();
-            ctx.arc(0, 0, 60, 0, Math.PI * 2);
-            ctx.fill();
-
-            drawGlassPanel(ctx, -70, -14, 140, 28, 14);
-
-            ctx.font = "600 14px -apple-system, SF Pro Text, system-ui, sans-serif";
-            ctx.fillStyle = COLORS.warning;
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            const mult = getComboMultiplier(state.combo);
-            ctx.fillText(copy.combo + " " + state.combo + " (x" + mult + ")", 0, 0);
-
-            ctx.restore();
-        }
-
-        // Chain kill indicator
-        if (chainCount > 1 && chainTimer > 0) {
-            const chainAlpha = Math.min(1, chainTimer / 0.3);
-            const chainScale = 1 + Math.sin(time * 0.008) * 0.05;
-            ctx.save();
-            ctx.globalAlpha = chainAlpha;
-            ctx.translate(w / 2, 110);
-            ctx.scale(chainScale, chainScale);
-
-            // Chain fire effect
-            const chainFireGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, 40);
-            chainFireGrad.addColorStop(0, "rgba(255,107,107," + (chainCount * 0.08) + ")");
-            chainFireGrad.addColorStop(1, "rgba(255,107,107,0)");
-            ctx.fillStyle = chainFireGrad;
-            ctx.beginPath();
-            ctx.arc(0, 0, 40, 0, Math.PI * 2);
-            ctx.fill();
-
-            drawGlassPanel(ctx, -50, -12, 100, 24, 12);
-
-            ctx.font = "700 13px -apple-system, SF Pro Display, system-ui, sans-serif";
-            ctx.fillStyle = "#ff6b6b";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText("CHAIN x" + chainCount, 0, 0);
-
-            ctx.restore();
-        }
-
-        // Active power-up indicators
-        drawActivePowerUps(ctx, activePowerUps, w, time);
-
-        // Active input display
-        if (state.typedInput) {
-            drawGlassPanel(ctx, w / 2 - 80, 108, 160, 32, 8);
-            ctx.font = "500 16px SF Mono, Cascadia Mono, monospace";
-            ctx.fillStyle = COLORS.success;
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText(state.typedInput, w / 2, 124);
-        }
-
-        ctx.restore();
+        drawEnhancedHud(ctx, w, h, time, state, copy);
     }
 
     // --- Enemy Drawing ---
@@ -736,6 +619,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
             clearAchievementQueue();
             enemyVariants.clear();
             resetComboFx();
+            resetHud();
             return;
         }
 
