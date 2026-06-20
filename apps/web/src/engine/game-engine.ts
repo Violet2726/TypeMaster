@@ -1,0 +1,679 @@
+/**
+ * Typing Raid Game Engine
+ *
+ * Central orchestrator: game loop, event dispatch, effect coordination.
+ * Extracted from the 956-line monolith GamePage.tsx to enforce separation
+ * between domain logic (packages/domain), engine coordination (this file),
+ * and presentation (GamePage.tsx).
+ */
+
+import {
+    createGameState, transitionGameMode, processInput, updateGameState,
+    startWave, processSpawns, buildGameResult, getGameCopy,
+    getEnemyTypeConfig, getComboMultiplier, commonWords, biasWordPool,
+} from "@typemaster/domain";
+import { ParticleSystem, ScreenShake } from "./particle-system";
+import { ScorePopupSystem } from "./score-popup";
+import { COLORS } from "../components/game/colors";
+import { drawGlassPanel, drawProgressRing } from "../components/game/draw-helpers";
+import { initSound, playClickSound, playKillSound, playErrorSound, playComboSound } from "../components/game/sound-engine";
+
+// ---------------------------------------------------------------------------
+// Hue shift for dynamic background
+// ---------------------------------------------------------------------------
+
+function shiftHue(hex: string, degrees: number): string {
+    if (!hex || degrees === 0) return hex;
+    let r = parseInt(hex.slice(1, 3), 16);
+    let g = parseInt(hex.slice(3, 5), 16);
+    let b = parseInt(hex.slice(5, 7), 16);
+    const shift = degrees / 360;
+    const temp = r;
+    r = Math.round(r * (1 - shift) + g * shift);
+    g = Math.round(g * (1 - shift) + b * shift);
+    b = Math.round(b * (1 - shift) + temp * shift);
+    return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
+}
+
+// ---------------------------------------------------------------------------
+// Engine types
+// ---------------------------------------------------------------------------
+
+export interface GameEvent {
+    type: string;
+    [key: string]: any;
+}
+
+export type EventCallback = (event: GameEvent) => void;
+
+export interface GameEngine {
+    state: any;
+    particles: ParticleSystem;
+    scorePopups: ScorePopupSystem;
+    shake: ScreenShake;
+    tick(dt: number): void;
+    render(ctx: CanvasRenderingContext2D, width: number, height: number): void;
+    handleKey(e: KeyboardEvent): void;
+    resize(width: number, height: number): void;
+    destroy(): void;
+    saveGameResult(): any;
+}
+
+// ---------------------------------------------------------------------------
+// Factory
+// ---------------------------------------------------------------------------
+
+export function createGameEngine(wordPool?: string[]): GameEngine {
+    let state = createGameState();
+    const particles = new ParticleSystem();
+    const scorePopups = new ScorePopupSystem();
+    const shake = new ScreenShake();
+    const pool = biasWordPool(commonWords, []);
+
+    let canvasWidth = 800;
+    let canvasHeight = 600;
+    let startTime = 0;
+    let gameOverTime = 0;
+    let lastCorrectEnemyIds: string[] = [];
+
+    // Pause/resume countdown
+    let resumeCountdown = 0;
+    let resumeTarget = 0;
+
+    const language = "en-US";
+    const copy = getGameCopy(language);
+
+    // --- Ticking ---
+
+    function tick(dt: number): void {
+        if (state.mode === "resuming") {
+            resumeCountdown -= dt;
+            if (resumeCountdown <= 0) {
+                state = transitionGameMode(state, "resume");
+                resumeCountdown = 0;
+            }
+            return;
+        }
+
+        if (state.mode !== "playing") return;
+
+        state = processSpawns(state, dt);
+        const physResult = updateGameState(state, dt, canvasHeight);
+        state = physResult.state;
+
+        physResult.events.forEach((evt: any) => {
+            if (evt.type === "enemy_leaked") {
+                const leaked = state.enemies.find((e: any) => e.id === evt.enemyId);
+                if (leaked) {
+                    particles.emit({ x: leaked.x, y: canvasHeight - 20, count: 15, color: COLORS.error, spread: Math.PI, speed: 2, gravity: 3, turbulence: 0.5, trail: true });
+                    shake.trigger(8);
+                }
+            }
+            if (evt.type === "wave_complete") {
+                if (evt.perfect) {
+                    state = { ...state, perfectWaves: state.perfectWaves + 1 };
+                    for (let i = 0; i < 5; i++) {
+                        particles.emit({ x: Math.random() * canvasWidth, y: Math.random() * canvasHeight, count: 20, color: COLORS.warning, speed: 4, gravity: -1, trail: true, turbulence: 0.8 });
+                    }
+                    shake.trigger(5);
+                }
+                setTimeout(() => {
+                    if (state.mode === "playing") {
+                        state = startWave(state, pool, { canvasWidth, canvasHeight });
+                    }
+                }, 1500);
+            }
+            if (evt.type === "game_over") {
+                gameOverTime = performance.now();
+                shake.trigger(12);
+            }
+        });
+
+        particles.update(dt);
+        scorePopups.update(dt);
+        shake.update(dt);
+    }
+
+    // --- Rendering ---
+
+    function render(ctx: CanvasRenderingContext2D, width: number, height: number): void {
+        const time = performance.now();
+        canvasWidth = width;
+        canvasHeight = height;
+
+        const offset = shake.getOffset();
+        ctx.save();
+        ctx.translate(offset.x, offset.y);
+
+        drawBackground(ctx, width, height, time);
+
+        if (state.mode === "idle") {
+            renderIdle(ctx, width, height, time);
+        } else if (state.mode === "playing" || state.mode === "resuming") {
+            renderPlaying(ctx, width, height, time);
+        } else if (state.mode === "paused") {
+            renderPaused(ctx, width, height, time);
+        } else if (state.mode === "gameover") {
+            renderGameOver(ctx, width, height, time);
+        }
+
+        ctx.restore();
+    }
+
+    function drawBackground(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
+        const hueShift = Math.min(30, state.combo) * 2;
+        const gradient = ctx.createLinearGradient(0, 0, 0, h);
+        gradient.addColorStop(0, shiftHue(COLORS.bgGradientStart, hueShift));
+        gradient.addColorStop(1, shiftHue(COLORS.bgGradientEnd, hueShift));
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, w, h);
+
+        // Grid
+        ctx.strokeStyle = "rgba(255,255,255,0.04)";
+        ctx.lineWidth = 1;
+        const gridSize = 40;
+        for (let x = 0; x < w; x += gridSize) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+        for (let y = 0; y < h; y += gridSize) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+
+        // Stars with parallax depth
+        for (let i = 0; i < 60; i++) {
+            const depth = (i % 3 + 1) / 3;
+            const sx = (i * 137.5 + time * 0.005 * depth) % w;
+            const sy = (i * 97.3 + time * 0.002 * depth) % h;
+            const alpha = 0.1 + depth * 0.2 + Math.sin(time * 0.001 + i) * 0.05;
+            ctx.fillStyle = "rgba(255,255,255," + alpha + ")";
+            ctx.beginPath();
+            ctx.arc(sx, sy, 0.5 + depth, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Ambient particles (idle only)
+        if (state.mode === "idle" && Math.random() < 0.08) {
+            particles.emit({ x: Math.random() * w, y: Math.random() * h, count: 1, color: COLORS.textTertiary, speed: 0.3, size: 1.5, lifetime: 2, glow: 0.3 });
+        }
+    }
+
+    function renderIdle(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
+        particles.update(1 / 60);
+        particles.draw(ctx);
+
+        // Fade-out when starting
+        const startAnimDuration = 500;
+        const startProgress = startTime ? Math.min(1, (time - startTime) / startAnimDuration) : 0;
+        if (startProgress > 0 && startProgress < 1) {
+            ctx.save();
+            const scale = 1 - startProgress * 0.5;
+            ctx.translate(w / 2, h / 2);
+            ctx.scale(scale, scale);
+            ctx.translate(-w / 2, -h / 2);
+            ctx.globalAlpha = 1 - startProgress;
+        }
+
+        drawGlassPanel(ctx, w / 2 - 180, h / 2 - 100, 360, 160, 20);
+
+        ctx.font = "700 42px -apple-system, SF Pro Display, system-ui, sans-serif";
+        ctx.fillStyle = COLORS.text;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(copy.title, w / 2, h / 2 - 50);
+
+        ctx.font = "400 16px -apple-system, SF Pro Text, system-ui, sans-serif";
+        ctx.fillStyle = COLORS.textSecondary;
+        ctx.fillText(copy.subtitle, w / 2, h / 2);
+
+        const pulse = Math.sin(time * 0.003) * 0.3 + 0.7;
+        ctx.globalAlpha *= pulse;
+        ctx.font = "500 14px -apple-system, SF Pro Text, system-ui, sans-serif";
+        ctx.fillStyle = COLORS.textTertiary;
+        ctx.fillText(copy.start, w / 2, h / 2 + 50);
+
+        if (startProgress > 0 && startProgress < 1) ctx.restore();
+    }
+
+    function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
+        // Enemies
+        state.enemies.filter((e: any) => e.alive).forEach((e: any) => {
+            drawEnemyAppleStyle(ctx, e, time, lastCorrectEnemyIds.includes(e.id));
+        });
+
+        particles.draw(ctx);
+        scorePopups.draw(ctx);
+        drawHUD(ctx, w, h, time);
+
+        // Wave incoming overlay
+        if (state.wave > 0 && state.waveQueue.length > 0 && state.nextSpawnIndex < state.waveQueue.length) {
+            const elapsed = time - (state.waveStartTime || time);
+            if (elapsed < 2000) {
+                const alpha = Math.max(0, 1 - elapsed / 2000);
+                const scale = 1 + (1 - alpha) * 0.5;
+                ctx.save();
+                ctx.globalAlpha = alpha;
+                ctx.translate(w / 2, h / 2);
+                ctx.scale(scale, scale);
+                drawGlassPanel(ctx, -120, -30, 240, 60, 12);
+                ctx.font = "600 20px -apple-system, SF Pro Display, system-ui, sans-serif";
+                ctx.fillStyle = COLORS.text;
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(copy.waveIncoming.replace("{wave}", String(state.wave)), 0, 0);
+                ctx.restore();
+            }
+        }
+
+        // Resume countdown overlay
+        if (state.mode === "resuming") {
+            const seconds = Math.ceil(resumeCountdown);
+            const frac = resumeCountdown - Math.floor(resumeCountdown);
+            const scale = 1 + (1 - frac) * 0.5;
+
+            // Dim overlay
+            ctx.fillStyle = "rgba(0,0,0,0.5)";
+            ctx.fillRect(0, 0, w, h);
+
+            ctx.save();
+            ctx.translate(w / 2, h / 2);
+            ctx.scale(scale, scale);
+            ctx.globalAlpha = Math.min(1, frac * 2);
+
+            drawGlassPanel(ctx, -60, -60, 120, 120, 20);
+
+            ctx.font = "700 48px -apple-system, SF Pro Display, system-ui, sans-serif";
+            ctx.fillStyle = COLORS.text;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(String(seconds), 0, 0);
+
+            ctx.restore();
+        }
+    }
+
+    function renderPaused(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
+        // Draw enemies dimmed
+        state.enemies.filter((e: any) => e.alive).forEach((e: any) => {
+            ctx.globalAlpha = 0.2;
+            drawEnemyAppleStyle(ctx, e, time);
+            ctx.globalAlpha = 1;
+        });
+
+        drawHUD(ctx, w, h, time);
+
+        // Blur overlay
+        ctx.fillStyle = "rgba(0,0,0,0.75)";
+        ctx.fillRect(0, 0, w, h);
+
+        drawGlassPanel(ctx, w / 2 - 150, h / 2 - 70, 300, 140, 24);
+
+        ctx.font = "600 28px -apple-system, SF Pro Display, system-ui, sans-serif";
+        ctx.fillStyle = COLORS.text;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(copy.paused, w / 2, h / 2 - 20);
+
+        ctx.font = "400 14px -apple-system, SF Pro Text, system-ui, sans-serif";
+        ctx.fillStyle = COLORS.textSecondary;
+        ctx.fillText(copy.resume, w / 2, h / 2 + 20);
+
+        // Subtle breathing animation on glass panel border
+        const breath = Math.sin(time * 0.002) * 0.02 + 0.12;
+        ctx.strokeStyle = "rgba(255,255,255," + breath + ")";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect(w / 2 - 150, h / 2 - 70, 300, 140, 24);
+        ctx.stroke();
+    }
+
+    function renderGameOver(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
+        const gameoverProgress = gameOverTime ? Math.min(1, (time - gameOverTime) / 500) : 0;
+        ctx.save();
+        ctx.globalAlpha = gameoverProgress;
+        ctx.fillStyle = "rgba(0,0,0,0.85)";
+        ctx.fillRect(0, 0, w, h);
+
+        const result = buildGameResult(state);
+
+        drawGlassPanel(ctx, w / 2 - 220, h / 2 - 160, 440, 320, 24);
+
+        ctx.font = "700 32px -apple-system, SF Pro Display, system-ui, sans-serif";
+        ctx.fillStyle = COLORS.text;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(copy.gameOver, w / 2, h / 2 - 120);
+
+        // Score with emphasis
+        ctx.font = "600 36px -apple-system, SF Pro Display, system-ui, sans-serif";
+        ctx.fillStyle = COLORS.warning;
+        ctx.fillText(String(result.score), w / 2, h / 2 - 70);
+
+        ctx.font = "400 12px -apple-system, SF Pro Text, system-ui, sans-serif";
+        ctx.fillStyle = COLORS.textSecondary;
+        ctx.fillText(copy.score, w / 2, h / 2 - 95);
+
+        // Stats grid
+        const stats = [
+            { label: copy.wave, value: String(result.wave) },
+            { label: copy.wpm, value: String(result.wpm) },
+            { label: copy.accuracy, value: result.accuracy + "%" },
+            { label: copy.combo, value: String(result.maxCombo) },
+        ];
+
+        stats.forEach((s, i) => {
+            const col = i % 2;
+            const row = Math.floor(i / 2);
+            const sx = w / 2 - 160 + col * 180;
+            const sy = h / 2 - 20 + row * 60;
+
+            drawGlassPanel(ctx, sx, sy, 160, 50, 10);
+
+            ctx.font = "400 11px -apple-system, SF Pro Text, system-ui, sans-serif";
+            ctx.fillStyle = COLORS.textTertiary;
+            ctx.textAlign = "center";
+            ctx.fillText(s.label, sx + 80, sy + 16);
+
+            ctx.font = "600 18px -apple-system, SF Pro Display, system-ui, sans-serif";
+            ctx.fillStyle = COLORS.text;
+            ctx.fillText(s.value, sx + 80, sy + 36);
+        });
+
+        // Action prompts
+        ctx.font = "500 14px -apple-system, SF Pro Text, system-ui, sans-serif";
+        ctx.fillStyle = COLORS.textTertiary;
+        ctx.fillText(copy.playAgain + " (R)  |  " + copy.backToHome + " (Esc)", w / 2, h / 2 + 130);
+
+        ctx.restore();
+    }
+
+    // --- HUD ---
+
+    function drawHUD(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
+        ctx.save();
+
+        // Top glass bar
+        drawGlassPanel(ctx, 20, 16, w - 40, 48, 16);
+
+        // Score
+        ctx.font = "600 18px -apple-system, SF Pro Display, system-ui, sans-serif";
+        ctx.fillStyle = COLORS.text;
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillText(copy.score + " " + state.score, 40, 40);
+
+        // Wave with countdown ring
+        ctx.fillStyle = COLORS.textSecondary;
+        ctx.textAlign = "center";
+        ctx.fillText(copy.wave + " " + state.wave, w / 2, 40);
+
+        // Lives as glowing dots instead of emoji
+        ctx.textAlign = "right";
+        for (let i = 0; i < state.maxLives; i++) {
+            const lx = w - 40 - (state.maxLives - 1 - i) * 20;
+            const alive = i < state.lives;
+            const pulse = alive ? Math.sin(time * 0.004 + i) * 0.15 + 0.85 : 0.3;
+            ctx.fillStyle = alive ? COLORS.error : COLORS.textTertiary;
+            ctx.globalAlpha = pulse;
+            ctx.beginPath();
+            ctx.arc(lx, 40, 5, 0, Math.PI * 2);
+            ctx.fill();
+            if (alive) {
+                ctx.shadowColor = COLORS.error;
+                ctx.shadowBlur = 6;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+            ctx.globalAlpha = 1;
+        }
+
+        // KPS
+        if (state.kps > 0) {
+            ctx.save();
+            ctx.font = "400 12px -apple-system, SF Pro Text, system-ui, sans-serif";
+            ctx.fillStyle = COLORS.textTertiary;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "bottom";
+            ctx.fillText((Math.round(state.kps * 10) / 10) + " kps", w / 2, 70);
+            ctx.restore();
+        }
+
+        // Combo with fire trail effect
+        if (state.combo >= 3) {
+            const comboScale = 1 + Math.sin(time * 0.005) * 0.08;
+            ctx.save();
+            ctx.translate(w / 2, 85);
+            ctx.scale(comboScale, comboScale);
+
+            // Fire gradient behind combo text
+            const fireAlpha = Math.min(1, state.combo / 10) * 0.15;
+            const fireGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, 60);
+            fireGrad.addColorStop(0, "rgba(255,159,10," + fireAlpha + ")");
+            fireGrad.addColorStop(1, "rgba(255,69,58,0)");
+            ctx.fillStyle = fireGrad;
+            ctx.beginPath();
+            ctx.arc(0, 0, 60, 0, Math.PI * 2);
+            ctx.fill();
+
+            drawGlassPanel(ctx, -70, -14, 140, 28, 14);
+
+            ctx.font = "600 14px -apple-system, SF Pro Text, system-ui, sans-serif";
+            ctx.fillStyle = COLORS.warning;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            const mult = getComboMultiplier(state.combo);
+            ctx.fillText(copy.combo + " " + state.combo + " (x" + mult + ")", 0, 0);
+
+            ctx.restore();
+        }
+
+        // Active input display
+        if (state.typedInput) {
+            drawGlassPanel(ctx, w / 2 - 80, 108, 160, 32, 8);
+            ctx.font = "500 16px SF Mono, Cascadia Mono, monospace";
+            ctx.fillStyle = COLORS.success;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(state.typedInput, w / 2, 124);
+        }
+
+        ctx.restore();
+    }
+
+    // --- Enemy Drawing ---
+
+    function drawEnemyAppleStyle(ctx: CanvasRenderingContext2D, enemy: any, time: number, isPotentialMatch = false): void {
+        const typeConfig = getEnemyTypeConfig(enemy.type);
+        const baseColor = (COLORS as any)[enemy.type] || COLORS.normal;
+        const glowColor = (COLORS as any)[enemy.type + "Glow"] || COLORS.normalGlow;
+
+        const size = enemy.type === "boss" ? 32 : enemy.type === "tank" ? 24 : enemy.type === "fast" ? 18 : 18;
+        const wobble = Math.sin(time * 0.002 + enemy.x * 0.01) * 2;
+
+        const spawnDuration = 300;
+        const spawnProgress = Math.min(1, (time - (enemy.spawnTime || 0)) / spawnDuration);
+        const scale = spawnProgress < 1 ? 0.5 + 0.5 * Math.sin(spawnProgress * Math.PI / 2) : 1;
+
+        const flashDuration = 150;
+        const flashProgress = Math.min(1, (time - (enemy.lastCorrectTime || 0)) / flashDuration);
+        const flashAlpha = flashProgress < 1 ? 0.8 * (1 - flashProgress) : 0;
+
+        ctx.save();
+        ctx.translate(enemy.x + wobble, enemy.y);
+        ctx.scale(scale, scale);
+
+        if (isPotentialMatch) {
+            const pulse = Math.sin(time * 0.005) * 0.5 + 0.5;
+            ctx.shadowColor = "#ffffff";
+            ctx.shadowBlur = 10 + pulse * 10;
+        }
+        if (flashAlpha > 0) ctx.globalAlpha += flashAlpha;
+
+        ctx.shadowColor = glowColor;
+        ctx.shadowBlur = 20 + Math.sin(time * 0.003) * 5;
+
+        const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, size);
+        gradient.addColorStop(0, "#ffffff");
+        gradient.addColorStop(0.3, baseColor);
+        gradient.addColorStop(1, baseColor + "80");
+        ctx.fillStyle = gradient;
+
+        if (enemy.type === "boss") {
+            ctx.beginPath();
+            ctx.moveTo(0, -size);
+            ctx.bezierCurveTo(size * 0.5, -size * 0.5, size * 0.5, size * 0.5, 0, size);
+            ctx.bezierCurveTo(-size * 0.5, size * 0.5, -size * 0.5, -size * 0.5, 0, -size);
+            ctx.fill();
+        } else if (enemy.type === "tank") {
+            ctx.beginPath();
+            ctx.roundRect(-size * 0.7, -size * 0.7, size * 1.4, size * 1.4, 6);
+            ctx.fill();
+        } else if (enemy.type === "fast") {
+            ctx.beginPath();
+            ctx.moveTo(0, -size);
+            ctx.bezierCurveTo(size * 0.3, -size * 0.3, size * 0.8, size * 0.3, 0, size * 0.7);
+            ctx.bezierCurveTo(-size * 0.8, size * 0.3, -size * 0.3, -size * 0.3, 0, -size);
+            ctx.fill();
+        } else {
+            ctx.beginPath();
+            ctx.arc(0, 0, size * 0.8, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        ctx.shadowBlur = 0;
+
+        // HP bar
+        if (typeConfig.hp > 1) {
+            const barW = size * 2;
+            const barH = 4;
+            const barY = -size - 12;
+            drawGlassPanel(ctx, -barW / 2, barY, barW, barH, 2);
+            ctx.fillStyle = baseColor;
+            ctx.beginPath();
+            ctx.roundRect(-barW / 2, barY, barW * (enemy.hp / enemy.maxHp), barH, 2);
+            ctx.fill();
+        }
+
+        // Progress ring
+        const progress = enemy.word.length > 0 ? (enemy.typed || "").length / enemy.word.length : 0;
+        drawProgressRing(ctx, 0, 0, size + 4, progress, baseColor);
+
+        // Word rendering
+        ctx.font = "500 14px -apple-system, SF Pro Text, system-ui, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        const word = enemy.word;
+        const typed = enemy.typed || "";
+
+        if (typed.length > 0) {
+            const typedWidth = ctx.measureText(typed).width;
+            const fullWidth = ctx.measureText(word).width;
+            const startX = -fullWidth / 2;
+            ctx.fillStyle = COLORS.success;
+            ctx.shadowColor = COLORS.success;
+            ctx.shadowBlur = 8;
+            ctx.textAlign = "left";
+            ctx.fillText(typed, startX, size + 16);
+            ctx.fillStyle = COLORS.text;
+            ctx.shadowBlur = 0;
+            ctx.fillText(word.slice(typed.length), startX + typedWidth, size + 16);
+        } else {
+            ctx.fillStyle = COLORS.text;
+            ctx.fillText(word, 0, size + 16);
+        }
+
+        ctx.restore();
+    }
+
+    // --- Keyboard Input ---
+
+    function handleKey(e: KeyboardEvent): void {
+        if (state.mode === "idle") {
+            if (e.key === "Escape") return;
+            initSound();
+            startTime = performance.now();
+            state = transitionGameMode(state, "start");
+            state = startWave(state, pool, { canvasWidth, canvasHeight, kps: state.kps });
+            return;
+        }
+
+        if (e.key === "Escape") {
+            if (state.mode === "playing") {
+                state = transitionGameMode(state, "pause");
+            } else if (state.mode === "paused") {
+                // Start 3-2-1 countdown
+                resumeCountdown = 3;
+                state = { ...state, mode: "resuming" as any };
+            } else if (state.mode === "gameover") {
+                state = createGameState();
+                startTime = 0;
+                gameOverTime = 0;
+            }
+            return;
+        }
+
+        if (state.mode === "gameover" && (e.key === "r" || e.key === "R")) {
+            state = createGameState();
+            startTime = 0;
+            gameOverTime = 0;
+            return;
+        }
+
+        if (state.mode === "playing" && e.key.length === 1) {
+            e.preventDefault();
+            const result = processInput(state, e.key);
+            state = result.state;
+
+            result.events.forEach((evt: any) => {
+                if (evt.type === "enemy_killed") {
+                    playKillSound();
+                    playComboSound(state.combo);
+                    const enemy = state.enemies.find((en: any) => en.id === evt.enemyId);
+                    if (enemy) {
+                        const color = (COLORS as any)[enemy.type] || COLORS.normal;
+                        particles.emit({ x: enemy.x, y: enemy.y, count: 25, color, speed: 4, size: 4, gravity: 2, turbulence: 0.6, trail: true });
+                        particles.emit({ x: enemy.x, y: enemy.y, count: 10, color: "#ffffff", speed: 2, size: 2, lifetime: 0.4 });
+                        shake.trigger(6);
+                        scorePopups.emit({ x: enemy.x, y: enemy.y - 20, text: "+" + evt.score, color: COLORS.warning, fontSize: 20 });
+                    }
+                }
+                if (evt.type === "char_correct") {
+                    playClickSound();
+                    const activeEnemy = state.enemies.find((en: any) => en.id === evt.enemyId);
+                    if (activeEnemy) {
+                        particles.emit({ x: activeEnemy.x, y: activeEnemy.y, count: 3, color: COLORS.success, speed: 1, size: 2, lifetime: 0.3 });
+                    }
+                }
+                if (evt.type === "char_error") {
+                    playErrorSound();
+                    shake.trigger(2);
+                }
+                if (evt.type === "char_miss") {
+                    lastCorrectEnemyIds = evt.matches || [];
+                }
+                if (evt.type === "achievement_unlocked") {
+                    // Handled by UI layer if needed
+                }
+            });
+        }
+    }
+
+    function resize(w: number, h: number): void {
+        canvasWidth = w;
+        canvasHeight = h;
+    }
+
+    function destroy(): void {
+        particles.clear();
+        scorePopups.clear();
+    }
+
+    return {
+        get state() { return state; },
+        particles,
+        scorePopups,
+        shake,
+        tick,
+        render,
+        handleKey,
+        resize,
+        destroy,
+        saveGameResult() { return buildGameResult(state); },
+    };
+}
