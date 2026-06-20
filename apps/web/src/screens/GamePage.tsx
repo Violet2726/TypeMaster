@@ -212,9 +212,15 @@ function drawEnemyAppleStyle(ctx: CanvasRenderingContext2D, enemy: any, time: nu
     const spawnProgress = Math.min(1, (time - (enemy.spawnTime || 0)) / spawnDuration);
     const scale = spawnProgress < 1 ? 0.5 + 0.5 * Math.sin(spawnProgress * Math.PI / 2) : 1;
     
+    // Flash Effect
+    const flashDuration = 150; // ms
+    const flashProgress = Math.min(1, (time - (enemy.lastCorrectTime || 0)) / flashDuration);
+    const flashAlpha = flashProgress < 1 ? 0.8 * (1 - flashProgress) : 0;
+    
     ctx.save();
     ctx.translate(enemy.x + wobble, enemy.y);
     ctx.scale(scale, scale);
+    ctx.globalAlpha += flashAlpha;
     
     // Outer glow
     ctx.shadowColor = glowColor;

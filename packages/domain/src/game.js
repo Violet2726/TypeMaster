@@ -307,6 +307,7 @@ export function processInput(state, char) {
             const newTyped = char;
             const isComplete = newTyped === match.word;
 
+            const updatedEnemy = { ...match, typed: newTyped, lastCorrectTime: Date.now() };
             events.push({ type: 'char_correct', enemyId: match.id });
 
             if (isComplete) {
@@ -370,6 +371,7 @@ export function processInput(state, char) {
         const newTyped = state.typedInput + char;
         const isComplete = newTyped === active.word;
 
+        const updatedEnemy = { ...active, typed: newTyped, lastCorrectTime: Date.now() };
         events.push({ type: 'char_correct', enemyId: active.id });
 
         if (isComplete) {
