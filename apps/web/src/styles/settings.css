@@ -2,10 +2,11 @@
 .settings-drawer {
     position: absolute;
     inset: 0.55rem 0.55rem 0.55rem auto;
-    width: min(430px, calc(100vw - 1.1rem));
+    width: min(420px, 100vw);
     height: calc(100% - 1.1rem);
     padding: 1.08rem;
-    border-radius: 26px;
+    border-radius: 0;
+    border-left: 1px solid var(--panel-stroke);
     border: 1px solid var(--panel-stroke);
     background:
         linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
