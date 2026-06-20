@@ -150,3 +150,39 @@ export function playAchievementSound() {
     tone(2093, "sine", 0.1, 0.05, 0.15);
     noise(0.1, 8000, 0.03, 0.1);
 }
+
+// ---------------------------------------------------------------------------
+// Menu Navigation Sounds
+// ---------------------------------------------------------------------------
+
+export function playMenuNavigate() {
+    // Soft click for menu navigation
+    tone(800, "sine", 0.03, 0.05);
+}
+
+export function playMenuSelect() {
+    // Confirmation sound
+    tone(600, "sine", 0.06, 0.08);
+    tone(900, "sine", 0.04, 0.06, 0.02);
+}
+
+export function playMenuBack() {
+    // Back/cancel sound
+    tone(400, "sine", 0.05, 0.06);
+}
+
+export function playMenuToggle() {
+    // Toggle switch sound
+    tone(1000, "sine", 0.03, 0.06);
+    tone(1200, "sine", 0.02, 0.04, 0.02);
+}
+
+export function playCountdownBeep() {
+    // Countdown beep
+    tone(440, "sine", 0.1, 0.1);
+}
+
+export function playCountdownGo() {
+    // Countdown go
+    tone(880, "sine", 0.15, 0.12);
+}

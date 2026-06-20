@@ -16,7 +16,7 @@ import { ParticleSystem, ScreenShake } from "./particle-system";
 import { ScorePopupSystem } from "./score-popup";
 import { COLORS } from "../components/game/colors";
 import { drawGlassPanel, drawProgressRing } from "../components/game/draw-helpers";
-import { initSound, playClickSound, playKillSound, playErrorSound, playComboSound, playChainSound, playPowerUpSound, playShieldBreakSound, playWaveClearSound, playGameOverSound, playAchievementSound, setSfxEnabled } from "../components/game/sound-engine";
+import { initSound, playClickSound, playKillSound, playErrorSound, playComboSound, playChainSound, playPowerUpSound, playShieldBreakSound, playWaveClearSound, playGameOverSound, playAchievementSound, setSfxEnabled, playCountdownBeep, playCountdownGo } from "../components/game/sound-engine";
 import { getBlendedTheme, drawThemedBackground } from "./environment-theme";
 import { initGameOver, renderGameOver, clearGameOver } from "./game-over";
 import { createMusicEngine } from "./music-engine";
@@ -144,8 +144,12 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         }
 
         if (state.mode === "resuming") {
+            const prevSec = Math.ceil(resumeCountdown);
             resumeCountdown -= dt;
+            const curSec = Math.ceil(resumeCountdown);
+            if (curSec < prevSec && curSec > 0) playCountdownBeep();
             if (resumeCountdown <= 0) {
+                playCountdownGo();
                 state = transitionGameMode(state, "resume");
                 resumeCountdown = 0;
             }

@@ -9,6 +9,7 @@
 
 import { COLORS } from "../components/game/colors";
 import { drawGlassPanel } from "../components/game/draw-helpers";
+import { playMenuNavigate, playMenuSelect, playMenuBack } from "../components/game/sound-engine";
 
 export type PauseAction = "continue" | "settings" | "quit" | null;
 
@@ -32,17 +33,20 @@ export function resetPauseMenu(): void { selectedIndex = 0; }
 export function handlePauseMenuKey(e: KeyboardEvent): PauseAction {
     if (e.key === "ArrowUp" || e.key === "w" || e.key === "W") {
         selectedIndex = Math.max(0, selectedIndex - 1);
+        playMenuNavigate();
         return null;
     }
     if (e.key === "ArrowDown" || e.key === "s" || e.key === "S") {
         selectedIndex = Math.min(MENU_ITEMS.length - 1, selectedIndex + 1);
+        playMenuNavigate();
         return null;
     }
     if (e.key === "Enter" || e.key === " ") {
+        playMenuSelect();
         return MENU_ITEMS[selectedIndex].action;
     }
     // Direct shortcuts
-    if (e.key === "Escape") return "continue";
+    if (e.key === "Escape") { playMenuBack(); return "continue"; }
     if (e.key === "q" || e.key === "Q") return "quit";
     return null;
 }

@@ -13,6 +13,7 @@
 
 import { COLORS } from "../components/game/colors";
 import { drawGlassPanel } from "../components/game/draw-helpers";
+import { playMenuNavigate, playMenuBack, playMenuToggle } from "../components/game/sound-engine";
 
 export interface GameSettings {
     volume: number;        // 0-100
@@ -75,17 +76,20 @@ export function handleSettingsKey(e: KeyboardEvent): boolean {
     if (!isOpen) return false;
 
     if (e.key === "Escape" || e.key === "s" || e.key === "S") {
+        playMenuBack();
         closeSettings();
         return true;
     }
 
     if (e.key === "ArrowUp" || e.key === "w" || e.key === "W") {
         selectedIndex = Math.max(0, selectedIndex - 1);
+        playMenuNavigate();
         return true;
     }
 
     if (e.key === "ArrowDown" || e.key === "s" || e.key === "S") {
         selectedIndex = Math.min(3, selectedIndex + 1);
+        playMenuNavigate();
         return true;
     }
 
@@ -107,6 +111,7 @@ export function handleSettingsKey(e: KeyboardEvent): boolean {
             settings.difficulty = DIFFICULTY_OPTIONS[newIdx].value;
         }
         saveSettings(settings);
+        playMenuToggle();
         return true;
     }
 
