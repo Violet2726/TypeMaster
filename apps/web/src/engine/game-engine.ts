@@ -26,6 +26,7 @@ import { showTutorial, isTutorialShowing, handleTutorialKey, updateTutorial, ren
 import { handlePauseMenuKey, renderPauseMenu, resetPauseMenu } from "./pause-menu";
 import { triggerComboFlash, updateComboFx, drawComboFx, resetComboFx } from "./combo-fx";
 import { updateHud, drawEnhancedHud, resetHud } from "./hud-overlay";
+import { openStats, isStatsOpen, handleStatsKey, renderStatsHistory, saveGameRecord } from "./stats-history";
 import { shouldSpawnVariant, createVariantState, updateVariant, processShieldInput, drawVariantOverlay, drawVariantBadge } from "./enemy-variant";
 import type { VariantState, VariantType } from "./enemy-variant";
 import { shouldDropPowerUp, createPowerUp, updatePowerUps, processPowerUpInput, drawPowerUp, drawActivePowerUps, getPowerUpConfig } from "./power-up";
@@ -230,6 +231,8 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                 shake.trigger(12);
                 initGameOver(buildGameResult(state));
                 music.setPlaying(false);
+                const result = buildGameResult(state);
+                saveGameRecord({ score: result.score, wave: result.wave, wpm: result.wpm, accuracy: result.accuracy, maxCombo: result.maxCombo, date: new Date().toLocaleDateString() });
             }
         });
 
@@ -287,6 +290,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         renderAchievementModal(ctx, width, height, time);
         renderSettingsPanel(ctx, width, height, time);
         renderTutorial(ctx, width, height, time);
+        renderStatsHistory(ctx, width, height, time);
 
         ctx.restore();
     }
@@ -549,6 +553,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     function handleKey(e: KeyboardEvent): void {
         if (state.mode === "idle") {
             if (e.key === "Escape") return;
+        if (e.key === "h" || e.key === "H") { openStats(); return; }
             initSound();
             showTutorial();
             music.start();
@@ -593,6 +598,9 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
             }
             return;
         }
+
+        // Stats history input
+        if (isStatsOpen()) { handleStatsKey(e); return; }
 
         // Tutorial overlay consumes first key
         if (isTutorialShowing()) {
