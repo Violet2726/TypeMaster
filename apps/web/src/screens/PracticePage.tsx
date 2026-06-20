@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
@@ -237,24 +237,24 @@ export function PracticePage() {
                     <p className="hero-body">{practiceBody}</p>
                 </div>
 
-                <div className="practice-hero__meta">
-                    <div className="practice-hero__pill">
+                <div className="practice-hero__config-strip">
+                    <div className="practice-hero__config-item">
                         <span>{store.copy.practice.sourceTitle}</span>
                         <strong>{sourceLabel}</strong>
                     </div>
-                    <div className="practice-hero__pill">
+                    <div className="practice-hero__config-item">
                         <span>{store.copy.practice.modeTitle}</span>
                         <strong>{activeModeLabel}</strong>
                     </div>
-                    <div className="practice-hero__pill">
+                    <div className="practice-hero__config-item">
                         <span>{store.copy.practice.volumeTitle}</span>
                         <strong>{activeVolumeLabel}</strong>
                     </div>
-                    <div className="practice-hero__pill">
+                    <div className="practice-hero__config-item">
                         <span>{trainingCopy.practice.layoutLabel}</span>
                         <strong>{keyboardLayoutLabel}</strong>
                     </div>
-                    <div className="practice-hero__pill practice-hero__pill--status">
+                    <div className="practice-hero__config-item practice-hero__config-item--status">
                         <span>{store.copy.common.status}</span>
                         <strong>{sessionStatusLabel}</strong>
                     </div>
@@ -358,7 +358,7 @@ export function PracticePage() {
                             </div>
                             <div>
                                 <p className="muted-text practice-toolbar__meta">{sourceLabel}</p>
-                                <p className="muted-text practice-toolbar__meta">{activeModeLabel} 路 {activeVolumeLabel}</p>
+                                <p className="muted-text practice-toolbar__meta">{activeModeLabel} 璺?{activeVolumeLabel}</p>
                             </div>
                         </div>
 
