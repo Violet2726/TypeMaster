@@ -1,13 +1,14 @@
 /**
- * Combo Visual Effects - Full-screen effects for high combos.
+ * Combo Visual Effects - Refined Apple-style effects for high combos.
  *
  * Progressive visual intensity as combo builds:
  *   3+   : Subtle screen pulse
- *   5+   : Color saturation boost
- *   10+  : Screen flash on each kill
+ *   10+  : Edge glow pulse
  *   15+  : Speed lines radiating from center
- *   20+  : Full-screen color shift + intense flash
+ *   20+  : Full-screen golden aura
  */
+
+import { COLORS } from '../components/game/colors';
 
 interface ComboFxState {
     flashIntensity: number;   // 0-1, decays over time
@@ -21,35 +22,32 @@ interface ComboFxState {
 const MILESTONES = [5, 10, 15, 20, 25, 30];
 
 let fx: ComboFxState = {
-    flashIntensity: 0, flashColor: "#ffffff", pulsePhase: 0,
+    flashIntensity: 0, flashColor: '#ffffff', pulsePhase: 0,
     saturation: 0, speedLineAlpha: 0, lastComboTrigger: 0,
 };
 
 export function resetComboFx(): void {
-    fx = { flashIntensity: 0, flashColor: "#ffffff", pulsePhase: 0, saturation: 0, speedLineAlpha: 0, lastComboTrigger: 0 };
+    fx = { flashIntensity: 0, flashColor: '#ffffff', pulsePhase: 0, saturation: 0, speedLineAlpha: 0, lastComboTrigger: 0 };
 }
 
 export function triggerComboFlash(combo: number): void {
-    // Check if we hit a new milestone
     const milestone = MILESTONES.filter(m => m <= combo).pop();
     if (milestone && milestone > fx.lastComboTrigger) {
-        fx.flashIntensity = 0.6 + Math.min(0.4, combo * 0.02);
+        fx.flashIntensity = 0.5 + Math.min(0.3, combo * 0.015);
         fx.lastComboTrigger = milestone;
-        // Color based on milestone
-        if (combo >= 20) fx.flashColor = "#ffd700";
-        else if (combo >= 15) fx.flashColor = "#ff453a";
-        else if (combo >= 10) fx.flashColor = "#bf5af2";
-        else fx.flashColor = "#0a84ff";
+        if (combo >= 20) fx.flashColor = COLORS.combo20;
+        else if (combo >= 15) fx.flashColor = COLORS.combo15;
+        else if (combo >= 10) fx.flashColor = COLORS.combo10;
+        else fx.flashColor = COLORS.combo3;
     } else if (combo >= 10) {
-        // Subtle flash on each kill at high combo
-        fx.flashIntensity = Math.max(fx.flashIntensity, 0.15);
-        fx.flashColor = combo >= 20 ? "#ffd700" : combo >= 15 ? "#ff6b6b" : "#bf5af2";
+        fx.flashIntensity = Math.max(fx.flashIntensity, 0.12);
+        fx.flashColor = combo >= 20 ? COLORS.combo20 : combo >= 15 ? COLORS.combo15 : COLORS.combo10;
     }
 }
 
 export function updateComboFx(dt: number, combo: number): void {
     // Decay flash
-    fx.flashIntensity *= Math.pow(0.85, dt * 60);
+    fx.flashIntensity *= Math.pow(0.82, dt * 60);
     if (fx.flashIntensity < 0.01) fx.flashIntensity = 0;
 
     // Update saturation based on combo
@@ -61,7 +59,7 @@ export function updateComboFx(dt: number, combo: number): void {
     fx.speedLineAlpha += (targetSpeedLines - fx.speedLineAlpha) * dt * 3;
 
     // Update pulse
-    fx.pulsePhase += dt * (2 + combo * 0.1);
+    fx.pulsePhase += dt * (2 + combo * 0.08);
 }
 
 export function drawComboFx(ctx: CanvasRenderingContext2D, w: number, h: number, time: number, combo: number): void {
@@ -78,10 +76,10 @@ export function drawComboFx(ctx: CanvasRenderingContext2D, w: number, h: number,
 
     // Pulse vignette at combo 3+
     if (combo >= 3) {
-        const pulse = Math.sin(fx.pulsePhase) * 0.1 + 0.1;
-        const pulseGrad = ctx.createRadialGradient(w / 2, h / 2, h * 0.4, w / 2, h / 2, h * 0.9);
-        pulseGrad.addColorStop(0, "rgba(0,0,0,0)");
-        pulseGrad.addColorStop(1, "rgba(0,0,0," + pulse + ")");
+        const pulse = Math.sin(fx.pulsePhase) * 0.08 + 0.08;
+        const pulseGrad = ctx.createRadialGradient(w / 2, h / 2, h * 0.35, w / 2, h / 2, h * 0.95);
+        pulseGrad.addColorStop(0, 'rgba(0,0,0,0)');
+        pulseGrad.addColorStop(1, 'rgba(0,0,0,' + pulse + ')');
         ctx.fillStyle = pulseGrad;
         ctx.fillRect(0, 0, w, h);
     }
@@ -89,19 +87,19 @@ export function drawComboFx(ctx: CanvasRenderingContext2D, w: number, h: number,
     // Speed lines at combo 15+
     if (fx.speedLineAlpha > 0.01) {
         ctx.save();
-        ctx.globalAlpha = fx.speedLineAlpha * 0.3;
-        ctx.strokeStyle = "#ffffff";
+        ctx.globalAlpha = fx.speedLineAlpha * 0.2;
+        ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 1;
 
-        const lineCount = 12;
+        const lineCount = 10;
         const centerX = w / 2;
         const centerY = h / 2;
-        const maxLen = Math.max(w, h) * 0.6;
+        const maxLen = Math.max(w, h) * 0.5;
 
         for (let i = 0; i < lineCount; i++) {
-            const angle = (Math.PI * 2 / lineCount) * i + time * 0.001;
-            const inner = 100 + Math.sin(time * 0.003 + i) * 30;
-            const outer = inner + maxLen * (0.3 + Math.sin(time * 0.005 + i * 2) * 0.2);
+            const angle = (Math.PI * 2 / lineCount) * i + time * 0.0008;
+            const inner = 120 + Math.sin(time * 0.002 + i) * 40;
+            const outer = inner + maxLen * (0.3 + Math.sin(time * 0.004 + i * 2) * 0.15);
 
             ctx.beginPath();
             ctx.moveTo(centerX + Math.cos(angle) * inner, centerY + Math.sin(angle) * inner);
@@ -113,21 +111,24 @@ export function drawComboFx(ctx: CanvasRenderingContext2D, w: number, h: number,
 
     // Edge glow at combo 10+
     if (combo >= 10) {
-        const glowAlpha = Math.min(0.15, (combo - 10) * 0.01);
-        const glowColor = combo >= 20 ? "255,215,0" : combo >= 15 ? "255,69,58" : "191,90,242";
+        const glowAlpha = Math.min(0.12, (combo - 10) * 0.008);
+        let glowRGB: string;
+        if (combo >= 20) glowRGB = '255,215,0';
+        else if (combo >= 15) glowRGB = '255,59,92';
+        else glowRGB = '191,90,242';
 
         // Top edge
-        const topGrad = ctx.createLinearGradient(0, 0, 0, 60);
-        topGrad.addColorStop(0, "rgba(" + glowColor + "," + glowAlpha + ")");
-        topGrad.addColorStop(1, "rgba(" + glowColor + ",0)");
+        const topGrad = ctx.createLinearGradient(0, 0, 0, 50);
+        topGrad.addColorStop(0, 'rgba(' + glowRGB + ',' + glowAlpha + ')');
+        topGrad.addColorStop(1, 'rgba(' + glowRGB + ',0)');
         ctx.fillStyle = topGrad;
-        ctx.fillRect(0, 0, w, 60);
+        ctx.fillRect(0, 0, w, 50);
 
         // Bottom edge
-        const botGrad = ctx.createLinearGradient(0, h - 60, 0, h);
-        botGrad.addColorStop(0, "rgba(" + glowColor + ",0)");
-        botGrad.addColorStop(1, "rgba(" + glowColor + "," + glowAlpha + ")");
+        const botGrad = ctx.createLinearGradient(0, h - 50, 0, h);
+        botGrad.addColorStop(0, 'rgba(' + glowRGB + ',0)');
+        botGrad.addColorStop(1, 'rgba(' + glowRGB + ',' + glowAlpha + ')');
         ctx.fillStyle = botGrad;
-        ctx.fillRect(0, h - 60, w, 60);
+        ctx.fillRect(0, h - 50, w, 50);
     }
 }

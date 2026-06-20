@@ -459,104 +459,318 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         const typeConfig = getEnemyTypeConfig(enemy.type);
         const baseColor = (COLORS as any)[enemy.type] || COLORS.normal;
         const glowColor = (COLORS as any)[enemy.type + "Glow"] || COLORS.normalGlow;
+        const innerColor = (COLORS as any)[enemy.type + "Inner"] || "#ffffff";
 
-        const size = enemy.type === "boss" ? 32 : enemy.type === "tank" ? 24 : enemy.type === "fast" ? 18 : 18;
+        const size = enemy.type === "boss" ? 36 : enemy.type === "tank" ? 28 : enemy.type === "fast" ? 20 : 20;
         const wobble = Math.sin(time * 0.002 + enemy.x * 0.01) * 2;
 
-        const spawnDuration = 300;
+        const spawnDuration = 400;
         const spawnProgress = Math.min(1, (time - (enemy.spawnTime || 0)) / spawnDuration);
-        const scale = spawnProgress < 1 ? 0.5 + 0.5 * Math.sin(spawnProgress * Math.PI / 2) : 1;
+        const scale = spawnProgress < 1 ? 0.3 + 0.7 * easeOutBack(spawnProgress) : 1;
 
-        const flashDuration = 150;
+        const flashDuration = 180;
         const flashProgress = Math.min(1, (time - (enemy.lastCorrectTime || 0)) / flashDuration);
-        const flashAlpha = flashProgress < 1 ? 0.8 * (1 - flashProgress) : 0;
+        const flashAlpha = flashProgress < 1 ? 0.9 * (1 - flashProgress) : 0;
 
         ctx.save();
         ctx.translate(enemy.x + wobble, enemy.y);
         ctx.scale(scale, scale);
 
+        // Potential match highlight
         if (isPotentialMatch) {
-            const pulse = Math.sin(time * 0.005) * 0.5 + 0.5;
+            const pulse = Math.sin(time * 0.004) * 0.4 + 0.6;
             ctx.shadowColor = "#ffffff";
-            ctx.shadowBlur = 10 + pulse * 10;
+            ctx.shadowBlur = 12 + pulse * 12;
         }
-        if (flashAlpha > 0) ctx.globalAlpha += flashAlpha;
 
-        ctx.shadowColor = glowColor;
-        ctx.shadowBlur = 20 + Math.sin(time * 0.003) * 5;
+        // Hit flash
+        if (flashAlpha > 0) {
+            ctx.globalAlpha = Math.min(1, ctx.globalAlpha + flashAlpha * 0.5);
+        }
 
-        const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, size);
-        gradient.addColorStop(0, "#ffffff");
-        gradient.addColorStop(0.3, baseColor);
-        gradient.addColorStop(1, baseColor + "80");
-        ctx.fillStyle = gradient;
-
+        // Draw by enemy type
         if (enemy.type === "boss") {
-            ctx.beginPath();
-            ctx.moveTo(0, -size);
-            ctx.bezierCurveTo(size * 0.5, -size * 0.5, size * 0.5, size * 0.5, 0, size);
-            ctx.bezierCurveTo(-size * 0.5, size * 0.5, -size * 0.5, -size * 0.5, 0, -size);
-            ctx.fill();
+            drawBossEnemy(ctx, size, time, baseColor, glowColor, innerColor);
         } else if (enemy.type === "tank") {
-            ctx.beginPath();
-            ctx.roundRect(-size * 0.7, -size * 0.7, size * 1.4, size * 1.4, 6);
-            ctx.fill();
+            drawTankEnemy(ctx, size, time, baseColor, glowColor, innerColor);
         } else if (enemy.type === "fast") {
-            ctx.beginPath();
-            ctx.moveTo(0, -size);
-            ctx.bezierCurveTo(size * 0.3, -size * 0.3, size * 0.8, size * 0.3, 0, size * 0.7);
-            ctx.bezierCurveTo(-size * 0.8, size * 0.3, -size * 0.3, -size * 0.3, 0, -size);
-            ctx.fill();
+            drawFastEnemy(ctx, size, time, baseColor, glowColor, innerColor);
         } else {
-            ctx.beginPath();
-            ctx.arc(0, 0, size * 0.8, 0, Math.PI * 2);
-            ctx.fill();
+            drawNormalEnemy(ctx, size, time, baseColor, glowColor, innerColor);
         }
 
         ctx.shadowBlur = 0;
 
-        // HP bar
+        // HP bar for multi-hp enemies
         if (typeConfig.hp > 1) {
-            const barW = size * 2;
+            const barW = size * 2.2;
             const barH = 4;
-            const barY = -size - 12;
+            const barY = -size - 14;
             drawGlassPanel(ctx, -barW / 2, barY, barW, barH, 2);
-            ctx.fillStyle = baseColor;
+            const hpRatio = enemy.hp / enemy.maxHp;
+            const hpColor = hpRatio > 0.5 ? baseColor : hpRatio > 0.25 ? COLORS.warning : COLORS.error;
+            ctx.fillStyle = hpColor;
             ctx.beginPath();
-            ctx.roundRect(-barW / 2, barY, barW * (enemy.hp / enemy.maxHp), barH, 2);
+            ctx.roundRect(-barW / 2, barY, barW * hpRatio, barH, 2);
             ctx.fill();
         }
 
         // Progress ring
         const progress = enemy.word.length > 0 ? (enemy.typed || "").length / enemy.word.length : 0;
-        drawProgressRing(ctx, 0, 0, size + 4, progress, baseColor);
+        if (progress > 0) {
+            drawProgressRing(ctx, 0, 0, size + 6, progress, baseColor);
+        }
 
         // Word rendering
-        ctx.font = "500 14px -apple-system, SF Pro Text, system-ui, sans-serif";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-
         const word = enemy.word;
         const typed = enemy.typed || "";
+        const wordY = size + 18;
+
+        ctx.font = "600 13px -apple-system, SF Pro Text, system-ui, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
 
         if (typed.length > 0) {
             const typedWidth = ctx.measureText(typed).width;
             const fullWidth = ctx.measureText(word).width;
             const startX = -fullWidth / 2;
+            // Typed part - bright green with glow
             ctx.fillStyle = COLORS.success;
             ctx.shadowColor = COLORS.success;
-            ctx.shadowBlur = 8;
+            ctx.shadowBlur = 10;
             ctx.textAlign = "left";
-            ctx.fillText(typed, startX, size + 16);
-            ctx.fillStyle = COLORS.text;
+            ctx.fillText(typed, startX, wordY);
+            // Remaining part - dimmer
             ctx.shadowBlur = 0;
-            ctx.fillText(word.slice(typed.length), startX + typedWidth, size + 16);
+            ctx.fillStyle = COLORS.textSecondary;
+            ctx.fillText(word.slice(typed.length), startX + typedWidth, wordY);
         } else {
             ctx.fillStyle = COLORS.text;
-            ctx.fillText(word, 0, size + 16);
+            ctx.fillText(word, 0, wordY);
         }
 
         ctx.restore();
+    }
+
+    // --- Enemy Type Renderers ---
+
+    function drawNormalEnemy(ctx: CanvasRenderingContext2D, size: number, time: number, baseColor: string, glowColor: string, innerColor: string): void {
+        // Smooth sphere with soft glow and breathing animation
+        const breathe = Math.sin(time * 0.003) * 0.08 + 1.0;
+        const s = size * breathe;
+
+        // Outer glow
+        ctx.shadowColor = glowColor;
+        ctx.shadowBlur = 25 + Math.sin(time * 0.004) * 8;
+
+        // Sphere gradient
+        const grad = ctx.createRadialGradient(-s * 0.25, -s * 0.25, 0, 0, 0, s);
+        grad.addColorStop(0, innerColor);
+        grad.addColorStop(0.4, baseColor);
+        grad.addColorStop(1, baseColor + "60");
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(0, 0, s * 0.85, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Inner highlight (specular)
+        ctx.shadowBlur = 0;
+        const specGrad = ctx.createRadialGradient(-s * 0.3, -s * 0.3, 0, -s * 0.1, -s * 0.1, s * 0.5);
+        specGrad.addColorStop(0, "rgba(255,255,255,0.5)");
+        specGrad.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.fillStyle = specGrad;
+        ctx.beginPath();
+        ctx.arc(0, 0, s * 0.85, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    function drawFastEnemy(ctx: CanvasRenderingContext2D, size: number, time: number, baseColor: string, glowColor: string, innerColor: string): void {
+        // Sharp diamond with vibration and motion trail
+        const vibrate = Math.sin(time * 0.015) * 1.5;
+        const stretch = 1.0 + Math.sin(time * 0.008) * 0.05;
+
+        ctx.save();
+        ctx.translate(vibrate, 0);
+        ctx.scale(1, stretch);
+
+        // Motion trail (trailing afterglow)
+        for (let i = 3; i > 0; i--) {
+            const alpha = 0.06 * (4 - i);
+            ctx.fillStyle = baseColor + Math.round(alpha * 255).toString(16).padStart(2, '0');
+            ctx.save();
+            ctx.translate(i * 4, i * 3);
+            drawDiamond(ctx, size * 0.7);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // Main diamond
+        ctx.shadowColor = glowColor;
+        ctx.shadowBlur = 20;
+
+        const grad = ctx.createRadialGradient(0, -size * 0.2, 0, 0, 0, size * 0.9);
+        grad.addColorStop(0, innerColor);
+        grad.addColorStop(0.5, baseColor);
+        grad.addColorStop(1, baseColor + "50");
+        ctx.fillStyle = grad;
+        drawDiamond(ctx, size * 0.7);
+        ctx.fill();
+
+        // Sharp highlight line
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = "rgba(255,255,255,0.6)";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(0, -size * 0.6);
+        ctx.lineTo(size * 0.15, -size * 0.1);
+        ctx.stroke();
+
+        ctx.restore();
+    }
+
+    function drawDiamond(ctx: CanvasRenderingContext2D, r: number): void {
+        ctx.beginPath();
+        ctx.moveTo(0, -r);
+        ctx.lineTo(r * 0.6, 0);
+        ctx.lineTo(0, r);
+        ctx.lineTo(-r * 0.6, 0);
+        ctx.closePath();
+    }
+
+    function drawTankEnemy(ctx: CanvasRenderingContext2D, size: number, time: number, baseColor: string, glowColor: string, innerColor: string): void {
+        // Heavy hexagon with solid presence and subtle bounce
+        const bounce = Math.abs(Math.sin(time * 0.002)) * 2;
+
+        ctx.save();
+        ctx.translate(0, bounce);
+
+        // Shadow
+        ctx.shadowColor = glowColor;
+        ctx.shadowBlur = 30;
+
+        // Hexagon
+        const grad = ctx.createRadialGradient(-size * 0.2, -size * 0.2, 0, 0, 0, size * 0.95);
+        grad.addColorStop(0, innerColor);
+        grad.addColorStop(0.35, baseColor);
+        grad.addColorStop(1, baseColor + "70");
+        ctx.fillStyle = grad;
+        drawHexagon(ctx, size * 0.85);
+        ctx.fill();
+
+        // Thick border
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = baseColor;
+        ctx.lineWidth = 2.5;
+        ctx.globalAlpha = 0.5;
+        drawHexagon(ctx, size * 0.85);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+
+        // Center cross pattern (armor texture)
+        ctx.strokeStyle = "rgba(255,255,255,0.15)";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(-size * 0.3, 0);
+        ctx.lineTo(size * 0.3, 0);
+        ctx.moveTo(0, -size * 0.3);
+        ctx.lineTo(0, size * 0.3);
+        ctx.stroke();
+
+        ctx.restore();
+    }
+
+    function drawHexagon(ctx: CanvasRenderingContext2D, r: number): void {
+        ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+            const angle = (Math.PI / 3) * i - Math.PI / 6;
+            const x = Math.cos(angle) * r;
+            const y = Math.sin(angle) * r;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+    }
+
+    function drawBossEnemy(ctx: CanvasRenderingContext2D, size: number, time: number, baseColor: string, glowColor: string, innerColor: string): void {
+        // Multi-layered command center with rotating rings
+        const rotation = time * 0.001;
+        const pulse = Math.sin(time * 0.003) * 0.1 + 1.0;
+
+        // Aura field
+        ctx.shadowColor = glowColor;
+        ctx.shadowBlur = 40 + Math.sin(time * 0.005) * 15;
+
+        // Outer rotating ring
+        ctx.save();
+        ctx.rotate(rotation);
+        ctx.strokeStyle = baseColor + "40";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(0, 0, size * 1.2, 0, Math.PI * 1.5);
+        ctx.stroke();
+        ctx.restore();
+
+        // Middle rotating ring (counter)
+        ctx.save();
+        ctx.rotate(-rotation * 1.3);
+        ctx.strokeStyle = baseColor + "60";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(0, 0, size * 0.95, 0, Math.PI * 1.8);
+        ctx.stroke();
+        ctx.restore();
+
+        // Core body - irregular shape
+        const grad = ctx.createRadialGradient(-size * 0.15, -size * 0.15, 0, 0, 0, size * pulse);
+        grad.addColorStop(0, innerColor);
+        grad.addColorStop(0.3, baseColor);
+        grad.addColorStop(0.7, baseColor + "80");
+        grad.addColorStop(1, baseColor + "30");
+        ctx.fillStyle = grad;
+
+        // Star-like shape
+        ctx.beginPath();
+        const points = 8;
+        for (let i = 0; i < points; i++) {
+            const angle = (Math.PI * 2 / points) * i + rotation * 0.5;
+            const r = i % 2 === 0 ? size * 0.75 : size * 0.55;
+            const x = Math.cos(angle) * r;
+            const y = Math.sin(angle) * r;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.fill();
+
+        // Inner glow
+        ctx.shadowBlur = 0;
+        const innerGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 0.4);
+        innerGrad.addColorStop(0, "rgba(255,255,255,0.6)");
+        innerGrad.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.fillStyle = innerGrad;
+        ctx.beginPath();
+        ctx.arc(0, 0, size * 0.4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Corner accent dots
+        for (let i = 0; i < 4; i++) {
+            const angle = (Math.PI / 2) * i + rotation * 2;
+            const dx = Math.cos(angle) * size * 0.5;
+            const dy = Math.sin(angle) * size * 0.5;
+            ctx.fillStyle = baseColor;
+            ctx.globalAlpha = 0.6;
+            ctx.beginPath();
+            ctx.arc(dx, dy, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 1;
+        }
+    }
+
+    // Easing function: overshoot for spawn
+    function easeOutBack(t: number): number {
+        const c1 = 1.70158;
+        const c3 = c1 + 1;
+        return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
     }
 
     // --- Keyboard Input ---
