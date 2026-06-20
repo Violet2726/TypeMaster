@@ -609,6 +609,17 @@ body[data-theme='serika-light'] .insights-history-panel {
     box-shadow: none;
 }
 
+/* --- Home records panel (used by InsightsPage) --- */
+.home-records-panel .history-table {
+    border-radius: var(--radius-sm);
+    border-color: var(--panel-stroke);
+    background: var(--bg-soft);
+}
+
+body[data-theme='serika-light'] .home-records-panel .history-table {
+    background: rgba(255, 255, 255, 0.76);
+}
+
 /* --- Responsive --- */
 
 @media (max-width: 980px) {
@@ -853,3 +864,4 @@ body[data-theme='serika-light'] .insights-history-panel {
         padding: 0.62rem 0.72rem;
     }
 }
+

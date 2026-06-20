@@ -1,3 +1,8 @@
+﻿/* --- Practice page base --- */
+.practice-page {
+    gap: 0.95rem;
+}
+
 .practice-page--refined {
     display: grid;
     gap: 0.95rem;
@@ -187,3 +192,4 @@ body[data-theme='serika-light'] .practice-page--refined .practice-toolbar__suppo
         height: calc(var(--typing-size) * var(--typing-line-height) * 3.35);
     }
 }
+
