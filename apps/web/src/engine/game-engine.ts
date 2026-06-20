@@ -24,6 +24,7 @@ import { enqueueAchievement, updateAchievementModal, renderAchievementModal, cle
 import { openSettings, closeSettings, isSettingsOpen, handleSettingsKey, renderSettingsPanel, getSettings } from "./settings-panel";
 import { showTutorial, isTutorialShowing, handleTutorialKey, updateTutorial, renderTutorial } from "./tutorial-overlay";
 import { handlePauseMenuKey, renderPauseMenu, resetPauseMenu } from "./pause-menu";
+import { triggerComboFlash, updateComboFx, drawComboFx, resetComboFx } from "./combo-fx";
 import { shouldSpawnVariant, createVariantState, updateVariant, processShieldInput, drawVariantOverlay, drawVariantBadge } from "./enemy-variant";
 import type { VariantState, VariantType } from "./enemy-variant";
 import { shouldDropPowerUp, createPowerUp, updatePowerUps, processPowerUpInput, drawPowerUp, drawActivePowerUps, getPowerUpConfig } from "./power-up";
@@ -239,6 +240,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         enemyVariants.forEach((v, id) => { enemyVariants.set(id, updateVariant(v, dt)); });
         updateAchievementModal(performance.now());
         updateTutorial(performance.now());
+        updateComboFx(dt, state.combo);
 
         // Update power-ups
         powerUps = updatePowerUps(powerUps, dt);
@@ -348,6 +350,9 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                 drawVariantBadge(ctx, variant, e.x, e.y, enemySize);
             }
         });
+
+        // Combo visual effects
+        drawComboFx(ctx, w, h, time, state.combo);
 
         // Draw power-ups
         powerUps.filter(pu => pu.alive).forEach(pu => drawPowerUp(ctx, pu, time));
@@ -730,6 +735,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
             clearGameOver();
             clearAchievementQueue();
             enemyVariants.clear();
+            resetComboFx();
             return;
         }
 
@@ -803,6 +809,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                         particles.emit({ x: enemy.x, y: enemy.y, count: 20 + chainBonus * 5, color, speed: 3 + chainBonus, size: 3 + chainBonus * 0.5, gravity: 2, turbulence: 0.5 + chainCount * 0.1, trail: true, trailLength: 6 + chainBonus * 2 });
                         particles.emit({ x: enemy.x, y: enemy.y, count: 8 + chainBonus * 2, color: "#ffffff", speed: 2, size: 2, lifetime: 0.4 });
                         shake.trigger(4 + chainBonus * 2);
+                        triggerComboFlash(state.combo);
 
                         // Chain kill tracking
                         const now = Date.now();
