@@ -1,0 +1,131 @@
+/* ============================================
+   Mobile Experience - Tab Bar & Touch Targets
+   ============================================ */
+
+@media (max-width: 720px) {
+    .app-main {
+        padding-bottom: 6rem;
+    }
+
+    .container {
+        width: min(100vw - 1rem, 100%);
+    }
+
+    .panel {
+        padding: 1rem;
+    }
+
+    /* Mobile Tab Bar - Apple HIG 44pt touch targets */
+    .mobile-tab-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        height: 3.6rem;
+        padding: 0.28rem 0.6rem calc(0.28rem + env(safe-area-inset-bottom, 0px));
+        border-top: 1px solid var(--panel-stroke);
+        background: rgba(10, 10, 12, 0.82);
+        backdrop-filter: saturate(180%) blur(22px);
+        -webkit-backdrop-filter: saturate(180%) blur(22px);
+        box-shadow: 0 -10px 28px rgba(0, 0, 0, 0.22);
+    }
+
+    body[data-theme='serika-light'] .mobile-tab-bar {
+        border-top-color: rgba(60, 60, 67, 0.10);
+        background: rgba(245, 245, 247, 0.84);
+        box-shadow: 0 -10px 28px rgba(0, 0, 0, 0.06);
+    }
+
+    .mobile-tab-bar__item {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.15rem;
+        flex: 1 1 0;
+        min-width: 0;
+        min-height: 2.75rem;
+        padding: 0.35rem 0;
+        border-radius: var(--radius-pill);
+        color: var(--text-dim);
+        font-size: 0.62rem;
+        font-weight: 650;
+        letter-spacing: 0;
+        text-decoration: none;
+        transition: color var(--transition-fast), background var(--transition-fast);
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .mobile-tab-bar__item:active {
+        transform: scale(0.96);
+    }
+
+    .mobile-tab-bar__item svg {
+        width: 1.2rem;
+        height: 1.2rem;
+        stroke-width: 2.15;
+    }
+
+    .mobile-tab-bar__item.is-active {
+        color: var(--main-color);
+        background: var(--main-soft);
+    }
+
+    body[data-theme='serika-light'] .mobile-tab-bar__item.is-active {
+        color: #0071e3;
+        background: var(--main-soft);
+    }
+
+    .app-shell.is-settings-open .mobile-tab-bar {
+        display: none;
+    }
+
+    /* Wider touch targets for all interactive elements */
+    .nav-link {
+        min-height: 2.5rem;
+        padding: 0.5rem 0.68rem;
+        font-size: 0.9rem;
+    }
+
+    .nav-icon {
+        max-width: 9.5rem;
+        min-height: 2.5rem;
+        padding: 0.52rem 0.7rem;
+        font-size: 0.86rem;
+    }
+
+    .nav-icon--tool {
+        width: 2.5rem;
+        min-width: 2.5rem;
+        padding: 0;
+    }
+
+    .action-btn,
+    .ghost-btn,
+    .segment-btn,
+    .toggle-btn {
+        width: 100%;
+    }
+
+    .sticky-action-bar {
+        display: grid;
+        bottom: calc(3.6rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    .live-stat-value {
+        font-size: 2rem;
+    }
+
+    .words-shell {
+        padding: 1rem;
+        scroll-margin-top: 4.25rem;
+    }
+
+    .words-container {
+        height: calc(var(--typing-size) * var(--typing-line-height) * 3);
+    }
+}

@@ -1,4 +1,4 @@
-ï»¿/* TypeMaster â€“ Apple Design System */
+/* TypeMaster ¨C Apple Design System */
 /* Variables, themes, and font sizes are declared in the Apple refresh section at the bottom. */
 
 
@@ -3610,7 +3610,7 @@ body[data-theme='serika-light'] .modal-overlay {
 
 /* ============================================
 /* ============================================
-   ConfirmDialog éˆ¥?Apple HIG Redesign
+   ConfirmDialog â€?Apple HIG Redesign
    ============================================ */
 
 .confirm-dialog {
@@ -3682,7 +3682,7 @@ body[data-theme='serika-light'] .modal-overlay {
 }
 
 /* ============================================
-   TypingArea éˆ¥?Apple Refinements
+   TypingArea â€?Apple Refinements
    ============================================ */
 
 
@@ -4411,10 +4411,6 @@ body[data-theme='serika-light'] .settings-data__summary {
 
     .settings-data__actions {
         grid-template-columns: 1fr;
-    }
-
-    .app-shell.is-settings-open .mobile-tab-bar {
-        display: none;
     }
 }
 
@@ -5385,47 +5381,6 @@ body[data-theme='serika-light'] .nav-icon {
     .nav-icon--language {
         min-width: 4.32rem;
     }
-
-    .mobile-tab-bar {
-        height: 3.85rem;
-        padding: 0.32rem 0.72rem calc(0.32rem + env(safe-area-inset-bottom, 0));
-        border-top-color: rgba(255, 255, 255, 0.08);
-        background: rgba(12, 12, 13, 0.82);
-        box-shadow: 0 -12px 32px rgba(0, 0, 0, 0.24);
-    }
-
-    body[data-theme='serika-light'] .mobile-tab-bar {
-        border-top-color: rgba(60, 60, 67, 0.12);
-        background: rgba(245, 245, 247, 0.84);
-        box-shadow: 0 -12px 32px rgba(0, 0, 0, 0.08);
-    }
-
-    .mobile-tab-bar__item {
-        position: relative;
-        flex: 1 1 0;
-        min-width: 0;
-        min-height: 3rem;
-        border-radius: 999px;
-        font-size: 0.66rem;
-        letter-spacing: 0;
-    }
-
-    .mobile-tab-bar__item svg {
-        width: 1.18rem;
-        height: 1.18rem;
-        stroke-width: 2.15;
-    }
-
-    .mobile-tab-bar__item.is-active {
-        background: rgba(10, 132, 255, 0.13);
-        color: #8ecaff;
-    }
-
-    body[data-theme='serika-light'] .mobile-tab-bar__item.is-active {
-        background: rgba(0, 113, 227, 0.12);
-        color: #006edb;
-    }
-}
 
 /* Practice workspace control refresh */
 .practice-toolbar {

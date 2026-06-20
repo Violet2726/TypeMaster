@@ -19,6 +19,7 @@ import '../src/styles/settings-drawer.css';
 import '../src/styles/overlays.css';
 import '../src/styles/settings.css';
 import '../src/styles/dialogs.css';
+import '../src/styles/mobile.css';
 import '../src/styles/challenge-page-full.css';
 import '../src/styles/coach-page-full.css';
 import '../src/styles/training-plan-page-full.css';
