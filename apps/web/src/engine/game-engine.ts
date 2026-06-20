@@ -19,6 +19,7 @@ import { drawGlassPanel, drawProgressRing } from "../components/game/draw-helper
 import { initSound, playClickSound, playKillSound, playErrorSound, playComboSound } from "../components/game/sound-engine";
 import { getBlendedTheme, drawThemedBackground } from "./environment-theme";
 import { initGameOver, renderGameOver, clearGameOver } from "./game-over";
+import { createMusicEngine } from "./music-engine";
 import { shouldDropPowerUp, createPowerUp, updatePowerUps, processPowerUpInput, drawPowerUp, drawActivePowerUps, getPowerUpConfig } from "./power-up";
 import type { PowerUp, ActivePowerUp, PowerUpType } from "./power-up";
 
@@ -96,6 +97,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     let chainMultiplier = 1;
 
     // Power-ups
+    const music = createMusicEngine();
     let powerUps: PowerUp[] = [];
     let activePowerUps: ActivePowerUp[] = [];
     let shieldCount = 0;
@@ -190,6 +192,11 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                     shake.trigger(12);
                 }
 
+                // Update music theme based on wave
+                const waveNum = state.wave;
+                if (waveNum >= 13) music.setTheme("black-hole");
+                else if (waveNum >= 6) music.setTheme("nebula");
+
                 // Extended delay for wave clear celebration
                 setTimeout(() => {
                     if (state.mode === "playing") {
@@ -201,12 +208,14 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                 gameOverTime = performance.now();
                 shake.trigger(12);
                 initGameOver(buildGameResult(state));
+                music.setPlaying(false);
             }
         });
 
         particles.update(dt);
         scorePopups.update(dt);
         shake.update(dt);
+        music.setCombo(state.combo);
 
         // Update power-ups
         powerUps = updatePowerUps(powerUps, dt);
@@ -636,6 +645,8 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         if (state.mode === "idle") {
             if (e.key === "Escape") return;
             initSound();
+            music.start();
+            music.setPlaying(true);
             startTime = performance.now();
             state = transitionGameMode(state, "start");
             state = startWave(state, pool, { canvasWidth, canvasHeight, kps: state.kps });
@@ -645,9 +656,11 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         if (e.key === "Escape") {
             if (state.mode === "playing") {
                 state = transitionGameMode(state, "pause");
+                music.setPaused(true);
             } else if (state.mode === "paused") {
                 // Start 3-2-1 countdown
                 resumeCountdown = 3;
+                music.setPaused(false);
                 state = { ...state, mode: "resuming" as any };
             } else if (state.mode === "gameover") {
                 state = createGameState();
@@ -788,6 +801,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         scorePopups.clear();
         powerUps = [];
         activePowerUps = [];
+        music.stop();
     }
 
     return {
