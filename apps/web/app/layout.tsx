@@ -7,14 +7,14 @@ import '../src/styles/animations.css';
 import '../src/styles/toggle-switch.css';
 import '../src/styles/typing-shell.css';
 import '../src/styles/result-page.css';
-import '../src/styles/insights-page.css';
+import '../src/styles/insights-page-full.css';
 import '../src/styles/home-action-card.css';
 import '../src/styles/diagnostic-page.css';
 import '../src/styles/settings-drawer.css';
 import '../src/styles/confirm-dialog.css';
 import '../src/styles/challenge-page-full.css';
-import '../src/styles/insights-page-full.css';
 import '../src/styles/coach-page-full.css';
+import '../src/styles/training-plan-page-full.css';
 
 export const metadata: Metadata = {
     title: 'TypeMaster 2.0',
