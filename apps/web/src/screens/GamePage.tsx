@@ -19,6 +19,7 @@ import '../../src/styles/game-page.css';
 import { useGameStore } from '../features/game/state/game-store';
 import { appendSession } from '../services/storage/sessions-repo';
 import { COLORS } from '../components/game/colors';
+import { initSound, playClickSound, playKillSound, playErrorSound, playComboSound } from '../components/game/sound-engine';
 import { drawProgressRing, drawGlassPanel } from '../components/game/draw-helpers';
 
 
@@ -786,6 +787,7 @@ export default function GamePage() {
                 
                 result.events.forEach((event: any) => {
                     if (event.type === 'enemy_killed') {
+                        playKillSound();
                         const enemy = state.enemies.find((en: any) => en.id === event.enemyId);
                         if (enemy) {
                             // Kill particles
@@ -796,6 +798,7 @@ export default function GamePage() {
                         }
                     }
                     if (event.type === 'char_correct') {
+                        playClickSound();
                         // Input ripple effect
                         const activeEnemy = state.enemies.find((en: any) => en.id === event.enemyId);
                         if (activeEnemy) {
@@ -803,6 +806,7 @@ export default function GamePage() {
                         }
                     }
                     if (event.type === 'char_error') {
+                        playErrorSound();
                         // Error flash
                         shakeRef.current.trigger(2);
                     }
