@@ -403,6 +403,7 @@ export default function GamePage() {
     const shakeRef = useRef(new ScreenShake());
     const animFrameRef = useRef<number>(0);
     const startTimeRef = useRef<number>(0);
+    const gameOverTimeRef = useRef<number>(0);
     const lastTimeRef = useRef(0);
     const [, setUiState] = useState('idle');
     const language = 'en-US';
@@ -535,6 +536,7 @@ export default function GamePage() {
             }
             if (event.type === 'game_over') {
                 setUiState('gameover');
+                gameOverTimeRef.current = performance.now();
                 saveGameResult(stateRef.current);
                 shakeRef.current.trigger(12);
             }
@@ -706,6 +708,11 @@ export default function GamePage() {
         
         // Game over overlay
         if (state.mode === 'gameover') {
+            const gameoverAnimDuration = 500; // ms
+            const gameoverProgress = gameOverTimeRef.current ? Math.min(1, (time - gameOverTimeRef.current) / gameoverAnimDuration) : 0;
+            
+            ctx.save();
+            ctx.globalAlpha = gameoverProgress;
             ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
             ctx.fillRect(0, 0, width, height);
             
