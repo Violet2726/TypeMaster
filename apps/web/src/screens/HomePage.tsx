@@ -8,11 +8,11 @@ import { useHomePageModel } from '../features/home/use-home-page-model';
 import { useHomePageStore } from '../store/app-state-selectors';
 import './home-page.css';
 
-function getHomeSessionTone(session) {
+function getHomeSessionTone(session: any) {
     return session.trainingMeta?.type || 'free';
 }
 
-function getHomeSessionLabel(session, trainingCopy) {
+function getHomeSessionLabel(session: any, trainingCopy: any) {
     if (session.trainingMeta?.type === 'challenge') {
         return trainingCopy.practice.challengeBadge;
     }
@@ -28,7 +28,7 @@ function getHomeSessionLabel(session, trainingCopy) {
     return trainingCopy.home.freePractice;
 }
 
-function HomeSessionIcon({ tone }) {
+function HomeSessionIcon({ tone }: { tone: string }) {
     const Icon = tone === 'challenge'
         ? Trophy
         : tone === 'plan'
@@ -37,24 +37,24 @@ function HomeSessionIcon({ tone }) {
                 ? Gauge
                 : Keyboard;
 
-    return <Icon aria-hidden="true" size={15} strokeWidth={2.2} />;
+    return <Icon aria-hidden="true" size={14} strokeWidth={2.2} />;
 }
 
-function HomeRecordPill({ icon: Icon, children, tone = 'speed' }) {
+function HomeRecordPill({ icon: Icon, children, tone = 'speed' }: { icon: any; children: ReactNode; tone?: string }) {
     return (
         <span className={`home-record-pill home-record-pill--${tone}`}>
-            <Icon aria-hidden="true" size={15} strokeWidth={2.2} />
+            <Icon aria-hidden="true" size={14} strokeWidth={2.2} />
             {children}
         </span>
     );
 }
 
-function HomeActionEmptySignal({ icon: Icon, title, value, items, tone = 'challenge' }) {
+function HomeActionEmptySignal({ icon: Icon, title, value, items, tone = 'challenge' }: { icon: any; title: string; value: string; items: { label: string; value: string }[]; tone?: string }) {
     return (
         <div className={`home-empty-signal home-empty-signal--${tone}`}>
             <div className="home-empty-signal__head">
                 <span className="home-empty-signal__icon" aria-hidden="true">
-                    <Icon size={16} strokeWidth={2.2} />
+                    <Icon size={15} strokeWidth={2.2} />
                 </span>
                 <div>
                     <span className="summary-label">{title}</span>
@@ -69,16 +69,6 @@ function HomeActionEmptySignal({ icon: Icon, title, value, items, tone = 'challe
                     </span>
                 ))}
             </div>
-        </div>
-    );
-}
-
-function HomeHeroStat({ label, value, hint }) {
-    return (
-        <div className="home-hero-stat">
-            <span>{label}</span>
-            <strong>{value}</strong>
-            {hint ? <small>{hint}</small> : null}
         </div>
     );
 }
@@ -166,23 +156,6 @@ export function HomePage() {
     const homeSessionsLabel = hasSessions ? insights.totalSessions : pendingLabel;
     const challengePrimaryAction = challengeDecisionModel?.primaryAction || challengeStrategyModel.primaryAction;
     const challengePrimaryLabel = challengeDecisionModel?.primaryLabel || challengeStrategyModel.primaryLabel;
-    const heroStats = [
-        {
-            label: trainingCopy.home.levelLabel,
-            value: homeLevelLabel,
-            hint: currentWeakness
-        },
-        {
-            label: trainingCopy.home.planLabel,
-            value: homePlanLabel,
-            hint: trainingPlan ? trainingCopy.home.continuePlan : pendingLabel
-        },
-        {
-            label: trainingCopy.home.weekLabel,
-            value: `${weeklyGoal.completed}/${weeklyGoal.target}`,
-            hint: trainingCopy.home.weekGoalSuffix
-        }
-    ];
     const challengeEmptyItems = [
         { label: copy.result.challengeRankLabel, value: trainingCopy.challenge.leaderboard },
         { label: copy.result.challengeBestLabel, value: trainingCopy.challenge.trendFirstLabel },
@@ -195,6 +168,7 @@ export function HomePage() {
 
     return (
         <div className={`page-stack page-stack--home home-refined ${isStarterHome ? 'home-refined--starter' : 'home-refined--dashboard'}`}>
+            {/* Hero Section - Compact, single-column, action-focused */}
             <section className="home-hero panel">
                 <div className="home-hero__copy">
                     <div className="home-hero__eyebrow">
@@ -213,7 +187,7 @@ export function HomePage() {
                             onClick={() => handleDecisionAction(homeDecision.primaryAction)}
                             disabled={isLaunchingChallenge && homeDecision.primaryAction === 'challenge'}
                         >
-                            <ArrowRight aria-hidden="true" size={18} strokeWidth={2.25} />
+                            <ArrowRight aria-hidden="true" size={17} strokeWidth={2.25} />
                             {homeDecision.primaryAction === 'challenge' && isLaunchingChallenge
                                 ? copy.common.loading
                                 : homeDecision.primaryLabel}
@@ -229,48 +203,31 @@ export function HomePage() {
                             </button>
                         ) : null}
                     </div>
+
+                    {/* Inline stats strip */}
+                    <div className="home-hero__stats-inline">
+                        <div className="home-hero__stat-inline">
+                            <span>{trainingCopy.home.levelLabel}</span>
+                            <strong>{homeLevelLabel}</strong>
+                        </div>
+                        <div className="home-hero__stat-inline">
+                            <span>{trainingCopy.home.planLabel}</span>
+                            <strong>{homePlanLabel}</strong>
+                        </div>
+                        <div className="home-hero__stat-inline">
+                            <span>{trainingCopy.home.weekLabel}</span>
+                            <strong>{`${weeklyGoal.completed}/${weeklyGoal.target}`}</strong>
+                        </div>
+                    </div>
+
                     <div className="home-hero__meta">
                         <span className="home-chip home-chip--soft">{latestModeLabel}</span>
                         <span className="home-chip home-chip--soft">{homeDecision.signalLabel}</span>
                     </div>
                 </div>
-
-                <div className="home-hero__visual" aria-hidden="true">
-                    <div className="home-hero__glass">
-                        <div className="home-hero__glass-head">
-                            <span />
-                            <span />
-                            <span />
-                        </div>
-                        <div className="home-hero__glass-grid">
-                            <div className="home-hero__metric home-hero__metric--wide">
-                                <span>WPM</span>
-                                <strong>{hasSessions ? insights.recent7.avgWpm : copy.statuses.ready}</strong>
-                                <small>{copy.home.avgWpm}</small>
-                            </div>
-                            <div className="home-hero__metric">
-                                <span>ACC</span>
-                                <strong>{recentBestAccuracy || 98}%</strong>
-                                <small>{copy.home.bestAccuracy}</small>
-                            </div>
-                            <div className="home-hero__rail">
-                                <span style={{ width: `${Math.max(24, Math.min(100, planPercent || 24))}%` }} />
-                            </div>
-                            <div className="home-hero__keyboard">
-                                {Array.from({ length: 15 }).map((_, index) => (
-                                    <span key={index} />
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                    <div className="home-hero__stats">
-                        {heroStats.map((item) => (
-                            <HomeHeroStat key={item.label} label={item.label} value={item.value} hint={item.hint} />
-                        ))}
-                    </div>
-                </div>
             </section>
 
+            {/* Dashboard Strip */}
             {!isStarterHome ? (
                 <section className="home-dashboard-strip" aria-label={copy.home.statsTitle}>
                     <div className="metric-card">
@@ -292,6 +249,7 @@ export function HomePage() {
                 </section>
             ) : null}
 
+            {/* Lane Cards */}
             <section className="home-lanes" aria-label={trainingCopy.home.todayFlowTitle}>
                 <div className="home-section-heading">
                     <div>
@@ -401,7 +359,7 @@ export function HomePage() {
                         )}
                     >
                         <div className="home-lane-card__cluster">
-                            {challengeFacts.map((fact) => (
+                            {challengeFacts.map((fact: string) => (
                                 <span key={fact} className="home-chip">{fact}</span>
                             ))}
                             <span className="home-chip">{trainingCopy.challenge.trendFirstLabel}</span>
@@ -450,6 +408,7 @@ export function HomePage() {
                 </div>
             </section>
 
+            {/* Dashboard Evidence */}
             {hasDashboardEvidence ? (
                 <>
                     <section className="home-summary-band">
@@ -510,7 +469,7 @@ export function HomePage() {
 
                             {recentSessions.length ? (
                                 <div className="history-table">
-                                    {recentSessions.map((session) => {
+                                    {recentSessions.map((session: any) => {
                                         const tone = getHomeSessionTone(session);
 
                                         return (
@@ -548,9 +507,9 @@ export function HomePage() {
 
                             {unlockedAchievements.length ? (
                                 <div className="home-achievements-panel__list">
-                                    {unlockedAchievements.map((achievement) => (
+                                    {unlockedAchievements.map((achievement: any) => (
                                         <span key={achievement.id} className="tag-pill home-achievement-pill">
-                                            <Trophy aria-hidden="true" size={15} strokeWidth={2.2} />
+                                            <Trophy aria-hidden="true" size={14} strokeWidth={2.2} />
                                             {achievement.title}
                                         </span>
                                     ))}
@@ -558,7 +517,7 @@ export function HomePage() {
                             ) : (
                                 <div className="home-achievements-panel__empty">
                                     <div className="home-achievements-panel__empty-icon" aria-hidden="true">
-                                        <Sparkles size={18} strokeWidth={2.2} />
+                                        <Sparkles size={16} strokeWidth={2.2} />
                                     </div>
                                     <p className="muted-text">{trainingCopy.insights.achievementsBody}</p>
                                     <button type="button" className="action-btn" onClick={() => handleDecisionAction(homeDecision.primaryAction)}>
