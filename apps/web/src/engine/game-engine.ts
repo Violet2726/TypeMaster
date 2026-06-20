@@ -18,6 +18,7 @@ import { COLORS } from "../components/game/colors";
 import { drawGlassPanel, drawProgressRing } from "../components/game/draw-helpers";
 import { initSound, playClickSound, playKillSound, playErrorSound, playComboSound } from "../components/game/sound-engine";
 import { getBlendedTheme, drawThemedBackground } from "./environment-theme";
+import { initGameOver, renderGameOver, clearGameOver } from "./game-over";
 import { shouldDropPowerUp, createPowerUp, updatePowerUps, processPowerUpInput, drawPowerUp, drawActivePowerUps, getPowerUpConfig } from "./power-up";
 import type { PowerUp, ActivePowerUp, PowerUpType } from "./power-up";
 
@@ -199,6 +200,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
             if (evt.type === "game_over") {
                 gameOverTime = performance.now();
                 shake.trigger(12);
+                initGameOver(buildGameResult(state));
             }
         });
 
@@ -242,7 +244,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         } else if (state.mode === "paused") {
             renderPaused(ctx, width, height, time);
         } else if (state.mode === "gameover") {
-            renderGameOver(ctx, width, height, time);
+            drawGameOverScreen(ctx, width, height, time);
         }
 
         ctx.restore();
@@ -393,64 +395,8 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         ctx.stroke();
     }
 
-    function renderGameOver(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
-        const gameoverProgress = gameOverTime ? Math.min(1, (time - gameOverTime) / 500) : 0;
-        ctx.save();
-        ctx.globalAlpha = gameoverProgress;
-        ctx.fillStyle = "rgba(0,0,0,0.85)";
-        ctx.fillRect(0, 0, w, h);
-
-        const result = buildGameResult(state);
-
-        drawGlassPanel(ctx, w / 2 - 220, h / 2 - 160, 440, 320, 24);
-
-        ctx.font = "700 32px -apple-system, SF Pro Display, system-ui, sans-serif";
-        ctx.fillStyle = COLORS.text;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(copy.gameOver, w / 2, h / 2 - 120);
-
-        // Score with emphasis
-        ctx.font = "600 36px -apple-system, SF Pro Display, system-ui, sans-serif";
-        ctx.fillStyle = COLORS.warning;
-        ctx.fillText(String(result.score), w / 2, h / 2 - 70);
-
-        ctx.font = "400 12px -apple-system, SF Pro Text, system-ui, sans-serif";
-        ctx.fillStyle = COLORS.textSecondary;
-        ctx.fillText(copy.score, w / 2, h / 2 - 95);
-
-        // Stats grid
-        const stats = [
-            { label: copy.wave, value: String(result.wave) },
-            { label: copy.wpm, value: String(result.wpm) },
-            { label: copy.accuracy, value: result.accuracy + "%" },
-            { label: copy.combo, value: String(result.maxCombo) },
-        ];
-
-        stats.forEach((s, i) => {
-            const col = i % 2;
-            const row = Math.floor(i / 2);
-            const sx = w / 2 - 160 + col * 180;
-            const sy = h / 2 - 20 + row * 60;
-
-            drawGlassPanel(ctx, sx, sy, 160, 50, 10);
-
-            ctx.font = "400 11px -apple-system, SF Pro Text, system-ui, sans-serif";
-            ctx.fillStyle = COLORS.textTertiary;
-            ctx.textAlign = "center";
-            ctx.fillText(s.label, sx + 80, sy + 16);
-
-            ctx.font = "600 18px -apple-system, SF Pro Display, system-ui, sans-serif";
-            ctx.fillStyle = COLORS.text;
-            ctx.fillText(s.value, sx + 80, sy + 36);
-        });
-
-        // Action prompts
-        ctx.font = "500 14px -apple-system, SF Pro Text, system-ui, sans-serif";
-        ctx.fillStyle = COLORS.textTertiary;
-        ctx.fillText(copy.playAgain + " (R)  |  " + copy.backToHome + " (Esc)", w / 2, h / 2 + 130);
-
-        ctx.restore();
+    function drawGameOverScreen(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
+        renderGameOver(ctx, w, h, time);
     }
 
     // --- HUD ---
@@ -707,6 +653,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                 state = createGameState();
                 startTime = 0;
                 gameOverTime = 0;
+                clearGameOver();
             }
             return;
         }
@@ -718,6 +665,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
             powerUps = [];
             activePowerUps = [];
             shieldCount = 0;
+            clearGameOver();
             return;
         }
 
