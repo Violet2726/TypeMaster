@@ -98,10 +98,10 @@
     width: 3.1rem;
     height: 3.1rem;
     margin-bottom: 0.9rem;
-    border: 1px solid rgba(10, 132, 255, 0.28);
+    border: 1px solid var(--accent-blue-border);
     border-radius: var(--radius-sm);
     background: rgba(10, 132, 255, 0.16);
-    color: #8ecaff;
+    color: var(--accent-blue);
 }
 
 .challenge-starter-panel h1 {
@@ -159,10 +159,10 @@
     place-items: center;
     width: 2.55rem;
     height: 2.55rem;
-    border: 1px solid rgba(153, 242, 192, 0.24);
+    border: 1px solid var(--accent-green-border);
     border-radius: var(--radius-sm);
-    background: rgba(153, 242, 192, 0.12);
-    color: #99f2c0;
+    background: var(--accent-green-bg);
+    color: var(--accent-green);
 }
 
 .challenge-starter-brief__head strong {
@@ -204,7 +204,7 @@
 
 .challenge-starter-route small {
     width: 1.7rem;
-    color: #8ecaff;
+    color: var(--accent-blue);
     font-size: 0.66rem;
     font-weight: 800;
 }
@@ -259,15 +259,15 @@
     height: 2rem;
     border-radius: var(--radius-sm);
     background: var(--bg-soft);
-    color: #8ecaff;
+    color: var(--accent-blue);
 }
 
 .challenge-starter-unlock-row:nth-child(2) > span {
-    color: #ffd66b;
+    color: var(--accent-gold);
 }
 
 .challenge-starter-unlock-row:nth-child(3) > span {
-    color: #99f2c0;
+    color: var(--accent-green);
 }
 
 .challenge-starter-unlock-row small {
@@ -320,8 +320,8 @@
     height: 3rem;
     border: 1px solid rgba(10, 132, 255, 0.3);
     border-radius: var(--radius-sm);
-    background: rgba(10, 132, 255, 0.14);
-    color: #8ecaff;
+    background: var(--accent-blue-bg);
+    color: var(--accent-blue);
 }
 
 .challenge-first-run-panel__copy h2 {
@@ -367,19 +367,19 @@
     border: 1px solid rgba(10, 132, 255, 0.24);
     border-radius: var(--radius-sm);
     background: rgba(10, 132, 255, 0.12);
-    color: #8ecaff;
+    color: var(--accent-blue);
 }
 
 .challenge-first-run-card--peer .challenge-first-run-card__icon {
-    border-color: rgba(255, 214, 107, 0.24);
-    background: rgba(255, 214, 107, 0.12);
-    color: #ffd66b;
+    border-color: var(--accent-gold-border);
+    background: var(--accent-gold-bg);
+    color: var(--accent-gold);
 }
 
 .challenge-first-run-card--trend .challenge-first-run-card__icon {
-    border-color: rgba(153, 242, 192, 0.24);
+    border-color: var(--accent-green-border);
     background: rgba(153, 242, 192, 0.1);
-    color: #99f2c0;
+    color: var(--accent-green);
 }
 
 .challenge-first-run-card strong {
@@ -468,16 +468,16 @@
     width: 2.5rem;
     height: 2.5rem;
     place-items: center;
-    border: 1px solid rgba(10, 132, 255, 0.28);
+    border: 1px solid var(--accent-blue-border);
     border-radius: var(--radius-sm);
-    background: rgba(10, 132, 255, 0.14);
-    color: #8ecaff;
+    background: var(--accent-blue-bg);
+    color: var(--accent-blue);
 }
 
 .challenge-empty-status--peer .challenge-empty-status__icon {
-    border-color: rgba(255, 214, 107, 0.24);
-    background: rgba(255, 214, 107, 0.12);
-    color: #ffd66b;
+    border-color: var(--accent-gold-border);
+    background: var(--accent-gold-bg);
+    color: var(--accent-gold);
 }
 
 .challenge-empty-status__grid {
@@ -543,10 +543,10 @@
     width: 2.65rem;
     height: 2.65rem;
     place-items: center;
-    border: 1px solid rgba(10, 132, 255, 0.28);
+    border: 1px solid var(--accent-blue-border);
     border-radius: var(--radius-sm);
-    background: rgba(10, 132, 255, 0.14);
-    color: #8ecaff;
+    background: var(--accent-blue-bg);
+    color: var(--accent-blue);
 }
 
 .challenge-replay-empty strong {
@@ -645,15 +645,15 @@
 }
 
 .challenge-rank-chip--top {
-    color: #ffd66b;
-    border-color: rgba(255, 214, 107, 0.24);
-    background: rgba(255, 214, 107, 0.12);
+    color: var(--accent-gold);
+    border-color: var(--accent-gold-border);
+    background: var(--accent-gold-bg);
 }
 
 .challenge-rank-chip--latest {
-    color: #8ecaff;
+    color: var(--accent-blue);
     border-color: rgba(142, 202, 255, 0.24);
-    background: rgba(10, 132, 255, 0.14);
+    background: var(--accent-blue-bg);
 }
 
 /* --- Metric pill --- */
@@ -673,11 +673,11 @@
 }
 
 .challenge-metric-pill--speed svg {
-    color: #8ecaff;
+    color: var(--accent-blue);
 }
 
 .challenge-metric-pill--accuracy svg {
-    color: #99f2c0;
+    color: var(--accent-green);
 }
 
 .challenge-best-badge {

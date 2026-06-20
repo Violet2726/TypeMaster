@@ -1,4 +1,4 @@
-ï»¿:root {
+:root {
     color-scheme: dark light;
 
     --bg-color: #070708;
@@ -23,6 +23,17 @@
     --challenge-soft: rgba(255, 159, 10, 0.12);
     --free-color: #30d158;
     --free-soft: rgba(48, 209, 88, 0.12);
+
+    /* Accent palette ¡ª challenge / streak / icon surfaces */
+    --accent-blue: #8ecaff;
+    --accent-blue-bg: rgba(10, 132, 255, 0.14);
+    --accent-blue-border: rgba(10, 132, 255, 0.28);
+    --accent-green: #99f2c0;
+    --accent-green-bg: rgba(153, 242, 192, 0.12);
+    --accent-green-border: rgba(153, 242, 192, 0.24);
+    --accent-gold: #ffd66b;
+    --accent-gold-bg: rgba(255, 214, 107, 0.12);
+    --accent-gold-border: rgba(255, 214, 107, 0.24);
 
     --text-color: #d1d1d6;
     --text-strong: #f5f5f7;
@@ -79,6 +90,17 @@ body[data-theme='serika-light'] {
     --free-color: #1f8b3d;
     --free-soft: rgba(31, 139, 61, 0.10);
 
+    /* Accent palette ¡ª light overrides */
+    --accent-blue: #0a6fcc;
+    --accent-blue-bg: rgba(10, 132, 255, 0.10);
+    --accent-blue-border: rgba(10, 132, 255, 0.20);
+    --accent-green: #1d9652;
+    --accent-green-bg: rgba(29, 150, 82, 0.10);
+    --accent-green-border: rgba(29, 150, 82, 0.18);
+    --accent-gold: #a67c00;
+    --accent-gold-bg: rgba(166, 124, 0, 0.10);
+    --accent-gold-border: rgba(166, 124, 0, 0.18);
+
     --text-color: #3a3a3c;
     --text-strong: #1d1d1f;
     --text-dim: #6e6e73;
@@ -99,4 +121,3 @@ body[data-font='lg'] {
     --typing-size: 2.2rem;
     --typing-visible-lines: 3.5;
 }
-

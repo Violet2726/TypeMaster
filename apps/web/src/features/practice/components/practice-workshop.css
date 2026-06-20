@@ -1,4 +1,4 @@
-﻿/* ============================================
+/* ============================================
    Practice Workshop
    ============================================ */
 
@@ -255,7 +255,7 @@ body[data-theme='serika-light'] .typing-stage--unavailable .words-shell {
     height: 1.8rem;
     border-radius: 50%;
     background: var(--surface-2);
-    color: #8ecaff;
+    color: var(--accent-blue);
 }
 
 .live-stat--accuracy .live-stat__icon { color: #7ee198; }
@@ -274,10 +274,10 @@ body[data-theme='serika-light'] .typing-stage--unavailable .words-shell {
     width: 3rem;
     height: 3rem;
     place-items: center;
-    border: 1px solid rgba(255, 214, 107, 0.24);
+    border: 1px solid var(--accent-gold-border);
     border-radius: var(--radius-sm);
-    background: rgba(255, 214, 107, 0.12);
-    color: #ffd66b;
+    background: var(--accent-gold-bg);
+    color: var(--accent-gold);
 }
 
 .typing-empty-state {
@@ -360,7 +360,7 @@ body[data-theme='serika-light'] .typing-stage--unavailable .words-shell {
     height: 2.1rem;
     place-items: center;
     border-radius: var(--radius-sm);
-    color: #8ecaff;
+    color: var(--accent-blue);
     background: rgba(10, 132, 255, 0.12);
     border: 1px solid rgba(142, 202, 255, 0.2);
 }
@@ -442,7 +442,7 @@ body[data-theme='serika-light'] .ai-custom-panel { background: rgba(255, 255, 25
     border-radius: 50%;
     border: 1px solid rgba(10, 132, 255, 0.26);
     background: rgba(10, 132, 255, 0.12);
-    color: #8ecaff;
+    color: var(--accent-blue);
 }
 
 .ai-custom-panel--custom .ai-custom-panel__icon {
@@ -475,10 +475,10 @@ body[data-theme='serika-light'] .ai-custom-panel { background: rgba(255, 255, 25
     gap: 0.34rem;
     min-height: 2.05rem;
     padding: 0.38rem 0.66rem;
-    border: 1px solid rgba(10, 132, 255, 0.28);
+    border: 1px solid var(--accent-blue-border);
     border-radius: var(--radius-pill);
     background: rgba(10, 132, 255, 0.12);
-    color: #8ecaff;
+    color: var(--accent-blue);
     white-space: nowrap;
 }
 
@@ -486,7 +486,7 @@ body[data-theme='serika-light'] .ai-custom-panel { background: rgba(255, 255, 25
 .ai-custom-panel__status-pill strong { color: currentColor; font-size: 0.78rem; }
 .ai-custom-panel__status-pill--ready { border-color: rgba(52, 199, 89, 0.32); background: rgba(52, 199, 89, 0.12); color: #7ee198; }
 .ai-custom-panel__status-pill--idle { border-color: rgba(255, 214, 10, 0.32); background: rgba(255, 214, 10, 0.1); color: #ffe08a; }
-.ai-custom-panel__status-pill--stale { border-color: rgba(255, 214, 10, 0.34); background: rgba(255, 214, 10, 0.12); color: #ffd66b; }
+.ai-custom-panel__status-pill--stale { border-color: rgba(255, 214, 10, 0.34); background: rgba(255, 214, 10, 0.12); color: var(--accent-gold); }
 .ai-custom-panel__status-pill--error { border-color: rgba(255, 69, 58, 0.34); background: rgba(255, 69, 58, 0.12); color: #ff9a92; }
 
 /* --- Workshop Grid --- */
@@ -655,7 +655,7 @@ body[data-theme='serika-light'] .custom-text-workshop__editor { background: rgba
     border-radius: 50%;
     border: 1px solid rgba(10, 132, 255, 0.27);
     background: rgba(10, 132, 255, 0.13);
-    color: #8ecaff;
+    color: var(--accent-blue);
 }
 
 .keyboard-hotspots__primary .action-btn { gap: 0.42rem; min-height: 2.62rem; }
@@ -674,7 +674,7 @@ body[data-theme='serika-light'] .custom-text-workshop__editor { background: rgba
 .keyboard-zone-row__share {
     position: relative;
     z-index: 1;
-    color: #8ecaff;
+    color: var(--accent-blue);
     font-family: var(--font-display);
     font-size: 1.08rem;
     font-weight: 750;

@@ -17,7 +17,7 @@
 }
 
 .live-stat__icon--speed {
-    color: #8ecaff;
+    color: var(--accent-blue);
 }
 
 .live-stat__icon--accuracy {

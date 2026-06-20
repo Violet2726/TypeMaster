@@ -1,4 +1,4 @@
-﻿/* ============================================
+/* ============================================
    Training Plan Page
    ============================================ */
 
@@ -129,10 +129,10 @@
     width: 2.55rem;
     height: 2.55rem;
     place-items: center;
-    border: 1px solid rgba(10, 132, 255, 0.28);
+    border: 1px solid var(--accent-blue-border);
     border-radius: var(--radius-sm);
-    background: rgba(10, 132, 255, 0.14);
-    color: #8ecaff;
+    background: var(--accent-blue-bg);
+    color: var(--accent-blue);
 }
 
 .training-plan-gateway__top strong {
@@ -162,15 +162,15 @@
 }
 
 .training-plan-gateway__signal svg {
-    color: #8ecaff;
+    color: var(--accent-blue);
 }
 
 .training-plan-gateway__signal:nth-child(2) svg {
-    color: #99f2c0;
+    color: var(--accent-green);
 }
 
 .training-plan-gateway__signal:nth-child(3) svg {
-    color: #ffd66b;
+    color: var(--accent-gold);
 }
 
 .training-plan-gateway__signal span {
@@ -293,7 +293,7 @@
 }
 
 .training-plan-current__meta svg {
-    color: #8ecaff;
+    color: var(--accent-blue);
 }
 
 /* --- Hero metrics --- */
@@ -381,7 +381,7 @@
     border: 1px solid rgba(10, 132, 255, 0.34);
     border-radius: 50%;
     background: rgba(10, 132, 255, 0.13);
-    color: #8ecaff;
+    color: var(--accent-blue);
     font-size: 0.78rem;
     font-weight: 800;
     font-variant-numeric: tabular-nums;
@@ -390,25 +390,25 @@
 .training-plan-route-map__item:nth-child(2) .training-plan-route-map__index {
     border-color: rgba(153, 242, 192, 0.34);
     background: rgba(52, 199, 89, 0.12);
-    color: #99f2c0;
+    color: var(--accent-green);
 }
 
 .training-plan-route-map__item:nth-child(3) .training-plan-route-map__index {
     border-color: rgba(255, 214, 107, 0.34);
     background: rgba(255, 214, 107, 0.11);
-    color: #ffd66b;
+    color: var(--accent-gold);
 }
 
 .training-plan-route-map__item svg {
-    color: #8ecaff;
+    color: var(--accent-blue);
 }
 
 .training-plan-route-map__item:nth-child(2) svg {
-    color: #99f2c0;
+    color: var(--accent-green);
 }
 
 .training-plan-route-map__item:nth-child(3) svg {
-    color: #ffd66b;
+    color: var(--accent-gold);
 }
 
 .training-plan-route-map__item strong,
@@ -464,15 +464,15 @@
     border: 1px solid var(--surface-2);
     border-radius: var(--radius-sm);
     background: var(--bg-soft);
-    color: #8ecaff;
+    color: var(--accent-blue);
 }
 
 .training-plan-unlock-panel__item:nth-child(2) > span {
-    color: #99f2c0;
+    color: var(--accent-green);
 }
 
 .training-plan-unlock-panel__item:nth-child(3) > span {
-    color: #ffd66b;
+    color: var(--accent-gold);
 }
 
 .training-plan-unlock-panel__item strong {
@@ -551,7 +551,7 @@
 .training-plan-step__status--active {
     border-color: rgba(10, 132, 255, 0.42);
     background: rgba(10, 132, 255, 0.15);
-    color: #8ecaff;
+    color: var(--accent-blue);
 }
 
 .training-plan-step--complete .training-plan-step__index,
@@ -603,8 +603,8 @@
     width: 3rem;
     height: 3rem;
     border-radius: 50%;
-    background: rgba(10, 132, 255, 0.14);
-    color: #8ecaff;
+    background: var(--accent-blue-bg);
+    color: var(--accent-blue);
 }
 
 .training-plan-empty strong {

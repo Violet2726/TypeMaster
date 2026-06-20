@@ -53,7 +53,7 @@ body[data-theme='serika-light'] .words-shell {
 .words-shell.is-focused {
     border-color: rgba(10, 132, 255, 0.34);
     box-shadow:
-        inset 0 0 0 1px rgba(10, 132, 255, 0.14),
+        inset 0 0 0 1px var(--accent-blue-bg),
         0 20px 60px rgba(10, 132, 255, 0.12);
 }
 
@@ -95,6 +95,25 @@ body[data-theme='serika-light'] .words-shell.is-focused {
 .word[data-line-state='next'],
 .word[data-line-state='future'] {
     color: var(--surface-3);
+}
+
+
+/* --- Words layout --- */
+
+.words {
+    gap: 0.42rem 0.64rem;
+}
+
+.word {
+    border-bottom-color: transparent;
+}
+
+/* --- Caret --- */
+
+.caret {
+    border-radius: var(--radius-pill);
+    background: var(--main-color);
+    box-shadow: 0 0 18px rgba(10, 132, 255, 0.4);
 }
 
 /* --- Letter States --- */
@@ -179,7 +198,7 @@ body[data-theme='serika-light'] .word[data-line-state='current'] .letter.pending
 .live-stat-value {
     color: var(--text-strong);
     font-family: var(--font-display);
-    font-size: 1.5rem;
+    font-size: 2.2rem;
     line-height: 1;
 }
 

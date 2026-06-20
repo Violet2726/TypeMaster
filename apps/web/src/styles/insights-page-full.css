@@ -1,4 +1,4 @@
-﻿/* ============================================
+/* ============================================
    Insights Page
    ============================================ */
 
@@ -74,7 +74,7 @@
 
 .insights-empty-panel__signals svg {
     grid-row: span 2;
-    color: #8ecaff;
+    color: var(--accent-blue);
 }
 
 .insights-empty-panel__signals small {
@@ -153,7 +153,7 @@ body[data-theme='serika-light'] .insights-empty-preview__unlock p {
 
 .insights-empty-preview__eyebrow strong {
     flex: 0 0 auto;
-    color: #ffd66b;
+    color: var(--accent-gold);
     font-size: 0.74rem;
 }
 
@@ -182,8 +182,8 @@ body[data-theme='serika-light'] .insights-empty-preview__unlock p {
     height: 2.7rem;
     place-items: center;
     border-radius: var(--radius-sm);
-    color: #8ecaff;
-    background: rgba(10, 132, 255, 0.14);
+    color: var(--accent-blue);
+    background: var(--accent-blue-bg);
     border: 1px solid rgba(142, 202, 255, 0.22);
 }
 
@@ -248,20 +248,20 @@ body[data-theme='serika-light'] .insights-empty-preview__unlock p {
     height: 2.35rem;
     place-items: center;
     border-radius: var(--radius-sm);
-    color: #8ecaff;
+    color: var(--accent-blue);
     background: rgba(10, 132, 255, 0.12);
     border: 1px solid rgba(142, 202, 255, 0.2);
 }
 
 .insights-empty-preview__unlock--keyboard .insights-empty-preview__unlock-icon {
-    color: #99f2c0;
+    color: var(--accent-green);
     background: rgba(153, 242, 192, 0.11);
     border-color: rgba(153, 242, 192, 0.2);
 }
 
 .insights-empty-preview__unlock--achievement .insights-empty-preview__unlock-icon {
-    color: #ffd66b;
-    background: rgba(255, 214, 107, 0.12);
+    color: var(--accent-gold);
+    background: var(--accent-gold-bg);
     border-color: rgba(255, 214, 107, 0.2);
 }
 
@@ -404,7 +404,7 @@ body[data-theme='serika-light'] .insights-command-center::before {
 }
 
 .insights-command-center__metric svg {
-    color: #8ecaff;
+    color: var(--accent-blue);
 }
 
 .insights-command-center__metric--accuracy svg {
@@ -651,7 +651,7 @@ body[data-theme='serika-light'] .home-records-panel .history-table {
 }
 
 .history-metric-pill svg {
-    color: #8ecaff;
+    color: var(--accent-blue);
 }
 
 body[data-theme='serika-light'] .history-metric-pill {

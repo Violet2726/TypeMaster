@@ -1,4 +1,4 @@
-﻿/* ============================================
+/* ============================================
    Result Page
    ============================================ */
 
@@ -33,7 +33,7 @@
     width: 3.4rem;
     height: 3.4rem;
     border-radius: var(--radius-sm);
-    border: 1px solid rgba(10, 132, 255, 0.28);
+    border: 1px solid var(--accent-blue-border);
     background: var(--main-soft);
     color: var(--main-color);
 }

@@ -1,4 +1,4 @@
-﻿/* ============================================
+/* ============================================
    Coach Page
    ============================================ */
 
@@ -31,9 +31,9 @@
     display: grid;
     place-items: center;
     border-radius: var(--radius-sm);
-    border: 1px solid rgba(10, 132, 255, 0.28);
+    border: 1px solid var(--accent-blue-border);
     background: rgba(10, 132, 255, 0.13);
-    color: #8ecaff;
+    color: var(--accent-blue);
 }
 
 .coach-hero__icon {
@@ -166,7 +166,7 @@ body[data-theme='serika-light'] .coach-starter-step {
     height: 2rem;
     border-radius: 50%;
     background: rgba(10, 132, 255, 0.13);
-    color: #8ecaff;
+    color: var(--accent-blue);
     font-weight: 900;
 }
 
@@ -299,15 +299,15 @@ body[data-theme='serika-light'] .coach-brief-card {
     position: absolute;
     inset: 0 0 auto 0;
     height: 0.18rem;
-    background: #8ecaff;
+    background: var(--accent-blue);
 }
 
-.coach-signal--profile::before { background: #99f2c0; }
-.coach-signal--goal::before { background: #ffd66b; }
+.coach-signal--profile::before { background: var(--accent-green); }
+.coach-signal--goal::before { background: var(--accent-gold); }
 
-.coach-signal svg { color: #8ecaff; }
-.coach-signal--profile svg { color: #99f2c0; }
-.coach-signal--goal svg { color: #ffd66b; }
+.coach-signal svg { color: var(--accent-blue); }
+.coach-signal--profile svg { color: var(--accent-green); }
+.coach-signal--goal svg { color: var(--accent-gold); }
 
 .coach-signal span {
     color: var(--text-dim);
@@ -408,7 +408,7 @@ body[data-theme='serika-light'] .coach-brief-card {
     height: 2rem;
     border-radius: 50%;
     background: rgba(10, 132, 255, 0.13);
-    color: #8ecaff;
+    color: var(--accent-blue);
     font-weight: 900;
 }
 
