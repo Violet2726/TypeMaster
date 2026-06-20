@@ -850,3 +850,10 @@ body[data-theme='serika-light'] .insights-command-center__radar p {
     }
 }
 
+/* Insights data panels refresh */
+.insights-keyboard-panel,
+.insights-history-panel {
+    background:
+        linear-gradient(135deg, rgba(10, 132, 255, 0.08), transparent 38%),
+        linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
+}
