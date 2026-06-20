@@ -64,7 +64,7 @@
     padding: 0.68rem;
     border: 1px solid var(--panel-stroke);
     border-radius: var(--radius-sm);
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--bg-soft);
 }
 
 .insights-empty-panel__signals svg {
@@ -100,7 +100,7 @@
     border-radius: var(--radius-sm);
     border: 1px solid var(--panel-stroke);
     background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025)),
+        linear-gradient(180deg, var(--surface-2), var(--bg-soft)),
         rgba(0, 0, 0, 0.18);
     box-shadow: 0 24px 65px rgba(0, 0, 0, 0.22);
 }
@@ -110,7 +110,7 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), transparent 40%);
+    background: linear-gradient(145deg, var(--surface-2), transparent 40%);
     opacity: 0.7;
 }
 
@@ -146,7 +146,7 @@ body[data-theme='serika-light'] .insights-empty-preview__unlock p {
     padding: 0.38rem 0.48rem;
     border: 1px solid var(--panel-stroke);
     border-radius: var(--radius-sm);
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--bg-soft);
 }
 
 .insights-empty-preview__eyebrow span {
@@ -304,7 +304,7 @@ body[data-theme='serika-light'] .insights-empty-preview__unlock p {
     padding: 0.42rem;
     border: 1px solid var(--panel-stroke);
     border-radius: var(--radius-sm);
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--bg-soft);
     color: var(--text-strong);
     font-size: 0.74rem;
     font-weight: 750;
@@ -351,7 +351,7 @@ body[data-theme='serika-light'] .insights-empty-preview__unlock p {
     pointer-events: none;
     background:
         radial-gradient(circle at 80% 18%, rgba(52, 199, 89, 0.12), transparent 26%),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.07), transparent 34%);
+        linear-gradient(90deg, var(--surface-2), transparent 34%);
 }
 
 .insights-command-center > * {
@@ -407,8 +407,8 @@ body[data-theme='serika-light'] .insights-empty-preview__unlock p {
     border: 1px solid var(--panel-stroke);
     border-radius: var(--radius-sm);
     background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02)),
-        rgba(255, 255, 255, 0.035);
+        linear-gradient(180deg, var(--surface-2), var(--bg-soft)),
+        var(--bg-soft);
 }
 
 .insights-command-center__metric {
@@ -521,7 +521,7 @@ body[data-theme='serika-light'] .insights-empty-preview__unlock p {
     gap: 0.22rem;
     min-width: 0;
     padding: 0.7rem;
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    border: 1px solid var(--surface-2);
     border-radius: var(--radius-sm);
     background: var(--bg-soft);
 }

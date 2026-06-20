@@ -463,7 +463,7 @@ body[data-theme='serika-light'] .field select {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.12);
+    background: var(--panel-stroke);
     border-radius: 999px;
 }
 

@@ -111,7 +111,7 @@
     border-radius: var(--radius-sm);
     border: 1px solid var(--panel-stroke);
     background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025)),
+        linear-gradient(180deg, var(--surface-2), var(--bg-soft)),
         rgba(0, 0, 0, 0.18);
     box-shadow: 0 24px 65px rgba(0, 0, 0, 0.22);
 }
@@ -187,7 +187,7 @@
     border-radius: var(--radius-sm);
     border: 1px solid var(--panel-stroke);
     background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025)),
+        linear-gradient(180deg, var(--surface-2), var(--bg-soft)),
         rgba(0, 0, 0, 0.18);
     box-shadow: 0 24px 65px rgba(0, 0, 0, 0.22);
 }
@@ -372,7 +372,7 @@
     padding: 0.92rem;
     border-radius: var(--radius-sm);
     border: 1px solid var(--panel-stroke);
-    background: rgba(255, 255, 255, 0.035);
+    background: var(--bg-soft);
 }
 
 .coach-next-panel__signal strong {
@@ -856,7 +856,7 @@ body[data-theme='serika-light'] .home-action-empty-signal__grid span {
     border-color: var(--panel-stroke);
     background:
         linear-gradient(180deg, var(--bg-soft), rgba(255, 255, 255, 0.018)),
-        rgba(255, 255, 255, 0.025);
+        var(--bg-soft);
 }
 
 .home-record-row {

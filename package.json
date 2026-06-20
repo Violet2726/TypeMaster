@@ -10,7 +10,8 @@
     "test": "turbo run test",
     "typecheck": "pnpm --filter @typemaster/web typecheck && pnpm --filter @typemaster/api typecheck",
     "test:coverage": "turbo run test:coverage",
-    "test:e2e": "pnpm --filter @typemaster/web test:e2e"
+    "test:e2e": "pnpm --filter @typemaster/web test:e2e",
+    "audit:tokens": "node scripts/design-tokens-audit.js"
   },
   "devDependencies": {
     "turbo": "^2.5.8"
