@@ -402,6 +402,7 @@ export default function GamePage() {
     const particlesRef = useRef(new ParticleSystem());
     const shakeRef = useRef(new ScreenShake());
     const animFrameRef = useRef<number>(0);
+    const startTimeRef = useRef<number>(0);
     const lastTimeRef = useRef(0);
     const [, setUiState] = useState('idle');
     const language = 'en-US';
@@ -568,6 +569,18 @@ export default function GamePage() {
         if (state.mode === 'idle') {
             // Apple-style idle screen
             ctx.save();
+            
+            // Start animation
+            const startAnimDuration = 500; // ms
+            const startProgress = startTimeRef.current ? Math.min(1, (time - startTimeRef.current) / startAnimDuration) : 0;
+            if (startProgress > 0) {
+                const scale = 1 - startProgress * 0.5;
+                const alpha = 1 - startProgress;
+                ctx.translate(width / 2, height / 2);
+                ctx.scale(scale, scale);
+                ctx.translate(-width / 2, -height / 2);
+                ctx.globalAlpha = alpha;
+            }
             
             // Title with glass effect
             drawGlassPanel(ctx, width / 2 - 180, height / 2 - 100, 360, 160, 20);
@@ -782,6 +795,8 @@ export default function GamePage() {
             
             if (state.mode === 'idle') {
                 if (e.key === 'Escape') return;
+                initSound();
+                startTimeRef.current = performance.now();
                 stateRef.current = transitionGameMode(state, 'start');
                 stateRef.current = startWave(stateRef.current, wordPoolRef.current, {
                     canvasWidth: canvasRef.current ? canvasRef.current.width : 800,
