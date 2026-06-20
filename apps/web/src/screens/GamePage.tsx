@@ -58,6 +58,23 @@ const COLORS = {
     glassHighlight: 'rgba(255, 255, 255, 0.15)'
 };
 
+function shiftHue(hex: string, degrees: number) {
+    if (!hex || degrees === 0) return hex;
+    let r = parseInt(hex.slice(1, 3), 16);
+    let g = parseInt(hex.slice(3, 5), 16);
+    let b = parseInt(hex.slice(5, 7), 16);
+    
+    // Simple hue shift approximation by rotating RGB channels slightly
+    // A proper HSL rotation would be better but this is cheaper for canvas
+    const shift = degrees / 360;
+    const temp = r;
+    r = Math.round(r * (1 - shift) + g * shift);
+    g = Math.round(g * (1 - shift) + b * shift);
+    b = Math.round(b * (1 - shift) + temp * shift);
+    
+    return `#` + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
+}
+
 // ------------------------------------------------------------------------------
 // Particle System
 // ------------------------------------------------------------------------------
@@ -154,11 +171,12 @@ class ScreenShake {
 // Drawing Helpers
 // ------------------------------------------------------------------------------
 
-function drawBackground(ctx: CanvasRenderingContext2D, width: number, height: number, time: number) {
+function drawBackground(ctx: CanvasRenderingContext2D, width: number, height: number, time: number, combo: number = 0) {
     // Gradient background
+    const hueShift = Math.min(30, combo) * 2; // Shift hue up to 60 degrees at max combo
     const gradient = ctx.createLinearGradient(0, 0, 0, height);
-    gradient.addColorStop(0, COLORS.bgGradientStart);
-    gradient.addColorStop(1, COLORS.bgGradientEnd);
+    gradient.addColorStop(0, shiftHue(COLORS.bgGradientStart, hueShift));
+    gradient.addColorStop(1, shiftHue(COLORS.bgGradientEnd, hueShift));
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
     
@@ -585,7 +603,7 @@ export default function GamePage() {
         ctx.translate(shakeOffset.x, shakeOffset.y);
         
         // Draw background
-        drawBackground(ctx, width, height, time);
+        drawBackground(ctx, width, height, time, state.combo);
         
         if (state.mode === 'idle') {
             // Apple-style idle screen
