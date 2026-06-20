@@ -264,6 +264,10 @@ function drawEnemyAppleStyle(ctx: CanvasRenderingContext2D, enemy: any, time: nu
         ctx.fill();
     }
     
+    // Progress Ring
+    const progress = enemy.word.length > 0 ? (enemy.typed || '').length / enemy.word.length : 0;
+    drawProgressRing(ctx, 0, 0, size + 4, progress, baseColor);
+    
     // Word with Apple typography
     ctx.font = '500 14px -apple-system, "SF Pro Text", system-ui, sans-serif';
     ctx.textAlign = 'center';
