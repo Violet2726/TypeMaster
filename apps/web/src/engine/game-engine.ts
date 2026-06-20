@@ -21,6 +21,8 @@ import { getBlendedTheme, drawThemedBackground } from "./environment-theme";
 import { initGameOver, renderGameOver, clearGameOver } from "./game-over";
 import { createMusicEngine } from "./music-engine";
 import { enqueueAchievement, updateAchievementModal, renderAchievementModal, clearAchievementQueue } from "./achievement-modal";
+import { shouldSpawnVariant, createVariantState, updateVariant, processShieldInput, drawVariantOverlay, drawVariantBadge } from "./enemy-variant";
+import type { VariantState, VariantType } from "./enemy-variant";
 import { shouldDropPowerUp, createPowerUp, updatePowerUps, processPowerUpInput, drawPowerUp, drawActivePowerUps, getPowerUpConfig } from "./power-up";
 import type { PowerUp, ActivePowerUp, PowerUpType } from "./power-up";
 
@@ -99,6 +101,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
 
     // Power-ups
     const music = createMusicEngine();
+    let enemyVariants: Map<string, VariantState> = new Map();
     let powerUps: PowerUp[] = [];
     let activePowerUps: ActivePowerUp[] = [];
     let shieldCount = 0;
@@ -202,6 +205,16 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                 setTimeout(() => {
                     if (state.mode === "playing") {
                         state = startWave(state, pool, { canvasWidth, canvasHeight });
+                        // Spawn variant enemies for this wave
+                        const variantType = shouldSpawnVariant(state.wave - 1);
+                        if (variantType && state.enemies) {
+                            const aliveEnemies = state.enemies.filter((e: any) => e.alive);
+                            if (aliveEnemies.length > 0) {
+                                // Pick a random alive enemy to be variant
+                                const target = aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)];
+                                enemyVariants.set(target.id, createVariantState(variantType));
+                            }
+                        }
                     }
                 }, 2000);
             }
@@ -217,6 +230,8 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         scorePopups.update(dt);
         shake.update(dt);
         music.setCombo(state.combo);
+        // Update enemy variants
+        enemyVariants.forEach((v, id) => { enemyVariants.set(id, updateVariant(v, dt)); });
         updateAchievementModal(performance.now());
 
         // Update power-ups
@@ -315,9 +330,15 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     }
 
     function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
-        // Enemies
+        // Enemies with variant overlays
         state.enemies.filter((e: any) => e.alive).forEach((e: any) => {
             drawEnemyAppleStyle(ctx, e, time, lastCorrectEnemyIds.includes(e.id));
+            const variant = enemyVariants.get(e.id);
+            if (variant) {
+                const enemySize = e.type === "boss" ? 32 : e.type === "tank" ? 24 : 18;
+                drawVariantOverlay(ctx, variant, e.x, e.y, enemySize, time);
+                drawVariantBadge(ctx, variant, e.x, e.y, enemySize);
+            }
         });
 
         // Draw power-ups
@@ -685,6 +706,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
             shieldCount = 0;
             clearGameOver();
             clearAchievementQueue();
+            enemyVariants.clear();
             return;
         }
 
@@ -734,6 +756,20 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
 
             result.events.forEach((evt: any) => {
                 if (evt.type === "enemy_killed") {
+                    // Check if enemy has active shield (absorb the kill)
+                    const killedVariant = enemyVariants.get(evt.enemyId);
+                    if (killedVariant && killedVariant.type === "shielded" && killedVariant.shieldActive) {
+                        // Shield absorbed the hit - enemy survives
+                        state = {
+                            ...state,
+                            enemies: state.enemies.map((en: any) => en.id === evt.enemyId ? { ...en, alive: true, typed: "" } : en),
+                            enemiesDefeated: state.enemiesDefeated - 1,
+                        };
+                        enemyVariants.set(evt.enemyId, { ...killedVariant, shieldActive: false });
+                        shake.trigger(4);
+                        particles.emit({ x: 0, y: 0, count: 15, color: "#0a84ff", speed: 3, size: 3, glow: 0.8 });
+                        return; // skip normal kill effects
+                    }
                     playKillSound();
                     playComboSound(state.combo);
                     const enemy = state.enemies.find((en: any) => en.id === evt.enemyId);
@@ -767,6 +803,21 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
 
                         // Trigger hitlag
                         hitlagTimer = HITLAG_DURATION * (1 + chainCount * 0.3);
+
+                        // Splitter variant: spawn 2 mini enemies on death
+                        const killedVariant2 = enemyVariants.get(evt.enemyId);
+                        if (killedVariant2 && killedVariant2.type === "splitter") {
+                            for (let si = 0; si < 2; si++) {
+                                const splitId = "split-" + Date.now().toString(36) + "-" + si;
+                                state.enemies.push({
+                                    id: splitId, type: "normal", word: "go"[si] || "go",
+                                    x: enemy.x + (si === 0 ? -20 : 20), y: enemy.y,
+                                    speed: enemy.speed * 1.3, hp: 1, maxHp: 1, scoreMultiplier: 1,
+                                    alive: true, typed: "", spawnTime: Date.now(),
+                                });
+                            }
+                            particles.emit({ x: enemy.x, y: enemy.y, count: 20, color: "#bf5af2", speed: 4, size: 3, trail: true });
+                        }
 
                         // Power-up drop chance
                         const dropType = shouldDropPowerUp(enemy.type);
