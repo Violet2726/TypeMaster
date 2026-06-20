@@ -22,6 +22,7 @@ import { initGameOver, renderGameOver, clearGameOver } from "./game-over";
 import { createMusicEngine } from "./music-engine";
 import { enqueueAchievement, updateAchievementModal, renderAchievementModal, clearAchievementQueue } from "./achievement-modal";
 import { openSettings, closeSettings, isSettingsOpen, handleSettingsKey, renderSettingsPanel, getSettings } from "./settings-panel";
+import { showTutorial, isTutorialShowing, handleTutorialKey, updateTutorial, renderTutorial } from "./tutorial-overlay";
 import { shouldSpawnVariant, createVariantState, updateVariant, processShieldInput, drawVariantOverlay, drawVariantBadge } from "./enemy-variant";
 import type { VariantState, VariantType } from "./enemy-variant";
 import { shouldDropPowerUp, createPowerUp, updatePowerUps, processPowerUpInput, drawPowerUp, drawActivePowerUps, getPowerUpConfig } from "./power-up";
@@ -236,6 +237,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         // Update enemy variants
         enemyVariants.forEach((v, id) => { enemyVariants.set(id, updateVariant(v, dt)); });
         updateAchievementModal(performance.now());
+        updateTutorial(performance.now());
 
         // Update power-ups
         powerUps = updatePowerUps(powerUps, dt);
@@ -279,6 +281,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         // Achievement modal overlay (renders on top of everything)
         renderAchievementModal(ctx, width, height, time);
         renderSettingsPanel(ctx, width, height, time);
+        renderTutorial(ctx, width, height, time);
 
         ctx.restore();
     }
@@ -675,6 +678,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         if (state.mode === "idle") {
             if (e.key === "Escape") return;
             initSound();
+            showTutorial();
             music.start();
             const s = getSettings();
             music.setVolume(s.volume / 100);
@@ -700,6 +704,12 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                 gameOverTime = 0;
                 clearGameOver();
             }
+            return;
+        }
+
+        // Tutorial overlay consumes first key
+        if (isTutorialShowing()) {
+            handleTutorialKey();
             return;
         }
 
