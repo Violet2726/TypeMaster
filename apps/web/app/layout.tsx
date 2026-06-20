@@ -14,8 +14,6 @@ import '../src/styles/typing-experience.css';
 import '../src/styles/result-page.css';
 import '../src/styles/insights-page-full.css';
 import '../src/styles/home-action-card.css';
-import '../src/styles/diagnostic-page.css';
-import '../src/styles/settings-drawer.css';
 import '../src/styles/overlays.css';
 import '../src/styles/settings.css';
 import '../src/styles/dialogs.css';
