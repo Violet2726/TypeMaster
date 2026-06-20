@@ -316,7 +316,7 @@
 }
 
 .training-plan-hero__metric svg {
-    color: #7ee198;
+    color: var(--accent-success);
 }
 
 .training-plan-hero__metric span {
@@ -558,7 +558,7 @@
 .training-plan-step__status--complete {
     border-color: rgba(52, 199, 89, 0.38);
     background: rgba(52, 199, 89, 0.13);
-    color: #7ee198;
+    color: var(--accent-success);
 }
 
 .training-plan-step__head {

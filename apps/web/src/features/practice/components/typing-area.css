@@ -21,11 +21,11 @@
 }
 
 .live-stat__icon--accuracy {
-    color: #7ee198;
+    color: var(--accent-success);
 }
 
 .live-stat__icon--time {
-    color: #ffd60a;
+    color: var(--warning-color);
 }
 
 .typing-stage .live-stat-label {

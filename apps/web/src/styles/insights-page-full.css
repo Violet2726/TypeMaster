@@ -109,10 +109,6 @@
     background: var(--surface-2);
 }
 
-.insights-empty-preview > * {
-    position: relative;
-}
-
 body[data-theme='serika-light'] .insights-empty-preview {
     background: rgba(255, 255, 255, 0.94);
 }
@@ -323,26 +319,9 @@ body[data-theme='serika-light'] .insights-empty-preview__unlock p {
     background: var(--bg-panel);
 }
 
-.insights-command-center::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: radial-gradient(circle at 80% 18%, rgba(52, 199, 89, 0.12), transparent 26%);
-}
-
 body[data-theme='serika-light'] .insights-command-center {
     border-color: rgba(60, 60, 67, 0.12);
     background: var(--bg-panel);
-}
-
-body[data-theme='serika-light'] .insights-command-center::before {
-    background: radial-gradient(circle at 80% 18%, rgba(52, 199, 89, 0.1), transparent 26%);
-}
-
-.insights-command-center > * {
-    position: relative;
-    z-index: 1;
 }
 
 .insights-command-center__lead {
@@ -408,15 +387,15 @@ body[data-theme='serika-light'] .insights-command-center::before {
 }
 
 .insights-command-center__metric--accuracy svg {
-    color: #7ee198;
+    color: var(--accent-success);
 }
 
 .insights-command-center__metric--best svg {
-    color: #ffd60a;
+    color: var(--warning-color);
 }
 
 .insights-command-center__metric--sessions svg {
-    color: #ff9f0a;
+    color: var(--challenge-color);
 }
 
 .insights-command-center__metric span,
@@ -477,7 +456,7 @@ body[data-theme='serika-light'] .insights-command-center::before {
 }
 
 .insights-command-center__signal svg {
-    color: #7ee198;
+    color: var(--accent-success);
 }
 
 .insights-command-center__radar {

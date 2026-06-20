@@ -1,4 +1,4 @@
-﻿/* ============================================
+/* ============================================
    Apple Refresh - Typing, Results, Charts & Headers
    ============================================ */
 
@@ -80,7 +80,7 @@ body[data-theme='serika-light'] .word[data-line-state='current'] .letter.pending
 }
 
 .letter.extra {
-    color: #ff9f0a;
+    color: var(--challenge-color);
     text-shadow: none;
 }
 

@@ -34,6 +34,7 @@
     --accent-gold: #ffd66b;
     --accent-gold-bg: rgba(255, 214, 107, 0.12);
     --accent-gold-border: rgba(255, 214, 107, 0.24);
+    --accent-success: #7ee198;
 
     --text-color: #d1d1d6;
     --text-strong: #f5f5f7;
@@ -100,6 +101,7 @@ body[data-theme='serika-light'] {
     --accent-gold: #a67c00;
     --accent-gold-bg: rgba(166, 124, 0, 0.10);
     --accent-gold-border: rgba(166, 124, 0, 0.18);
+    --accent-success: #2d9e5a;
 
     --text-color: #3a3a3c;
     --text-strong: #1d1d1f;

@@ -258,8 +258,8 @@ body[data-theme='serika-light'] .typing-stage--unavailable .words-shell {
     color: var(--accent-blue);
 }
 
-.live-stat--accuracy .live-stat__icon { color: #7ee198; }
-.live-stat--time .live-stat__icon { color: #ffd60a; }
+.live-stat--accuracy .live-stat__icon { color: var(--accent-success); }
+.live-stat--time .live-stat__icon { color: var(--warning-color); }
 
 .typing-stage .live-stat-value {
     font-size: 2rem;
@@ -448,7 +448,7 @@ body[data-theme='serika-light'] .ai-custom-panel { background: rgba(255, 255, 25
 .ai-custom-panel--custom .ai-custom-panel__icon {
     border-color: rgba(52, 199, 89, 0.24);
     background: rgba(52, 199, 89, 0.12);
-    color: #7ee198;
+    color: var(--accent-success);
 }
 
 .ai-custom-panel__head strong {
@@ -484,7 +484,7 @@ body[data-theme='serika-light'] .ai-custom-panel { background: rgba(255, 255, 25
 
 .ai-custom-panel__status-pill small { color: currentColor; font-size: 0.68rem; font-weight: 750; opacity: 0.74; }
 .ai-custom-panel__status-pill strong { color: currentColor; font-size: 0.78rem; }
-.ai-custom-panel__status-pill--ready { border-color: rgba(52, 199, 89, 0.32); background: rgba(52, 199, 89, 0.12); color: #7ee198; }
+.ai-custom-panel__status-pill--ready { border-color: rgba(52, 199, 89, 0.32); background: rgba(52, 199, 89, 0.12); color: var(--accent-success); }
 .ai-custom-panel__status-pill--idle { border-color: rgba(255, 214, 10, 0.32); background: rgba(255, 214, 10, 0.1); color: #ffe08a; }
 .ai-custom-panel__status-pill--stale { border-color: rgba(255, 214, 10, 0.34); background: rgba(255, 214, 10, 0.12); color: var(--accent-gold); }
 .ai-custom-panel__status-pill--error { border-color: rgba(255, 69, 58, 0.34); background: rgba(255, 69, 58, 0.12); color: #ff9a92; }
@@ -557,8 +557,8 @@ body[data-theme='serika-light'] .ai-custom-panel__state { background: rgba(255, 
 }
 
 .ai-custom-panel--ready .ai-custom-panel__state::before { background: #34c759; }
-.ai-custom-panel--idle .ai-custom-panel__state::before { background: #ffd60a; }
-.ai-custom-panel--stale .ai-custom-panel__state::before { background: #ffd60a; }
+.ai-custom-panel--idle .ai-custom-panel__state::before { background: var(--warning-color); }
+.ai-custom-panel--stale .ai-custom-panel__state::before { background: var(--warning-color); }
 .ai-custom-panel--error .ai-custom-panel__state::before { background: #ff453a; }
 
 .practice-workshop-snapshot__copy { display: grid; gap: 0.24rem; align-content: start; min-width: 0; }
