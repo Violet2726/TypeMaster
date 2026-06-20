@@ -620,6 +620,44 @@ body[data-theme='serika-light'] .home-records-panel .history-table {
     background: rgba(255, 255, 255, 0.76);
 }
 
+/* --- History panel (moved from practice-workshop.css) --- */
+.insights-history-panel .history-table {
+    border-radius: var(--radius-sm);
+    background: var(--bg-soft);
+}
+
+.insights-history-panel .history-row {
+    min-height: 4.8rem;
+    padding: 0.86rem 0.95rem;
+}
+
+.insights-history-panel .history-row__meta {
+    gap: 0.18rem;
+}
+
+.history-metric-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.34rem;
+    min-height: 2rem;
+    padding: 0.36rem 0.58rem;
+    border: 1px solid var(--panel-stroke);
+    border-radius: var(--radius-pill);
+    background: var(--bg-soft);
+    color: var(--text-strong);
+    font-size: 0.76rem;
+    font-weight: 720;
+    white-space: nowrap;
+}
+
+.history-metric-pill svg {
+    color: #8ecaff;
+}
+
+body[data-theme='serika-light'] .history-metric-pill {
+    background: rgba(255, 255, 255, 0.72);
+}
+
 /* --- Responsive --- */
 
 @media (max-width: 980px) {
@@ -864,4 +902,5 @@ body[data-theme='serika-light'] .home-records-panel .history-table {
         padding: 0.62rem 0.72rem;
     }
 }
+
 
