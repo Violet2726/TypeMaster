@@ -3,11 +3,11 @@
     align-items: center;
     justify-content: center;
     gap: 0.52rem;
-    min-height: 2.85rem;
+    min-height: 2.55rem;
     min-width: 8rem;
-    padding: 0.72rem 1.12rem;
+    padding: 0.76rem 1.12rem;
     border-radius: var(--radius-pill);
-    border: 1px solid var(--panel-stroke);
+    border: 1px solid transparent;
     background: var(--text-strong);
     color: var(--bg-color);
     font-weight: 700;
@@ -19,10 +19,11 @@
 }
 
 .action-btn.primary {
-    background: var(--main-gradient);
+    background: var(--main-color);
     color: var(--main-color-strong);
     border-color: transparent;
-    box-shadow: 0 12px 28px rgba(10, 132, 255, 0.22);
+    font-weight: 700;
+    box-shadow: 0 12px 28px rgba(10, 132, 255, 0.24);
 }
 
 body[data-theme='serika-light'] .action-btn {
@@ -54,9 +55,82 @@ body[data-theme='serika-light'] .action-btn.primary {
 body[data-theme='serika-light'] .action-btn:disabled,
 body[data-theme='serika-light'] .action-btn.primary:disabled {
     background: rgba(60, 60, 67, 0.08);
-    color: rgba(60, 60, 67, 0.5);
+    color: rgba(60, 60, 67, 0.52);
 }
 
+
+/* Navigation & ghost button styles */
+.nav-link {
+    padding: 0.62rem 0.86rem;
+    color: var(--text-dim);
+}
+
+.nav-link.active,
+.nav-link[aria-current='page'],
+.nav-link:hover {
+    color: var(--text-strong);
+    background: var(--surface-2);
+    border-color: var(--panel-stroke);
+}
+
+.nav-icon,
+.ghost-btn,
+.toggle-btn,
+.segment-btn {
+    background: var(--bg-soft);
+    color: var(--text-strong);
+}
+
+.nav-icon,
+.ghost-btn,
+.action-btn,
+.toggle-btn,
+.segment-btn,
+.nav-link,
+.panel-badge,
+.home-action-chip,
+.tag-pill,
+.replay-legend__chip,
+.replay-mode-btn {
+    border-radius: var(--radius-pill);
+}
+
+.nav-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.46rem;
+    max-width: 12rem;
+    padding: 0.64rem 0.9rem;
+}
+
+.nav-icon svg {
+    flex: 0 0 auto;
+}
+
+.nav-icon--tool {
+    width: 2.55rem;
+    min-width: 2.55rem;
+    padding: 0;
+}
+
+.nav-icon--language {
+    min-width: 5.5rem;
+    padding: 0.62rem 0.82rem;
+}
+
+.nav-icon--language span {
+    font-weight: 700;
+}
+
+.ghost-btn {
+    padding: 0.66rem 0.98rem;
+}
+
+.ghost-btn--small {
+    min-height: 2.35rem;
+    padding: 0.54rem 0.82rem;
+}
 .nav-icon:hover,
 .ghost-btn:hover,
 .action-btn:hover {

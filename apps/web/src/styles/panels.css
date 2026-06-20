@@ -2,7 +2,7 @@
     position: relative;
     display: grid;
     gap: 1rem;
-    padding: 1.35rem;
+    padding: 1.25rem;
     border-radius: var(--radius-lg);
     border: 1px solid var(--panel-stroke);
     background: linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
@@ -15,7 +15,21 @@
 .feedback-card,
 .tag-pill,
 .mini-series__row,
-.banner {
+.banner,
+.sticky-action-bar,
+.home-action-card__strategy,
+.adaptive-drill-chip,
+.result-prescription,
+.result-prescription__item,
+.result-decision-signal,
+.replay-summary-card,
+.replay-inspect,
+.chart-summary__item,
+.keyboard-hotspots__primary,
+.keyboard-zone-row,
+.targeted-progress__hero,
+.targeted-area-row,
+.disabled-card {
     border-radius: var(--radius-md);
     padding: 1rem;
     border: 1px solid var(--panel-stroke);
