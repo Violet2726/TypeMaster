@@ -596,6 +596,27 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                 state = { ...state, mode: "resuming" as any };
             } else if (action === "settings") {
                 openSettings();
+            } else if (action === "restart") {
+                state = createGameState();
+                startTime = 0;
+                gameOverTime = 0;
+                powerUps = [];
+                activePowerUps = [];
+                shieldCount = 0;
+                enemyVariants.clear();
+                clearGameOver();
+                clearAchievementQueue();
+                resetComboFx();
+                resetHud();
+                resetTracker();
+                music.stop();
+                initSound();
+                music.start();
+                const s = getSettings();
+                music.setVolume(s.volume / 100);
+                music.setPlaying(s.musicEnabled);
+                state = transitionGameMode(state, "start");
+                state = startWave(state, pool, { canvasWidth, canvasHeight, kps: state.kps });
             } else if (action === "quit") {
                 state = createGameState();
                 startTime = 0;

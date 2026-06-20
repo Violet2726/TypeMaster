@@ -13,7 +13,7 @@ import { drawGlassPanel } from "../components/game/draw-helpers";
 function getScale(w: number, h: number): number { return Math.max(0.6, Math.min(1.2, w / 800)); }
 import { playMenuNavigate, playMenuSelect, playMenuBack } from "../components/game/sound-engine";
 
-export type PauseAction = "continue" | "settings" | "quit" | null;
+export type PauseAction = "continue" | "settings" | "restart" | "quit" | null;
 
 interface MenuItem {
     label: string;
@@ -25,6 +25,7 @@ interface MenuItem {
 const MENU_ITEMS: MenuItem[] = [
     { label: "Continue", key: "ESC", action: "continue", color: "#32d74b" },
     { label: "Settings", key: "S", action: "settings", color: "#0a84ff" },
+    { label: "Restart", key: "R", action: "restart", color: "#ff9f0a" },
     { label: "Quit", key: "Q", action: "quit", color: "#ff453a" },
 ];
 
@@ -49,13 +50,14 @@ export function handlePauseMenuKey(e: KeyboardEvent): PauseAction {
     }
     // Direct shortcuts
     if (e.key === "Escape") { playMenuBack(); return "continue"; }
+    if (e.key === "r" || e.key === "R") return "restart";
     if (e.key === "q" || e.key === "Q") return "quit";
     return null;
 }
 
 export function renderPauseMenu(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
     const panelW = 320;
-    const panelH = 300;
+    const panelH = 360;
     const panelX = w / 2 - panelW / 2;
     const panelY = h / 2 - panelH / 2;
 
