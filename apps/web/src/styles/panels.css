@@ -1,3 +1,8 @@
+﻿/* ============================================
+   Panels - Base, Badges, Metrics & Headings
+   ============================================ */
+
+/* --- Base panel --- */
 .panel {
     position: relative;
     display: grid;
@@ -5,10 +10,10 @@
     padding: 1.25rem;
     border-radius: var(--radius-lg);
     border: 1px solid var(--panel-stroke);
-    background: linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
-    box-shadow: var(--shadow-soft);
+    background: var(--bg-panel);
 }
 
+/* --- Shared card style --- */
 .metric-card,
 .result-item,
 .status-card,
@@ -33,8 +38,7 @@
     border-radius: var(--radius-md);
     padding: 1rem;
     border: 1px solid var(--panel-stroke);
-    background: linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
-    box-shadow: var(--shadow-soft);
+    background: var(--bg-panel);
 }
 
 .metric-card,
@@ -43,13 +47,48 @@
     gap: 0.34rem;
 }
 
+/* --- Metric display --- */
+.metric-card,
+.result-item,
+.live-stat {
+    padding: 1rem;
+    min-width: 0;
+}
+
+.metric-card span,
+.result-item-label,
+.live-stat-label {
+    color: var(--text-dim);
+    font-size: 0.82rem;
+    font-weight: 650;
+}
+
 .metric-card strong,
 .result-item-value {
     color: var(--text-strong);
     font-family: var(--font-display);
     font-size: 1.05rem;
+    line-height: 1.18;
 }
 
+/* --- Shared bold text across card types --- */
+.metric-card strong,
+.result-item-value,
+.history-row strong,
+.typing-stage__source strong,
+.status-card strong,
+.ai-custom-panel strong,
+.mini-series__row strong,
+.home-action-card__summary strong,
+.result-prescription__item strong,
+.targeted-progress__hero strong,
+.keyboard-hotspots__primary strong {
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-weight: 700;
+}
+
+/* --- Panel headings --- */
 .panel-head {
     display: flex;
     align-items: flex-start;
@@ -68,29 +107,31 @@
 .insights-latest-card h2 {
     margin: 0.18rem 0 0;
     color: var(--text-strong);
-    font-family: var(--font-ui);
-    font-size: clamp(1.28rem, 2vw, 1.85rem);
-    line-height: 1.14;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.16;
     letter-spacing: -0.015em;
 }
 
-.panel-badge,
+/* --- Badges & chips --- */
 .home-action-chip,
-.tag-pill {
+.panel-badge {
     display: inline-flex;
     align-items: center;
     white-space: nowrap;
-    padding: 0.42rem 0.72rem;
+    padding: 0.38rem 0.65rem;
     border-radius: var(--radius-pill);
     border: 1px solid var(--panel-stroke);
     background: var(--bg-soft);
     color: var(--text-strong);
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     font-weight: 650;
 }
 
 .panel-badge {
     background: var(--main-soft);
+    color: var(--main-color);
 }
 
 .badge-idle,
@@ -116,11 +157,33 @@
     background: var(--error-soft);
 }
 
+/* --- Stats strip --- */
+.home-stats-strip,
+.result-metrics-strip {
+    gap: 0.72rem;
+}
+
+/* --- Layout helpers --- */
 .history-metrics,
 .results-actions,
 .confirm-dialog__actions,
 .workshop-actions {
     display: flex;
     align-items: center;
-    gap: 0.7rem;
+    gap: 0.65rem;
+}
+
+/* --- Responsive --- */
+@media (max-width: 720px) {
+    .panel-head h2,
+    .home-action-section__head h2,
+    .home-action-card h2,
+    .adaptive-drill-panel h2,
+    .practice-toolbar h2,
+    .result-copy h2,
+    .result-decision-panel h2,
+    .result-advice-panel h2,
+    .insights-latest-card h2 {
+        font-size: 1.28rem;
+    }
 }

@@ -1,4 +1,4 @@
-:root {
+﻿:root {
     color-scheme: dark light;
 
     --bg-color: #070708;
@@ -29,7 +29,7 @@
     --text-dim: #8e8e93;
 
     --panel-stroke: rgba(255, 255, 255, 0.10);
-    --shadow-soft: 0 24px 70px rgba(0, 0, 0, 0.34);
+    --shadow-soft: 0 2px 12px rgba(0, 0, 0, 0.08);
     --shadow-focus: 0 0 0 4px rgba(10, 132, 255, 0.24);
     --radius-sm: 12px;
     --radius-md: 16px;
@@ -84,7 +84,7 @@ body[data-theme='serika-light'] {
     --text-dim: #6e6e73;
 
     --panel-stroke: rgba(0, 0, 0, 0.08);
-    --shadow-soft: 0 24px 65px rgba(0, 0, 0, 0.09);
+    --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.06);
     --shadow-focus: 0 0 0 4px rgba(0, 113, 227, 0.18);
 }
 
@@ -99,3 +99,4 @@ body[data-font='lg'] {
     --typing-size: 2.2rem;
     --typing-visible-lines: 3.5;
 }
+
