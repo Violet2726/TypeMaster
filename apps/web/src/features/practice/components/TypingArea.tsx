@@ -4,6 +4,7 @@ import { buildRenderedWords } from '@typemaster/domain';
 import { TypingAreaEmptyState } from './TypingAreaEmptyState';
 import { TypingAreaLiveStats } from './TypingAreaLiveStats';
 import { TypingWordStream } from './TypingWordStream';
+import './typing-area.css';
 
 function getSessionStatusText(copy, status) {
     return copy.statuses[status] || copy.statuses.idle;
@@ -95,24 +96,44 @@ export function TypingArea({
             className: 'live-stat--wpm',
             icon: Gauge,
             value: liveMetrics.wpm,
-            label: copy.common.wpm
+            label: copy.common.wpm,
+            tone: 'speed'
         },
         {
             key: 'accuracy',
             className: 'live-stat--accuracy',
             icon: ShieldCheck,
             value: `${liveMetrics.accuracy}%`,
-            label: copy.common.accuracy
+            label: copy.common.accuracy,
+            tone: 'accuracy'
         },
         {
             key: 'time',
             className: 'live-stat--time',
             icon: Clock3,
             value: timerDisplay,
-            label: mode === 'time' ? copy.practice.timeRemaining : copy.practice.timeElapsed
+            label: mode === 'time' ? copy.practice.timeRemaining : copy.practice.timeElapsed,
+            tone: 'time'
         }
     ];
     const footerHint = getHintText(copy, status);
+    const stageMetaItems = [
+        {
+            key: 'source',
+            label: copy.practice.sourceTitle,
+            value: sourceLabel || copy.common.emptyValue
+        },
+        {
+            key: 'session',
+            label: copy.practice.sessionLabel,
+            value: getSessionStatusText(copy, status)
+        },
+        {
+            key: 'readiness',
+            label: copy.common.status,
+            value: textAvailabilityLabel
+        }
+    ];
 
     const renderedWords = useMemo(
         () => buildRenderedWords(words, typedHistory, currentInput, currentWordIndex),
@@ -257,6 +278,17 @@ export function TypingArea({
                         <span className="summary-label">{copy.common.currentText}</span>
                         <strong>{sourceLabel || copy.common.emptyValue}</strong>
                     </div>
+
+                    {!isTypingUnavailable && (
+                        <div className="typing-stage__meta-strip" aria-label={copy.practice.sessionLabel}>
+                            {stageMetaItems.map((item) => (
+                                <div key={item.key} className="typing-stage__meta-pill">
+                                    <small>{item.label}</small>
+                                    <strong>{item.value}</strong>
+                                </div>
+                            ))}
+                        </div>
+                    )}
 
                     <div className="typing-stage__status">
                         <span className={`panel-badge badge-${getBadgeStatus(status)}`}>
