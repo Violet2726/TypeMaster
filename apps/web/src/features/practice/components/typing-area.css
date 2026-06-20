@@ -9,11 +9,11 @@
     gap: 0.14rem;
     min-height: 3.4rem;
     padding: 0.72rem 0.78rem;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--panel-stroke);
     border-radius: 16px;
     background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)),
-        rgba(255, 255, 255, 0.025);
+        linear-gradient(180deg, var(--bg-soft), rgba(255, 255, 255, 0.02)),
+        var(--bg-soft);
 }
 
 .typing-stage__meta-pill small {
