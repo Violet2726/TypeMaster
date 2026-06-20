@@ -1,6 +1,6 @@
 .practice-page--refined {
     display: grid;
-    gap: 1rem;
+    gap: 0.95rem;
 }
 
 .practice-page--refined .panel,

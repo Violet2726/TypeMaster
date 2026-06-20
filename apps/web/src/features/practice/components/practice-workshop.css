@@ -139,8 +139,12 @@ body[data-theme='serika-light'] .practice-workshop-shell {
     letter-spacing: 0;
 }
 
-.config-strip {
-    gap: 0.78rem;
+.config-strip,
+.workshop-grid,
+.summary-stack,
+.tag-list,
+.settings-grid {
+    gap: 0.75rem;
 }
 
 .config-strip__main {
@@ -165,7 +169,7 @@ body[data-theme='serika-light'] .practice-workshop-shell {
 .segmented-group {
     display: inline-flex;
     flex-wrap: nowrap;
-    gap: 0.16rem;
+    gap: 0.45rem;
     width: fit-content;
     max-width: 100%;
     padding: 0.22rem;
@@ -187,7 +191,7 @@ body[data-theme='serika-light'] .segmented-group {
     gap: 0.36rem;
     min-height: 2.1rem;
     min-width: 0;
-    padding: 0.44rem 0.66rem;
+    padding: 0.58rem 0.88rem;
     border: 0;
     background: transparent;
     color: var(--text-dim);
@@ -203,20 +207,15 @@ body[data-theme='serika-light'] .segmented-group {
 
 .segment-btn.active,
 .segment-btn[aria-pressed='true'] {
-    color: var(--text-strong);
-    background: var(--panel-stroke);
-    box-shadow:
-        inset 0 1px 0 var(--panel-stroke),
-        0 8px 18px rgba(0, 0, 0, 0.12);
+    background: var(--text-strong);
+    color: var(--bg-color);
+    border-color: transparent;
 }
 
 body[data-theme='serika-light'] .segment-btn.active,
 body[data-theme='serika-light'] .segment-btn[aria-pressed='true'] {
-    color: #1d1d1f;
-    background: rgba(255, 255, 255, 0.92);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.96),
-        0 8px 18px rgba(0, 0, 0, 0.07);
+    background: #1d1d1f;
+    color: #ffffff;
 }
 
 .segment-btn:hover {
