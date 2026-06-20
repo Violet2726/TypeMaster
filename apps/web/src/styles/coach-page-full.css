@@ -1,4 +1,4 @@
-﻿.coach-page {
+.coach-page {
     gap: 1.05rem;
 }
 
@@ -30,7 +30,7 @@
 .coach-brief-card__glyph {
     display: grid;
     place-items: center;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     border: 1px solid rgba(10, 132, 255, 0.28);
     background: rgba(10, 132, 255, 0.13);
     color: #8ecaff;
@@ -108,7 +108,7 @@
     gap: 1.05rem;
     min-width: 0;
     padding: 1rem;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     border: 1px solid var(--panel-stroke);
     background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025)),
@@ -151,7 +151,7 @@
     gap: 0.68rem;
     align-items: start;
     padding-top: 0.7rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.09);
+    border-top: 1px solid var(--panel-stroke);
 }
 
 .coach-starter-step > span {
@@ -184,7 +184,7 @@
     align-content: space-between;
     min-height: 100%;
     padding: 1rem;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     border: 1px solid var(--panel-stroke);
     background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025)),
@@ -211,14 +211,14 @@
     gap: 0.52rem;
     min-height: 3.1rem;
     padding: 0.72rem;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     border: 1px solid var(--panel-stroke);
     background: var(--surface-2);
 }
 
 .coach-brief-card__rail span {
     height: 0.42rem;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: rgba(255, 255, 255, 0.16);
 }
 
@@ -260,7 +260,7 @@
     width: fit-content;
     max-width: 100%;
     padding: 0.5rem 0.66rem;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     border: 1px solid var(--panel-stroke);
     background: var(--bg-soft);
     color: var(--text-strong);
@@ -280,7 +280,7 @@
     gap: 0.4rem;
     min-height: 7rem;
     padding: 0.95rem;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     border: 1px solid var(--panel-stroke);
     background: var(--bg-elevated);
     overflow: hidden;
@@ -360,7 +360,7 @@
     min-height: 2rem;
     align-items: center;
     padding: 0.34rem 0.62rem;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     border: 1px solid var(--panel-stroke);
     background: var(--bg-soft);
     color: var(--text-strong);
@@ -370,7 +370,7 @@
 
 .coach-next-panel__signal {
     padding: 0.92rem;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     border: 1px solid var(--panel-stroke);
     background: rgba(255, 255, 255, 0.035);
 }
@@ -400,7 +400,7 @@
     align-items: start;
     min-height: 8rem;
     padding: 0.85rem;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     border: 1px solid var(--panel-stroke);
     background: var(--bg-soft);
 }
@@ -712,7 +712,7 @@ body[data-theme='serika-light'] .coach-starter-step {
     gap: 0.22rem;
     padding: 0.78rem;
     border: 1px solid var(--panel-stroke);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.062), rgba(255, 255, 255, 0.022)),
         rgba(255, 255, 255, 0.028);
@@ -756,7 +756,7 @@ body[data-theme='serika-light'] .home-starter-signal {
     min-width: min(100%, 18rem);
     padding: 0.78rem;
     border: 1px solid var(--panel-stroke);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.062), rgba(255, 255, 255, 0.022)),
         rgba(255, 255, 255, 0.028);
@@ -782,7 +782,7 @@ body[data-theme='serika-light'] .home-starter-signal {
     height: 2.35rem;
     place-items: center;
     border: 1px solid rgba(255, 214, 107, 0.24);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background: rgba(255, 214, 107, 0.12);
     color: #ffd66b;
 }
@@ -812,8 +812,8 @@ body[data-theme='serika-light'] .home-starter-signal {
     padding: 0.54rem;
     overflow: hidden;
     border: 1px solid var(--panel-stroke);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.045);
+    border-radius: var(--radius-sm);
+    background: var(--bg-soft);
 }
 
 .home-action-empty-signal__grid span::before {
@@ -852,10 +852,10 @@ body[data-theme='serika-light'] .home-action-empty-signal__grid span {
 }
 
 .home-records-panel .history-table {
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     border-color: var(--panel-stroke);
     background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018)),
+        linear-gradient(180deg, var(--bg-soft), rgba(255, 255, 255, 0.018)),
         rgba(255, 255, 255, 0.025);
 }
 
@@ -865,7 +865,7 @@ body[data-theme='serika-light'] .home-action-empty-signal__grid span {
 }
 
 .home-record-row:hover {
-    background: rgba(255, 255, 255, 0.055);
+    background: var(--bg-soft);
 }
 
 .home-record-row__main {
@@ -895,7 +895,7 @@ body[data-theme='serika-light'] .home-action-empty-signal__grid span {
     gap: 0.34rem;
     min-height: 2rem;
     border: 1px solid var(--panel-stroke);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     white-space: nowrap;
 }
 
@@ -930,7 +930,7 @@ body[data-theme='serika-light'] .home-action-empty-signal__grid span {
 
 .home-record-type--free {
     color: var(--text-dim);
-    background: rgba(255, 255, 255, 0.055);
+    background: var(--bg-soft);
 }
 
 .home-records-panel .history-metrics {
@@ -943,7 +943,7 @@ body[data-theme='serika-light'] .home-action-empty-signal__grid span {
 
 .home-record-pill {
     padding: 0.34rem 0.58rem;
-    background: rgba(255, 255, 255, 0.055);
+    background: var(--bg-soft);
     color: var(--text-strong);
     font-size: 0.76rem;
     font-weight: 730;

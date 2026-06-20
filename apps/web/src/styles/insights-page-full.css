@@ -1,4 +1,4 @@
-﻿.insights-page {
+.insights-page {
     gap: 1rem;
 }
 
@@ -63,7 +63,7 @@
     min-height: 4rem;
     padding: 0.68rem;
     border: 1px solid var(--panel-stroke);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background: rgba(255, 255, 255, 0.04);
 }
 
@@ -97,7 +97,7 @@
     display: grid;
     gap: 0.95rem;
     padding: 1.05rem;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     border: 1px solid var(--panel-stroke);
     background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025)),
@@ -145,7 +145,7 @@ body[data-theme='serika-light'] .insights-empty-preview__unlock p {
     min-height: 2.2rem;
     padding: 0.38rem 0.48rem;
     border: 1px solid var(--panel-stroke);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background: rgba(255, 255, 255, 0.04);
 }
 
@@ -188,7 +188,7 @@ body[data-theme='serika-light'] .insights-empty-preview__unlock p {
     width: 2.7rem;
     height: 2.7rem;
     place-items: center;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     color: #8ecaff;
     background: rgba(10, 132, 255, 0.14);
     border: 1px solid rgba(142, 202, 255, 0.22);
@@ -199,7 +199,7 @@ body[data-theme='serika-light'] .insights-empty-preview__unlock p {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1px;
     overflow: hidden;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     border: 1px solid var(--panel-stroke);
     background: var(--panel-stroke);
 }
@@ -209,7 +209,7 @@ body[data-theme='serika-light'] .insights-empty-preview__unlock p {
     gap: 0.3rem;
     min-height: 4.15rem;
     padding: 0.72rem;
-    background: rgba(255, 255, 255, 0.045);
+    background: var(--bg-soft);
 }
 
 .insights-empty-preview__metric span,
@@ -254,7 +254,7 @@ body[data-theme='serika-light'] .insights-empty-preview__unlock p {
     width: 2.35rem;
     height: 2.35rem;
     place-items: center;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     color: #8ecaff;
     background: rgba(10, 132, 255, 0.12);
     border: 1px solid rgba(142, 202, 255, 0.2);
@@ -303,7 +303,7 @@ body[data-theme='serika-light'] .insights-empty-preview__unlock p {
     place-items: center;
     padding: 0.42rem;
     border: 1px solid var(--panel-stroke);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background: rgba(255, 255, 255, 0.04);
     color: var(--text-strong);
     font-size: 0.74rem;
@@ -405,7 +405,7 @@ body[data-theme='serika-light'] .insights-empty-preview__unlock p {
 .insights-command-center__coach,
 .insights-command-center__radar {
     border: 1px solid var(--panel-stroke);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02)),
         rgba(255, 255, 255, 0.035);
@@ -484,7 +484,7 @@ body[data-theme='serika-light'] .insights-empty-preview__unlock p {
     justify-self: start;
     min-height: 2rem;
     padding: 0.36rem 0.62rem;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     border: 1px solid rgba(52, 199, 89, 0.18);
     background: rgba(52, 199, 89, 0.1);
     color: var(--text-strong);
@@ -522,8 +522,8 @@ body[data-theme='serika-light'] .insights-empty-preview__unlock p {
     min-width: 0;
     padding: 0.7rem;
     border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.045);
+    border-radius: var(--radius-sm);
+    background: var(--bg-soft);
 }
 
 .insights-command-center__radar-metrics strong {
@@ -552,7 +552,7 @@ body[data-theme='serika-light'] .insights-empty-preview__unlock p {
     min-height: 3.35rem;
     padding: 0.68rem 0.82rem;
     border: 1px solid var(--panel-stroke);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background: var(--bg-soft);
 }
 
@@ -705,7 +705,7 @@ body[data-theme='serika-light'] .insights-command-center__radar p {
         min-height: 5.2rem;
         padding: 0.58rem;
         border: 1px solid var(--panel-stroke);
-        border-radius: 8px;
+        border-radius: var(--radius-sm);
     }
 
     .insights-empty-preview__unlock:first-child {
