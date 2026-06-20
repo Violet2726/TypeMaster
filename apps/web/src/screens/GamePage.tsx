@@ -161,6 +161,23 @@ function drawBackground(ctx: CanvasRenderingContext2D, width: number, height: nu
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
     
+    // Grid effect
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+    ctx.lineWidth = 1;
+    const gridSize = 40;
+    for (let x = 0; x < width; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+    }
+    for (let y = 0; y < height; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+    }
+
     // Animated stars with depth
     const starCount = 60;
     for (let i = 0; i < starCount; i++) {
