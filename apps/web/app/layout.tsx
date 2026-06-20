@@ -9,6 +9,7 @@ import '../src/styles/buttons.css';
 import '../src/styles/panels.css';
 import '../src/styles/base-page.css';
 import '../src/styles/typography.css';
+import '../src/styles/apple-refresh.css';
 import '../src/styles/animations.css';
 import '../src/styles/toggle-switch.css';
 import '../src/styles/typing-experience.css';
