@@ -1,4 +1,4 @@
-﻿/* ============================================
+/* ============================================
    Challenge Page
    ============================================ */
 
@@ -66,29 +66,12 @@
 /* --- Starter panel (full-page) --- */
 .challenge-starter-panel {
     display: grid;
-    position: relative;
     grid-template-columns: minmax(0, 1fr) clamp(18.5rem, 30vw, 24rem);
     gap: clamp(0.9rem, 1.4vw, 1.2rem);
     min-height: clamp(25rem, calc(100dvh - 8.8rem), 34rem);
     padding: clamp(1.05rem, 1.7vw, 1.5rem);
     border-color: var(--panel-stroke);
     background: var(--bg-panel);
-}
-
-.challenge-starter-panel::after {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    content: '';
-    background:
-        linear-gradient(180deg, var(--bg-soft), transparent 32%),
-        linear-gradient(90deg, transparent, var(--bg-soft), transparent);
-    mask-image: linear-gradient(180deg, black, transparent 74%);
-}
-
-.challenge-starter-panel > * {
-    position: relative;
-    z-index: 1;
 }
 
 .challenge-starter-panel__copy {
@@ -364,7 +347,6 @@
 }
 
 .challenge-first-run-card {
-    position: relative;
     display: grid;
     align-content: end;
     gap: 0.64rem;
@@ -375,22 +357,6 @@
     border: 1px solid var(--panel-stroke);
     border-radius: var(--radius-sm);
     background: var(--bg-soft);
-}
-
-.challenge-first-run-card::before {
-    content: '';
-    position: absolute;
-    inset: 0 0 auto 0;
-    height: 0.18rem;
-    background: #0a84ff;
-}
-
-.challenge-first-run-card--peer::before {
-    background: #ffd66b;
-}
-
-.challenge-first-run-card--trend::before {
-    background: #99f2c0;
 }
 
 .challenge-first-run-card__icon {
@@ -464,9 +430,7 @@
 
 .challenge-metric {
     min-height: 5rem;
-    padding: 0.8rem 0.85rem;
-    box-shadow: none;
-    border-radius: var(--radius-sm);
+    padding: 0.8rem 0.85rem;`n    border-radius: var(--radius-sm);
 }
 
 .challenge-metric .result-item-value {
@@ -523,7 +487,6 @@
 }
 
 .challenge-empty-status__grid span {
-    position: relative;
     display: grid;
     gap: 0.16rem;
     min-height: 3.8rem;
@@ -533,22 +496,6 @@
     border: 1px solid var(--panel-stroke);
     border-radius: var(--radius-sm);
     background: var(--bg-soft);
-}
-
-.challenge-empty-status__grid span::before {
-    content: '';
-    position: absolute;
-    inset: 0 0 auto 0;
-    height: 0.16rem;
-    background: #0a84ff;
-}
-
-.challenge-empty-status__grid span:nth-child(2)::before {
-    background: #99f2c0;
-}
-
-.challenge-empty-status__grid span:nth-child(3)::before {
-    background: #ffd66b;
 }
 
 .challenge-empty-status__grid small {
@@ -577,9 +524,7 @@
 }
 
 .challenge-replay-section .replay-summary-card,
-.challenge-replay-section .replay-inspect {
-    box-shadow: none;
-}
+.challenge-replay-section .replay-inspect {`n}
 
 .challenge-replay-empty {
     display: grid;
