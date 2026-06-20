@@ -17,6 +17,8 @@ import { ScorePopupSystem } from "./score-popup";
 import { COLORS } from "../components/game/colors";
 import { drawGlassPanel, drawProgressRing } from "../components/game/draw-helpers";
 import { initSound, playClickSound, playKillSound, playErrorSound, playComboSound } from "../components/game/sound-engine";
+import { shouldDropPowerUp, createPowerUp, updatePowerUps, processPowerUpInput, drawPowerUp, drawActivePowerUps, getPowerUpConfig } from "./power-up";
+import type { PowerUp, ActivePowerUp, PowerUpType } from "./power-up";
 
 // ---------------------------------------------------------------------------
 // Hue shift for dynamic background
@@ -91,6 +93,11 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     let lastChainTime = 0;
     let chainMultiplier = 1;
 
+    // Power-ups
+    let powerUps: PowerUp[] = [];
+    let activePowerUps: ActivePowerUp[] = [];
+    let shieldCount = 0;
+
     // Vignette
     const VIGNETTE_STRENGTH = 0.35;
 
@@ -138,8 +145,17 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
             if (evt.type === "enemy_leaked") {
                 const leaked = state.enemies.find((e: any) => e.id === evt.enemyId);
                 if (leaked) {
-                    particles.emit({ x: leaked.x, y: canvasHeight - 20, count: 15, color: COLORS.error, spread: Math.PI, speed: 2, gravity: 3, turbulence: 0.5, trail: true });
-                    shake.trigger(8);
+                    // Shield absorbs leak
+                    if (shieldCount > 0) {
+                        shieldCount--;
+                        particles.emit({ x: leaked.x, y: canvasHeight - 20, count: 20, color: "#0a84ff", speed: 3, size: 3, glow: 0.8, trail: true });
+                        shake.trigger(4);
+                        // Restore the life that was lost
+                        state = { ...state, lives: Math.min(state.maxLives, state.lives + 1), enemiesLeaked: state.enemiesLeaked - 1 };
+                    } else {
+                        particles.emit({ x: leaked.x, y: canvasHeight - 20, count: 15, color: COLORS.error, spread: Math.PI, speed: 2, gravity: 3, turbulence: 0.5, trail: true });
+                        shake.trigger(8);
+                    }
                 }
             }
             if (evt.type === "wave_complete") {
@@ -156,6 +172,9 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                     });
                 }
                 shake.trigger(8);
+
+                // Bomb screen flash handled by bomb power-up
+                const hasBombFlash = activePowerUps.some(ap => ap.type === "bomb");
 
                 if (evt.perfect) {
                     state = { ...state, perfectWaves: state.perfectWaves + 1 };
@@ -185,6 +204,21 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         particles.update(dt);
         scorePopups.update(dt);
         shake.update(dt);
+
+        // Update power-ups
+        powerUps = updatePowerUps(powerUps, dt);
+
+        // Update active power-up durations
+        activePowerUps = activePowerUps.map(ap => ({ ...ap, remaining: ap.remaining - dt })).filter(ap => ap.remaining > 0);
+
+        // Slow power-up effect: reduce enemy speed
+        const hasSlow = activePowerUps.some(ap => ap.type === "slow");
+        if (hasSlow && state.enemies) {
+            state = {
+                ...state,
+                enemies: state.enemies.map((e: any) => e.alive ? { ...e, speed: e.speed * 0.4 } : e)
+            };
+        }
     }
 
     // --- Rendering ---
@@ -297,6 +331,9 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         state.enemies.filter((e: any) => e.alive).forEach((e: any) => {
             drawEnemyAppleStyle(ctx, e, time, lastCorrectEnemyIds.includes(e.id));
         });
+
+        // Draw power-ups
+        powerUps.filter(pu => pu.alive).forEach(pu => drawPowerUp(ctx, pu, time));
 
         particles.draw(ctx);
         scorePopups.draw(ctx);
@@ -553,6 +590,9 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
             ctx.restore();
         }
 
+        // Active power-up indicators
+        drawActivePowerUps(ctx, activePowerUps, w, time);
+
         // Active input display
         if (state.typedInput) {
             drawGlassPanel(ctx, w / 2 - 80, 108, 160, 32, 8);
@@ -703,11 +743,53 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
             state = createGameState();
             startTime = 0;
             gameOverTime = 0;
+            powerUps = [];
+            activePowerUps = [];
+            shieldCount = 0;
             return;
         }
 
         if (state.mode === "playing" && e.key.length === 1) {
             e.preventDefault();
+
+            // Process power-up input first (only if no active enemy)
+            const puResult = processPowerUpInput(powerUps, e.key, state.activeEnemyId);
+            powerUps = puResult.powerUps;
+
+            // Handle collected power-ups
+            puResult.collected.forEach((puType: PowerUpType) => {
+                const config = getPowerUpConfig(puType);
+                playKillSound();
+                shake.trigger(5);
+                particles.emit({ x: canvasWidth / 2, y: canvasHeight / 2, count: 30, color: config.color, speed: 5, size: 4, glow: 0.9, trail: true, trailLength: 12 });
+
+                if (puType === "bomb") {
+                    // Bomb: destroy all alive enemies
+                    const aliveEnemies = state.enemies.filter((en: any) => en.alive);
+                    aliveEnemies.forEach((en: any) => {
+                        particles.emit({ x: en.x, y: en.y, count: 15, color: COLORS.error, speed: 4, size: 3, gravity: 2, trail: true });
+                        state = { ...state, score: state.score + 50, enemiesDefeated: state.enemiesDefeated + 1 };
+                    });
+                    state = { ...state, enemies: state.enemies.map((en: any) => ({ ...en, alive: false })) };
+                    shake.trigger(15);
+                    scorePopups.emit({ x: canvasWidth / 2, y: canvasHeight / 2, text: "BOMB!", color: COLORS.error, fontSize: 32 });
+                } else if (puType === "shield") {
+                    shieldCount++;
+                    activePowerUps.push({ type: "shield", remaining: config.duration, duration: config.duration });
+                    scorePopups.emit({ x: canvasWidth / 2, y: canvasHeight / 2 - 30, text: "SHIELD", color: config.color, fontSize: 24 });
+                } else {
+                    activePowerUps.push({ type: puType, remaining: config.duration, duration: config.duration });
+                    scorePopups.emit({ x: canvasWidth / 2, y: canvasHeight / 2 - 30, text: config.label, color: config.color, fontSize: 24 });
+                }
+            });
+
+            // If power-up consumed the input, skip enemy input
+            if (puResult.collected.length > 0 || puResult.events.length > 0) {
+                // Check if the input also matched a power-up word start
+                const matchedPu = puResult.events.some((ev: any) => ev.type === "powerup_collected");
+                if (matchedPu) return; // Power-up consumed the input
+            }
+
             const result = processInput(state, e.key);
             state = result.state;
 
@@ -737,13 +819,22 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                         chainTimer = CHAIN_WINDOW;
 
                         // Score popup with chain indicator
+                        // Double score power-up
+                        const hasDouble = activePowerUps.some(ap => ap.type === "double");
                         const baseScore = evt.score;
-                        const chainScore = Math.round(baseScore * chainMultiplier);
+                        const chainScore = Math.round(baseScore * chainMultiplier * (hasDouble ? 2 : 1));
                         const chainLabel = chainCount > 1 ? " x" + chainCount : "";
                         scorePopups.emit({ x: enemy.x, y: enemy.y - 20, text: "+" + chainScore + chainLabel, color: chainCount > 3 ? "#ff6b6b" : chainCount > 1 ? COLORS.warning : COLORS.warning, fontSize: 18 + chainCount * 2 });
 
                         // Trigger hitlag
                         hitlagTimer = HITLAG_DURATION * (1 + chainCount * 0.3);
+
+                        // Power-up drop chance
+                        const dropType = shouldDropPowerUp(enemy.type);
+                        if (dropType) {
+                            powerUps.push(createPowerUp(dropType, enemy.x, enemy.y));
+                            particles.emit({ x: enemy.x, y: enemy.y, count: 8, color: getPowerUpConfig(dropType).color, speed: 2, size: 2, lifetime: 0.5, glow: 0.8 });
+                        }
                     }
                 }
                 if (evt.type === "char_correct") {
@@ -775,6 +866,8 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     function destroy(): void {
         particles.clear();
         scorePopups.clear();
+        powerUps = [];
+        activePowerUps = [];
     }
 
     return {
