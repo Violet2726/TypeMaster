@@ -80,12 +80,45 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     let resumeCountdown = 0;
     let resumeTarget = 0;
 
+    // Hitlag: micro time-freeze on kill for weighty feel
+    let hitlagTimer = 0;
+    const HITLAG_DURATION = 0.018; // 18ms
+
+    // Chain kill: rapid successive kills within window
+    let chainCount = 0;
+    let chainTimer = 0;
+    const CHAIN_WINDOW = 0.6; // 600ms to chain
+    let lastChainTime = 0;
+    let chainMultiplier = 1;
+
+    // Vignette
+    const VIGNETTE_STRENGTH = 0.35;
+
     const language = "en-US";
     const copy = getGameCopy(language);
 
     // --- Ticking ---
 
     function tick(dt: number): void {
+        // Hitlag: freeze game for micro-moment on kill
+        if (hitlagTimer > 0) {
+            hitlagTimer -= dt;
+            // Still update particles and shake during hitlag for visual juice
+            particles.update(dt);
+            scorePopups.update(dt);
+            shake.update(dt);
+            return;
+        }
+
+        // Chain kill timer decay
+        if (chainTimer > 0) {
+            chainTimer -= dt;
+            if (chainTimer <= 0) {
+                chainCount = 0;
+                chainMultiplier = 1;
+            }
+        }
+
         if (state.mode === "resuming") {
             resumeCountdown -= dt;
             if (resumeCountdown <= 0) {
@@ -110,18 +143,38 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                 }
             }
             if (evt.type === "wave_complete") {
+                // Confetti burst from all directions
+                const confettiColors = [COLORS.normal, COLORS.fast, COLORS.warning, COLORS.success, "#ff6b6b", "#c084fc"];
+                for (let i = 0; i < 8; i++) {
+                    const angle = (Math.PI * 2 / 8) * i;
+                    const cx = canvasWidth / 2 + Math.cos(angle) * canvasWidth * 0.3;
+                    const cy = canvasHeight / 2 + Math.sin(angle) * canvasHeight * 0.3;
+                    particles.emit({
+                        x: cx, y: cy, count: 15,
+                        color: confettiColors[i % confettiColors.length],
+                        speed: 5, size: 4, gravity: 3, turbulence: 1.2, trail: true, trailLength: 12, lifetime: 1.5
+                    });
+                }
+                shake.trigger(8);
+
                 if (evt.perfect) {
                     state = { ...state, perfectWaves: state.perfectWaves + 1 };
-                    for (let i = 0; i < 5; i++) {
-                        particles.emit({ x: Math.random() * canvasWidth, y: Math.random() * canvasHeight, count: 20, color: COLORS.warning, speed: 4, gravity: -1, trail: true, turbulence: 0.8 });
+                    // Extra golden burst for perfect wave
+                    for (let i = 0; i < 6; i++) {
+                        particles.emit({
+                            x: Math.random() * canvasWidth, y: Math.random() * canvasHeight,
+                            count: 25, color: "#ffd700", speed: 5, size: 5, gravity: -2, turbulence: 1.0, trail: true, trailLength: 15, lifetime: 2.0
+                        });
                     }
-                    shake.trigger(5);
+                    shake.trigger(12);
                 }
+
+                // Extended delay for wave clear celebration
                 setTimeout(() => {
                     if (state.mode === "playing") {
                         state = startWave(state, pool, { canvasWidth, canvasHeight });
                     }
-                }, 1500);
+                }, 2000);
             }
             if (evt.type === "game_over") {
                 gameOverTime = performance.now();
@@ -190,6 +243,15 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         // Ambient particles (idle only)
         if (state.mode === "idle" && Math.random() < 0.08) {
             particles.emit({ x: Math.random() * w, y: Math.random() * h, count: 1, color: COLORS.textTertiary, speed: 0.3, size: 1.5, lifetime: 2, glow: 0.3 });
+        }
+
+        // Vignette: subtle darkening at edges for depth and focus
+        if (state.mode !== "idle") {
+            const vignetteGrad = ctx.createRadialGradient(w / 2, h / 2, h * 0.3, w / 2, h / 2, h * 0.85);
+            vignetteGrad.addColorStop(0, "rgba(0,0,0,0)");
+            vignetteGrad.addColorStop(1, "rgba(0,0,0," + VIGNETTE_STRENGTH + ")");
+            ctx.fillStyle = vignetteGrad;
+            ctx.fillRect(0, 0, w, h);
         }
     }
 
@@ -462,6 +524,35 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
             ctx.restore();
         }
 
+        // Chain kill indicator
+        if (chainCount > 1 && chainTimer > 0) {
+            const chainAlpha = Math.min(1, chainTimer / 0.3);
+            const chainScale = 1 + Math.sin(time * 0.008) * 0.05;
+            ctx.save();
+            ctx.globalAlpha = chainAlpha;
+            ctx.translate(w / 2, 110);
+            ctx.scale(chainScale, chainScale);
+
+            // Chain fire effect
+            const chainFireGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, 40);
+            chainFireGrad.addColorStop(0, "rgba(255,107,107," + (chainCount * 0.08) + ")");
+            chainFireGrad.addColorStop(1, "rgba(255,107,107,0)");
+            ctx.fillStyle = chainFireGrad;
+            ctx.beginPath();
+            ctx.arc(0, 0, 40, 0, Math.PI * 2);
+            ctx.fill();
+
+            drawGlassPanel(ctx, -50, -12, 100, 24, 12);
+
+            ctx.font = "700 13px -apple-system, SF Pro Display, system-ui, sans-serif";
+            ctx.fillStyle = "#ff6b6b";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText("CHAIN x" + chainCount, 0, 0);
+
+            ctx.restore();
+        }
+
         // Active input display
         if (state.typedInput) {
             drawGlassPanel(ctx, w / 2 - 80, 108, 160, 32, 8);
@@ -627,10 +718,32 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                     const enemy = state.enemies.find((en: any) => en.id === evt.enemyId);
                     if (enemy) {
                         const color = (COLORS as any)[enemy.type] || COLORS.normal;
-                        particles.emit({ x: enemy.x, y: enemy.y, count: 25, color, speed: 4, size: 4, gravity: 2, turbulence: 0.6, trail: true });
-                        particles.emit({ x: enemy.x, y: enemy.y, count: 10, color: "#ffffff", speed: 2, size: 2, lifetime: 0.4 });
-                        shake.trigger(6);
-                        scorePopups.emit({ x: enemy.x, y: enemy.y - 20, text: "+" + evt.score, color: COLORS.warning, fontSize: 20 });
+                        // Scale particles by chain count
+                        const chainBonus = Math.min(chainCount + 1, 5);
+                        particles.emit({ x: enemy.x, y: enemy.y, count: 20 + chainBonus * 5, color, speed: 3 + chainBonus, size: 3 + chainBonus * 0.5, gravity: 2, turbulence: 0.5 + chainCount * 0.1, trail: true, trailLength: 6 + chainBonus * 2 });
+                        particles.emit({ x: enemy.x, y: enemy.y, count: 8 + chainBonus * 2, color: "#ffffff", speed: 2, size: 2, lifetime: 0.4 });
+                        shake.trigger(4 + chainBonus * 2);
+
+                        // Chain kill tracking
+                        const now = Date.now();
+                        if (now - lastChainTime < CHAIN_WINDOW * 1000) {
+                            chainCount++;
+                            chainMultiplier = 1 + chainCount * 0.25;
+                        } else {
+                            chainCount = 1;
+                            chainMultiplier = 1;
+                        }
+                        lastChainTime = now;
+                        chainTimer = CHAIN_WINDOW;
+
+                        // Score popup with chain indicator
+                        const baseScore = evt.score;
+                        const chainScore = Math.round(baseScore * chainMultiplier);
+                        const chainLabel = chainCount > 1 ? " x" + chainCount : "";
+                        scorePopups.emit({ x: enemy.x, y: enemy.y - 20, text: "+" + chainScore + chainLabel, color: chainCount > 3 ? "#ff6b6b" : chainCount > 1 ? COLORS.warning : COLORS.warning, fontSize: 18 + chainCount * 2 });
+
+                        // Trigger hitlag
+                        hitlagTimer = HITLAG_DURATION * (1 + chainCount * 0.3);
                     }
                 }
                 if (evt.type === "char_correct") {
