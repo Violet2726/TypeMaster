@@ -330,6 +330,10 @@ export function processInput(state, char) {
             if (isComplete) {
                 const score = calculateKillScore(match, state.combo);
                 events.push({ type: 'enemy_killed', enemyId: match.id, score });
+                
+                if (state.combo + 1 === 20) {
+                    events.push({ type: 'achievement_unlocked', achievementId: 'combo-20' });
+                }
 
                 return {
                     state: {

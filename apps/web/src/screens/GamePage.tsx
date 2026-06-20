@@ -441,6 +441,7 @@ export default function GamePage() {
     const startTimeRef = useRef<number>(0);
     const gameOverTimeRef = useRef<number>(0);
     const potentialMatchesRef = useRef<string[]>([]);
+    const achievementRef = useRef<{id: string, time: number} | null>(null);
     const lastTimeRef = useRef(0);
     const [, setUiState] = useState('idle');
     const language = 'en-US';
@@ -744,6 +745,25 @@ export default function GamePage() {
         }
         
         // Game over overlay
+        // Achievement Notification
+        if (achievementRef.current) {
+            const elapsed = performance.now() - achievementRef.current.time;
+            if (elapsed < 3000) {
+                const alpha = elapsed < 2500 ? 1 : 1 - (elapsed - 2500) / 500;
+                ctx.save();
+                ctx.globalAlpha = alpha;
+                drawGlassPanel(ctx, width / 2 - 150, 100, 300, 60, 16);
+                ctx.font = '600 16px -apple-system, "SF Pro Display", system-ui, sans-serif';
+                ctx.fillStyle = COLORS.warning;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('Achievement Unlocked: ' + achievementRef.current.id, width / 2, 130);
+                ctx.restore();
+            } else {
+                achievementRef.current = null;
+            }
+        }
+
         if (state.mode === 'gameover') {
             const gameoverAnimDuration = 500; // ms
             const gameoverProgress = gameOverTimeRef.current ? Math.min(1, (time - gameOverTimeRef.current) / gameoverAnimDuration) : 0;
@@ -904,6 +924,9 @@ export default function GamePage() {
                     }
                     if (event.type === 'char_miss') {
                         potentialMatchesRef.current = event.matches || [];
+                    }
+                    if (event.type === 'achievement_unlocked') {
+                        achievementRef.current = { id: event.achievementId, time: performance.now() };
                     }
                 });
             }
