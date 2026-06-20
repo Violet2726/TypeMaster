@@ -1,0 +1,18 @@
+﻿   Home Page 鈥?Hero Polish
+   ============================================ */
+
+.home-launch {
+    position: relative;
+}
+
+.home-launch::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--panel-stroke), transparent);
+}
+
+

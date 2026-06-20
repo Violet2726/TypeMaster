@@ -1,0 +1,21 @@
+﻿/* Home action card gradient overlays */
+.home-action-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.home-action-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.12), transparent);
+    pointer-events: none;
+    z-index: 0;
+}
+
+body[data-theme='serika-light'] .home-action-card::after {
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.03), transparent);
+}

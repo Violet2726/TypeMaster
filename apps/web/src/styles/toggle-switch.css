@@ -1,0 +1,59 @@
+﻿/* --- Apple-Style Toggle Switch --- */
+
+.apple-toggle {
+    position: relative;
+    width: 51px;
+    height: 31px;
+    border-radius: 31px;
+    border: none;
+    background: rgba(120, 120, 128, 0.32);
+    cursor: pointer;
+    transition: background-color 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+    flex-shrink: 0;
+    padding: 0;
+}
+
+.apple-toggle.is-on {
+    background: #34c759;
+}
+
+body[data-theme='serika-light'] .apple-toggle {
+    background: rgba(120, 120, 128, 0.24);
+}
+
+body[data-theme='serika-light'] .apple-toggle.is-on {
+    background: #34c759;
+}
+
+.apple-toggle__thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 27px;
+    height: 27px;
+    border-radius: 999px;
+    background: #ffffff;
+    box-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.15),
+        0 1px 1px rgba(0, 0, 0, 0.06);
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.apple-toggle.is-on .apple-toggle__thumb {
+    transform: translateX(20px);
+}
+
+.apple-toggle:active .apple-toggle__thumb {
+    width: 31px;
+}
+
+.apple-toggle.is-on:active .apple-toggle__thumb {
+    width: 31px;
+    transform: translateX(16px);
+}
+
+.apple-toggle:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+}
+
