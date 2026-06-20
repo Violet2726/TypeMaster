@@ -1,0 +1,77 @@
+/* ============================================
+   Typography & Global Utilities
+   ============================================ */
+
+/* Heading hierarchy */
+h1 {
+    letter-spacing: -0.035em;
+}
+
+h2 {
+    letter-spacing: -0.02em;
+}
+
+h3 {
+    letter-spacing: -0.01em;
+}
+
+/* Paragraph line height */
+.lead-text {
+    line-height: 1.6;
+}
+
+.muted-text {
+    line-height: 1.5;
+    font-size: 0.88rem;
+}
+
+/* Kicker spacing */
+.panel-kicker {
+    margin: 0 0 0.15rem;
+    color: var(--text-dim);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+
+body[data-language='zh-CN'] .panel-kicker {
+    text-transform: none;
+    font-size: 0.75rem;
+}
+
+/* Tabular numbers for metrics */
+.metric-card strong,
+.live-stat-value,
+.result-item-value {
+    font-variant-numeric: tabular-nums;
+}
+
+/* History table */
+.history-row {
+    transition: background-color 0.15s ease;
+}
+
+.history-row:hover {
+    background: var(--surface-2);
+}
+
+/* Tag pill */
+.tag-pill {
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Footer */
+.app-footer {
+    color: var(--text-dim);
+    font-size: 0.82rem;
+    padding: 1.2rem 0;
+}
+
+.app-footer__inner {
+    justify-content: center;
+}
