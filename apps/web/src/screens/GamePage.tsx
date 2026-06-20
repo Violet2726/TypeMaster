@@ -636,6 +636,37 @@ export default function GamePage() {
         // Draw HUD
         drawHUDAppleStyle(ctx, state, copy, width, time);
         
+        // Wave Preview UI
+        if (state.wavePreview && Object.keys(state.wavePreview).length > 0) {
+            ctx.save();
+            const previewX = width - 200;
+            const previewY = 80;
+            
+            drawGlassPanel(ctx, previewX, previewY, 180, 60 + Object.keys(state.wavePreview).length * 24, 12);
+            
+            ctx.font = '600 14px -apple-system, "SF Pro Text", system-ui, sans-serif';
+            ctx.fillStyle = COLORS.textSecondary;
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            ctx.fillText(copy.waveIncoming.replace('{wave}', String(state.wave + 1)), previewX + 16, previewY + 16);
+            
+            let yOffset = previewY + 36;
+            Object.entries(state.wavePreview).forEach(([type, count]) => {
+                const typeColor = COLORS[type as keyof typeof COLORS] || COLORS.normal;
+                ctx.fillStyle = typeColor;
+                ctx.beginPath();
+                ctx.arc(previewX + 24, yOffset + 8, 5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = COLORS.text;
+                ctx.font = '400 13px -apple-system, "SF Pro Text", system-ui, sans-serif';
+                ctx.fillText(`${type}: ${count}`, previewX + 36, yOffset);
+                yOffset += 24;
+            });
+            
+            ctx.restore();
+        }
+        
         // Wave incoming overlay
         if (state.wave > 0 && state.waveQueue.length > 0 && state.nextSpawnIndex < state.waveQueue.length) {
             const elapsed = time - (state.waveStartTime || time);

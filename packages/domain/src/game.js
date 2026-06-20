@@ -466,6 +466,15 @@ export function updateGameState(state, deltaTime, canvasHeight) {
     if (waveComplete && state.waveQueue.length > 0) {
         const perfect = newLeaked === (state._waveStartLeaked || 0);
         events.push({ type: 'wave_complete', wave: state.wave, perfect });
+        
+        // Generate preview for next wave
+        const nextWaveIndex = state.wave;
+        const nextWaveEnemies = generateWaveEnemies(nextWaveIndex, commonWords, {});
+        const preview = nextWaveEnemies.reduce((acc, e) => {
+            acc[e.type] = (acc[e.type] || 0) + 1;
+            return acc;
+        }, {});
+        state.wavePreview = preview;
     }
 
     const isGameOver = newLives <= 0;
