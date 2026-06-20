@@ -58,6 +58,36 @@ export function buildAchievements({
             title: 'Fast Lane',
             description: 'Break 100 WPM in a completed round.',
             unlockedAt: firstMatchDate(safeSessions, (session) => (session?.result?.wpm || 0) >= 100)
+        },
+        {
+            id: 'first-raid',
+            title: 'First Raid',
+            description: 'Complete your first Typing Raid game.',
+            unlockedAt: firstMatchDate(safeSessions, (session) => session?.trainingMeta?.type === 'raid')
+        },
+        {
+            id: 'combo-20',
+            title: 'Combo Master',
+            description: 'Reach a 20-combo streak in Typing Raid.',
+            unlockedAt: firstMatchDate(safeSessions, (session) => session?.trainingMeta?.type === 'raid' && (session?.trainingMeta?.maxCombo || 0) >= 20)
+        },
+        {
+            id: 'wave-10',
+            title: 'Wave Survivor',
+            description: 'Survive to wave 10 in Typing Raid.',
+            unlockedAt: firstMatchDate(safeSessions, (session) => session?.trainingMeta?.type === 'raid' && (session?.trainingMeta?.wave || 0) >= 10)
+        },
+        {
+            id: 'raid-perfect',
+            title: 'Perfect Raid',
+            description: 'Complete a Typing Raid wave without losing any lives.',
+            unlockedAt: firstMatchDate(safeSessions, (session) => session?.trainingMeta?.type === 'raid' && (session?.trainingMeta?.perfectWaves || 0) > 0)
+        },
+        {
+            id: 'raid-1000',
+            title: 'Raid Commander',
+            description: 'Score 1000+ points in a single Typing Raid game.',
+            unlockedAt: firstMatchDate(safeSessions, (session) => session?.trainingMeta?.type === 'raid' && (session?.result?.score || 0) >= 1000)
         }
     ];
 

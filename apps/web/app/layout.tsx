@@ -1,6 +1,6 @@
-import type { Metadata, Viewport } from 'next';
+﻿import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
-import { AppFrame } from '../src/application/AppFrame';
+import { AppFrameWrapper } from '../src/application/AppFrameWrapper';
 import { AppProviders } from '../src/application/AppProviders';
 import '../index.css';
 import '../src/styles/layout.css';
@@ -39,11 +39,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <html lang="zh-CN">
             <body>
                 <AppProviders>
-                    <AppFrame>
+                    <AppFrameWrapper>
                         {children}
-                    </AppFrame>
+                    </AppFrameWrapper>
                 </AppProviders>
             </body>
         </html>
     );
 }
+

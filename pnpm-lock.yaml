@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      playwright:
+        specifier: ^1.61.0
+        version: 1.61.0
       turbo:
         specifier: ^2.5.8
         version: 2.9.16
@@ -2734,8 +2737,18 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
+  playwright-core@1.61.0:
+    resolution: {integrity: sha512-caX7TrY3Ml6egyDX0WUcTHDxodl/b51y5wJOdCEA36QviK/s2g081hvmGs8eaE3DWb6NYZQ6BjO/QkNRPenoPA==, tarball: https://registry.npmmirror.com/playwright-core/-/playwright-core-1.61.0.tgz}
+    engines: {node: '>=18'}
+    hasBin: true
+
   playwright@1.60.0:
     resolution: {integrity: sha512-hheHdokM8cdqCb0lcE3s+zT4t4W+vvjpGxsZlDnikarzx8tSzMebh3UiFtgqwFwnTnjYQcsyMF8ei2mCO/tpeA==, tarball: https://registry.npmmirror.com/playwright/-/playwright-1.60.0.tgz}
+    engines: {node: '>=18'}
+    hasBin: true
+
+  playwright@1.61.0:
+    resolution: {integrity: sha512-Z+7BeeqQPRRzklHsVFP4KTGIyMxKUmfeRA4WisM6G3/XW6nwGeX6fX9qYaDa+CiUqpOkb2f6X3nar05R3kSuJQ==, tarball: https://registry.npmmirror.com/playwright/-/playwright-1.61.0.tgz}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -5548,9 +5561,17 @@ snapshots:
 
   playwright-core@1.60.0: {}
 
+  playwright-core@1.61.0: {}
+
   playwright@1.60.0:
     dependencies:
       playwright-core: 1.60.0
+    optionalDependencies:
+      fsevents: 2.3.2
+
+  playwright@1.61.0:
+    dependencies:
+      playwright-core: 1.61.0
     optionalDependencies:
       fsevents: 2.3.2
 

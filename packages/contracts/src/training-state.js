@@ -209,7 +209,7 @@ export const SessionSourceTextMetaSchema = z.object({
 }).catchall(z.unknown());
 
 export const SessionTrainingMetaSchema = z.object({
-    type: z.enum(['diagnostic', 'plan', 'challenge']).optional(),
+    type: z.enum(['diagnostic', 'plan', 'challenge', 'raid']).optional(),
     stepId: z.string().optional(),
     title: z.string().optional()
 }).catchall(z.unknown());

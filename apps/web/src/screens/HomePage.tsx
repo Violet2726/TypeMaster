@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import type { ReactNode } from 'react';
-import { ArrowRight, BarChart3, CalendarClock, Gauge, Keyboard, ShieldCheck, Target, TrendingUp, Trophy } from 'lucide-react';
+import { ArrowRight, BarChart3, CalendarClock, Gauge, Keyboard, ShieldCheck, Swords, Target, TrendingUp, Trophy } from 'lucide-react';
 import { formatDateTime } from '../i18n';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { useHomePageModel } from '../features/home/use-home-page-model';
@@ -141,6 +141,15 @@ export function HomePage() {
             description: trainingCopy.home.freePracticeBody,
             tone: 'default',
             onClick: () => handleDecisionAction('free')
+        },
+        {
+            key: 'game',
+            icon: Swords,
+            kicker: 'Game Mode',
+            label: 'Typing Raid',
+            description: 'Type words to destroy enemies',
+            tone: 'default',
+            onClick: () => navigate('/game')
         }
     ] satisfies Array<{ key: string; icon: any; kicker: string; label: string; description: string; tone?: string; disabled?: boolean; onClick: () => void }>;
 
@@ -250,3 +259,4 @@ export function HomePage() {
 }
 
 export default HomePage;
+
