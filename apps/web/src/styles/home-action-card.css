@@ -1,7 +1,13 @@
-﻿/* Home action card gradient overlays */
+/* ============================================
+   Home Action Cards - Grid & Variants
+   ============================================ */
+
+/* --- Base card --- */
+
 .home-action-card {
     position: relative;
     overflow: hidden;
+    min-height: 18rem;
 }
 
 .home-action-card::after {
@@ -18,4 +24,75 @@
 
 body[data-theme='serika-light'] .home-action-card::after {
     background: linear-gradient(0deg, rgba(0, 0, 0, 0.03), transparent);
+}
+
+/* --- Grid layout --- */
+
+.home-action-section,
+.home-action-card,
+.home-action-card__body {
+    gap: 0.9rem;
+}
+
+.home-action-section__head {
+    align-items: end;
+}
+
+.home-action-grid {
+    grid-template-columns: minmax(0, 1.34fr) minmax(20rem, 0.76fr);
+    grid-template-areas:
+        "primary challenge"
+        "primary free";
+    gap: 0.9rem;
+    align-items: stretch;
+}
+
+/* --- Card variants --- */
+
+.home-action-card--primary {
+    grid-area: primary;
+    grid-column: auto;
+}
+
+.home-action-card--challenge {
+    grid-area: challenge;
+}
+
+.home-action-card--free {
+    grid-area: free;
+    min-height: 0;
+}
+
+.home-action-card--primary,
+.home-action-card--challenge,
+.home-action-card--free,
+.adaptive-drill-panel,
+.result-target-feedback--ready,
+.result-target-feedback--stale,
+.result-target-feedback--error,
+.result-decision-panel {
+    background: linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
+}
+
+.home-action-card--primary {
+    border-color: rgba(10, 132, 255, 0.32);
+}
+
+.home-action-card--challenge {
+    border-color: rgba(255, 159, 10, 0.28);
+}
+
+.home-action-card--free {
+    border-color: rgba(50, 215, 75, 0.24);
+}
+
+/* --- Responsive --- */
+
+@media (max-width: 720px) {
+    .action-btn,
+    .ghost-btn,
+    .segment-btn,
+    .toggle-btn {
+        width: 100%;
+    }
 }

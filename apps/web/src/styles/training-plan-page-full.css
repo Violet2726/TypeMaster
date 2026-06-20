@@ -380,7 +380,7 @@
     place-items: center;
     border: 1px solid rgba(10, 132, 255, 0.34);
     border-radius: 50%;
-    background: rgba(10, 132, 255, 0.13);
+    background: var(--accent-blue-bg);
     color: var(--accent-blue);
     font-size: 0.78rem;
     font-weight: 800;

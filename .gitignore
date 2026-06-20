@@ -35,3 +35,14 @@ docs/*
 !src/engine/config.js
 .vercel
 .env*.local
+
+
+# Codex dev artifacts
+.codex-screens/
+tmp/
+.tmp-*.png
+.tmp-*.js
+*.bak
+tools/
+*.out.log
+*.err.log

@@ -245,7 +245,7 @@ body[data-theme='serika-light'] .insights-empty-preview__unlock p {
     place-items: center;
     border-radius: var(--radius-sm);
     color: var(--accent-blue);
-    background: rgba(10, 132, 255, 0.12);
+    background: var(--accent-blue-bg);
     border: 1px solid rgba(142, 202, 255, 0.2);
 }
 

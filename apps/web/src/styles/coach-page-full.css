@@ -32,7 +32,7 @@
     place-items: center;
     border-radius: var(--radius-sm);
     border: 1px solid var(--accent-blue-border);
-    background: rgba(10, 132, 255, 0.13);
+    background: var(--accent-blue-bg);
     color: var(--accent-blue);
 }
 
@@ -165,7 +165,7 @@ body[data-theme='serika-light'] .coach-starter-step {
     width: 2rem;
     height: 2rem;
     border-radius: 50%;
-    background: rgba(10, 132, 255, 0.13);
+    background: var(--accent-blue-bg);
     color: var(--accent-blue);
     font-weight: 900;
 }
@@ -407,7 +407,7 @@ body[data-theme='serika-light'] .coach-brief-card {
     width: 2rem;
     height: 2rem;
     border-radius: 50%;
-    background: rgba(10, 132, 255, 0.13);
+    background: var(--accent-blue-bg);
     color: var(--accent-blue);
     font-weight: 900;
 }

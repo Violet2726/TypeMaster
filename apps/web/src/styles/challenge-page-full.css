@@ -366,7 +366,7 @@
     height: 2.3rem;
     border: 1px solid rgba(10, 132, 255, 0.24);
     border-radius: var(--radius-sm);
-    background: rgba(10, 132, 255, 0.12);
+    background: var(--accent-blue-bg);
     color: var(--accent-blue);
 }
 

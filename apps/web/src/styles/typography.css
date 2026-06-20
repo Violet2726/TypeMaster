@@ -2,6 +2,24 @@
    Typography & Global Utilities
    ============================================ */
 
+/* --- Display headings --- */
+
+.home-launch h1,
+.insights-header h1 {
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: 4.4rem;
+    font-weight: 750;
+    line-height: 0.98;
+}
+
+.hero-body {
+    max-width: 42rem;
+    color: var(--text-color);
+    font-size: 1.22rem;
+    line-height: 1.5;
+}
+
 /* Heading hierarchy */
 h1 {
     letter-spacing: -0.035em;
@@ -17,13 +35,12 @@ h3 {
 
 /* Paragraph line height */
 .lead-text {
-    color: var(--text-color);
-    line-height: 1.6;
+    color: var(--text-strong);
+    font-size: 1.02rem;
+    line-height: 1.55;
 }
 
 .muted-text {
-    line-height: 1.5;
-    font-size: 0.88rem;
     color: var(--text-dim);
 }
 
@@ -86,4 +103,24 @@ body[data-language='zh-CN'] .panel-kicker {
 
 .app-footer__inner {
     justify-content: center;
+}
+
+/* Responsive */
+@media (max-width: 980px) {
+    .home-launch h1,
+    .insights-header h1 {
+        font-size: 3.35rem;
+    }
+}
+
+@media (max-width: 720px) {
+    .home-launch h1,
+    .insights-header h1 {
+        font-size: 2.55rem;
+        line-height: 1.04;
+    }
+
+    .hero-body {
+        font-size: 1.05rem;
+    }
 }
