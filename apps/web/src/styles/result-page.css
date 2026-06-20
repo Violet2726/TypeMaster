@@ -1,4 +1,4 @@
-/* ============================================
+﻿/* ============================================
    Result Page - Complete Standalone Module
    ============================================ */
 
@@ -508,6 +508,12 @@ body[data-theme='serika-light'] .result-empty-preview {
 
 /* --- Responsive --- */
 
+
+/* --- KPI strip layout (moved from training-plan-page-full.css) --- */
+.result-kpi-strip {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 @media (max-width: 980px) {
     .result-empty-panel,
     .result-completion-stage {
@@ -956,3 +962,89 @@ body[data-theme='serika-light'] .result-completion-stage .result-prescription__i
         grid-template-columns: 1fr;
     }
 }
+
+/* --- Result summary (base layout) --- */
+
+.result-summary {
+    grid-template-columns: minmax(260px, auto) minmax(0, 1fr);
+}
+
+.result-summary__scores {
+    gap: 1.2rem;
+}
+
+.result-prescription {
+    box-shadow: none;
+}
+
+.result-prescription__item {
+    box-shadow: none;
+}
+
+/* --- Chart & replay styles --- */
+
+.chart-panel,
+.chart-empty,
+.replay-panel {
+    min-height: 280px;
+}
+
+.replay-canvas,
+.result-chart,
+.replay-chart {
+    border-radius: var(--radius-sm);
+}
+
+.chart-plot-bg,
+.replay-canvas {
+    fill: var(--bg-soft);
+    border-color: var(--panel-stroke);
+}
+
+.grid-line,
+.replay-grid-line {
+    stroke: rgba(255, 255, 255, 0.1);
+}
+
+body[data-theme='serika-light'] .grid-line,
+body[data-theme='serika-light'] .replay-grid-line {
+    stroke: rgba(0, 0, 0, 0.09);
+}
+
+.chart-line.wpm,
+.replay-main-line {
+    stroke: var(--main-color);
+    filter: none;
+}
+
+.chart-tooltip,
+.replay-floating-inspect {
+    border-radius: var(--radius-sm);
+    background: rgba(28, 28, 30, 0.92);
+    border-color: var(--panel-stroke);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.24);
+}
+
+body[data-theme='serika-light'] .chart-tooltip,
+body[data-theme='serika-light'] .replay-floating-inspect {
+    background: rgba(255, 255, 255, 0.94);
+}
+
+/* --- Responsive --- */
+
+@media (max-width: 720px) {
+    .result-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .result-summary__scores {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.85rem;
+    }
+
+    .result-value {
+        font-size: 3rem;
+    }
+}
+
