@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { StoredSettingsSchema } from '@typemaster/contracts/storage';
 import { CheckCircle2, Cloud, Download, Eye, Globe2, Keyboard, Palette, ShieldCheck, Type, Upload, UserRound, Volume2, X } from 'lucide-react';
 import { SUPPORTED_KEYBOARD_LAYOUTS, SUPPORTED_LANGUAGES, getKeyboardLayoutLabel } from '@typemaster/domain';
@@ -122,7 +122,7 @@ export function SettingsDrawer({
                     </button>
                 </div>
 
-                <div className="settings-drawer__scroll">
+                <div className="settings-drawer__safe"><div className="settings-drawer__scroll">
                     <section className="settings-summary-card" aria-label={copy.settings.summaryTitle}>
                         <div className="settings-summary-card__head">
                             <span className="settings-summary-card__icon" aria-hidden="true">
@@ -345,8 +345,7 @@ export function SettingsDrawer({
                             </div>
                         </div>
                     </section>
-                </div>
-            </aside>
+                </div></div>\n            </aside>
         </div>
     );
 }
