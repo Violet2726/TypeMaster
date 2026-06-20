@@ -23,6 +23,7 @@ import { createMusicEngine } from "./music-engine";
 import { enqueueAchievement, updateAchievementModal, renderAchievementModal, clearAchievementQueue } from "./achievement-modal";
 import { openSettings, closeSettings, isSettingsOpen, handleSettingsKey, renderSettingsPanel, getSettings } from "./settings-panel";
 import { showTutorial, isTutorialShowing, handleTutorialKey, updateTutorial, renderTutorial } from "./tutorial-overlay";
+import { handlePauseMenuKey, renderPauseMenu, resetPauseMenu } from "./pause-menu";
 import { shouldSpawnVariant, createVariantState, updateVariant, processShieldInput, drawVariantOverlay, drawVariantBadge } from "./enemy-variant";
 import type { VariantState, VariantType } from "./enemy-variant";
 import { shouldDropPowerUp, createPowerUp, updatePowerUps, processPowerUpInput, drawPowerUp, drawActivePowerUps, getPowerUpConfig } from "./power-up";
@@ -416,25 +417,8 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         ctx.fillStyle = "rgba(0,0,0,0.75)";
         ctx.fillRect(0, 0, w, h);
 
-        drawGlassPanel(ctx, w / 2 - 150, h / 2 - 70, 300, 140, 24);
-
-        ctx.font = "600 28px -apple-system, SF Pro Display, system-ui, sans-serif";
-        ctx.fillStyle = COLORS.text;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(copy.paused, w / 2, h / 2 - 20);
-
-        ctx.font = "400 14px -apple-system, SF Pro Text, system-ui, sans-serif";
-        ctx.fillStyle = COLORS.textSecondary;
-        ctx.fillText(copy.resume, w / 2, h / 2 + 20);
-
-        // Subtle breathing animation on glass panel border
-        const breath = Math.sin(time * 0.002) * 0.02 + 0.12;
-        ctx.strokeStyle = "rgba(255,255,255," + breath + ")";
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.roundRect(w / 2 - 150, h / 2 - 70, 300, 140, 24);
-        ctx.stroke();
+        // Pause menu
+        renderPauseMenu(ctx, w, h, time);
     }
 
     function drawGameOverScreen(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
@@ -693,16 +677,31 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
             if (state.mode === "playing") {
                 state = transitionGameMode(state, "pause");
                 music.setPaused(true);
-            } else if (state.mode === "paused") {
-                // Start 3-2-1 countdown
+                resetPauseMenu();
+                return;
+            }
+        }
+
+        // Pause menu navigation
+        if (state.mode === "paused" && !isSettingsOpen()) {
+            const action = handlePauseMenuKey(e);
+            if (action === "continue") {
                 resumeCountdown = 3;
                 music.setPaused(false);
                 state = { ...state, mode: "resuming" as any };
-            } else if (state.mode === "gameover") {
+            } else if (action === "settings") {
+                openSettings();
+            } else if (action === "quit") {
                 state = createGameState();
                 startTime = 0;
                 gameOverTime = 0;
+                powerUps = [];
+                activePowerUps = [];
+                shieldCount = 0;
+                enemyVariants.clear();
                 clearGameOver();
+                clearAchievementQueue();
+                music.stop();
             }
             return;
         }
@@ -713,11 +712,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
             return;
         }
 
-        // S key opens settings during pause
-        if ((e.key === "s" || e.key === "S") && state.mode === "paused" && !isSettingsOpen()) {
-            openSettings();
-            return;
-        }
+
 
         // Settings input consumes all keys when open
         if (isSettingsOpen()) {
