@@ -28,6 +28,7 @@ import { triggerComboFlash, updateComboFx, drawComboFx, resetComboFx } from "./c
 import { updateHud, drawEnhancedHud, resetHud } from "./hud-overlay";
 import { openStats, isStatsOpen, handleStatsKey, renderStatsHistory, saveGameRecord } from "./stats-history";
 import { drawTouchIndicator, isMobile } from "./touch-input";
+import { updateTracker, drawAchievementTracker, resetTracker, trackPowerUp } from "./achievement-tracker";
 import { shouldSpawnVariant, createVariantState, updateVariant, processShieldInput, drawVariantOverlay, drawVariantBadge } from "./enemy-variant";
 import type { VariantState, VariantType } from "./enemy-variant";
 import { shouldDropPowerUp, createPowerUp, updatePowerUps, processPowerUpInput, drawPowerUp, drawActivePowerUps, getPowerUpConfig } from "./power-up";
@@ -253,6 +254,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         updateTutorial(performance.now());
         updateComboFx(dt, state.combo);
         updateHud(dt, state.score, state.lives, state.combo);
+        updateTracker({ combo: state.combo, wave: state.wave, wpm: 0, score: state.score, chain: chainCount, perfectWaves: state.perfectWaves });
 
         // Update power-ups
         powerUps = updatePowerUps(powerUps, dt);
@@ -367,6 +369,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
 
         // Combo visual effects
         drawComboFx(ctx, w, h, time, state.combo);
+        drawAchievementTracker(ctx, w, h, time);
 
         // Draw power-ups
         powerUps.filter(pu => pu.alive).forEach(pu => drawPowerUp(ctx, pu, time));
@@ -637,6 +640,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
             enemyVariants.clear();
             resetComboFx();
             resetHud();
+            resetTracker();
             return;
         }
 
