@@ -607,6 +607,18 @@ export default function GamePage() {
         drawBackground(ctx, width, height, time, state.combo);
         
         if (state.mode === 'idle') {
+            // Ambient particles for idle screen
+            if (Math.random() < 0.1) {
+                particlesRef.current.emit(
+                    Math.random() * width,
+                    Math.random() * height,
+                    1,
+                    COLORS.textTertiary,
+                    { speed: 0.5, size: 1.5, spread: Math.PI * 2 }
+                );
+            }
+            particlesRef.current.draw(ctx);
+            
             // Apple-style idle screen
             ctx.save();
             
