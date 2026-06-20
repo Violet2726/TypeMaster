@@ -819,6 +819,7 @@ export default function GamePage() {
                 result.events.forEach((event: any) => {
                     if (event.type === 'enemy_killed') {
                         playKillSound();
+                        playComboSound(stateRef.current.combo);
                         const enemy = state.enemies.find((en: any) => en.id === event.enemyId);
                         if (enemy) {
                             // Kill particles
