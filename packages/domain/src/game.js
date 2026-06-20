@@ -168,7 +168,18 @@ export function generateWaveEnemies(waveIndex, wordPool, options = {}) {
     addEnemies('boss', template.bosses);
 
     if (difficultyProfile) {
-        const speedMod = getDifficultyModifier(difficultyProfile);
+        let speedMod = getDifficultyModifier(difficultyProfile);
+        
+        // Dynamic KPS adaptation
+        // Assuming average comfortable KPS is 4. 
+        // If KPS > 4, speed up. If KPS < 4, slow down.
+        // Cap the multiplier between 0.8 and 1.2 to avoid extreme changes.
+        const kps = options.kps || 0;
+        if (kps > 0) {
+            const kpsFactor = 1 + (kps - 4) * 0.05;
+            speedMod *= Math.max(0.8, Math.min(1.2, kpsFactor));
+        }
+        
         enemies.forEach((e) => {
             e.speed *= speedMod;
         });
@@ -252,6 +263,8 @@ export function createGameState(options = {}) {
         score: 0,
         wave: 0,
         combo: 0,
+        kps: 0,
+        keyTimestamps: [],
         maxCombo: 0,
         enemiesTotal: 0,
         enemiesDefeated: 0,
@@ -297,6 +310,10 @@ export function transitionGameMode(state, action) {
 
 export function processInput(state, char) {
     if (state.mode !== 'playing') return { state, events: [] };
+    
+    const now = Date.now();
+    const timestamps = [...(state.keyTimestamps || []), now].filter(t => now - t < 2000);
+    const kps = timestamps.length / 2;
 
     const events = [];
     const aliveEnemies = state.enemies.filter((e) => e.alive);
@@ -417,7 +434,9 @@ export function processInput(state, char) {
         state: {
             ...state,
             combo: 0,
-            totalCharsTyped: state.totalCharsTyped + 1
+            totalCharsTyped: state.totalCharsTyped + 1,
+            kps,
+            keyTimestamps: timestamps
         },
         events
     };
@@ -505,7 +524,7 @@ export function updateGameState(state, deltaTime, canvasHeight) {
 
 export function startWave(state, wordPool, options = {}) {
     const waveIndex = state.wave;
-    const enemies = generateWaveEnemies(waveIndex, wordPool, options);
+    const enemies = generateWaveEnemies(waveIndex, wordPool, { ...options, kps: state.kps });
 
     return {
         ...state,

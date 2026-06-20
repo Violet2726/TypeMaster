@@ -367,6 +367,17 @@ function drawHUDAppleStyle(ctx: CanvasRenderingContext2D, state: any, copy: any,
     }
     ctx.fillText(hearts, width - 40, 40);
     
+    // KPS indicator
+    if (state.kps > 0) {
+        ctx.save();
+        ctx.font = '400 12px -apple-system, "SF Pro Text", system-ui, sans-serif';
+        ctx.fillStyle = COLORS.textTertiary;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(${Math.round(state.kps * 10) / 10} kps, width / 2, 70);
+        ctx.restore();
+    }
+    
     // Combo indicator
     if (state.combo >= 3) {
         const comboScale = 1 + Math.sin(time * 0.005) * 0.1;
@@ -815,7 +826,8 @@ export default function GamePage() {
                 stateRef.current = transitionGameMode(state, 'start');
                 stateRef.current = startWave(stateRef.current, wordPoolRef.current, {
                     canvasWidth: canvasRef.current ? canvasRef.current.width : 800,
-                    canvasHeight: canvasRef.current ? canvasRef.current.height : 600
+                    canvasHeight: canvasRef.current ? canvasRef.current.height : 600,
+                    kps: stateRef.current.kps
                 });
                 setUiState('playing');
                 return;
