@@ -5,6 +5,7 @@ import '../../src/styles/game-page.css';
 import { useGameStore } from '../features/game/state/game-store';
 import { appendSession } from '../services/storage/sessions-repo';
 import { createGameEngine } from '../engine/game-engine';
+import { initTouchInput, destroyTouchInput, focusInput, isMobile } from '../engine/touch-input';
 import type { GameEngine } from '../engine/game-engine';
 
 // ---------------------------------------------------------------------------
@@ -97,6 +98,20 @@ export default function GamePage() {
         const engine = createGameEngine();
         engineRef.current = engine;
 
+        // Initialize touch input for mobile
+        if (isMobile()) {
+            initTouchInput({
+                onChar: (ch) => {
+                    const fakeEvent = new KeyboardEvent('keydown', { key: ch, bubbles: true });
+                    engine.handleKey(fakeEvent);
+                },
+                onKey: (key) => {
+                    const fakeEvent = new KeyboardEvent('keydown', { key, bubbles: true });
+                    engine.handleKey(fakeEvent);
+                },
+            });
+        }
+
         function resize() {
             const container = canvas!.parentElement;
             if (!container) return;
@@ -132,6 +147,7 @@ export default function GamePage() {
             window.removeEventListener('resize', resize);
             cancelAnimationFrame(animRef.current);
             engine.destroy();
+            destroyTouchInput();
         };
     }, [saveResult]);
 

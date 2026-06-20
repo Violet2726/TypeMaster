@@ -27,6 +27,7 @@ import { handlePauseMenuKey, renderPauseMenu, resetPauseMenu } from "./pause-men
 import { triggerComboFlash, updateComboFx, drawComboFx, resetComboFx } from "./combo-fx";
 import { updateHud, drawEnhancedHud, resetHud } from "./hud-overlay";
 import { openStats, isStatsOpen, handleStatsKey, renderStatsHistory, saveGameRecord } from "./stats-history";
+import { drawTouchIndicator, isMobile } from "./touch-input";
 import { shouldSpawnVariant, createVariantState, updateVariant, processShieldInput, drawVariantOverlay, drawVariantBadge } from "./enemy-variant";
 import type { VariantState, VariantType } from "./enemy-variant";
 import { shouldDropPowerUp, createPowerUp, updatePowerUps, processPowerUpInput, drawPowerUp, drawActivePowerUps, getPowerUpConfig } from "./power-up";
@@ -293,6 +294,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         renderSettingsPanel(ctx, width, height, time);
         renderTutorial(ctx, width, height, time);
         renderStatsHistory(ctx, width, height, time);
+        drawTouchIndicator(ctx, width, height, time);
 
         ctx.restore();
     }
