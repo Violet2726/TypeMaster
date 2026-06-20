@@ -93,7 +93,7 @@ body[data-theme='serika-light'] .word[data-line-state='current'] .letter.pending
 .focus-overlay {
     background: rgba(0, 0, 0, 0.42);
     backdrop-filter: blur(12px);
-    color: #ffffff;
+    color: var(--main-color-strong);
     font-weight: 650;
 }
 
@@ -136,8 +136,6 @@ body[data-theme='serika-light'] .focus-overlay {
 
 .result-prescription,
 .result-prescription__item {
-    box-shadow: none;
-}
 
 /* --- Insights header --- */
 .insights-header {
@@ -154,30 +152,8 @@ body[data-theme='serika-light'] .focus-overlay {
 }
 
 /* --- Tag list --- */
-.tag-list {
-    grid-template-columns: repeat(auto-fit, minmax(124px, max-content));
-}
-
-.tag-pill {
-    justify-content: center;
-    padding: 0.58rem 0.75rem;
-    box-shadow: none;
-}
 
 /* --- History table --- */
-.history-table {
-    border-color: var(--panel-stroke);
-    border-radius: var(--radius-sm);
-    background: var(--bg-soft);
-}
-
-.history-row {
-    padding: 0.92rem;
-}
-
-.history-row + .history-row {
-    border-top-color: var(--panel-stroke);
-}
 
 /* --- Chart & replay --- */
 .chart-panel,
