@@ -21,6 +21,7 @@ import { getBlendedTheme, drawThemedBackground } from "./environment-theme";
 import { initGameOver, renderGameOver, clearGameOver } from "./game-over";
 import { createMusicEngine } from "./music-engine";
 import { enqueueAchievement, updateAchievementModal, renderAchievementModal, clearAchievementQueue } from "./achievement-modal";
+import { openSettings, closeSettings, isSettingsOpen, handleSettingsKey, renderSettingsPanel, getSettings } from "./settings-panel";
 import { shouldSpawnVariant, createVariantState, updateVariant, processShieldInput, drawVariantOverlay, drawVariantBadge } from "./enemy-variant";
 import type { VariantState, VariantType } from "./enemy-variant";
 import { shouldDropPowerUp, createPowerUp, updatePowerUps, processPowerUpInput, drawPowerUp, drawActivePowerUps, getPowerUpConfig } from "./power-up";
@@ -102,6 +103,8 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     // Power-ups
     const music = createMusicEngine();
     let enemyVariants: Map<string, VariantState> = new Map();
+    // Apply difficulty modifier
+    const diffMods = { easy: 0.7, normal: 1.0, hard: 1.3 };
     let powerUps: PowerUp[] = [];
     let activePowerUps: ActivePowerUp[] = [];
     let shieldCount = 0;
@@ -275,6 +278,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
 
         // Achievement modal overlay (renders on top of everything)
         renderAchievementModal(ctx, width, height, time);
+        renderSettingsPanel(ctx, width, height, time);
 
         ctx.restore();
     }
@@ -672,7 +676,9 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
             if (e.key === "Escape") return;
             initSound();
             music.start();
-            music.setPlaying(true);
+            const s = getSettings();
+            music.setVolume(s.volume / 100);
+            music.setPlaying(s.musicEnabled);
             startTime = performance.now();
             state = transitionGameMode(state, "start");
             state = startWave(state, pool, { canvasWidth, canvasHeight, kps: state.kps });
@@ -694,6 +700,18 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                 gameOverTime = 0;
                 clearGameOver();
             }
+            return;
+        }
+
+        // S key opens settings during pause
+        if ((e.key === "s" || e.key === "S") && state.mode === "paused" && !isSettingsOpen()) {
+            openSettings();
+            return;
+        }
+
+        // Settings input consumes all keys when open
+        if (isSettingsOpen()) {
+            handleSettingsKey(e);
             return;
         }
 
