@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { BadgeCheck, FileText, PencilLine, WandSparkles } from 'lucide-react';
+import { ConfirmDialog } from '@typemaster/ui';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { AIWorkshop } from '../features/practice/components/AIWorkshop';
 import { ConfigPanel } from '../features/practice/components/ConfigPanel';
@@ -10,7 +11,23 @@ import { CustomTextWorkshop } from '../features/practice/components/CustomTextWo
 import { TypingArea } from '../features/practice/components/TypingArea';
 import { usePracticePageModel } from '../features/practice/use-practice-page-model';
 import { usePracticePageStore } from '../store/app-state-selectors';
-import { ConfirmDialog } from '@typemaster/ui';
+import './practice-page.css';
+
+function getTrainingTaskBadgeLabel(task, trainingCopy) {
+    if (!task) {
+        return null;
+    }
+
+    if (task.id.startsWith('daily-')) {
+        return trainingCopy.practice.challengeBadge;
+    }
+
+    if (task.order <= 3 && task.id.startsWith('diagnostic')) {
+        return trainingCopy.practice.diagnosticBadge;
+    }
+
+    return trainingCopy.practice.planBadge;
+}
 
 export function PracticePage() {
     const router = useRouter();
@@ -55,6 +72,7 @@ export function PracticePage() {
         ...store,
         navigate
     });
+
     const isCustomComposeMode = store.config.source === 'custom' && isCustomEmpty;
     const isAiTextPending = store.config.source === 'ai' && aiPracticeStatus !== 'ready';
     const isCustomTextPending = store.config.source === 'custom' && isCustomEmpty;
@@ -75,6 +93,7 @@ export function PracticePage() {
             window.requestAnimationFrame(focusEditor);
         }
     }, [setControlsOpen]);
+
     const lockedPrimaryActionLabel = isAiTextPending
         ? aiPracticeStatus === 'stale'
             ? store.copy.common.reGenerateAiText
@@ -99,6 +118,23 @@ export function PracticePage() {
     const lockedSecondaryActionIcon = isAiTextPending ? FileText : PencilLine;
     const activeModeLabel = store.config.mode === 'time' ? store.copy.common.timeMode : store.copy.common.wordsMode;
     const activeVolumeLabel = store.config.mode === 'time' ? `${store.config.durationSeconds}s` : `${store.config.wordCount}`;
+    const keyboardLayoutLabel = store.settings.keyboardLayout.toUpperCase();
+    const sessionStatusLabel = store.copy.statuses[typingSession.status] || store.copy.statuses.idle;
+    const currentTaskBadgeLabel = getTrainingTaskBadgeLabel(currentTrainingTask, trainingCopy);
+    const practiceHeadline = currentTrainingTask
+        ? currentTrainingTask.title
+        : store.config.source === 'custom'
+            ? trainingCopy.practice.customTitle
+            : store.config.source === 'ai' && aiPracticeStatus !== 'ready'
+                ? store.copy.practice.customTitle
+                : store.copy.practice.pageTitle;
+    const practiceBody = currentTrainingTask
+        ? currentTrainingTask.summary
+        : store.config.source === 'custom' && isCustomEmpty
+            ? trainingCopy.practice.customBody
+            : store.config.source === 'ai' && aiPracticeStatus !== 'ready'
+                ? store.copy.practice.customBody
+                : primaryActionHint;
     const toolbarHighlights = [
         {
             label: store.copy.practice.sourceTitle,
@@ -111,6 +147,10 @@ export function PracticePage() {
         {
             label: store.copy.practice.volumeTitle,
             value: activeVolumeLabel
+        },
+        {
+            label: trainingCopy.practice.layoutLabel,
+            value: keyboardLayoutLabel
         }
     ];
     const onLockedPrimaryAction = isAiTextPending
@@ -184,68 +224,88 @@ export function PracticePage() {
     }, [pathname]);
 
     return (
-        <div className={`page-stack practice-page ${isCustomComposeMode ? 'practice-page--compose' : ''}`}>
-            {nextRoundBrief && (
-                <section className="panel practice-brief-panel" aria-labelledby="practice-brief-title">
-                    <div className="panel-head">
-                        <div>
-                            <p className="panel-kicker">{trainingCopy.practice.nextBriefKicker}</p>
-                            <h2 id="practice-brief-title">{nextRoundBrief.title}</h2>
-                        </div>
-                        <span className="panel-badge badge-ready">{trainingCopy.practice.nextBriefBadge}</span>
+        <div className={`page-stack practice-page practice-page--refined ${isCustomComposeMode ? 'practice-page--compose' : ''}`}>
+            <section className="panel practice-hero">
+                <div className="practice-hero__copy">
+                    <div className="practice-hero__eyebrow">
+                        <p className="hero-kicker">{currentTrainingTask ? trainingCopy.practice.taskKicker : store.copy.practice.pageTitle}</p>
+                        {currentTaskBadgeLabel ? (
+                            <span className="panel-badge badge-ready">{currentTaskBadgeLabel}</span>
+                        ) : null}
                     </div>
-                    <p className="muted-text">{nextRoundBrief.body}</p>
-                    <div className="result-prescription result-prescription--practice" aria-label={nextRoundBrief.title}>
-                        <div className="result-prescription__grid">
-                            {nextRoundBrief.items.map((item) => (
-                                <div key={item.id} className={`result-prescription__item result-prescription__item--${item.tone}`}>
-                                    <span className="summary-label">{item.label}</span>
-                                    <strong>{item.value}</strong>
-                                    <p>{item.note}</p>
+                    <h1>{practiceHeadline}</h1>
+                    <p className="hero-body">{practiceBody}</p>
+                </div>
+
+                <div className="practice-hero__meta">
+                    <div className="practice-hero__pill">
+                        <span>{store.copy.practice.sourceTitle}</span>
+                        <strong>{sourceLabel}</strong>
+                    </div>
+                    <div className="practice-hero__pill">
+                        <span>{store.copy.practice.modeTitle}</span>
+                        <strong>{activeModeLabel}</strong>
+                    </div>
+                    <div className="practice-hero__pill">
+                        <span>{store.copy.practice.volumeTitle}</span>
+                        <strong>{activeVolumeLabel}</strong>
+                    </div>
+                    <div className="practice-hero__pill">
+                        <span>{trainingCopy.practice.layoutLabel}</span>
+                        <strong>{keyboardLayoutLabel}</strong>
+                    </div>
+                    <div className="practice-hero__pill practice-hero__pill--status">
+                        <span>{store.copy.common.status}</span>
+                        <strong>{sessionStatusLabel}</strong>
+                    </div>
+                </div>
+            </section>
+
+            {(nextRoundBrief || adaptiveDrillInsight) ? (
+                <section className={`practice-support-grid ${adaptiveDrillInsight && nextRoundBrief ? 'practice-support-grid--split' : ''}`}>
+                    {nextRoundBrief ? (
+                        <section className="panel practice-brief-panel" aria-labelledby="practice-brief-title">
+                            <div className="panel-head">
+                                <div>
+                                    <p className="panel-kicker">{trainingCopy.practice.nextBriefKicker}</p>
+                                    <h2 id="practice-brief-title">{nextRoundBrief.title}</h2>
                                 </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-            )}
-
-            {adaptiveDrillInsight && (
-                <section className="panel adaptive-drill-panel" aria-label={adaptiveDrillInsight.kicker}>
-                    <div>
-                        <p className="panel-kicker">{adaptiveDrillInsight.kicker}</p>
-                        <h2>{adaptiveDrillInsight.title}</h2>
-                    </div>
-                    <p className="muted-text">{adaptiveDrillInsight.body}</p>
-                    <div className="adaptive-drill-panel__chips">
-                        {adaptiveDrillInsight.chips.map((chip) => (
-                            <div key={chip.label} className="adaptive-drill-chip">
-                                <span>{chip.label}</span>
-                                <strong>{chip.value}</strong>
+                                <span className="panel-badge badge-ready">{trainingCopy.practice.nextBriefBadge}</span>
                             </div>
-                        ))}
-                    </div>
-                </section>
-            )}
+                            <p className="muted-text">{nextRoundBrief.body}</p>
+                            <div className="result-prescription result-prescription--practice" aria-label={nextRoundBrief.title}>
+                                <div className="result-prescription__grid">
+                                    {nextRoundBrief.items.map((item) => (
+                                        <div key={item.id} className={`result-prescription__item result-prescription__item--${item.tone}`}>
+                                            <span className="summary-label">{item.label}</span>
+                                            <strong>{item.value}</strong>
+                                            <p>{item.note}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
+                    ) : null}
 
-            {currentTrainingTask && (
-                <section className="panel">
-                    <div className="panel-head">
-                        <div>
-                            <p className="panel-kicker">{trainingCopy.practice.taskKicker}</p>
-                            <h2>{currentTrainingTask.title}</h2>
-                        </div>
-                        <span className="panel-badge badge-ready">
-                            {currentTrainingTask.id.startsWith('daily-')
-                                ? trainingCopy.practice.challengeBadge
-                                : currentTrainingTask.order <= 3 && currentTrainingTask.id.startsWith('diagnostic')
-                                ? trainingCopy.practice.diagnosticBadge
-                                : trainingCopy.practice.planBadge}
-                        </span>
-                    </div>
-                    <p className="muted-text">{currentTrainingTask.summary}</p>
-                    <p className="muted-text">{trainingCopy.practice.layoutLabel}: {store.settings.keyboardLayout.toUpperCase()}</p>
+                    {adaptiveDrillInsight ? (
+                        <section className="panel adaptive-drill-panel" aria-label={adaptiveDrillInsight.kicker}>
+                            <div>
+                                <p className="panel-kicker">{adaptiveDrillInsight.kicker}</p>
+                                <h2>{adaptiveDrillInsight.title}</h2>
+                            </div>
+                            <p className="muted-text">{adaptiveDrillInsight.body}</p>
+                            <div className="adaptive-drill-panel__chips">
+                                {adaptiveDrillInsight.chips.map((chip) => (
+                                    <div key={chip.label} className="adaptive-drill-chip">
+                                        <span>{chip.label}</span>
+                                        <strong>{chip.value}</strong>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    ) : null}
                 </section>
-            )}
+            ) : null}
 
             <div className={`practice-workbench ${isCustomComposeMode ? 'practice-workbench--compose' : ''} ${isAiTextPending ? 'practice-workbench--ai-pending' : ''}`}>
                 <div className="practice-workbench__primary">
@@ -287,10 +347,18 @@ export function PracticePage() {
                 <aside className="practice-workbench__rail" aria-label={store.copy.practice.configTitle}>
                     <section className="panel practice-toolbar">
                         <div className="practice-toolbar__row">
+                            <div className="practice-toolbar__header">
+                                <div>
+                                    <p className="panel-kicker">{store.copy.practice.configTitle}</p>
+                                    <h2>{store.copy.practice.configTitle}</h2>
+                                </div>
+                                <span className={`panel-badge badge-${typingSession.status === 'running' ? 'loading' : typingSession.status === 'complete' ? 'success' : 'ready'}`}>
+                                    {sessionStatusLabel}
+                                </span>
+                            </div>
                             <div>
-                                <p className="panel-kicker">{store.copy.practice.configTitle}</p>
-                                <h2>{sourceLabel}</h2>
-                                <p className="muted-text practice-toolbar__meta">{activeModeLabel} · {activeVolumeLabel}</p>
+                                <p className="muted-text practice-toolbar__meta">{sourceLabel}</p>
+                                <p className="muted-text practice-toolbar__meta">{activeModeLabel} 路 {activeVolumeLabel}</p>
                             </div>
                         </div>
 
@@ -312,7 +380,7 @@ export function PracticePage() {
                             onToggleAdvanced={() => setControlsOpen((value) => !value)}
                         />
 
-                        {controlsOpen && store.config.source === 'ai' && (
+                        {controlsOpen && store.config.source === 'ai' ? (
                             <div className="practice-toolbar__studio">
                                 <AIWorkshop
                                     copy={store.copy}
@@ -327,15 +395,15 @@ export function PracticePage() {
                                     onUseBuiltin={handleUseBuiltin}
                                 />
                             </div>
-                        )}
+                        ) : null}
 
-                        {controlsOpen && store.config.source === 'builtin' && (
+                        {!controlsOpen && store.config.source === 'builtin' ? (
                             <div className="practice-toolbar__support-note" role="note">
                                 <p className="muted-text practice-toolbar__hint">{store.copy.practice.builtInReady}</p>
                             </div>
-                        )}
+                        ) : null}
 
-                        {store.config.source === 'custom' && (
+                        {store.config.source === 'custom' ? (
                             <div className="practice-toolbar__studio">
                                 <CustomTextWorkshop
                                     language={store.language}
@@ -345,12 +413,12 @@ export function PracticePage() {
                                     onApply={handleApplyCustomText}
                                 />
                             </div>
-                        )}
+                        ) : null}
                     </section>
                 </aside>
             </div>
 
-            {!isCustomComposeMode && (
+            {!isCustomComposeMode ? (
                 <div className="sticky-action-bar">
                     <div>
                         <span className="summary-label">{store.copy.practice.helperTitle}</span>
@@ -365,7 +433,7 @@ export function PracticePage() {
                         {primaryActionLabel}
                     </button>
                 </div>
-            )}
+            ) : null}
 
             <ConfirmDialog
                 isOpen={Boolean(confirmState)}

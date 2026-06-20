@@ -1,0 +1,252 @@
+.practice-page--refined {
+    gap: 1rem;
+}
+
+.practice-page--refined .panel,
+.practice-page--refined .sticky-action-bar {
+    border-radius: 28px;
+}
+
+.practice-hero,
+.practice-hero__meta,
+.practice-support-grid,
+.practice-toolbar__header,
+.practice-hero__copy {
+    display: grid;
+}
+
+.practice-hero {
+    position: relative;
+    grid-template-columns: minmax(0, 1.1fr) minmax(18rem, 0.9fr);
+    gap: 1.15rem;
+    overflow: hidden;
+    padding: clamp(1.2rem, 2vw, 1.6rem);
+    background:
+        radial-gradient(circle at top left, rgba(116, 188, 255, 0.18), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(255, 208, 144, 0.14), transparent 28%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.065), rgba(255, 255, 255, 0.02)),
+        linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
+}
+
+.practice-hero::after {
+    position: absolute;
+    right: -4rem;
+    top: -3rem;
+    width: 14rem;
+    height: 14rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.08), transparent 70%);
+    content: '';
+    pointer-events: none;
+}
+
+.practice-hero__copy {
+    position: relative;
+    z-index: 1;
+    gap: 0.9rem;
+    align-content: center;
+}
+
+.practice-hero__eyebrow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    align-items: center;
+}
+
+.practice-hero h1 {
+    margin: 0;
+    color: var(--text-strong);
+    font-size: clamp(2rem, 3.2vw, 3rem);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+}
+
+.practice-hero .hero-body {
+    margin: 0;
+    max-width: 40rem;
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.practice-hero__meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.7rem;
+}
+
+.practice-hero__pill {
+    display: grid;
+    gap: 0.18rem;
+    min-height: 5rem;
+    padding: 0.92rem 0.96rem;
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.026)),
+        rgba(255, 255, 255, 0.03);
+}
+
+.practice-hero__pill span {
+    color: var(--text-dim);
+    font-size: 0.76rem;
+}
+
+.practice-hero__pill strong {
+    color: var(--text-strong);
+    font-size: 1rem;
+    line-height: 1.2;
+}
+
+.practice-hero__pill--status strong {
+    color: var(--main-color);
+}
+
+.practice-support-grid {
+    gap: 1rem;
+}
+
+.practice-support-grid--split {
+    grid-template-columns: minmax(0, 1.08fr) minmax(18rem, 0.92fr);
+}
+
+.practice-brief-panel,
+.adaptive-drill-panel {
+    border-radius: 24px;
+}
+
+.practice-workbench__rail .practice-toolbar {
+    border-radius: 24px;
+}
+
+.practice-toolbar__header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.6rem;
+    align-items: start;
+}
+
+.practice-toolbar__header h2 {
+    margin-top: 0.18rem;
+}
+
+.practice-page--refined .practice-toolbar__support-note {
+    padding: 0.82rem 0.86rem;
+    border: 1px solid var(--panel-stroke);
+    border-radius: 18px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02)),
+        rgba(255, 255, 255, 0.025);
+}
+
+.practice-page--refined .practice-toolbar__hint {
+    line-height: 1.5;
+}
+
+.practice-page--refined .practice-workbench__primary .typing-stage {
+    min-height: clamp(35rem, calc(100dvh - 11rem), 46rem);
+    border-radius: 28px;
+}
+
+.practice-page--refined .practice-workbench__primary .typing-stage__head {
+    padding-bottom: 0.88rem;
+}
+
+.practice-page--refined .practice-workbench__primary .typing-stage__source strong {
+    font-size: clamp(1.2rem, 1.8vw, 1.52rem);
+}
+
+.practice-page--refined .practice-workbench__primary .typing-stage .words-shell {
+    border-radius: 24px;
+}
+
+.practice-page--refined .practice-workbench__primary .typing-stage .words-container {
+    height: clamp(18rem, 40vh, 25rem);
+}
+
+.practice-page--refined .practice-workbench__primary .typing-empty-state__step,
+.practice-page--refined .practice-workbench__primary .typing-empty-state__preview,
+.practice-page--refined .practice-workbench__primary .typing-empty-state__preflight li {
+    border-radius: 18px;
+}
+
+.practice-page--refined .sticky-action-bar {
+    border-radius: 24px;
+}
+
+.practice-page--refined.practice-page--compose .practice-hero {
+    grid-template-columns: 1fr;
+}
+
+.practice-page--refined.practice-page--compose .practice-workbench {
+    grid-template-columns: minmax(0, 0.9fr) minmax(19rem, 1.1fr);
+}
+
+.practice-page--refined.practice-page--compose .practice-workbench__primary .typing-stage {
+    min-height: clamp(31rem, calc(100dvh - 12rem), 42rem);
+}
+
+body[data-theme='serika-light'] .practice-hero,
+body[data-theme='serika-light'] .practice-hero__pill,
+body[data-theme='serika-light'] .practice-page--refined .practice-toolbar__support-note {
+    border-color: rgba(60, 60, 67, 0.1);
+}
+
+body[data-theme='serika-light'] .practice-hero {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 255, 0.86)),
+        #ffffff;
+}
+
+body[data-theme='serika-light'] .practice-hero__pill,
+body[data-theme='serika-light'] .practice-page--refined .practice-toolbar__support-note {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 255, 0.84)),
+        rgba(255, 255, 255, 0.82);
+}
+
+@media (max-width: 1100px) {
+    .practice-hero,
+    .practice-support-grid--split,
+    .practice-page--refined.practice-page--compose .practice-workbench {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 720px) {
+    .practice-page--refined {
+        gap: 0.85rem;
+    }
+
+    .practice-page--refined .panel,
+    .practice-page--refined .sticky-action-bar,
+    .practice-page--refined .practice-workbench__primary .typing-stage,
+    .practice-page--refined .practice-workbench__primary .typing-stage .words-shell,
+    .practice-workbench__rail .practice-toolbar,
+    .practice-brief-panel,
+    .adaptive-drill-panel {
+        border-radius: 22px;
+    }
+
+    .practice-hero {
+        padding: 1rem;
+    }
+
+    .practice-hero h1 {
+        font-size: clamp(1.8rem, 9vw, 2.4rem);
+    }
+
+    .practice-hero__meta {
+        grid-template-columns: 1fr;
+    }
+
+    .practice-hero__pill {
+        min-height: 4.4rem;
+    }
+
+    .practice-page--refined .practice-workbench__primary .typing-stage {
+        min-height: auto;
+    }
+
+    .practice-page--refined .practice-workbench__primary .typing-stage .words-container {
+        height: calc(var(--typing-size) * var(--typing-line-height) * 3.35);
+    }
+}
