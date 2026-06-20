@@ -10,7 +10,7 @@ import '../src/styles/panels.css';
 import '../src/styles/base-page.css';
 import '../src/styles/animations.css';
 import '../src/styles/toggle-switch.css';
-import '../src/styles/typing-shell.css';
+import '../src/styles/typing-experience.css';
 import '../src/styles/result-page.css';
 import '../src/styles/insights-page-full.css';
 import '../src/styles/home-action-card.css';

@@ -1,0 +1,268 @@
+/* ============================================
+   Typing Experience - Unified Module
+   ============================================ */
+
+/* --- Words Shell --- */
+
+.words-shell {
+    position: relative;
+    border: 1px solid var(--panel-stroke);
+    border-radius: 24px;
+    background: linear-gradient(180deg, var(--surface-2), var(--bg-soft));
+    transition:
+        border-color var(--transition-normal),
+        box-shadow var(--transition-normal),
+        background-color var(--transition-normal);
+}
+
+.words-shell::before,
+.words-shell::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+.words-shell::before {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 34%);
+}
+
+.words-shell::after {
+    background: linear-gradient(0deg, rgba(255, 255, 255, 0.04), transparent 34%);
+}
+
+body[data-theme='serika-light'] .words-shell::before {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent 34%);
+}
+
+body[data-theme='serika-light'] .words-shell::after {
+    background: linear-gradient(0deg, rgba(255, 255, 255, 0.5), transparent 34%);
+}
+
+body[data-theme='serika-light'] .words-shell {
+    border-color: rgba(60, 60, 67, 0.10);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 255, 0.88));
+}
+
+.words-shell.is-focused {
+    border-color: rgba(10, 132, 255, 0.36);
+    box-shadow:
+        inset 0 0 0 1px rgba(10, 132, 255, 0.14),
+        0 24px 64px rgba(10, 132, 255, 0.12),
+        0 0 0 1px rgba(10, 132, 255, 0.06);
+}
+
+.words-shell.is-paused {
+    opacity: 0.6;
+}
+
+.words-shell.is-locked {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+body[data-theme='serika-light'] .words-shell.is-focused {
+    border-color: rgba(0, 113, 227, 0.32);
+    box-shadow:
+        inset 0 0 0 1px rgba(0, 113, 227, 0.12),
+        0 20px 56px rgba(0, 113, 227, 0.10);
+}
+
+/* --- Words Container --- */
+
+.words-container {
+    position: relative;
+    overflow: hidden;
+    scroll-behavior: smooth;
+}
+
+/* --- Word States --- */
+
+.word[data-line-state='current'] {
+    color: var(--text-strong);
+}
+
+.word[data-line-state='previous'],
+.word[data-line-state='past'] {
+    color: var(--text-dim);
+}
+
+.word[data-line-state='next'],
+.word[data-line-state='future'] {
+    color: var(--surface-3);
+}
+
+/* --- Letter States --- */
+
+.letter.correct {
+    color: var(--text-strong);
+    text-shadow: 0 0 8px rgba(245, 245, 247, 0.08);
+}
+
+body[data-theme='serika-light'] .letter.correct {
+    text-shadow: none;
+}
+
+.letter.pending-current,
+.word[data-line-state='current'] .letter.pending-current {
+    color: var(--text-strong);
+    border-bottom: 2px solid var(--main-color);
+}
+
+body[data-theme='serika-light'] .letter.pending-current,
+body[data-theme='serika-light'] .word[data-line-state='current'] .letter.pending-current {
+    color: var(--text-strong);
+    border-bottom-color: #0071e3;
+}
+
+.letter.pending-future,
+.word[data-line-state='next'] .letter.pending-future {
+    color: var(--surface-3);
+}
+
+.letter.incorrect {
+    color: var(--error-color);
+    text-shadow: 0 0 10px rgba(255, 69, 58, 0.1);
+    animation: letterShake 0.15s ease-in-out;
+}
+
+.letter.missed {
+    color: var(--warning-color);
+}
+
+.letter.extra {
+    color: var(--text-dim);
+    text-decoration: line-through;
+    text-decoration-color: var(--error-color);
+}
+
+.word[data-line-state='previous'] .letter.correct,
+.word[data-line-state='past'] .letter.correct {
+    color: var(--text-dim);
+}
+
+.word[data-line-state='future'] .letter.correct,
+.word[data-line-state='future'] .letter.incorrect,
+.word[data-line-state='future'] .letter.extra,
+.word[data-line-state='future'] .letter.missed {
+    color: var(--surface-3);
+}
+
+@keyframes letterShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+}
+
+/* --- Live Stats --- */
+
+.live-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.55rem;
+}
+
+.live-stat {
+    display: grid;
+    gap: 0.35rem;
+    padding: 0.72rem 0.78rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--panel-stroke);
+    background: var(--surface-2);
+    transition: border-color var(--transition-fast);
+}
+
+.live-stat-value {
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.live-stat-label {
+    color: var(--text-dim);
+    font-size: 0.72rem;
+    font-weight: 650;
+}
+
+/* --- Empty State --- */
+
+.typing-empty-state {
+    display: grid;
+    gap: 1rem;
+    place-items: center;
+    text-align: center;
+}
+
+.typing-empty-state__copy {
+    display: grid;
+    gap: 0.66rem;
+    place-items: center;
+}
+
+.typing-empty-state__copy p {
+    max-width: 26rem;
+    color: var(--text-color);
+}
+
+.typing-empty-state__actions {
+    margin-top: 0.1rem;
+}
+
+.typing-empty-state__preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    justify-content: center;
+    min-height: 4.5rem;
+}
+
+.typing-empty-state__step,
+.typing-empty-state__preview,
+.typing-empty-state__preflight li {
+    border-radius: 18px;
+}
+
+/* --- Focus Overlay --- */
+
+.focus-overlay {
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+}
+
+/* --- Banner --- */
+
+.banner {
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.banner strong {
+    color: var(--warning-color);
+}
+
+/* --- Responsive --- */
+
+@media (max-width: 720px) {
+    .words-shell {
+        padding: 1rem;
+        scroll-margin-top: 4.25rem;
+    }
+
+    .words-container {
+        height: calc(var(--typing-size) * var(--typing-line-height) * 3);
+    }
+
+    .live-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .live-stat-value {
+        font-size: 2rem;
+    }
+}
