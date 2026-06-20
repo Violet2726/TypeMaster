@@ -217,7 +217,7 @@ function drawGlassPanel(ctx: CanvasRenderingContext2D, x: number, y: number, wid
     ctx.fill();
 }
 
-function drawEnemyAppleStyle(ctx: CanvasRenderingContext2D, enemy: any, time: number) {
+function drawEnemyAppleStyle(ctx: CanvasRenderingContext2D, enemy: any, time: number, isPotentialMatch: boolean = false) {
     const typeConfig = getEnemyTypeConfig(enemy.type);
     const baseColor = COLORS[enemy.type as keyof typeof COLORS] || COLORS.normal;
     const glowColor = COLORS[`${enemy.type}Glow` as keyof typeof COLORS] || COLORS.normalGlow;
@@ -238,6 +238,13 @@ function drawEnemyAppleStyle(ctx: CanvasRenderingContext2D, enemy: any, time: nu
     ctx.save();
     ctx.translate(enemy.x + wobble, enemy.y);
     ctx.scale(scale, scale);
+    
+    // Potential match highlight
+    if (isPotentialMatch) {
+        const pulse = Math.sin(time * 0.005) * 0.5 + 0.5;
+        ctx.shadowColor = '#ffffff';
+        ctx.shadowBlur = 10 + pulse * 10;
+    }
     ctx.globalAlpha += flashAlpha;
     
     // Outer glow
@@ -404,6 +411,7 @@ export default function GamePage() {
     const animFrameRef = useRef<number>(0);
     const startTimeRef = useRef<number>(0);
     const gameOverTimeRef = useRef<number>(0);
+    const potentialMatchesRef = useRef<string[]>([]);
     const lastTimeRef = useRef(0);
     const [, setUiState] = useState('idle');
     const language = 'en-US';
@@ -642,7 +650,7 @@ export default function GamePage() {
         
         // Draw enemies with Apple style
         state.enemies.filter((e: any) => e.alive).forEach((e: any) => {
-            drawEnemyAppleStyle(ctx, e, time);
+            drawEnemyAppleStyle(ctx, e, time, potentialMatchesRef.current.includes(e.id));
         });
         
         // Draw particles
@@ -863,6 +871,9 @@ export default function GamePage() {
                         playErrorSound();
                         // Error flash
                         shakeRef.current.trigger(2);
+                    }
+                    if (event.type === 'char_miss') {
+                        potentialMatchesRef.current = event.matches || [];
                     }
                 });
             }

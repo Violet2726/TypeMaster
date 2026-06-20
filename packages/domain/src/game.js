@@ -348,7 +348,8 @@ export function processInput(state, char) {
             };
         }
 
-        events.push({ type: 'char_miss' });
+        const matches = aliveEnemies.filter((e) => e.word[0] === char);
+        events.push({ type: 'char_miss', matches: matches.map(e => e.id) });
         return {
             state: {
                 ...state,
