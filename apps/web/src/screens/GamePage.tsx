@@ -207,8 +207,14 @@ function drawEnemyAppleStyle(ctx: CanvasRenderingContext2D, enemy: any, time: nu
     const size = enemy.type === 'boss' ? 32 : enemy.type === 'tank' ? 24 : 18;
     const wobble = Math.sin(time * 0.002 + enemy.x * 0.01) * 2;
     
+    // Spawn Animation
+    const spawnDuration = 300; // ms
+    const spawnProgress = Math.min(1, (time - (enemy.spawnTime || 0)) / spawnDuration);
+    const scale = spawnProgress < 1 ? 0.5 + 0.5 * Math.sin(spawnProgress * Math.PI / 2) : 1;
+    
     ctx.save();
     ctx.translate(enemy.x + wobble, enemy.y);
+    ctx.scale(scale, scale);
     
     // Outer glow
     ctx.shadowColor = glowColor;
@@ -263,6 +269,10 @@ function drawEnemyAppleStyle(ctx: CanvasRenderingContext2D, enemy: any, time: nu
         ctx.roundRect(-barWidth / 2, barY, barWidth * (enemy.hp / enemy.maxHp), barHeight, 2);
         ctx.fill();
     }
+    
+    // Progress Ring
+    const progress = enemy.word.length > 0 ? (enemy.typed || '').length / enemy.word.length : 0;
+    drawProgressRing(ctx, 0, 0, size + 4, progress, baseColor);
     
     // Progress Ring
     const progress = enemy.word.length > 0 ? (enemy.typed || '').length / enemy.word.length : 0;

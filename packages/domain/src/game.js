@@ -517,7 +517,8 @@ export function processSpawns(state, deltaTime) {
     const newEnemies = [...state.enemies];
 
     while (timer >= interval && spawnIndex < state.waveQueue.length) {
-        newEnemies.push(state.waveQueue[spawnIndex]);
+        const enemy = { ...state.waveQueue[spawnIndex], spawnTime: Date.now() };
+        newEnemies.push(enemy);
         spawnIndex += 1;
         timer -= interval;
     }
