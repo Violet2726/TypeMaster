@@ -30,19 +30,16 @@ describe('HomePage', () => {
         });
 
         expect(await screen.findByRole('heading', { name: 'Start with a 3-minute assessment' })).toBeInTheDocument();
-        expect(screen.getAllByText('Built-in · Time 30s').length).toBeGreaterThan(0);
-        expect(screen.getAllByRole('button', { name: 'Start assessment' })).toHaveLength(1);
-        expect(screen.getAllByRole('button', { name: 'Start challenge' })).toHaveLength(1);
-        expect(screen.getAllByRole('button', { name: 'Free practice' })).toHaveLength(1);
+        expect(screen.getByRole('button', { name: /Primary action: Start assessment/ })).toBeInTheDocument();
+        expect(screen.getAllByRole('button', { name: /Start assessment/ }).length).toBeGreaterThanOrEqual(1);
+        expect(screen.getAllByRole('button', { name: /Free practice/ })).toHaveLength(1);
         expect(screen.queryByText('--')).not.toBeInTheDocument();
         expect(screen.queryByText('0 WPM')).not.toBeInTheDocument();
-        expect(screen.getAllByText('Pending').length).toBeGreaterThan(0);
-        expect(screen.getAllByText('Ready').length).toBeGreaterThan(0);
         expect(screen.queryByRole('heading', { name: 'Achievement wall' })).not.toBeInTheDocument();
         expect(screen.queryByText('No sessions yet. Start your first round.')).not.toBeInTheDocument();
     });
 
-    test('shows the training dashboard when skill profile and plan exist', async () => {
+    test('shows the training dashboard when skill profile and challenge state exist', async () => {
         const challengeId = `daily-${new Date().toISOString().slice(0, 10)}`;
 
         renderWithProvider(<HomePage />, {
@@ -67,16 +64,6 @@ describe('HomePage', () => {
                     primaryFocus: 'accuracy',
                     weakZones: [{ id: 'accuracy', label: 'accuracy', score: 92 }],
                     metrics: { avgAccuracy: 92, avgConsistency: 84 }
-                },
-                'typemaster:v5:training-plan-cache': {
-                    id: 'plan-1',
-                    title: '7-day starter plan',
-                    summary: 'Stabilize the clearest weakness first, then add pressure.',
-                    status: 'active',
-                    currentStepIndex: 0,
-                    steps: [
-                        { id: 'step-1', status: 'pending', title: 'Reset accuracy', summary: 'Round summary', config: { mode: 'time', durationSeconds: 45 } }
-                    ]
                 },
                 'typemaster:v5:sessions-cache': [
                     {
@@ -159,18 +146,12 @@ describe('HomePage', () => {
             }
         });
 
-        expect(await screen.findByRole('heading', { name: 'Push the board again' })).toBeInTheDocument();
-        expect(screen.getAllByRole('button', { name: 'Retry challenge' }).length).toBeGreaterThan(0);
-        expect(screen.getByText('What to train today')).toBeInTheDocument();
-        expect(screen.getByRole('heading', { name: 'Free practice' })).toBeInTheDocument();
-        expect(screen.getByText('New best today')).toBeInTheDocument();
-        expect(screen.getByText('Keep pushing the board. Today\'s speed curve is still moving upward.')).toBeInTheDocument();
-        expect(screen.getByText('Today\'s challenge trend is still worth one more push.')).toBeInTheDocument();
-        expect(screen.getByText('Current rank')).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'View leaderboard' })).toBeInTheDocument();
+        expect(await screen.findByRole('heading', { name: 'What to train today' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Primary action: Continue today's task/ })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /View leaderboard/ })).toBeInTheDocument();
     });
 
-    test('suggests switching back to the plan when challenge momentum fades', async () => {
+    test('suggests continuing the current plan when a training step is active', async () => {
         const challengeId = `daily-${new Date().toISOString().slice(0, 10)}`;
 
         renderWithProvider(<HomePage />, {
@@ -266,13 +247,11 @@ describe('HomePage', () => {
             }
         });
 
-        expect(await screen.findByRole('heading', { name: 'Return to the plan now' })).toBeInTheDocument();
-        expect(screen.getByText('Leaderboard pressure is starting to reduce training quality.')).toBeInTheDocument();
-        const [recoverButton] = screen.getAllByRole('button', { name: 'Back to plan' });
-        expect(recoverButton).toBeInTheDocument();
-        expect(screen.getByText('The leaderboard push is flattening out. Step away from challenge mode and return to plan work.')).toBeInTheDocument();
+        expect(await screen.findByRole('heading', { name: 'What to train today' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Primary action: Continue today's task/ })).toBeInTheDocument();
+        const continueButton = screen.getByRole('button', { name: /Primary action: Continue today's task/ });
 
-        fireEvent.click(recoverButton);
+        fireEvent.click(continueButton);
 
         await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith('/practice'));
         await waitFor(() => {
@@ -322,9 +301,9 @@ describe('HomePage', () => {
             }
         });
 
-        expect(await screen.findByRole('heading', { name: 'Reassess for the next phase' })).toBeInTheDocument();
-        const [button] = screen.getAllByRole('button', { name: 'Start reassessment' });
-        expect(button).toBeInTheDocument();
+        expect(await screen.findByRole('heading', { name: 'What to train today' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Primary action: Start reassessment/ })).toBeInTheDocument();
+        const button = screen.getByRole('button', { name: /Primary action: Start reassessment/ });
 
         fireEvent.click(button);
 

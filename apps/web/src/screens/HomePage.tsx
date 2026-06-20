@@ -1,7 +1,7 @@
-'use client';
+﻿'use client';
 
 import type { ReactNode } from 'react';
-import { ArrowRight, CalendarClock, Gauge, Keyboard, ShieldCheck, Sparkles, Trophy } from 'lucide-react';
+import { ArrowRight, BarChart3, CalendarClock, Gauge, Keyboard, ShieldCheck, Target, TrendingUp, Trophy } from 'lucide-react';
 import { formatDateTime } from '../i18n';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { useHomePageModel } from '../features/home/use-home-page-model';
@@ -37,74 +37,35 @@ function HomeSessionIcon({ tone }: { tone: string }) {
                 ? Gauge
                 : Keyboard;
 
-    return <Icon aria-hidden="true" size={14} strokeWidth={2.2} />;
+    return <Icon aria-hidden="true" size={16} strokeWidth={2.2} />;
 }
 
-function HomeRecordPill({ icon: Icon, children, tone = 'speed' }: { icon: any; children: ReactNode; tone?: string }) {
+function HomeQuickCard({ icon: Icon, kicker, label, description, tone = 'default', disabled, onClick }: { icon: any; kicker: string; label: string; description: string; tone?: string; disabled?: boolean; onClick: () => void }) {
     return (
-        <span className={`home-record-pill home-record-pill--${tone}`}>
-            <Icon aria-hidden="true" size={14} strokeWidth={2.2} />
+        <button
+            type="button"
+            className={`home-quick-card home-quick-card--${tone}`}
+            disabled={disabled}
+            onClick={onClick}
+        >
+            <span className="home-quick-card__icon" aria-hidden="true">
+                <Icon size={18} strokeWidth={2.2} />
+            </span>
+            <span className="home-quick-card__text">
+                <p className="home-quick-card__kicker">{kicker}</p>
+                <strong>{label}</strong>
+                <span>{description}</span>
+            </span>
+        </button>
+    );
+}
+
+function HomeRecentChip({ icon: Icon, children, accent = false }: { icon: any; children: ReactNode; accent?: boolean }) {
+    return (
+        <span className={`home-recent-chip${accent ? ' home-recent-chip--accent' : ''}`}>
+            <Icon aria-hidden="true" size={13} strokeWidth={2.2} />
             {children}
         </span>
-    );
-}
-
-function HomeActionEmptySignal({ icon: Icon, title, value, items, tone = 'challenge' }: { icon: any; title: string; value: string; items: { label: string; value: string }[]; tone?: string }) {
-    return (
-        <div className={`home-empty-signal home-empty-signal--${tone}`}>
-            <div className="home-empty-signal__head">
-                <span className="home-empty-signal__icon" aria-hidden="true">
-                    <Icon size={15} strokeWidth={2.2} />
-                </span>
-                <div>
-                    <span className="summary-label">{title}</span>
-                    <strong>{value}</strong>
-                </div>
-            </div>
-            <div className="home-empty-signal__grid">
-                {items.map((item) => (
-                    <span key={item.label}>
-                        <small>{item.label}</small>
-                        <strong>{item.value}</strong>
-                    </span>
-                ))}
-            </div>
-        </div>
-    );
-}
-
-function HomeLaneCard(props: {
-    badge?: { label: string; tone: string };
-    body: string;
-    children?: ReactNode;
-    footer?: ReactNode;
-    kicker: string;
-    title: string;
-    tone?: string;
-}) {
-    const {
-        badge,
-        body,
-        children,
-        footer,
-        kicker,
-        title,
-        tone = 'default'
-    } = props;
-
-    return (
-        <article className={`panel home-lane-card home-lane-card--${tone}`}>
-            <div className="home-lane-card__main">
-                <div className="home-lane-card__heading">
-                    <p className="panel-kicker">{kicker}</p>
-                    {badge ? <span className={`panel-badge badge-${badge.tone}`}>{badge.label}</span> : null}
-                </div>
-                <h2>{title}</h2>
-                <p className="lead-text">{body}</p>
-                {children}
-            </div>
-            {footer ? <div className="home-lane-card__footer">{footer}</div> : null}
-        </article>
     );
 }
 
@@ -113,22 +74,15 @@ export function HomePage() {
     const store = useHomePageStore();
     const {
         challengeDecisionModel,
-        challengeFacts,
         challengeIsPrimaryDecision,
-        challengeLeaderboardCount,
         challengePerformanceText,
-        challengePersonalBest,
         challengeSessions,
-        challengeStanding,
         challengeStrategyModel,
         copy,
-        currentWeakness,
         homeDecision,
         insights,
         isLaunchingChallenge,
         language,
-        latestModeLabel,
-        planPercent,
         recentBestAccuracy,
         recentSessions,
         sessionStreak,
@@ -136,7 +90,6 @@ export function HomePage() {
         trainingCopy,
         trainingPlan,
         unlockedAchievements,
-        weeklyGoal,
         handleDecisionAction
     } = useHomePageModel({
         ...store,
@@ -144,292 +97,153 @@ export function HomePage() {
     });
 
     const hasSessions = insights.totalSessions > 0;
-    const hasChallengeRun = challengeSessions.length > 0;
     const hasDashboardEvidence = Boolean(skillProfile || trainingPlan || hasSessions || unlockedAchievements.length);
     const isStarterHome = !hasDashboardEvidence;
     const pendingLabel = trainingCopy.diagnostic.pending;
-    const homeLevelLabel = skillProfile?.level?.label || pendingLabel;
     const homeStreakLabel = sessionStreak || pendingLabel;
-    const homePlanLabel = trainingPlan ? `${planPercent}%` : pendingLabel;
     const homeAverageWpmLabel = hasSessions ? `${insights.recent7.avgWpm} ${copy.common.wpm}` : copy.statuses.ready;
     const homeBestAccuracyLabel = recentBestAccuracy ? `${recentBestAccuracy}%` : pendingLabel;
-    const homeSessionsLabel = hasSessions ? insights.totalSessions : pendingLabel;
-    const challengePrimaryAction = challengeDecisionModel?.primaryAction || challengeStrategyModel.primaryAction;
-    const challengePrimaryLabel = challengeDecisionModel?.primaryLabel || challengeStrategyModel.primaryLabel;
-    const challengeEmptyItems = [
-        { label: copy.result.challengeRankLabel, value: trainingCopy.challenge.leaderboard },
-        { label: copy.result.challengeBestLabel, value: trainingCopy.challenge.trendFirstLabel },
-        { label: trainingCopy.challenge.attemptsLabel, value: trainingCopy.challenge.cta }
-    ];
-    const freeReadyItems = [
-        { label: copy.home.latestMode, value: latestModeLabel },
-        { label: copy.common.sessions, value: pendingLabel }
-    ];
+    const statusBadge = skillProfile
+        ? (hasSessions ? copy.statuses.ready : copy.statuses.idle)
+        : trainingCopy.home.levelLabel;
+    const primaryDescription = challengeIsPrimaryDecision ? challengePerformanceText : homeDecision.body;
+    const quickActions = [
+        {
+            key: challengeIsPrimaryDecision ? 'challenge' : 'primary',
+            icon: ArrowRight,
+            kicker: challengeIsPrimaryDecision ? trainingCopy.challenge.strategyTitle : trainingCopy.home.todayKicker,
+            label: challengeIsPrimaryDecision
+                ? (challengeDecisionModel?.primaryLabel || challengeStrategyModel.primaryLabel)
+                : homeDecision.primaryLabel,
+            description: primaryDescription,
+            tone: 'primary',
+            disabled: challengeIsPrimaryDecision
+                ? isLaunchingChallenge && (challengeDecisionModel?.primaryAction || challengeStrategyModel.primaryAction) === 'challenge'
+                : isLaunchingChallenge && homeDecision.primaryAction === 'challenge',
+            onClick: () => handleDecisionAction(challengeIsPrimaryDecision
+                ? (challengeDecisionModel?.primaryAction || challengeStrategyModel.primaryAction)
+                : homeDecision.primaryAction)
+        },
+        {
+            key: 'leaderboard',
+            icon: BarChart3,
+            kicker: trainingCopy.challenge.kicker,
+            label: trainingCopy.challenge.viewBoard,
+            description: trainingCopy.challenge.strategyTitle,
+            tone: 'default',
+            onClick: () => handleDecisionAction('leaderboard')
+        },
+        {
+            key: 'free',
+            icon: Keyboard,
+            kicker: trainingCopy.home.freePracticeKicker,
+            label: trainingCopy.home.freePractice,
+            description: trainingCopy.home.freePracticeBody,
+            tone: 'default',
+            onClick: () => handleDecisionAction('free')
+        }
+    ] satisfies Array<{ key: string; icon: any; kicker: string; label: string; description: string; tone?: string; disabled?: boolean; onClick: () => void }>;
 
     return (
-        <div className={`page-stack page-stack--home home-refined ${isStarterHome ? 'home-refined--starter' : 'home-refined--dashboard'}`}>
-            {/* Hero Section - Compact, single-column, action-focused */}
-            <section className="home-hero panel">
-                <div className="home-hero__copy">
-                    <div className="home-hero__eyebrow">
-                        <p className="hero-kicker">{trainingCopy.home.todayKicker}</p>
-                        <span className={`panel-badge badge-${homeDecision.badgeTone || 'ready'}`}>{homeDecision.badge}</span>
-                    </div>
+        <div className={`page-stack page-stack--home home-status-page-stack ${isStarterHome ? 'home-status-page-stack--starter' : 'home-status-page-stack--dashboard'}`}>
+            <section className="home-starter-hero" aria-label={copy.home.statsTitle}>
+                <div className="home-starter-hero__copy">
+                    <span className="home-starter-hero__status">
+                        <Target aria-hidden="true" size={15} strokeWidth={2.2} />
+                        {statusBadge}
+                    </span>
                     <h1>{skillProfile ? trainingCopy.home.dashboardTitle : trainingCopy.home.diagnosticTitle}</h1>
                     <p className="hero-body">
                         {skillProfile ? trainingCopy.home.dashboardBody : trainingCopy.home.diagnosticBody}
                     </p>
-                    <div className="home-hero__actions">
+                    <div className="home-starter-hero__actions">
                         <button
                             type="button"
                             className="action-btn primary"
-                            aria-label={`Primary action: ${homeDecision.primaryLabel}`}
-                            onClick={() => handleDecisionAction(homeDecision.primaryAction)}
-                            disabled={isLaunchingChallenge && homeDecision.primaryAction === 'challenge'}
+                            aria-label={`Primary action: ${challengeIsPrimaryDecision ? (challengeDecisionModel?.primaryLabel || challengeStrategyModel.primaryLabel) : homeDecision.primaryLabel}`}
+                            onClick={() => handleDecisionAction(challengeIsPrimaryDecision
+                                ? (challengeDecisionModel?.primaryAction || challengeStrategyModel.primaryAction)
+                                : homeDecision.primaryAction)}
+                            disabled={challengeIsPrimaryDecision
+                                ? isLaunchingChallenge && (challengeDecisionModel?.primaryAction || challengeStrategyModel.primaryAction) === 'challenge'
+                                : isLaunchingChallenge && homeDecision.primaryAction === 'challenge'}
                         >
                             <ArrowRight aria-hidden="true" size={17} strokeWidth={2.25} />
-                            {homeDecision.primaryAction === 'challenge' && isLaunchingChallenge
+                            {isLaunchingChallenge && (
+                                challengeIsPrimaryDecision
+                                    ? (challengeDecisionModel?.primaryAction || challengeStrategyModel.primaryAction) === 'challenge'
+                                    : homeDecision.primaryAction === 'challenge'
+                            )
                                 ? copy.common.loading
-                                : homeDecision.primaryLabel}
+                                : (challengeIsPrimaryDecision
+                                    ? (challengeDecisionModel?.primaryLabel || challengeStrategyModel.primaryLabel)
+                                    : homeDecision.primaryLabel)}
                         </button>
-
                     </div>
-
-
-
                 </div>
             </section>
 
-            {/* Dashboard Strip */}
             {!isStarterHome ? (
-                <section className="home-dashboard-strip" aria-label={copy.home.statsTitle}>
-                    <div className="metric-card">
+                <section className="home-starter-metrics" aria-label={copy.home.statsTitle}>
+                    <div className="home-starter-metric">
                         <span>{trainingCopy.home.streakLabel}</span>
                         <strong>{homeStreakLabel}</strong>
                     </div>
-                    <div className="metric-card">
+                    <div className="home-starter-metric">
                         <span>{copy.home.avgWpm}</span>
                         <strong>{homeAverageWpmLabel}</strong>
                     </div>
-                    <div className="metric-card">
+                    <div className="home-starter-metric">
                         <span>{copy.home.bestAccuracy}</span>
                         <strong>{homeBestAccuracyLabel}</strong>
-                    </div>
-                    <div className="metric-card">
-                        <span>{copy.common.sessions}</span>
-                        <strong>{homeSessionsLabel}</strong>
                     </div>
                 </section>
             ) : null}
 
-            {/* Lane Cards */}
-            <section className="home-lanes" aria-label={trainingCopy.home.todayFlowTitle}>
-
-                <div className={`home-lanes__grid ${isStarterHome ? 'home-lanes__grid--starter' : ''}`}>
-                    <HomeLaneCard
-                        kicker={trainingCopy.home.todayKicker}
-                        title={homeDecision.headline}
-                        body={homeDecision.body}
-                        tone="primary"
-                        badge={{ label: homeDecision.badge, tone: homeDecision.badgeTone || 'ready' }}
-                        footer={(
-                            <>
-                                <div className="home-lane-card__cluster">
-                                    <span className="home-chip">{homeDecision.signalLabel}</span>
-                                    <span className="home-chip">{currentWeakness}</span>
-                                    {!isStarterHome && trainingPlan ? (
-                                        <span className="home-chip">{trainingCopy.home.planLabel} {planPercent}%</span>
-                                    ) : null}
-                                </div>
-                                <div className="home-lane-card__action">
-                                    <button
-                                        type="button"
-                                        className="action-btn primary"
-                                        onClick={() => handleDecisionAction(homeDecision.primaryAction)}
-                                        disabled={isLaunchingChallenge && homeDecision.primaryAction === 'challenge'}
-                                    >
-                                        {homeDecision.primaryAction === 'challenge' && isLaunchingChallenge
-                                            ? copy.common.loading
-                                            : homeDecision.primaryLabel}
-                                    </button>
-                                </div>
-                            </>
-                        )}
-                    >
-                        <div className="home-signal-block">
-                            <span className="summary-label">{homeDecision.signalLabel}</span>
-                            <p>{homeDecision.signal}</p>
-                        </div>
-                    </HomeLaneCard>
-
-                    <HomeLaneCard
-                        kicker={trainingCopy.challenge.kicker}
-                        title={store.dailyChallenge?.title || trainingCopy.challenge.title}
-                        body={store.dailyChallenge?.summary || trainingCopy.challenge.body}
-                        tone="challenge"
-                        footer={(
-                            <>
-                                {hasChallengeRun ? (
-                                    <div className="home-lane-card__metrics">
-                                        <div className="home-mini-stat">
-                                            <span>{copy.result.challengeRankLabel}</span>
-                                            <strong>{challengeStanding ? `#${challengeStanding.rank}` : copy.common.emptyValue}</strong>
-                                        </div>
-                                        <div className="home-mini-stat">
-                                            <span>{copy.result.challengeBestLabel}</span>
-                                            <strong>
-                                                {challengePersonalBest?.bestSession?.result?.wpm
-                                                    ? `${challengePersonalBest.bestSession.result.wpm} ${copy.common.wpm}`
-                                                    : copy.common.emptyValue}
-                                            </strong>
-                                        </div>
-                                        <div className="home-mini-stat">
-                                            <span>{trainingCopy.challenge.attemptsLabel}</span>
-                                            <strong>{challengeSessions.length}</strong>
-                                        </div>
-                                        <div className="home-mini-stat">
-                                            <span>{trainingCopy.challenge.leaderboard}</span>
-                                            <strong>{challengeLeaderboardCount}</strong>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <HomeActionEmptySignal
-                                        icon={Trophy}
-                                        title={trainingCopy.challenge.statusTitle}
-                                        value={trainingCopy.challenge.trendFirstLabel}
-                                        items={challengeEmptyItems}
-                                    />
-                                )}
-                                <div className="home-lane-card__action home-lane-card__action--split">
-                                    {!challengeIsPrimaryDecision ? (
-                                        <button
-                                            type="button"
-                                            className="action-btn primary"
-                                            onClick={() => handleDecisionAction(challengePrimaryAction)}
-                                            disabled={isLaunchingChallenge && challengePrimaryAction === 'challenge'}
-                                        >
-                                            {challengePrimaryAction === 'challenge' && isLaunchingChallenge
-                                                ? copy.common.loading
-                                                : challengePrimaryLabel}
-                                        </button>
-                                    ) : null}
-                                    <button
-                                        type="button"
-                                        className="action-btn"
-                                        onClick={() => handleDecisionAction('leaderboard')}
-                                    >
-                                        {trainingCopy.challenge.viewBoard}
-                                    </button>
-                                </div>
-                            </>
-                        )}
-                    >
-                        <div className="home-lane-card__cluster">
-                            {challengeFacts.map((fact: string) => (
-                                <span key={fact} className="home-chip">{fact}</span>
-                            ))}
-                            <span className="home-chip">{trainingCopy.challenge.trendFirstLabel}</span>
-                        </div>
-                        <p className="muted-text">{challengePerformanceText}</p>
-                        <div className="home-signal-block">
-                            <span className="summary-label">{trainingCopy.challenge.strategyTitle}</span>
-                            <p>{challengeStrategyModel.note}</p>
-                        </div>
-                    </HomeLaneCard>
-
-                    <HomeLaneCard
-                        kicker={trainingCopy.home.freePracticeKicker}
-                        title={trainingCopy.home.freePractice}
-                        body={trainingCopy.home.freePracticeBody}
-                        tone="free"
-                        footer={(
-                            <>
-                                {hasSessions ? (
-                                    <div className="home-mini-stat home-mini-stat--single">
-                                        <span>{copy.common.sessions}</span>
-                                        <strong>{homeSessionsLabel}</strong>
-                                    </div>
-                                ) : (
-                                    <HomeActionEmptySignal
-                                        icon={Keyboard}
-                                        title={trainingCopy.home.freePracticeKicker}
-                                        value={copy.statuses.ready}
-                                        items={freeReadyItems}
-                                        tone="free"
-                                    />
-                                )}
-                                <div className="home-lane-card__action">
-                                    <button type="button" className="action-btn" onClick={() => handleDecisionAction('free')}>
-                                        {trainingCopy.home.freePractice}
-                                    </button>
-                                </div>
-                            </>
-                        )}
-                    >
-                        <div className="home-lane-card__cluster">
-                            <span className="home-chip">{latestModeLabel}</span>
-                            <span className="home-chip">{hasSessions ? homeAverageWpmLabel : copy.statuses.ready}</span>
-                        </div>
-                    </HomeLaneCard>
-                </div>
+            <section className="home-quick-cards" aria-label={trainingCopy.home.todayFlowTitle}>
+                {quickActions.map((action) => (
+                    <HomeQuickCard
+                        key={action.key}
+                        icon={action.icon}
+                        kicker={action.kicker}
+                        label={action.label}
+                        description={action.description}
+                        tone={action.tone}
+                        disabled={action.disabled}
+                        onClick={action.onClick}
+                    />
+                ))}
             </section>
 
-            {/* Dashboard Evidence */}
-            {hasDashboardEvidence ? (
-                <>
+            {hasDashboardEvidence && recentSessions.length ? (
+                <section className="home-recent">
+                    <div className="home-recent__head">
+                        <p className="panel-kicker">{copy.home.statsTitle}</p>
+                        <h2>{copy.home.recentHistoryTitle}</h2>
+                    </div>
 
-                    <section className="home-activity-section">
-                        <div className="home-activity-section__head">
-                            <p className="panel-kicker">{copy.home.statsTitle}</p>
-                            <h2>{copy.home.recentHistoryTitle}</h2>
-                        </div>
+                    <div className="home-recent-list">
+                        {recentSessions.map((session: any) => {
+                            const tone = getHomeSessionTone(session);
 
-                        {recentSessions.length ? (
-                            <div className="history-table">
-                                {recentSessions.map((session: any) => {
-                                    const tone = getHomeSessionTone(session);
-
-                                    return (
-                                        <div key={session.id} className={`history-row home-record-row home-record-row--${tone}`}>
-                                            <div className="home-record-row__main">
-                                                <span className={`home-record-type home-record-type--${tone}`}>
-                                                    <HomeSessionIcon tone={tone} />
-                                                    {getHomeSessionLabel(session, trainingCopy)}
-                                                </span>
-                                                <div className="history-row__meta">
-                                                    <strong>{session.trainingMeta?.title || session.sourceTextMeta?.label || copy.common.emptyValue}</strong>
-                                                    <p className="muted-text">{formatDateTime(session.result.completedAt, language)}</p>
-                                                </div>
-                                            </div>
-                                            <div className="history-metrics">
-                                                <HomeRecordPill icon={Gauge}>{session.result.wpm} {copy.common.wpm}</HomeRecordPill>
-                                                <HomeRecordPill icon={ShieldCheck} tone="accuracy">{session.result.accuracy}%</HomeRecordPill>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        ) : (
-                            <p className="muted-text">{copy.home.recentEmpty}</p>
-                        )}
-
-                        {unlockedAchievements.length ? (
-                            <div className="home-achievements-inline">
-                                <p className="panel-kicker">{trainingCopy.insights.achievementsTitle}</p>
-                                <div className="home-achievements-inline__list">
-                                    {unlockedAchievements.map((achievement: any) => (
-                                        <span key={achievement.id} className="tag-pill home-achievement-pill">
-                                            <Trophy aria-hidden="true" size={14} strokeWidth={2.2} />
-                                            {achievement.title}
-                                        </span>
-                                    ))}
+                            return (
+                                <div key={session.id} className="home-recent-item">
+                                    <span className="home-recent-item__icon" aria-hidden="true">
+                                        <HomeSessionIcon tone={tone} />
+                                    </span>
+                                    <div className="home-recent-item__body">
+                                        <strong>{session.trainingMeta?.title || session.sourceTextMeta?.label || copy.common.emptyValue}</strong>
+                                        <p>{getHomeSessionLabel(session, trainingCopy)} · {formatDateTime(session.result.completedAt, language)}</p>
+                                    </div>
+                                    <div className="home-recent-item__metrics">
+                                        <HomeRecentChip icon={TrendingUp}>{session.result.wpm} {copy.common.wpm}</HomeRecentChip>
+                                        <HomeRecentChip icon={ShieldCheck} accent>{session.result.accuracy}%</HomeRecentChip>
+                                    </div>
                                 </div>
-                            </div>
-                        ) : null}
-                    </section>
-
-
-                </>
+                            );
+                        })}
+                    </div>
+                </section>
             ) : null}
         </div>
     );
