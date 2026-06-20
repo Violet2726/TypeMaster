@@ -162,7 +162,6 @@ describe('HomePage', () => {
         expect(await screen.findByRole('heading', { name: 'Push the board again' })).toBeInTheDocument();
         expect(screen.getAllByRole('button', { name: 'Retry challenge' }).length).toBeGreaterThan(0);
         expect(screen.getByText('What to train today')).toBeInTheDocument();
-        expect(screen.getByText('Start from one of these lanes')).toBeInTheDocument();
         expect(screen.getAllByText('Builder').length).toBeGreaterThan(0);
         expect(screen.getByRole('heading', { name: 'Free practice' })).toBeInTheDocument();
         expect(screen.getByText('New best today')).toBeInTheDocument();

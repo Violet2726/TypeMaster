@@ -192,38 +192,11 @@ export function HomePage() {
                                 ? copy.common.loading
                                 : homeDecision.primaryLabel}
                         </button>
-                        {homeDecision.primaryAction !== 'free' ? (
-                            <button
-                                type="button"
-                                className="action-btn"
-                                aria-label={`Secondary action: ${trainingCopy.home.freePractice}`}
-                                onClick={() => handleDecisionAction('free')}
-                            >
-                                {trainingCopy.home.freePractice}
-                            </button>
-                        ) : null}
+
                     </div>
 
-                    {/* Inline stats strip */}
-                    <div className="home-hero__stats-inline">
-                        <div className="home-hero__stat-inline">
-                            <span>{trainingCopy.home.levelLabel}</span>
-                            <strong>{homeLevelLabel}</strong>
-                        </div>
-                        <div className="home-hero__stat-inline">
-                            <span>{trainingCopy.home.planLabel}</span>
-                            <strong>{homePlanLabel}</strong>
-                        </div>
-                        <div className="home-hero__stat-inline">
-                            <span>{trainingCopy.home.weekLabel}</span>
-                            <strong>{`${weeklyGoal.completed}/${weeklyGoal.target}`}</strong>
-                        </div>
-                    </div>
 
-                    <div className="home-hero__meta">
-                        <span className="home-chip home-chip--soft">{latestModeLabel}</span>
-                        <span className="home-chip home-chip--soft">{homeDecision.signalLabel}</span>
-                    </div>
+
                 </div>
             </section>
 
@@ -251,13 +224,6 @@ export function HomePage() {
 
             {/* Lane Cards */}
             <section className="home-lanes" aria-label={trainingCopy.home.todayFlowTitle}>
-                <div className="home-section-heading">
-                    <div>
-                        <p className="panel-kicker">{trainingCopy.home.todayKicker}</p>
-                        <h2>{trainingCopy.home.todayFlowTitle}</h2>
-                    </div>
-                    <p className="muted-text">{trainingCopy.home.todayFlowBody}</p>
-                </div>
 
                 <div className={`home-lanes__grid ${isStarterHome ? 'home-lanes__grid--starter' : ''}`}>
                     <HomeLaneCard
