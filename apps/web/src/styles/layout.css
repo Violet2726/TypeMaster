@@ -16,8 +16,7 @@ body {
     margin: 0;
     min-height: 100vh;
     background:
-        radial-gradient(circle at top center, rgba(115, 188, 255, 0.10), transparent 28%),
-        linear-gradient(180deg, var(--bg-soft), transparent 32%),
+        linear-gradient(180deg, var(--bg-soft), rgba(255, 255, 255, 0) 34rem),
         var(--bg-color);
     color: var(--text-color);
     font-family: var(--font-ui);
@@ -30,7 +29,7 @@ body {
 
 body[data-theme='serika-light'] {
     background:
-        linear-gradient(180deg, #ffffff 0%, #f5f5f7 36rem),
+        linear-gradient(180deg, #ffffff 0, #f5f5f7 34rem),
         var(--bg-color);
 }
 
@@ -58,6 +57,10 @@ textarea:focus-visible {
     box-shadow: var(--shadow-focus);
 }
 
+body::before {
+    display: none;
+}
+
 .app-shell {
     display: flex;
     flex-direction: column;
@@ -66,21 +69,21 @@ textarea:focus-visible {
 
 .app-main {
     flex: 1;
-    padding: 2.2rem 0 3.5rem;
+    padding: 2.35rem 0 4rem;
 }
 
 .container {
-    width: min(var(--page-width), calc(100vw - 3rem));
+    width: min(1180px, calc(100vw - 3rem));
     margin: 0 auto;
 }
 
 .page-stack {
     display: grid;
-    gap: 1.25rem;
+    gap: 1.15rem;
 }
 
 .page-stack--home {
-    gap: 1.5rem;
+    gap: 1.4rem;
 }
 
 .page-loading-state {

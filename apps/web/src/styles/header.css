@@ -3,8 +3,8 @@
     top: 0;
     z-index: 40;
     border-bottom: 1px solid var(--panel-stroke);
-    background: rgba(10, 10, 12, 0.78);
-    backdrop-filter: saturate(180%) blur(22px);
+    background: rgba(12, 12, 13, 0.78);
+    backdrop-filter: saturate(180%) blur(24px);
     transition: background var(--transition-fast);
 }
 
@@ -25,28 +25,28 @@ body[data-theme='serika-light'] .app-header {
     justify-content: space-between;
     gap: 1rem;
     min-height: 4.25rem;
-    padding: 0.75rem 0;
+    padding: 0.78rem 0;
 }
 
 .brand-block {
     display: flex;
     flex-direction: column;
-    gap: 0.22rem;
+    gap: 0.25rem;
 }
 
 .logo {
     display: inline-flex;
     align-items: center;
-    gap: 0.7rem;
+    gap: 0.68rem;
     color: var(--text-strong);
 }
 
 .logo-mark {
     width: 1.45rem;
     height: 1.45rem;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #ffffff, #64d2ff 54%, #ffb340);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 10px 22px rgba(10, 132, 255, 0.18);
+    border-radius: var(--radius-sm);
+    background: linear-gradient(135deg, rgba(245, 245, 247, 0.95), rgba(10, 132, 255, 0.95) 54%, rgba(255, 159, 10, 0.94));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 12px 26px rgba(10, 132, 255, 0.22);
 }
 
 body[data-theme='serika-light'] .logo-mark {
@@ -57,8 +57,7 @@ body[data-theme='serika-light'] .logo-mark {
 .logo-word {
     font-family: var(--font-display);
     font-size: 1.08rem;
-    font-weight: 750;
-    letter-spacing: -0.01em;
+    font-weight: 700;
 }
 
 .logo-word span {

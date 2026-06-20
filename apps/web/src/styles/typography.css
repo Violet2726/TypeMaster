@@ -17,21 +17,33 @@ h3 {
 
 /* Paragraph line height */
 .lead-text {
+    color: var(--text-color);
     line-height: 1.6;
 }
 
 .muted-text {
     line-height: 1.5;
     font-size: 0.88rem;
+    color: var(--text-dim);
 }
 
 /* Kicker spacing */
+.hero-kicker,
+.panel-kicker,
+.summary-label,
+.result-label,
+.result-item-label,
+.live-stat-label,
+.control-label {
+    color: var(--text-dim);
+    font-family: var(--font-ui);
+    font-size: 0.78rem;
+    font-weight: 650;
+    text-transform: none;
+}
+
 .panel-kicker {
     margin: 0 0 0.15rem;
-    color: var(--text-dim);
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
 }
 
 body[data-language='zh-CN'] .panel-kicker {
