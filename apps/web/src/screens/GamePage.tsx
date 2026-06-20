@@ -18,6 +18,9 @@ import {
 import '../../src/styles/game-page.css';
 import { useGameStore } from '../features/game/state/game-store';
 import { appendSession } from '../services/storage/sessions-repo';
+import { COLORS } from '../components/game/colors';
+import { drawProgressRing, drawGlassPanel } from '../components/game/draw-helpers';
+
 
 // ------------------------------------------------------------------------------
 // Apple Design Language Colors
