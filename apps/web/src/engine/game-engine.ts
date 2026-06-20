@@ -17,6 +17,7 @@ import { ScorePopupSystem } from "./score-popup";
 import { COLORS } from "../components/game/colors";
 import { drawGlassPanel, drawProgressRing } from "../components/game/draw-helpers";
 import { initSound, playClickSound, playKillSound, playErrorSound, playComboSound } from "../components/game/sound-engine";
+import { getBlendedTheme, drawThemedBackground } from "./environment-theme";
 import { shouldDropPowerUp, createPowerUp, updatePowerUps, processPowerUpInput, drawPowerUp, drawActivePowerUps, getPowerUpConfig } from "./power-up";
 import type { PowerUp, ActivePowerUp, PowerUpType } from "./power-up";
 
@@ -248,44 +249,15 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     }
 
     function drawBackground(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
-        const hueShift = Math.min(30, state.combo) * 2;
-        const gradient = ctx.createLinearGradient(0, 0, 0, h);
-        gradient.addColorStop(0, shiftHue(COLORS.bgGradientStart, hueShift));
-        gradient.addColorStop(1, shiftHue(COLORS.bgGradientEnd, hueShift));
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, w, h);
+        const theme = getBlendedTheme(state.wave);
+        drawThemedBackground(ctx, w, h, time, theme, state.combo);
 
-        // Grid
-        ctx.strokeStyle = "rgba(255,255,255,0.04)";
-        ctx.lineWidth = 1;
-        const gridSize = 40;
-        for (let x = 0; x < w; x += gridSize) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
-        for (let y = 0; y < h; y += gridSize) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
-
-        // Stars with parallax depth
-        for (let i = 0; i < 60; i++) {
-            const depth = (i % 3 + 1) / 3;
-            const sx = (i * 137.5 + time * 0.005 * depth) % w;
-            const sy = (i * 97.3 + time * 0.002 * depth) % h;
-            const alpha = 0.1 + depth * 0.2 + Math.sin(time * 0.001 + i) * 0.05;
-            ctx.fillStyle = "rgba(255,255,255," + alpha + ")";
-            ctx.beginPath();
-            ctx.arc(sx, sy, 0.5 + depth, 0, Math.PI * 2);
-            ctx.fill();
-        }
-
-        // Ambient particles (idle only)
-        if (state.mode === "idle" && Math.random() < 0.08) {
-            particles.emit({ x: Math.random() * w, y: Math.random() * h, count: 1, color: COLORS.textTertiary, speed: 0.3, size: 1.5, lifetime: 2, glow: 0.3 });
-        }
-
-        // Vignette: subtle darkening at edges for depth and focus
-        if (state.mode !== "idle") {
-            const vignetteGrad = ctx.createRadialGradient(w / 2, h / 2, h * 0.3, w / 2, h / 2, h * 0.85);
-            vignetteGrad.addColorStop(0, "rgba(0,0,0,0)");
-            vignetteGrad.addColorStop(1, "rgba(0,0,0," + VIGNETTE_STRENGTH + ")");
-            ctx.fillStyle = vignetteGrad;
-            ctx.fillRect(0, 0, w, h);
+        // Theme-aware ambient particles
+        if (Math.random() < theme.particleRate) {
+            particles.emit({
+                x: Math.random() * w, y: Math.random() * h,
+                count: 1, color: theme.particleColor, speed: 0.3, size: 1.5, lifetime: 2, glow: 0.3
+            });
         }
     }
 
