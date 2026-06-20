@@ -32,7 +32,7 @@ export function CustomTextWorkshop({
     const numberFormatter = new Intl.NumberFormat(language);
     const statusVariant = hasText ? 'ready' : 'idle';
     const statusLabel = hasText ? copy.common.aiReady : copy.common.aiNeedsGenerate;
-    const previewText = hasText ? getPreviewText(trimmedValue) : copy.common.emptyValue;
+    const previewText = hasText ? getPreviewText(trimmedValue) : trainingCopy.practice.customPlaceholder;
 
     return (
         <PracticeWorkshopShell
@@ -70,6 +70,7 @@ export function CustomTextWorkshop({
                     className="custom-text-workshop__summary"
                     eyebrow={copy.common.currentText}
                     title={previewText}
+                    description={hasText ? copy.common.aiReady : copy.common.aiNeedsGenerate}
                     metrics={[
                         {
                             label: copy.common.wordsMode,

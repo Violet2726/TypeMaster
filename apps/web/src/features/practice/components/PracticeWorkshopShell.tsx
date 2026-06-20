@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Sparkles, type LucideIcon } from 'lucide-react';
+import './practice-workshop.css';
 
 interface PracticeWorkshopShellProps {
     actions?: ReactNode;
@@ -47,7 +48,9 @@ export function PracticeWorkshopShell({
                 </div>
             </div>
 
-            {children}
+            <div className="practice-workshop-shell__body">
+                {children}
+            </div>
         </section>
     );
 }
