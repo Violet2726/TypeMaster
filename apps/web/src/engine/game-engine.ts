@@ -20,6 +20,7 @@ import { initSound, playClickSound, playKillSound, playErrorSound, playComboSoun
 import { getBlendedTheme, drawThemedBackground } from "./environment-theme";
 import { initGameOver, renderGameOver, clearGameOver } from "./game-over";
 import { createMusicEngine } from "./music-engine";
+import { enqueueAchievement, updateAchievementModal, renderAchievementModal, clearAchievementQueue } from "./achievement-modal";
 import { shouldDropPowerUp, createPowerUp, updatePowerUps, processPowerUpInput, drawPowerUp, drawActivePowerUps, getPowerUpConfig } from "./power-up";
 import type { PowerUp, ActivePowerUp, PowerUpType } from "./power-up";
 
@@ -216,6 +217,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         scorePopups.update(dt);
         shake.update(dt);
         music.setCombo(state.combo);
+        updateAchievementModal(performance.now());
 
         // Update power-ups
         powerUps = updatePowerUps(powerUps, dt);
@@ -255,6 +257,9 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         } else if (state.mode === "gameover") {
             drawGameOverScreen(ctx, width, height, time);
         }
+
+        // Achievement modal overlay (renders on top of everything)
+        renderAchievementModal(ctx, width, height, time);
 
         ctx.restore();
     }
@@ -679,6 +684,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
             activePowerUps = [];
             shieldCount = 0;
             clearGameOver();
+            clearAchievementQueue();
             return;
         }
 
@@ -785,7 +791,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                     lastCorrectEnemyIds = evt.matches || [];
                 }
                 if (evt.type === "achievement_unlocked") {
-                    // Handled by UI layer if needed
+                    enqueueAchievement(evt.achievementId);
                 }
             });
         }
