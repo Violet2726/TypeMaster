@@ -13,6 +13,8 @@
 
 import { COLORS } from "../components/game/colors";
 import { drawGlassPanel } from "../components/game/draw-helpers";
+
+function getScale(w: number, h: number): number { return Math.max(0.6, Math.min(1.2, w / 800)); }
 import { playMenuNavigate, playMenuBack, playMenuToggle } from "../components/game/sound-engine";
 
 export interface GameSettings {

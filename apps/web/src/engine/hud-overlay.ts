@@ -12,6 +12,14 @@
 import { COLORS } from "../components/game/colors";
 import { drawGlassPanel } from "../components/game/draw-helpers";
 
+
+
+// Responsive scaling based on canvas size
+function getScale(w: number, h: number): number {
+    const base = 800; // reference width
+    return Math.max(0.6, Math.min(1.2, w / base));
+}
+
 // ---------------------------------------------------------------------------
 // Animated State
 // ---------------------------------------------------------------------------
@@ -66,45 +74,48 @@ export function drawEnhancedHud(
     state: any, copy: any,
 ): void {
     ctx.save();
+    const s = getScale(w, h);
 
     // --- Top bar ---
-    drawGlassPanel(ctx, 16, 12, w - 32, 52, 16);
+    const barH = Math.round(52 * s);
+    drawGlassPanel(ctx, 16, 12, w - 32, barH, Math.round(16 * s));
 
     // Score (left) with animated counter
-    ctx.font = "400 10px -apple-system, SF Pro Text, system-ui, sans-serif";
+    ctx.font = (9 * s) + "px -apple-system, SF Pro Text, system-ui, sans-serif";
     ctx.fillStyle = COLORS.textTertiary;
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
-    ctx.fillText(copy.score.toUpperCase(), 32, 18);
+    ctx.fillText(copy.score.toUpperCase(), 32, Math.round(18 * s));
 
-    ctx.font = "700 22px -apple-system, SF Pro Display, system-ui, sans-serif";
+    ctx.font = "700 " + Math.round(20 * s) + "px -apple-system, SF Pro Display, system-ui, sans-serif";
     ctx.fillStyle = COLORS.text;
     ctx.textBaseline = "bottom";
-    ctx.fillText(String(Math.round(hud.displayScore)), 32, 56);
+    ctx.fillText(String(Math.round(hud.displayScore)), 32, Math.round(54 * s));
 
     // Wave (center) with progress
-    ctx.font = "400 10px -apple-system, SF Pro Text, system-ui, sans-serif";
+    ctx.font = (9 * s) + "px -apple-system, SF Pro Text, system-ui, sans-serif";
     ctx.fillStyle = COLORS.textTertiary;
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
-    ctx.fillText(copy.wave.toUpperCase(), w / 2, 18);
+    ctx.fillText(copy.wave.toUpperCase(), w / 2, Math.round(18 * s));
 
-    ctx.font = "600 20px -apple-system, SF Pro Display, system-ui, sans-serif";
+    ctx.font = "600 " + Math.round(18 * s) + "px -apple-system, SF Pro Display, system-ui, sans-serif";
     ctx.fillStyle = COLORS.text;
     ctx.textBaseline = "bottom";
-    ctx.fillText(String(state.wave), w / 2, 56);
+    ctx.fillText(String(state.wave), w / 2, Math.round(54 * s));
 
     // Wave progress bar (mini)
     const waveProgress = state.waveQueue.length > 0 ? state.nextSpawnIndex / state.waveQueue.length : 0;
-    const barW = 60;
+    const barW = Math.round(60 * s);
     const barX = w / 2 - barW / 2;
+    const barY = Math.round(56 * s);
     ctx.fillStyle = "rgba(255,255,255,0.08)";
     ctx.beginPath();
-    ctx.roundRect(barX, 58, barW, 3, 1.5);
+    ctx.roundRect(barX, barY, barW, 3, 1.5);
     ctx.fill();
     ctx.fillStyle = COLORS.textTertiary;
     ctx.beginPath();
-    ctx.roundRect(barX, 58, barW * waveProgress, 3, 1.5);
+    ctx.roundRect(barX, barY, barW * waveProgress, 3, 1.5);
     ctx.fill();
 
     // Lives (right) with loss flash
@@ -143,10 +154,10 @@ export function drawEnhancedHud(
 
     // --- Combo meter (below top bar, center) ---
     if (state.combo >= 2) {
-        const meterW = 120;
-        const meterH = 6;
+        const meterW = Math.round(120 * s);
+        const meterH = Math.round(6 * s);
         const meterX = w / 2 - meterW / 2;
-        const meterY = 72;
+        const meterY = Math.round(68 * s);
 
         // Background bar
         ctx.fillStyle = "rgba(255,255,255,0.06)";
@@ -165,22 +176,23 @@ export function drawEnhancedHud(
         ctx.shadowBlur = 0;
 
         // Combo label
-        ctx.font = "600 11px -apple-system, SF Pro Text, system-ui, sans-serif";
+        ctx.font = "600 " + Math.round(10 * s) + "px -apple-system, SF Pro Text, system-ui, sans-serif";
         ctx.fillStyle = comboColor;
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
         const mult = 1 + Math.floor(state.combo / 5) * 0.5;
-        ctx.fillText("x" + mult.toFixed(1), w / 2, meterY + 8);
+        ctx.fillText("x" + mult.toFixed(1), w / 2, meterY + Math.round(10 * s));
     }
 
     // --- Active input display (centered, below combo) ---
     if (state.typedInput) {
-        drawGlassPanel(ctx, w / 2 - 80, 94, 160, 30, 8);
-        ctx.font = "500 15px SF Mono, Cascadia Mono, monospace";
+        const inputY = Math.round(90 * s);
+        drawGlassPanel(ctx, w / 2 - 80, inputY, 160, Math.round(28 * s), Math.round(8 * s));
+        ctx.font = "500 " + Math.round(14 * s) + "px SF Mono, Cascadia Mono, monospace";
         ctx.fillStyle = COLORS.success;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText(state.typedInput, w / 2, 109);
+        ctx.fillText(state.typedInput, w / 2, inputY + Math.round(14 * s));
     }
 
     // --- KPS indicator (bottom-left) ---
