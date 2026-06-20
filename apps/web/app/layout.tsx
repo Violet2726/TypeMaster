@@ -1,8 +1,13 @@
-﻿import type { Metadata, Viewport } from 'next';
+import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import { AppFrame } from '../src/application/AppFrame';
 import { AppProviders } from '../src/application/AppProviders';
 import '../index.css';
+import '../src/styles/layout.css';
+import '../src/styles/header.css';
+import '../src/styles/buttons.css';
+import '../src/styles/panels.css';
+import '../src/styles/base-page.css';
 import '../src/styles/animations.css';
 import '../src/styles/toggle-switch.css';
 import '../src/styles/typing-shell.css';

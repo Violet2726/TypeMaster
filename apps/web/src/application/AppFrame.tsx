@@ -60,7 +60,7 @@ export function AppFrame({ children }: AppFrameProps) {
             />
 
             <main className="app-main">
-                <div className="container">
+                <div className="container shell-container">
                     {children}
                 </div>
             </main>

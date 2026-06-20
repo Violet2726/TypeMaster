@@ -1,108 +1,91 @@
-/* Practice Page – Apple-inspired Compact Layout */
-
 .practice-page--refined {
+    display: grid;
     gap: 1rem;
 }
 
 .practice-page--refined .panel,
 .practice-page--refined .sticky-action-bar {
-    border-radius: 20px;
+    border-radius: 24px;
 }
-
-/* ─── Practice Hero: Compact single-column ─── */
 
 .practice-hero {
     position: relative;
     overflow: hidden;
-    padding: clamp(1.5rem, 3vw, 2.2rem) clamp(1.2rem, 2.5vw, 2rem);
+    padding: clamp(1.55rem, 3vw, 2.2rem) clamp(1.25rem, 2.5vw, 2rem);
+    border-radius: 26px;
     background:
-        radial-gradient(ellipse at 20% 0%, rgba(116, 188, 255, 0.10), transparent 50%),
+        radial-gradient(ellipse at 18% 0%, rgba(115, 188, 255, 0.12), transparent 52%),
         linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
-}
-
-.practice-hero::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -15%;
-    width: 60%;
-    height: 200%;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(125, 205, 255, 0.05), transparent 55%);
-    pointer-events: none;
+    box-shadow: var(--shadow-soft);
 }
 
 .practice-hero__copy {
     position: relative;
     z-index: 1;
     display: grid;
-    gap: 0.65rem;
-    max-width: 48rem;
+    gap: 0.62rem;
+    max-width: 46rem;
 }
 
 .practice-hero__eyebrow {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.6rem;
+    gap: 0.58rem;
     align-items: center;
 }
 
 .practice-hero h1 {
     margin: 0;
     color: var(--text-strong);
-    font-size: clamp(1.8rem, 3.5vw, 2.6rem);
-    line-height: 1.05;
-    letter-spacing: -0.03em;
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 3.4vw, 2.55rem);
+    line-height: 1.04;
+    letter-spacing: -0.028em;
     max-width: 20ch;
 }
 
 .practice-hero .hero-body {
     margin: 0;
     max-width: 36rem;
-    color: var(--text-color);
-    font-size: 0.95rem;
-    line-height: 1.55;
+    font-size: 0.98rem;
+    line-height: 1.58;
 }
 
-/* Config strip – compact inline display */
 .practice-hero__config-strip {
     display: flex;
     flex-wrap: wrap;
-    gap: 1.25rem;
+    gap: 1.2rem;
     align-items: center;
-    margin-top: 0.4rem;
-    padding-top: 0.65rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    margin-top: 0.42rem;
+    padding-top: 0.64rem;
+    border-top: 1px solid var(--panel-stroke);
 }
 
 .practice-hero__config-item {
     display: flex;
     align-items: baseline;
-    gap: 0.35rem;
+    gap: 0.34rem;
 }
 
 .practice-hero__config-item span {
     color: var(--text-dim);
     font-size: 0.74rem;
-    font-family: var(--font-mono);
-    letter-spacing: 0.04em;
+    font-weight: 650;
 }
 
 .practice-hero__config-item strong {
     color: var(--text-strong);
-    font-size: 0.84rem;
-    font-weight: 600;
+    font-size: 0.85rem;
+    font-weight: 700;
 }
 
 .practice-hero__config-item--status strong {
     color: var(--main-color);
 }
 
-/* ─── Support Grid ─── */
-
 .practice-support-grid {
     display: grid;
-    gap: 0.75rem;
+    gap: 0.8rem;
 }
 
 .practice-support-grid--split {
@@ -111,13 +94,11 @@
 
 .practice-brief-panel,
 .adaptive-drill-panel {
-    border-radius: 20px;
+    border-radius: 24px;
 }
 
-/* ─── Workbench ─── */
-
 .practice-workbench__rail .practice-toolbar {
-    border-radius: 20px;
+    border-radius: 24px;
 }
 
 .practice-toolbar__header {
@@ -128,91 +109,74 @@
 }
 
 .practice-toolbar__header h2 {
-    margin-top: 0.15rem;
+    margin-top: 0.12rem;
 }
 
 .practice-page--refined .practice-toolbar__support-note {
-    padding: 0.75rem 0.8rem;
+    padding: 0.76rem 0.82rem;
     border: 1px solid var(--panel-stroke);
-    border-radius: 16px;
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02)),
-        rgba(255, 255, 255, 0.025);
+    border-radius: 18px;
+    background: linear-gradient(180deg, var(--surface-2), var(--bg-soft));
 }
 
 .practice-page--refined .practice-toolbar__hint {
-    line-height: 1.5;
+    line-height: 1.52;
     font-size: 0.88rem;
 }
 
 .practice-page--refined .practice-workbench__primary .typing-stage {
-    min-height: clamp(35rem, calc(100dvh - 11rem), 46rem);
-    border-radius: 20px;
+    min-height: clamp(36rem, calc(100dvh - 11rem), 48rem);
+    border-radius: 24px;
 }
 
 .practice-page--refined .practice-workbench__primary .typing-stage__head {
-    padding-bottom: 0.8rem;
+    padding-bottom: 0.78rem;
 }
 
 .practice-page--refined .practice-workbench__primary .typing-stage__source strong {
-    font-size: clamp(1.15rem, 1.7vw, 1.4rem);
+    font-size: clamp(1.14rem, 1.7vw, 1.38rem);
 }
 
 .practice-page--refined .practice-workbench__primary .typing-stage .words-shell {
-    border-radius: 20px;
+    border-radius: 24px;
 }
 
 .practice-page--refined .practice-workbench__primary .typing-stage .words-container {
-    height: clamp(18rem, 40vh, 25rem);
+    height: clamp(18.5rem, 40vh, 25.5rem);
 }
 
 .practice-page--refined .practice-workbench__primary .typing-empty-state__step,
 .practice-page--refined .practice-workbench__primary .typing-empty-state__preview,
 .practice-page--refined .practice-workbench__primary .typing-empty-state__preflight li {
-    border-radius: 16px;
+    border-radius: 18px;
 }
 
 .practice-page--refined .sticky-action-bar {
-    border-radius: 20px;
+    border-radius: 22px;
 }
-
-/* ─── Compose Mode ─── */
 
 .practice-page--refined.practice-page--compose .practice-hero {
     padding-bottom: 1rem;
 }
 
 .practice-page--refined.practice-page--compose .practice-workbench {
-    grid-template-columns: minmax(0, 0.9fr) minmax(17rem, 1.1fr);
+    grid-template-columns: minmax(0, 0.92fr) minmax(17rem, 1.08fr);
 }
 
 .practice-page--refined.practice-page--compose .practice-workbench__primary .typing-stage {
-    min-height: clamp(31rem, calc(100dvh - 12rem), 42rem);
+    min-height: clamp(32rem, calc(100dvh - 12rem), 44rem);
 }
-
-/* ─── Light Theme ─── */
 
 body[data-theme='serika-light'] .practice-hero {
     background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 255, 0.88)),
         #ffffff;
-}
-
-body[data-theme='serika-light'] .practice-hero__config-strip {
-    border-top-color: rgba(60, 60, 67, 0.08);
+    box-shadow: var(--shadow-soft);
 }
 
 body[data-theme='serika-light'] .practice-page--refined .practice-toolbar__support-note {
-    border-color: rgba(60, 60, 67, 0.1);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 250, 255, 0.84));
 }
-
-body[data-theme='serika-light'] .practice-page--refined .practice-toolbar__support-note {
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 255, 0.84)),
-        rgba(255, 255, 255, 0.82);
-}
-
-/* ─── Responsive ─── */
 
 @media (max-width: 1100px) {
     .practice-support-grid--split,
@@ -223,7 +187,7 @@ body[data-theme='serika-light'] .practice-page--refined .practice-toolbar__suppo
 
 @media (max-width: 720px) {
     .practice-page--refined {
-        gap: 0.8rem;
+        gap: 0.78rem;
     }
 
     .practice-page--refined .panel,
@@ -233,20 +197,20 @@ body[data-theme='serika-light'] .practice-page--refined .practice-toolbar__suppo
     .practice-workbench__rail .practice-toolbar,
     .practice-brief-panel,
     .adaptive-drill-panel {
-        border-radius: 18px;
+        border-radius: 20px;
     }
 
     .practice-hero {
-        padding: 1.2rem 1rem;
+        padding: 1.18rem 1rem;
     }
 
     .practice-hero h1 {
-        font-size: clamp(1.6rem, 8vw, 2.2rem);
+        font-size: clamp(1.58rem, 8vw, 2.18rem);
         max-width: 100%;
     }
 
     .practice-hero__config-strip {
-        gap: 0.9rem;
+        gap: 0.88rem;
     }
 
     .practice-page--refined .practice-workbench__primary .typing-stage {

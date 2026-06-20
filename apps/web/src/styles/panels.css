@@ -1,0 +1,112 @@
+.panel {
+    position: relative;
+    display: grid;
+    gap: 1rem;
+    padding: 1.35rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--panel-stroke);
+    background: linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
+    box-shadow: var(--shadow-soft);
+}
+
+.metric-card,
+.result-item,
+.status-card,
+.feedback-card,
+.tag-pill,
+.mini-series__row,
+.banner {
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    border: 1px solid var(--panel-stroke);
+    background: linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
+    box-shadow: var(--shadow-soft);
+}
+
+.metric-card,
+.result-item {
+    display: grid;
+    gap: 0.34rem;
+}
+
+.metric-card strong,
+.result-item-value {
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+}
+
+.panel-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.panel-head h2,
+.home-action-section__head h2,
+.home-action-card h2,
+.adaptive-drill-panel h2,
+.practice-toolbar h2,
+.result-copy h2,
+.result-decision-panel h2,
+.result-advice-panel h2,
+.insights-latest-card h2 {
+    margin: 0.18rem 0 0;
+    color: var(--text-strong);
+    font-family: var(--font-ui);
+    font-size: clamp(1.28rem, 2vw, 1.85rem);
+    line-height: 1.14;
+    letter-spacing: -0.015em;
+}
+
+.panel-badge,
+.home-action-chip,
+.tag-pill {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    padding: 0.42rem 0.72rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--panel-stroke);
+    background: var(--bg-soft);
+    color: var(--text-strong);
+    font-size: 0.82rem;
+    font-weight: 650;
+}
+
+.panel-badge {
+    background: var(--main-soft);
+}
+
+.badge-idle,
+.badge-loading {
+    color: var(--main-color);
+    background: var(--main-soft);
+}
+
+.badge-ready,
+.badge-success {
+    color: var(--success-color);
+    background: var(--success-soft);
+}
+
+.badge-stale,
+.badge-fallback {
+    color: var(--warning-color);
+    background: var(--warning-soft);
+}
+
+.badge-error {
+    color: var(--error-color);
+    background: var(--error-soft);
+}
+
+.history-metrics,
+.results-actions,
+.confirm-dialog__actions,
+.workshop-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+}

@@ -1,0 +1,54 @@
+.hero-body,
+.muted-text,
+.typing-empty-state p,
+.feedback-card p,
+.banner p {
+    margin: 0;
+}
+
+.hero-body {
+    color: var(--text-color);
+    font-size: 1.12rem;
+    line-height: 1.55;
+}
+
+.lead-text {
+    margin: 0;
+    color: var(--text-strong);
+    font-size: 1.02rem;
+    line-height: 1.55;
+}
+
+.muted-text {
+    color: var(--text-dim);
+}
+
+.home-launch,
+.insights-header {
+    display: grid;
+    gap: 1rem;
+}
+
+.home-launch h1,
+.insights-header h1 {
+    margin: 0;
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: clamp(2.6rem, 4.8vw, 4.2rem);
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+}
+
+.hero-actions,
+.home-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.home-stats-strip,
+.result-metrics-strip {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.9rem;
+}

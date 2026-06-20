@@ -67,15 +67,15 @@
     scrollbar-width: thin;
     box-shadow:
         0 14px 34px rgba(0, 0, 0, 0.14),
-        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        inset 0 1px 0 var(--panel-stroke);
     backdrop-filter: saturate(160%) blur(22px);
     -webkit-backdrop-filter: saturate(160%) blur(22px);
 }
 
 body[data-theme='serika-light'] .practice-workbench__rail .practice-toolbar {
     box-shadow:
-        0 16px 40px rgba(80, 102, 136, 0.12),
-        inset 0 1px 0 rgba(255, 255, 255, 0.62);
+        0 16px 40px var(--shadow-soft),
+        inset 0 1px 0 var(--panel-stroke);
 }
 
 .practice-workbench__rail .practice-toolbar__row {
@@ -105,8 +105,8 @@ body[data-theme='serika-light'] .practice-workbench__rail .practice-toolbar {
     border-radius: 0.5rem;
     overflow: hidden;
     background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.032), rgba(255, 255, 255, 0.012)),
-        rgba(8, 10, 18, 0.24);
+        linear-gradient(180deg, var(--bg-elevated), var(--bg-panel)),
+        var(--surface-2);
 }
 
 .practice-workbench__rail .practice-toolbar__snapshot-item {
@@ -506,7 +506,7 @@ body[data-theme='serika-light'] .practice-workbench__rail .ai-custom-panel {
 .practice-workbench__primary .typing-stage .words-shell {
     border-radius: 8px;
     background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.012)),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.045), var(--bg-panel)),
         rgba(255, 255, 255, 0.026);
 }
 
@@ -563,7 +563,7 @@ body[data-theme='serika-light'] .practice-workbench__rail .ai-custom-panel {
     border: 1px solid var(--panel-stroke);
     border-radius: 8px;
     background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.052), rgba(255, 255, 255, 0.018)),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.052), var(--bg-panel)),
         rgba(255, 255, 255, 0.026);
 }
 
