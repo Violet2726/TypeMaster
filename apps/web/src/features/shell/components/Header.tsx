@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Languages, Moon, Sun, Home, Keyboard, Target, BarChart3, Brain } from 'lucide-react';
+import { Moon, Sun, Home, Keyboard, Target, BarChart3, Brain, Settings } from 'lucide-react';
 import { StoredSettingsSchema } from '@typemaster/contracts/storage';
-import { getCopy, getLanguageMeta } from '../../../i18n';
+import { getCopy } from '../../../i18n';
 import { getTrainingCopy } from '../../../training/copy';
 
 type Settings = ReturnType<typeof StoredSettingsSchema.parse>;
@@ -18,12 +18,17 @@ type HeaderProps = {
     onOpenSettings: () => void,
 };
 
-const NAV_TABS = [
-    { href: '/', icon: Home },
-    { href: '/practice', icon: Keyboard },
-    { href: '/challenge', icon: Target },
-    { href: '/insights', icon: BarChart3 },
-] as const;
+type NavItem = { href: string; label: string; icon: typeof Home; show: boolean };
+
+function buildNavItems(copy: AppCopy, trainingCopy: any, hasTrainingPlan: boolean): NavItem[] {
+    return [
+        { href: '/', label: copy.nav.home, icon: Home, show: true },
+        { href: '/practice', label: copy.nav.practice, icon: Keyboard, show: true },
+        { href: '/plan', label: trainingCopy.nav.plan, icon: Brain, show: hasTrainingPlan },
+        { href: '/challenge', label: trainingCopy.nav.challenge, icon: Target, show: true },
+        { href: '/insights', label: copy.nav.insights, icon: BarChart3, show: true },
+    ].filter((item) => item.show);
+}
 
 function getNavProps(pathname: string, href: string) {
     const isActive = href === '/'
@@ -39,30 +44,27 @@ function getNavProps(pathname: string, href: string) {
 export function Header({ settings, copy, hasTrainingPlan = false, onToggleTheme, onOpenSettings }: HeaderProps) {
     const pathname = usePathname();
     const compact = settings.focusMode && pathname === '/practice';
-    const languageMeta = getLanguageMeta(settings.language);
     const trainingCopy = getTrainingCopy(settings.language);
     const ThemeIcon = settings.theme === 'serika-dark' ? Sun : Moon;
     const themeLabel = settings.theme === 'serika-dark' ? copy.settings.themeLight : copy.settings.themeDark;
+    const navItems = buildNavItems(copy, trainingCopy, hasTrainingPlan);
 
     return (
         <>
             <header className={`app-header ${compact ? 'is-compact' : ''}`}>
                 <div className="container app-header__inner">
-                    <div className="brand-block">
-                        <Link href="/" className="logo">
-                            <span className="logo-mark" />
-                            <span className="logo-word">Type<span>Master</span></span>
-                        </Link>
-                        {!compact && <p className="hero-kicker">{copy.shell.kicker}</p>}
-                    </div>
+                    <Link href="/" className="logo">
+                        <span className="logo-mark" />
+                        <span className="logo-word">Type<span>Master</span></span>
+                    </Link>
 
                     {!compact && (
                         <nav className="nav-links" aria-label="Primary">
-                            <Link href="/" {...getNavProps(pathname, '/')}>{copy.nav.home}</Link>
-                            <Link href="/practice" {...getNavProps(pathname, '/practice')}>{copy.nav.practice}</Link>
-                            {hasTrainingPlan && <Link href="/plan" {...getNavProps(pathname, '/plan')}>{trainingCopy.nav.plan}</Link>}
-                            <Link href="/challenge" {...getNavProps(pathname, '/challenge')}>{trainingCopy.nav.challenge}</Link>
-                            <Link href="/insights" {...getNavProps(pathname, '/insights')}>{copy.nav.insights}</Link>
+                            {navItems.map(({ href, label }) => (
+                                <Link key={href} href={href} {...getNavProps(pathname, href)}>
+                                    {label}
+                                </Link>
+                            ))}
                         </nav>
                     )}
 
@@ -77,14 +79,13 @@ export function Header({ settings, copy, hasTrainingPlan = false, onToggleTheme,
                             <ThemeIcon aria-hidden="true" size={17} strokeWidth={2.2} />
                         </button>
                         <button
-                            className="nav-icon nav-icon--language"
+                            className="nav-icon nav-icon--tool"
                             type="button"
                             onClick={onOpenSettings}
                             title={copy.nav.openSettings}
                             aria-label={copy.nav.openSettings}
                         >
-                            <Languages aria-hidden="true" size={17} strokeWidth={2.2} />
-                            <span>{languageMeta.shortLabel}</span>
+                            <Settings aria-hidden="true" size={17} strokeWidth={2.2} />
                         </button>
                     </div>
                 </div>
@@ -93,17 +94,10 @@ export function Header({ settings, copy, hasTrainingPlan = false, onToggleTheme,
             {/* Mobile bottom tab bar - Apple HIG style */}
             {!compact && (
                 <nav className="mobile-tab-bar" aria-label="Mobile navigation">
-                    {NAV_TABS.map(({ href, icon: Icon }) => {
+                    {navItems.map(({ href, label, icon: Icon }) => {
                         const isActive = href === '/'
                             ? pathname === '/'
                             : pathname.startsWith(href);
-                        const label = href === '/'
-                            ? copy.nav.home
-                            : href === '/practice'
-                                ? copy.nav.practice
-                                : href === '/challenge'
-                                    ? trainingCopy.nav.challenge
-                                    : copy.nav.insights;
                         return (
                             <Link
                                 key={href}
@@ -116,16 +110,6 @@ export function Header({ settings, copy, hasTrainingPlan = false, onToggleTheme,
                             </Link>
                         );
                     })}
-                    {hasTrainingPlan && (
-                        <Link
-                            href="/plan"
-                            className={`mobile-tab-bar__item${pathname === '/plan' ? ' is-active' : ''}`}
-                            aria-current={pathname === '/plan' ? 'page' : undefined}
-                        >
-                            <Brain aria-hidden="true" />
-                            <span>{trainingCopy.nav.plan}</span>
-                        </Link>
-                    )}
                 </nav>
             )}
         </>
