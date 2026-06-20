@@ -279,16 +279,6 @@ export function TypingArea({
                         <strong>{sourceLabel || copy.common.emptyValue}</strong>
                     </div>
 
-                    {!isTypingUnavailable && (
-                        <div className="typing-stage__meta-strip" aria-label={copy.practice.sessionLabel}>
-                            {stageMetaItems.map((item) => (
-                                <div key={item.key} className="typing-stage__meta-pill">
-                                    <small>{item.label}</small>
-                                    <strong>{item.value}</strong>
-                                </div>
-                            ))}
-                        </div>
-                    )}
 
                     <div className="typing-stage__status">
                         <span className={`panel-badge badge-${getBadgeStatus(status)}`}>

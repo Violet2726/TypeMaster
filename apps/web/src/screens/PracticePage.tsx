@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
@@ -237,28 +237,6 @@ export function PracticePage() {
                     <p className="hero-body">{practiceBody}</p>
                 </div>
 
-                <div className="practice-hero__config-strip">
-                    <div className="practice-hero__config-item">
-                        <span>{store.copy.practice.sourceTitle}</span>
-                        <strong>{sourceLabel}</strong>
-                    </div>
-                    <div className="practice-hero__config-item">
-                        <span>{store.copy.practice.modeTitle}</span>
-                        <strong>{activeModeLabel}</strong>
-                    </div>
-                    <div className="practice-hero__config-item">
-                        <span>{store.copy.practice.volumeTitle}</span>
-                        <strong>{activeVolumeLabel}</strong>
-                    </div>
-                    <div className="practice-hero__config-item">
-                        <span>{trainingCopy.practice.layoutLabel}</span>
-                        <strong>{keyboardLayoutLabel}</strong>
-                    </div>
-                    <div className="practice-hero__config-item practice-hero__config-item--status">
-                        <span>{store.copy.common.status}</span>
-                        <strong>{sessionStatusLabel}</strong>
-                    </div>
-                </div>
             </section>
 
             {(nextRoundBrief || adaptiveDrillInsight) ? (
@@ -348,17 +326,10 @@ export function PracticePage() {
                     <section className="panel practice-toolbar">
                         <div className="practice-toolbar__row">
                             <div className="practice-toolbar__header">
-                                <div>
-                                    <p className="panel-kicker">{store.copy.practice.configTitle}</p>
-                                    <h2>{store.copy.practice.configTitle}</h2>
-                                </div>
+                                <h2>{store.copy.practice.configTitle}</h2>
                                 <span className={`panel-badge badge-${typingSession.status === 'running' ? 'loading' : typingSession.status === 'complete' ? 'success' : 'ready'}`}>
                                     {sessionStatusLabel}
                                 </span>
-                            </div>
-                            <div>
-                                <p className="muted-text practice-toolbar__meta">{sourceLabel}</p>
-                                <p className="muted-text practice-toolbar__meta">{activeModeLabel} 璺?{activeVolumeLabel}</p>
                             </div>
                         </div>
 

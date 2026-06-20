@@ -51,37 +51,6 @@
     line-height: 1.58;
 }
 
-.practice-hero__config-strip {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.2rem;
-    align-items: center;
-    margin-top: 0.42rem;
-    padding-top: 0.64rem;
-    border-top: 1px solid var(--panel-stroke);
-}
-
-.practice-hero__config-item {
-    display: flex;
-    align-items: baseline;
-    gap: 0.34rem;
-}
-
-.practice-hero__config-item span {
-    color: var(--text-dim);
-    font-size: 0.74rem;
-    font-weight: 650;
-}
-
-.practice-hero__config-item strong {
-    color: var(--text-strong);
-    font-size: 0.85rem;
-    font-weight: 700;
-}
-
-.practice-hero__config-item--status strong {
-    color: var(--main-color);
-}
 
 .practice-support-grid {
     display: grid;
@@ -209,9 +178,6 @@ body[data-theme='serika-light'] .practice-page--refined .practice-toolbar__suppo
         max-width: 100%;
     }
 
-    .practice-hero__config-strip {
-        gap: 0.88rem;
-    }
 
     .practice-page--refined .practice-workbench__primary .typing-stage {
         min-height: auto;
