@@ -1,4 +1,4 @@
-﻿.challenge-page {
+.challenge-page {
     gap: 1.05rem;
 }
 
@@ -44,7 +44,7 @@
     align-items: center;
     min-height: 2.05rem;
     padding: 0.42rem 0.7rem;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     border: 1px solid var(--panel-stroke);
     background: var(--bg-soft);
     color: var(--text-strong);
@@ -82,7 +82,7 @@
     height: 3.2rem;
     margin-bottom: 1.05rem;
     border: 1px solid rgba(10, 132, 255, 0.3);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background: rgba(10, 132, 255, 0.16);
     color: #8ecaff;
     box-shadow:
@@ -118,7 +118,7 @@
     gap: 0.86rem;
     min-width: 0;
     padding-left: 1.15rem;
-    border-left: 1px solid rgba(255, 255, 255, 0.12);
+    border-left: 1px solid var(--panel-stroke);
 }
 
 .challenge-starter-brief__head {
@@ -134,7 +134,7 @@
     width: 2.7rem;
     height: 2.7rem;
     border: 1px solid rgba(153, 242, 192, 0.26);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background: rgba(153, 242, 192, 0.12);
     color: #99f2c0;
 }
@@ -167,8 +167,8 @@
     min-height: 5.1rem;
     padding: 0.66rem;
     border: 1px solid var(--panel-stroke);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.045);
+    border-radius: var(--radius-sm);
+    background: var(--bg-soft);
 }
 
 .challenge-starter-route small {
@@ -210,7 +210,7 @@
     align-items: start;
     min-width: 0;
     padding: 0.68rem 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.09);
+    border-top: 1px solid var(--panel-stroke);
 }
 
 .challenge-starter-unlock-row > span {
@@ -218,8 +218,8 @@
     place-items: center;
     width: 2rem;
     height: 2rem;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.065);
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
     color: #8ecaff;
 }
 
@@ -282,7 +282,7 @@
     width: 3.05rem;
     height: 3.05rem;
     border: 1px solid rgba(10, 132, 255, 0.3);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background: rgba(10, 132, 255, 0.14);
     color: #8ecaff;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
@@ -320,10 +320,10 @@
     padding: 0.82rem;
     overflow: hidden;
     border: 1px solid var(--panel-stroke);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.058), rgba(255, 255, 255, 0.018)),
-        rgba(255, 255, 255, 0.032);
+        linear-gradient(180deg, var(--bg-soft), rgba(255, 255, 255, 0.018)),
+        var(--bg-soft);
 }
 
 .challenge-first-run-card::before {
@@ -348,7 +348,7 @@
     width: 2.35rem;
     height: 2.35rem;
     border: 1px solid rgba(10, 132, 255, 0.24);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background: rgba(10, 132, 255, 0.12);
     color: #8ecaff;
 }
@@ -396,10 +396,10 @@
     margin-top: 0.2rem;
     padding: 0.86rem;
     border: 1px solid var(--panel-stroke);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.018)),
-        rgba(255, 255, 255, 0.028);
+        linear-gradient(180deg, var(--bg-soft), rgba(255, 255, 255, 0.018)),
+        var(--bg-soft);
 }
 
 .challenge-empty-status__head {
@@ -423,7 +423,7 @@
     height: 2.55rem;
     place-items: center;
     border: 1px solid rgba(10, 132, 255, 0.28);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background: rgba(10, 132, 255, 0.14);
     color: #8ecaff;
 }
@@ -449,8 +449,8 @@
     padding: 0.58rem;
     overflow: hidden;
     border: 1px solid var(--panel-stroke);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.045);
+    border-radius: var(--radius-sm);
+    background: var(--bg-soft);
 }
 
 .challenge-empty-status__grid span::before {
@@ -499,7 +499,7 @@
     padding: 0.84rem 0.9rem;
     box-shadow: none;
     background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.024)),
+        linear-gradient(180deg, var(--bg-soft), var(--bg-soft)),
         var(--surface-2);
 }
 
@@ -532,10 +532,10 @@
     min-height: 8.8rem;
     padding: 0.9rem;
     border: 1px solid var(--panel-stroke);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.018)),
-        rgba(255, 255, 255, 0.026);
+        linear-gradient(180deg, var(--bg-soft), rgba(255, 255, 255, 0.018)),
+        var(--bg-soft);
 }
 
 .challenge-replay-empty__icon {
@@ -544,7 +544,7 @@
     height: 2.75rem;
     place-items: center;
     border: 1px solid rgba(10, 132, 255, 0.28);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background: rgba(10, 132, 255, 0.14);
     color: #8ecaff;
 }
@@ -569,8 +569,8 @@
 
 .challenge-replay-empty__rail span {
     height: 0.42rem;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-pill);
+    background: var(--panel-stroke);
 }
 
 .challenge-replay-empty__rail span:first-child {
@@ -582,11 +582,11 @@
 }
 
 .challenge-page .history-table {
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     border-color: var(--panel-stroke);
     background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018)),
-        rgba(255, 255, 255, 0.025);
+        linear-gradient(180deg, var(--bg-soft), rgba(255, 255, 255, 0.018)),
+        var(--bg-soft);
 }
 
 .challenge-page .history-row {
@@ -599,7 +599,7 @@
 }
 
 .challenge-page .history-row:hover {
-    background: rgba(255, 255, 255, 0.055);
+    background: var(--bg-soft);
     transform: translateY(-1px);
 }
 
@@ -629,7 +629,7 @@
     height: 2.18rem;
     place-items: center;
     border: 1px solid var(--panel-stroke);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: var(--surface-2);
     color: var(--text-dim);
     font-family: var(--font-mono);
@@ -665,8 +665,8 @@
     min-height: 2rem;
     padding: 0.34rem 0.58rem;
     border: 1px solid var(--panel-stroke);
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.055);
+    border-radius: var(--radius-pill);
+    background: var(--bg-soft);
     color: var(--text-strong);
     font-size: 0.76rem;
     font-weight: 730;
@@ -691,7 +691,7 @@
 
 body[data-theme='serika-light'] .challenge-page .history-table {
     background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.68)),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.92), var(--bg-elevated)),
         var(--bg-soft);
 }
 
@@ -715,7 +715,7 @@ body[data-theme='serika-light'] .challenge-starter-unlock-row {
 }
 
 body[data-theme='serika-light'] .challenge-starter-route span {
-    background: rgba(255, 255, 255, 0.68);
+    background: var(--bg-elevated);
 }
 
 body[data-theme='serika-light'] .challenge-starter-unlock-row > span {
@@ -727,7 +727,7 @@ body[data-theme='serika-light'] .challenge-page .history-row:hover {
 }
 
 body[data-theme='serika-light'] .challenge-metric-pill {
-    background: rgba(255, 255, 255, 0.78);
+    background: var(--bg-elevated);
 }
 
 @media (max-width: 980px) {
@@ -757,7 +757,7 @@ body[data-theme='serika-light'] .challenge-metric-pill {
     .challenge-starter-brief {
         padding-top: 1rem;
         padding-left: 0;
-        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        border-top: 1px solid var(--panel-stroke);
         border-left: 0;
     }
 
@@ -1028,7 +1028,7 @@ body[data-theme='serika-light'] .challenge-metric-pill {
 }
 
 .challenge-page .panel {
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
 }
 
 .challenge-page--starter {
@@ -1042,10 +1042,10 @@ body[data-theme='serika-light'] .challenge-metric-pill {
     gap: clamp(0.9rem, 1.4vw, 1.25rem);
     min-height: clamp(25rem, calc(100dvh - 8.8rem), 34rem);
     padding: clamp(1.05rem, 1.7vw, 1.55rem);
-    border-color: rgba(255, 255, 255, 0.13);
+    border-color: var(--panel-stroke);
     background:
         linear-gradient(135deg, rgba(10, 132, 255, 0.13), transparent 34%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.078), rgba(255, 255, 255, 0.026)),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.078), var(--bg-soft)),
         var(--bg-panel);
     box-shadow:
         0 18px 46px rgba(0, 0, 0, 0.16),
@@ -1058,8 +1058,8 @@ body[data-theme='serika-light'] .challenge-metric-pill {
     pointer-events: none;
     content: '';
     background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 32%),
-        linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.024), transparent);
+        linear-gradient(180deg, var(--bg-soft), transparent 32%),
+        linear-gradient(90deg, transparent, var(--bg-soft), transparent);
     mask-image: linear-gradient(180deg, black, transparent 74%);
 }
 
@@ -1090,7 +1090,7 @@ body[data-theme='serika-light'] .challenge-metric-pill {
     background:
         linear-gradient(180deg, rgba(10, 132, 255, 0.24), rgba(10, 132, 255, 0.11));
     color: #9fd0ff;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    box-shadow: inset 0 1px 0 var(--panel-stroke);
 }
 
 .challenge-starter-panel h1 {
@@ -1112,15 +1112,15 @@ body[data-theme='serika-light'] .challenge-metric-pill {
 .challenge-fact {
     min-height: 1.98rem;
     padding: 0.38rem 0.68rem;
-    border-color: rgba(255, 255, 255, 0.12);
-    background: rgba(255, 255, 255, 0.052);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    border-color: var(--panel-stroke);
+    background: var(--bg-soft);
+    box-shadow: inset 0 1px 0 var(--bg-soft);
 }
 
 .challenge-starter-panel__cta {
     margin-top: 1.2rem;
     min-height: 2.72rem;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
 }
 
 .challenge-starter-brief {
@@ -1129,10 +1129,10 @@ body[data-theme='serika-light'] .challenge-metric-pill {
     gap: 0.7rem;
     padding: 0.82rem;
     border: 1px solid var(--panel-stroke);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.018)),
-        rgba(255, 255, 255, 0.026);
+        linear-gradient(180deg, var(--bg-soft), rgba(255, 255, 255, 0.018)),
+        var(--bg-soft);
 }
 
 .challenge-starter-brief__head {
@@ -1164,8 +1164,8 @@ body[data-theme='serika-light'] .challenge-metric-pill {
     min-height: 2.9rem;
     padding: 0.58rem 0.64rem;
     background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.052), rgba(255, 255, 255, 0.016)),
-        rgba(255, 255, 255, 0.024);
+        linear-gradient(180deg, var(--bg-soft), rgba(255, 255, 255, 0.016)),
+        var(--bg-soft);
 }
 
 .challenge-starter-route small {
@@ -1199,7 +1199,7 @@ body[data-theme='serika-light'] .challenge-metric-pill {
 .challenge-starter-unlock-row > span {
     width: 1.9rem;
     height: 1.9rem;
-    background: rgba(255, 255, 255, 0.058);
+    background: var(--bg-soft);
 }
 
 .challenge-starter-unlock-row strong {
@@ -1211,10 +1211,10 @@ body[data-theme='serika-light'] .challenge-metric-pill {
 }
 
 .challenge-hero {
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background:
         linear-gradient(135deg, rgba(10, 132, 255, 0.12), transparent 38%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.076), rgba(255, 255, 255, 0.026)),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.076), var(--bg-soft)),
         var(--bg-panel);
     box-shadow:
         0 14px 36px rgba(0, 0, 0, 0.13),
@@ -1244,19 +1244,19 @@ body[data-theme='serika-light'] .challenge-metric-pill {
 
 .challenge-metric {
     min-height: 5rem;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
 }
 
 .challenge-empty-status,
 .challenge-replay-empty {
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.052), rgba(255, 255, 255, 0.016)),
+        linear-gradient(180deg, var(--bg-soft), rgba(255, 255, 255, 0.016)),
         rgba(255, 255, 255, 0.022);
 }
 
 .challenge-page .history-table {
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
 }
 
 .challenge-page .history-row {
@@ -1271,7 +1271,7 @@ body[data-theme='serika-light'] .challenge-replay-section,
 body[data-theme='serika-light'] .challenge-page > .panel:not(.challenge-starter-panel):not(.challenge-first-run-panel):not(.challenge-hero) {
     background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 255, 0.78)),
-        rgba(255, 255, 255, 0.88);
+        var(--bg-panel);
 }
 
 body[data-theme='serika-light'] .challenge-starter-brief,
@@ -1280,12 +1280,12 @@ body[data-theme='serika-light'] .challenge-empty-status,
 body[data-theme='serika-light'] .challenge-replay-empty {
     background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(248, 250, 255, 0.62)),
-        rgba(255, 255, 255, 0.72);
+        var(--bg-elevated);
 }
 
 body[data-theme='serika-light'] .challenge-fact {
     border-color: rgba(15, 23, 42, 0.08);
-    background: rgba(255, 255, 255, 0.72);
+    background: var(--bg-elevated);
 }
 
 @media (max-width: 980px) {
