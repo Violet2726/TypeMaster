@@ -29,12 +29,12 @@ export interface GameOverResult {
 
 export type Rating = "S" | "A" | "B" | "C" | "D";
 
-const RATING_CONFIG: Record<Rating, { color: string; glow: string; label: string; minScore: number }> = {
-    S: { color: "#ffd700", glow: "rgba(255,215,0,0.6)", label: "LEGENDARY", minScore: 5000 },
-    A: { color: "#32d74b", glow: "rgba(50,215,75,0.5)", label: "EXCELLENT", minScore: 3000 },
-    B: { color: "#0a84ff", glow: "rgba(10,132,255,0.5)", label: "GREAT", minScore: 1500 },
-    C: { color: "#ff9f0a", glow: "rgba(255,159,10,0.5)", label: "GOOD", minScore: 500 },
-    D: { color: "#ff453a", glow: "rgba(255,69,58,0.5)", label: "KEEP TRYING", minScore: 0 },
+const RATING_CONFIG: Record<Rating, { color: string; glow: string; label: string; labelZh: string; subtitle: string; minScore: number }> = {
+    S: { color: "#ffd700", glow: "rgba(255,215,0,0.6)", label: "LEGENDARY", labelZh: "传奇", subtitle: "Absolute mastery", minScore: 5000 },
+    A: { color: "#32d74b", glow: "rgba(50,215,75,0.5)", label: "EXCELLENT", labelZh: "卓越", subtitle: "Outstanding performance", minScore: 3000 },
+    B: { color: "#0a84ff", glow: "rgba(10,132,255,0.5)", label: "GREAT", labelZh: "出色", subtitle: "Strong typing skills", minScore: 1500 },
+    C: { color: "#ff9f0a", glow: "rgba(255,159,10,0.5)", label: "GOOD", labelZh: "良好", subtitle: "Room to grow", minScore: 500 },
+    D: { color: "#ff453a", glow: "rgba(255,69,58,0.5)", label: "KEEP TRYING", labelZh: "加油", subtitle: "Keep practicing!", minScore: 0 },
 };
 
 const STORAGE_KEY = "typing-raid-best";
@@ -234,7 +234,7 @@ export function renderGameOver(ctx: CanvasRenderingContext2D, w: number, h: numb
         // Rating label
         ctx.font = "600 10px -apple-system, SF Pro Text, system-ui, sans-serif";
         ctx.fillStyle = ratingCfg.color;
-        ctx.fillText(ratingCfg.label, 0, 38);
+        ctx.fillText(ratingCfg.labelZh + " " + ratingCfg.label, 0, 38);
 
         ctx.restore();
     }
@@ -293,6 +293,13 @@ export function renderGameOver(ctx: CanvasRenderingContext2D, w: number, h: numb
         ctx.translate(-(sx + cellW / 2), -(sy + cellH / 2));
 
         drawGlassPanel(ctx, sx, sy, cellW, cellH, 10);
+        // Accent left border
+        ctx.fillStyle = (s as any).accent;
+        ctx.globalAlpha = 0.8;
+        ctx.beginPath();
+        ctx.roundRect(sx, sy + 8, 3, cellH - 16, 1.5);
+        ctx.fill();
+        ctx.globalAlpha = 1;
 
         ctx.font = "400 10px -apple-system, SF Pro Text, system-ui, sans-serif";
         ctx.fillStyle = COLORS.textTertiary;
