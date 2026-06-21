@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Typing Raid Game Engine
  *
  * Central orchestrator: game loop, event dispatch, effect coordination.
@@ -22,6 +22,7 @@ import { COLORS } from "../components/game/colors";
 import { drawGlassPanel, drawProgressRing } from "../components/game/draw-helpers";
 import { initSound, playClickSound, playKillSound, playErrorSound, playComboSound, playChainSound, playPowerUpSound, playShieldBreakSound, playWaveClearSound, playGameOverSound, playAchievementSound, setSfxEnabled, playCountdownBeep, playCountdownGo, playBossPhaseSound, playBreathingWaveSound, playComboMilestoneSound, playThemeTransitionSound } from "../components/game/sound-engine";
 import { getBlendedTheme, drawThemedBackground } from "./environment-theme";
+import { GenerativeVisualSystem } from "./generative-visuals";
 import { initGameOver, renderGameOver, clearGameOver } from "./game-over";
 import { showWaveComplete, isWaveCompleteShowing, renderWaveComplete } from "./wave-complete";
 import { addGameResult, saveReplay } from "../services/storage/game-save";
@@ -145,6 +146,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     const music = createMusicEngine();
     const dynamicMusic = new DynamicMusicManager();
     const perfManager = new PerformanceManager();
+    const genVisuals = new GenerativeVisualSystem();
     let enemyVariants: Map<string, VariantState> = new Map();
     // Apply difficulty modifier
     const diffMods = { easy: 0.7, normal: 1.0, hard: 1.3 };
@@ -248,6 +250,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                     });
                 }
                 shake.trigger(8);
+                genVisuals.triggerBurst(canvasWidth / 2, canvasHeight / 2, '#4ade80', 2);
 
                 // Bomb screen flash handled by bomb power-up
                 const hasBombFlash = activePowerUps.some(ap => ap.type === "bomb");
@@ -580,6 +583,11 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         ctx.save();
         ctx.translate(enemy.x + wobble, enemy.y + shakeOff.y);
         ctx.scale(scale, scale);
+
+        // Generative aura
+        const auraColor = (COLORS as any)[enemy.type] || COLORS.normal;
+        const isActive = enemy.id === state.activeEnemyId;
+        genVisuals.drawEnemyAura(ctx, 0, 0, size, auraColor, time, isActive, state.combo);
 
         // Potential match highlight
         if (isPotentialMatch) {
@@ -1111,6 +1119,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                         // Scale particles by chain count
                         const chainBonus = Math.min(chainCount + 1, 5);
                         particles.emit({ x: enemy.x, y: enemy.y, count: 20 + chainBonus * 5, color, speed: 3 + chainBonus, size: 3 + chainBonus * 0.5, gravity: 2, turbulence: 0.5 + chainCount * 0.1, trail: true, trailLength: 6 + chainBonus * 2 });
+                        genVisuals.triggerBurst(enemy.x, enemy.y, color, 0.5 + chainCount * 0.2);
                         particles.emit({ x: enemy.x, y: enemy.y, count: 8 + chainBonus * 2, color: "#ffffff", speed: 2, size: 2, lifetime: 0.4 });
                         shake.trigger(4 + chainBonus * 2);
                         triggerComboFlash(state.combo); onComboMilestone(state.combo); if (state.combo % 5 === 0 && state.combo > 0) { playComboMilestoneSound(state.combo); haptic([10, 30, 10]); }
