@@ -44,6 +44,7 @@ import { shouldDropPowerUp, createPowerUp, updatePowerUps, processPowerUpInput, 
 import type { PowerUp, ActivePowerUp, PowerUpType } from "./power-up";
 import { TypingFeedbackManager } from "./typing-feedback";
 import { IdleScreenManager } from "./idle-screen";
+import { BattleVfxManager } from "./battle-vfx";
 
 // ---------------------------------------------------------------------------
 // Hue shift for dynamic background
@@ -99,7 +100,9 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     const shake = new ScreenShake();
 
     const typingFeedback = new TypingFeedbackManager();
+
     const idleScreen = new IdleScreenManager();
+    const battleVfx = new BattleVfxManager();
     const pool = biasWordPool(commonWords, []);
 
     let canvasWidth = 800;
@@ -1203,6 +1206,11 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         saveGameResult() { return buildGameResult(state); },
     };
 }
+
+
+
+
+
 
 
 
