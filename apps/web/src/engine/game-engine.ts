@@ -46,6 +46,8 @@ import { getThemeColors } from "@typemaster/domain";
 import { findChainMatch, getChainHint } from "@typemaster/domain";
 import { RhythmEngine } from "@typemaster/domain";
 import { BossBattleState, BOSS_PHASES } from "@typemaster/domain";
+import { generateRun, selectNode, completeCurrentNode, advanceToNextAct, getAvailableChoices, getCurrentNode, getEncounterConfig, getRunStats, NODE_TYPES, EVENTS, processEvent, restAction, purchaseUpgrade, getShopOffers } from "@typemaster/domain";
+import { renderRunMap, createRunMapState, handleRunMapKey } from "./run-map";
 import { renderBossBattleUI } from "./boss-battle-ui";
 import { renderRhythmReward } from "./rhythm-reward-visual";
 import { triggerComboFlash, updateComboFx, drawComboFx, resetComboFx } from "./combo-fx";
@@ -154,6 +156,12 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     const perfManager = new PerformanceManager();
     const rhythmEngine = new RhythmEngine();
     const bossBattle = new BossBattleState();
+    // Run system state
+    let currentRun: any = null;
+    let runMapState: any = null;
+    let encounterConfig: any = null;
+    let wavesInEncounter = 0;
+    let wavesTarget = 0;
     const genVisuals = new GenerativeVisualSystem();
     let enemyVariants: Map<string, VariantState> = new Map();
     // Apply difficulty modifier
@@ -190,6 +198,8 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         }
         // Update generative visuals (always, even during hitlag)
         genVisuals.update(dt);
+        // run_map tick: animate map
+        if (state.mode === "run_map" && runMapState) { runMapState.animTime += dt * 1000; }
 
         // Boss battle update
         const activeBoss = state.enemies.find((e: any) => e.alive && e.type === "boss");
@@ -1117,6 +1127,28 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
             resetComboFx();
             resetHud();
             resetTracker();
+            return;
+        }
+
+        if (state.mode === "run_map") {
+            if (!runMapState) return;
+            const mapResult = handleRunMapKey(e.key, runMapState);
+            runMapState = mapResult;
+            if (mapResult.action === "select" && currentRun) {
+                currentRun = selectNode(currentRun, mapResult.nodeId);
+                runMapState = createRunMapState(currentRun);
+                const currentNode = getCurrentNode(currentRun);
+                const actConfig = currentRun.acts[currentRun.currentAct].config;
+                encounterConfig = getEncounterConfig(currentNode, actConfig);
+                wavesInEncounter = 0;
+                wavesTarget = encounterConfig.waveCount;
+                // Start encounter
+                state = transitionGameMode(state, "start");
+                resetGameplayAura();
+                resetRhythm();
+                showTutorial();
+                { const perfScore = calculatePerformanceScore(state); state = { ...state, _performanceScore: perfScore } as any; state = startWave(state, pool, { canvasWidth, canvasHeight, kps: state.kps, performanceScore: perfScore }); }
+            }
             return;
         }
 
