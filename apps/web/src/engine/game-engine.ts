@@ -30,6 +30,7 @@ import { showTutorial, isTutorialShowing, handleTutorialKey, updateTutorial, ren
 import { handlePauseMenuKey, renderPauseMenu, resetPauseMenu } from "./pause-menu";
 import { openAchievementPage, closeAchievementPage, isAchievementPageOpen, handleAchievementPageKey, renderAchievementPage } from "./achievement-page";
 import { openLeaderboard, closeLeaderboard, isLeaderboardOpen, handleLeaderboardKey, renderLeaderboard, saveToLeaderboard } from "./leaderboard";
+import { initGamepad, pollGamepad, gamepadToKey, gamepadVibrate, isGamepadConnected } from "./gamepad";
 import { triggerComboFlash, updateComboFx, drawComboFx, resetComboFx } from "./combo-fx";
 import { updateHud, drawEnhancedHud, resetHud } from "./hud-overlay";
 import { openStats, isStatsOpen, handleStatsKey, renderStatsHistory, saveGameRecord } from "./stats-history";
@@ -87,6 +88,7 @@ export interface GameEngine {
 
 export function createGameEngine(wordPool?: string[]): GameEngine {
     let state = createGameState();
+    initGamepad();
     const particles = new ParticleSystem();
     const scorePopups = new ScorePopupSystem();
     const shake = new ScreenShake();
@@ -135,6 +137,15 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     // --- Ticking ---
 
     function tick(dt: number): void {
+        // Gamepad polling
+        const gpEvents = pollGamepad();
+        for (const evt of gpEvents) {
+            const key = gamepadToKey(evt);
+            if (key) {
+                const fakeEvent = new KeyboardEvent('keydown', { key, bubbles: true });
+                handleKey(fakeEvent);
+            }
+        }
         // FPS tracking
         fpsFrames++;
         const now = performance.now();
@@ -519,6 +530,16 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     function drawHUD(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
         drawEnhancedHud(ctx, w, h, time, state, copy);
         // FPS counter (bottom-right, subtle)
+        // Gamepad indicator (bottom-right, above FPS)
+        if (isGamepadConnected()) {
+            ctx.font = "500 9px -apple-system, SF Pro Text, system-ui, sans-serif";
+            ctx.fillStyle = "#34c759";
+            ctx.globalAlpha = 0.5;
+            ctx.textAlign = "right";
+            ctx.textBaseline = "bottom";
+            ctx.fillText("GAMEPAD", w - 12, h - 20);
+            ctx.globalAlpha = 1;
+        }
         if (fpsDisplay > 0) {
             const fpsColor = fpsDisplay >= 55 ? "#34c759" : fpsDisplay >= 30 ? "#ffcc02" : "#ff3b5c";
             ctx.font = "400 9px -apple-system, SF Pro Text, system-ui, sans-serif";
@@ -853,6 +874,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     // Haptic feedback via Vibration API (mobile)
     function haptic(pattern: number | number[]) {
         try { if (navigator.vibrate) navigator.vibrate(pattern); } catch {}
+        if (isGamepadConnected()) { gamepadVibrate(0.5, typeof pattern === "number" ? pattern : 100); }
     }
 
         function easeOutBack(t: number): number {
