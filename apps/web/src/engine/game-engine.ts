@@ -46,6 +46,7 @@ import { getThemeColors } from "@typemaster/domain";
 import { findChainMatch, getChainHint } from "@typemaster/domain";
 import { RhythmEngine } from "@typemaster/domain";
 import { BossBattleState, BOSS_PHASES } from "@typemaster/domain";
+import { dateToSeed } from "@typemaster/domain";
 import { generateRun, selectNode, completeCurrentNode, advanceToNextAct, getAvailableChoices, getCurrentNode, getEncounterConfig, getRunStats, NODE_TYPES, EVENTS, processEvent, restAction, purchaseUpgrade, getShopOffers, UPGRADE_DEFS } from "@typemaster/domain";
 import { renderRunMap, createRunMapState, handleRunMapKey, handleRunMapClick } from "./run-map";
 import { renderEncounter, createEncounterState, handleEncounterKey, handleEncounterClick } from "./encounter-ui";
@@ -1168,6 +1169,18 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
                 default:
                     // Handle challenge:modeId format
                     if (hubAction.startsWith('challenge:')) {
+                        // Daily challenge: generate seeded run
+                        const challengeDate = hubAction.split(':')[1] || '';
+                        const dailySeed = dateToSeed(challengeDate || new Date().toISOString().slice(0, 10));
+                        initSound();
+                        music.start();
+                        { const s = getSettings(); music.setVolume(s.volume / 100); music.setPlaying(s.musicEnabled); setSfxEnabled(s.sfxEnabled); }
+                        startTime = performance.now();
+                        currentRun = generateRun(dailySeed);
+                        applyRunUpgrades();
+                        runMapState = createRunMapState(currentRun);
+                        state = { ...state, mode: "run_map" } as any;
+                        return;
                         dailyChallenge = getDailyChallenge();
                         initSound();
                         showTutorial();
