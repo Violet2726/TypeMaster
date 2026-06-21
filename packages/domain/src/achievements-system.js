@@ -53,6 +53,15 @@ export const ACHIEVEMENTS = [
     { id: 'highscore-10000', name: 'Score Legend', nameZh: '�÷ִ���', desc: 'Score 10000+ in a single game', icon: 'H', target: 10000, unit: 'score', category: 'special', color: '#bf5af2', reward: 'Unlock: Purple theme' },
     { id: 'wpm-60', name: 'Speed Demon', nameZh: '�ٶȶ�ħ', desc: 'Reach 60 WPM', icon: 'F', target: 60, unit: 'wpm', category: 'special', color: '#ff3b5c' },
     { id: 'wpm-100', name: 'Typing God', nameZh: '����֮��', desc: 'Reach 100 WPM', icon: 'F', target: 100, unit: 'wpm', category: 'special', color: '#ffd700', reward: 'Unlock: Lightning trail' },
+    // === RUN SYSTEM ===
+    { id: "run-first", name: "First Run", nameZh: "首次跑局", desc: "Complete your first run", icon: "R", target: 1, unit: "runsCompleted", category: "run", color: "#34c759" },
+    { id: "run-victory", name: "Victory", nameZh: "胜利者", desc: "Win your first run", icon: "V", target: 1, unit: "runVictories", category: "run", color: "#ffd700" },
+    { id: "run-5", name: "Veteran Runner", nameZh: "老练跑者", desc: "Complete 5 runs", icon: "R", target: 5, unit: "runsCompleted", category: "run", color: "#3b9eff" },
+    { id: "run-victory-3", name: "Triple Crown", nameZh: "三连准", desc: "Win 3 runs", icon: "T", target: 3, unit: "runVictories", category: "run", color: "#bf5af2" },
+    { id: "run-perfect", name: "Flawless Run", nameZh: "完美跑局", desc: "Win a run without losing a life", icon: "F", target: 1, unit: "runPerfect", category: "run", color: "#ffd700" },
+    { id: "run-upgrades-10", name: "Collector", nameZh: "收藏家", desc: "Collect 10 upgrades in one run", icon: "C", target: 10, unit: "runUpgrades", category: "run", color: "#ff9f0a" },
+    { id: "run-coins-500", name: "Rich Runner", nameZh: "富裕跑者", desc: "Accumulate 500 coins in one run", icon: "$", target: 500, unit: "runCoins", category: "run", color: "#ffd60a" },
+    { id: "run-boss-first", name: "Boss Conqueror", nameZh: "Boss征服者", desc: "Defeat your first act boss", icon: "B", target: 1, unit: "runBossKills", category: "run", color: "#ff453a" },
 ];
 
 export function getAchievement(id) {
