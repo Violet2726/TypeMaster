@@ -25,6 +25,7 @@ import { getBlendedTheme, drawThemedBackground } from "./environment-theme";
 import { initGameOver, renderGameOver, clearGameOver } from "./game-over";
 import { createMusicEngine } from "./music-engine";
 import { DynamicMusicManager } from "./dynamic-music";
+import { PerformanceManager } from "./performance-optimizer";
 import { enqueueAchievement, updateAchievementModal, renderAchievementModal, clearAchievementQueue } from "./achievement-modal";
 import { openSettings, closeSettings, isSettingsOpen, handleSettingsKey, renderSettingsPanel, getSettings } from "./settings-panel";
 import { showTutorial, isTutorialShowing, handleTutorialKey, updateTutorial, renderTutorial } from "./tutorial-overlay";
@@ -136,6 +137,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     // Power-ups
     const music = createMusicEngine();
     const dynamicMusic = new DynamicMusicManager();
+    const perfManager = new PerformanceManager();
     let enemyVariants: Map<string, VariantState> = new Map();
     // Apply difficulty modifier
     const diffMods = { easy: 0.7, normal: 1.0, hard: 1.3 };
@@ -1210,6 +1212,9 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         saveGameResult() { return buildGameResult(state); },
     };
 }
+
+
+
 
 
 
