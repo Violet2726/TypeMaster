@@ -15,7 +15,7 @@ export const ENEMY_TYPES = {
     normal: { speedFactor: 1.0, hp: 1, scoreMultiplier: 1 },
     fast: { speedFactor: 1.8, hp: 1, scoreMultiplier: 1.5 },
     tank: { speedFactor: 0.6, hp: 2, scoreMultiplier: 2 },
-    boss: { speedFactor: 0.45, hp: 3, scoreMultiplier: 3 }
+    boss: { speedFactor: 0.45, hp: 5, scoreMultiplier: 3 }
 };
 
 export const WAVE_TEMPLATES = [
@@ -138,7 +138,7 @@ export function generateWaveEnemies(waveIndex, wordPool, options = {}) {
             normal: [2, 6],
             fast: [2, 5],
             tank: [5, 8],
-            boss: [6, 12]
+            boss: [5, 10]
         };
 
         for (let i = 0; i < count; i += 1) {
@@ -288,6 +288,59 @@ export function biasWordPool(basePool, hotspots = []) {
     });
 
     return [...biased, ...normal];
+}
+
+
+// ---------------------------------------------------------------------------
+// Boss phase system
+// ---------------------------------------------------------------------------
+
+/**
+ * Boss phases based on remaining HP percentage.
+ * Phase 1 (100%-60%): Standard - normal speed, standard words
+ * Phase 2 (60%-30%):  Enraged - 20% faster, longer words
+ * Phase 3 (30%-0%):   Desperate - 40% faster, hardest words
+ */
+export function getBossPhase(hp, maxHp) {
+    const ratio = maxHp > 0 ? hp / maxHp : 0;
+    if (ratio > 0.6) return 1;
+    if (ratio > 0.3) return 2;
+    return 3;
+}
+
+export function getBossPhaseSpeedMultiplier(phase) {
+    switch (phase) {
+        case 1: return 1.0;
+        case 2: return 1.2;
+        case 3: return 1.4;
+        default: return 1.0;
+    }
+}
+
+export function getBossPhaseWordRange(phase) {
+    switch (phase) {
+        case 1: return [5, 8];
+        case 2: return [6, 9];
+        case 3: return [7, 11];
+        default: return [5, 8];
+    }
+}
+
+export function getBossPhaseColor(phase) {
+    switch (phase) {
+        case 1: return "#3b9eff";
+        case 2: return "#ffcc02";
+        case 3: return "#ff3b5c";
+        default: return "#3b9eff";
+    }
+}
+
+export function checkBossPhaseTransition(enemy) {
+    if (enemy.type !== "boss") return null;
+    const currentPhase = enemy._bossPhase || 1;
+    const newPhase = getBossPhase(enemy.hp, enemy.maxHp);
+    if (newPhase > currentPhase) return newPhase;
+    return null;
 }
 
 // ---------------------------------------------------------------------------

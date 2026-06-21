@@ -12,6 +12,8 @@ import {
     startWave, processSpawns, buildGameResult, getGameCopy,
     getEnemyTypeConfig, getComboMultiplier, commonWords, biasWordPool,
     calculatePerformanceScore, isBreathingWave,
+    getBossPhase, getBossPhaseSpeedMultiplier, getBossPhaseColor,
+    checkBossPhaseTransition,
 } from "@typemaster/domain";
 import { ParticleSystem, ScreenShake } from "./particle-system";
 import { ScorePopupSystem } from "./score-popup";
@@ -491,7 +493,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
 
         // Draw by enemy type
         if (enemy.type === "boss") {
-            drawBossEnemy(ctx, size, time, baseColor, glowColor, innerColor);
+            drawBossEnemy(ctx, size, time, baseColor, glowColor, innerColor, enemy._bossPhase || 1);
         } else if (enemy.type === "tank") {
             drawTankEnemy(ctx, size, time, baseColor, glowColor, innerColor);
         } else if (enemy.type === "fast") {
@@ -692,18 +694,23 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         ctx.closePath();
     }
 
-    function drawBossEnemy(ctx: CanvasRenderingContext2D, size: number, time: number, baseColor: string, glowColor: string, innerColor: string): void {
+    function drawBossEnemy(ctx: CanvasRenderingContext2D, size: number, time: number, baseColor: string, glowColor: string, innerColor: string, bossPhase: number = 1): void {
         // Multi-layered command center with rotating rings
         const rotation = time * 0.001;
         const pulse = Math.sin(time * 0.003) * 0.1 + 1.0;
+        
+        // Phase-based visual intensity
+        const phaseIntensity = 1 + (bossPhase - 1) * 0.3;
+        const phaseGlowBoost = bossPhase >= 2 ? 10 : 0;
+        const phaseRingSpeed = bossPhase >= 3 ? 2.5 : 1.0;
 
         // Aura field
         ctx.shadowColor = glowColor;
-        ctx.shadowBlur = 40 + Math.sin(time * 0.005) * 15;
+        ctx.shadowBlur = 40 + phaseGlowBoost + Math.sin(time * 0.005) * 15;
 
         // Outer rotating ring
         ctx.save();
-        ctx.rotate(rotation);
+        ctx.rotate(rotation * phaseRingSpeed);
         ctx.strokeStyle = baseColor + "40";
         ctx.lineWidth = 3;
         ctx.beginPath();
@@ -713,7 +720,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
 
         // Middle rotating ring (counter)
         ctx.save();
-        ctx.rotate(-rotation * 1.3);
+        ctx.rotate(-rotation * 1.3 * phaseRingSpeed);
         ctx.strokeStyle = baseColor + "60";
         ctx.lineWidth = 2;
         ctx.beginPath();
@@ -722,7 +729,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         ctx.restore();
 
         // Core body - irregular shape
-        const grad = ctx.createRadialGradient(-size * 0.15, -size * 0.15, 0, 0, 0, size * pulse);
+        const grad = ctx.createRadialGradient(-size * 0.15, -size * 0.15, 0, 0, 0, size * pulse * phaseIntensity);
         grad.addColorStop(0, innerColor);
         grad.addColorStop(0.3, baseColor);
         grad.addColorStop(0.7, baseColor + "80");
@@ -976,6 +983,25 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
 
                         // Trigger hitlag
                         hitlagTimer = HITLAG_DURATION * (1 + chainCount * 0.3);
+                        
+                        // Boss phase transition check
+                        if (enemy && enemy.type === "boss" && enemy.alive) {
+                            const newPhase = checkBossPhaseTransition(enemy);
+                            if (newPhase) {
+                                // Update boss phase on the enemy
+                                state.enemies = state.enemies.map((en: any) => 
+                                    en.id === enemy.id ? { ...en, _bossPhase: newPhase } : en
+                                );
+                                // Phase transition effects
+                                shake.trigger(10);
+                                playComboSound(newPhase * 5);
+                                const phaseColor = getBossPhaseColor(newPhase);
+                                particles.emit({ x: canvasWidth / 2, y: canvasHeight / 2, count: 40, color: phaseColor, speed: 6, size: 4, glow: 0.9, trail: true, trailLength: 15 });
+                                particles.emit({ x: enemy.x, y: enemy.y, count: 30, color: "#ffffff", speed: 5, size: 3, lifetime: 0.8 });
+                                scorePopups.emit({ x: canvasWidth / 2, y: canvasHeight / 2 - 40, text: "PHASE " + newPhase + "!", color: phaseColor, fontSize: 28 });
+                                hitlagTimer = HITLAG_DURATION * 3; // Extra hitlag for phase transition
+                            }
+                        }
 
                         // Splitter variant: spawn 2 mini enemies on death
                         const killedVariant2 = enemyVariants.get(evt.enemyId);

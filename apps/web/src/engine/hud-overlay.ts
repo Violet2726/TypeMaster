@@ -10,6 +10,7 @@
  */
 
 import { COLORS } from "../components/game/colors";
+import { getBossPhaseColor } from "@typemaster/domain";
 import { drawGlassPanel } from "../components/game/draw-helpers";
 
 
@@ -203,6 +204,52 @@ export function drawEnhancedHud(
         ctx.textAlign = "right";
         ctx.textBaseline = "top";
         ctx.fillText("BREATHING WAVE", w - 20, Math.round(18 * s));
+    }
+
+    // --- Boss HP bar (center-top) ---
+    const bossEnemies = (state.enemies || []).filter((e: any) => e.type === "boss" && e.alive);
+    if (bossEnemies.length > 0) {
+        const boss = bossEnemies[0];
+        const bossPhase = boss._bossPhase || 1;
+        const phaseColor = getBossPhaseColor(bossPhase);
+        const barW = Math.round(300 * s);
+        const barH = Math.round(12 * s);
+        const barX = w / 2 - barW / 2;
+        const barY = Math.round(72 * s);
+        
+        // Background
+        ctx.fillStyle = "rgba(255,255,255,0.08)";
+        ctx.beginPath();
+        ctx.roundRect(barX, barY, barW, barH, 6);
+        ctx.fill();
+        
+        // HP fill
+        const hpRatio = boss.hp / boss.maxHp;
+        ctx.fillStyle = phaseColor;
+        ctx.shadowColor = phaseColor;
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.roundRect(barX, barY, barW * hpRatio, barH, 6);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        
+        // Phase markers (at 60% and 30%)
+        [0.6, 0.3].forEach(marker => {
+            const mx = barX + barW * marker;
+            ctx.strokeStyle = "rgba(255,255,255,0.3)";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(mx, barY);
+            ctx.lineTo(mx, barY + barH);
+            ctx.stroke();
+        });
+        
+        // Boss label
+        ctx.font = "600 " + Math.round(10 * s) + "px -apple-system, SF Pro Text, system-ui, sans-serif";
+        ctx.fillStyle = phaseColor;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "bottom";
+        ctx.fillText("BOSS PHASE " + bossPhase, w / 2, barY - 2);
     }
 
     // --- Performance indicator (bottom-left) ---

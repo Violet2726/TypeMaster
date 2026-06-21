@@ -103,7 +103,7 @@ describe('Typing Raid - enemy types', () => {
 
     it('getEnemyTypeConfig returns correct config', () => {
         expect(getEnemyTypeConfig('normal').hp).toBe(1);
-        expect(getEnemyTypeConfig('boss').hp).toBe(3);
+        expect(getEnemyTypeConfig('boss').hp).toBe(5);
         expect(getEnemyTypeConfig('unknown')).toEqual(ENEMY_TYPES.normal);
     });
 
