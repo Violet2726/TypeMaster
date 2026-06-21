@@ -582,7 +582,11 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
 
         ctx.save();
         ctx.translate(enemy.x + wobble, enemy.y + shakeOff.y);
-        ctx.scale(scale, scale);
+        // Depth perspective: enemies near top are far (small), near bottom are close (large)
+        const depthFactor = genVisuals.getDepthFactor(enemy.y, canvasHeight);
+        const depthAlpha = genVisuals.getDepthAlpha(enemy.y, canvasHeight);
+        ctx.globalAlpha *= depthAlpha;
+        ctx.scale(scale * depthFactor, scale * depthFactor);
 
         // Generative aura
         const auraColor = (COLORS as any)[enemy.type] || COLORS.normal;
@@ -1090,6 +1094,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                 const activeEnemy = state.enemies.find((e: any) => e.id === state.activeEnemyId);
                 if (activeEnemy) {
                     triggerTypingRipple(activeEnemy.x, activeEnemy.y, true);
+                    genVisuals.triggerRipple(activeEnemy.x, activeEnemy.y, (COLORS as any)[activeEnemy.type] || COLORS.normal, 0.3 + state.combo * 0.05);
                 }
             }
 
@@ -1120,6 +1125,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                         const chainBonus = Math.min(chainCount + 1, 5);
                         particles.emit({ x: enemy.x, y: enemy.y, count: 20 + chainBonus * 5, color, speed: 3 + chainBonus, size: 3 + chainBonus * 0.5, gravity: 2, turbulence: 0.5 + chainCount * 0.1, trail: true, trailLength: 6 + chainBonus * 2 });
                         genVisuals.triggerBurst(enemy.x, enemy.y, color, 0.5 + chainCount * 0.2);
+                        genVisuals.triggerRipple(enemy.x, enemy.y, color, 0.5 + chainCount * 0.15);
                         particles.emit({ x: enemy.x, y: enemy.y, count: 8 + chainBonus * 2, color: "#ffffff", speed: 2, size: 2, lifetime: 0.4 });
                         shake.trigger(4 + chainBonus * 2);
                         triggerComboFlash(state.combo); onComboMilestone(state.combo); if (state.combo % 5 === 0 && state.combo > 0) { playComboMilestoneSound(state.combo); haptic([10, 30, 10]); }
@@ -1218,6 +1224,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         canvasWidth = w;
         canvasHeight = h;
         gameHub.resize(w, h);
+        genVisuals.resize(w, h);
     }
     function destroy(): void {
         particles.clear();

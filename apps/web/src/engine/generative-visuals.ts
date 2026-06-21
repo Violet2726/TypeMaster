@@ -92,6 +92,15 @@ export class GenerativeVisualSystem {
     private targetScheme: ColorScheme = { ...SCHEMES.calm };
     private blendProgress = 1;
     private waveOffset = 0;
+    private scrollX = 0;
+    private scrollY = 0;
+    private targetScrollY = 0;
+
+    // Typing ripple system
+    private ripples: Array<{
+        x: number; y: number; radius: number; maxRadius: number;
+        alpha: number; color: string; speed: number;
+    }> = [];
 
     private bursts: Array<{
         x: number; y: number; radius: number; maxRadius: number;
@@ -153,6 +162,15 @@ export class GenerativeVisualSystem {
         }
     }
 
+    triggerRipple(x: number, y: number, color: string, intensity: number = 1): void {
+        this.ripples.push({
+            x, y, radius: 0,
+            maxRadius: 40 + intensity * 80,
+            alpha: 0.35 + intensity * 0.2,
+            color, speed: 120 + intensity * 80,
+        });
+    }
+
     triggerBurst(x: number, y: number, color: string, intensity: number = 1): void {
         this.bursts.push({
             x, y, radius: 0,
@@ -176,6 +194,9 @@ export class GenerativeVisualSystem {
         for (const p of this.particles) {
             p.x += p.vx;
             p.y += p.vy;
+            const parallaxFactor = p.layer === 'near' ? 1.0 : p.layer === 'mid' ? 0.5 : 0.15;
+            p.x += this.scrollX * parallaxFactor;
+            p.y += this.scrollY * parallaxFactor * 0.3;
             const waveAmplitude = p.layer === 'near' ? 0.8 : p.layer === 'mid' ? 0.4 : 0.15;
             p.x += Math.sin(this.waveOffset + p.phase) * waveAmplitude;
             if (comboBoost > 0.2) {
@@ -193,6 +214,19 @@ export class GenerativeVisualSystem {
             if (p.y < -10) p.y = this.h + 10;
             if (p.y > this.h + 10) p.y = -10;
         }
+        // Parallax scroll (subtle vertical drift based on game progress)
+        this.targetScrollY = this.state.wave * 2;
+        this.scrollY += (this.targetScrollY - this.scrollY) * 0.01;
+        this.scrollX = Math.sin(this.waveOffset * 0.3) * 3;
+
+        // Update ripples
+        for (let i = this.ripples.length - 1; i >= 0; i--) {
+            const r = this.ripples[i];
+            r.radius += r.speed * dt;
+            r.alpha *= 0.96;
+            if (r.alpha < 0.01 || r.radius > r.maxRadius) this.ripples.splice(i, 1);
+        }
+
         for (let i = this.bursts.length - 1; i >= 0; i--) {
             const b = this.bursts[i];
             b.radius += b.speed * dt;
@@ -226,6 +260,25 @@ export class GenerativeVisualSystem {
             ctx.fill();
             ctx.restore();
         }
+        // Ripples (spatial typing feedback)
+        for (const r of this.ripples) {
+            ctx.save();
+            ctx.globalAlpha = r.alpha;
+            const rGrad = ctx.createRadialGradient(r.x, r.y, r.radius * 0.7, r.x, r.y, r.radius);
+            rGrad.addColorStop(0, 'transparent');
+            rGrad.addColorStop(0.7, r.color + '30');
+            rGrad.addColorStop(1, r.color + '08');
+            ctx.fillStyle = rGrad;
+            ctx.beginPath();
+            ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+            ctx.fill();
+            // Ring outline
+            ctx.strokeStyle = r.color;
+            ctx.lineWidth = 1.5 * (1 - r.radius / r.maxRadius);
+            ctx.stroke();
+            ctx.restore();
+        }
+
         this.renderParticleLayer(ctx, 'far');
         this.renderParticleLayer(ctx, 'mid');
         this.renderParticleLayer(ctx, 'near');
@@ -365,4 +418,19 @@ export class GenerativeVisualSystem {
     }
 
     getParticleCount(): number { return this.particles.length; }
+
+    getDepthFactor(y: number, canvasHeight: number): number {
+        const normalizedY = y / canvasHeight;
+        return 0.7 + normalizedY * 0.5;
+    }
+
+    getDepthAlpha(y: number, canvasHeight: number): number {
+        const normalizedY = y / canvasHeight;
+        return 0.6 + normalizedY * 0.4;
+    }
+
+    getDepthBlur(y: number, canvasHeight: number): number {
+        const normalizedY = y / canvasHeight;
+        return (1 - normalizedY) * 2;
+    }
 }
