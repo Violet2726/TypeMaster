@@ -24,6 +24,7 @@ import { initSound, playClickSound, playKillSound, playErrorSound, playComboSoun
 import { getBlendedTheme, drawThemedBackground } from "./environment-theme";
 import { initGameOver, renderGameOver, clearGameOver } from "./game-over";
 import { showWaveComplete, isWaveCompleteShowing, renderWaveComplete } from "./wave-complete";
+import { addGameResult, saveReplay } from "../services/storage/game-save";
 import { updateGameplayAura, renderGameplayAura, renderDangerIndicator, triggerTypingRipple, resetGameplayAura } from "./gameplay-reactive-aura";
 import { spawnDeathEffect, updateDeathEffects, renderDeathEffects } from "./enemy-death-fx";
 import { onCorrectKey, onWrongKey, onComboMilestone, updateKeystrokeImpact, renderImpactRings, getEnemyShakeOffset, getEnemyErrorFlash, renderComboMilestones } from "./keystroke-impact";
@@ -298,6 +299,9 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                 const result = buildGameResult(state);
                 if (dailyChallenge) { saveDailyScore(dailyChallenge.date, result.score); }
                 saveGameRecord({ score: result.score, wave: result.wave, wpm: result.wpm, accuracy: result.accuracy, maxCombo: result.maxCombo, date: new Date().toLocaleDateString() });
+                // Save to new persistence system
+                addGameResult({ score: result.score, wave: result.wave, wpm: result.wpm, maxCombo: result.maxCombo, enemiesDefeated: result.enemiesDefeated, duration: (performance.now() - startTime) / 1000, accuracy: result.accuracy });
+                saveReplay({ id: "replay-" + Date.now(), date: new Date().toISOString(), score: result.score, wave: result.wave, wpm: result.wpm, accuracy: result.accuracy, maxCombo: result.maxCombo, enemiesDefeated: result.enemiesDefeated, enemiesLeaked: state.enemiesLeaked, duration: (performance.now() - startTime) / 1000, mode: "classic", rating: "", peakCombo: state.maxCombo, peakComboWave: state.wave, perfectWaves: state.perfectWaves });
             }
         });
 
