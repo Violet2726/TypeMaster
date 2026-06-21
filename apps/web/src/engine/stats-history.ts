@@ -8,6 +8,7 @@
 
 import { COLORS } from "../components/game/colors";
 import { drawGlassPanel } from "../components/game/draw-helpers";
+import { DataVizRenderer } from "./data-viz";
 
 interface GameRecord {
     score: number;
@@ -247,3 +248,6 @@ export function renderStatsHistory(ctx: CanvasRenderingContext2D, w: number, h: 
 
     ctx.restore();
 }
+
+
+
