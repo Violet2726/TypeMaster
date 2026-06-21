@@ -175,6 +175,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     let encounterState: any = null;
     let runCompleteState: any = null;
     let bossIntroState: any = null;
+    let transitionOverlay = { active: false, alpha: 0, startTime: 0, duration: 400, callback: null as any };
 
     // Upgrade effect helpers
     function getUpgradeStacks(id) {
@@ -635,6 +636,19 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
         }
         drawHUD(ctx, w, h, time);
         if (bossIntroState && isBossIntroActive(bossIntroState)) renderBossIntro(ctx, w, h, bossIntroState, time);
+        // Transition overlay
+        if (transitionOverlay.active) {
+            const elapsed = performance.now() - transitionOverlay.startTime;
+            const progress = Math.min(1, elapsed / transitionOverlay.duration);
+            const fadeIn = progress < 0.5 ? progress * 2 : 2 - progress * 2;
+            ctx.fillStyle = 'rgba(0,0,0,' + (fadeIn * 0.8) + ')';
+            ctx.fillRect(0, 0, w, h);
+            if (progress >= 0.5 && transitionOverlay.callback) {
+                transitionOverlay.callback();
+                transitionOverlay.callback = null;
+            }
+            if (progress >= 1) transitionOverlay.active = false;
+        }
 
         // Wave incoming overlay
         if (state.wave > 0 && state.waveQueue.length > 0 && state.nextSpawnIndex < state.waveQueue.length) {
@@ -713,6 +727,10 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
     }
 
     // --- HUD ---
+
+    function startTransition(callback) {
+        transitionOverlay = { active: true, alpha: 0, startTime: performance.now(), duration: 400, callback };
+    }
 
     function drawHUD(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
         renderDangerIndicator(ctx, w, h);
@@ -1466,6 +1484,18 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
                         }
                         lastChainTime = now;
                         chainTimer = CHAIN_WINDOW;
+                        // Chain lightning upgrade: damage nearest enemy on kill
+                        if (hasUpgrade('chain_lightning') && enemy) {
+                            const otherAlive = state.enemies.filter((e: any) => e.alive && e.id !== enemy.id);
+                            if (otherAlive.length > 0) {
+                                const nearest = otherAlive.sort((a: any, b: any) => Math.abs(a.x - enemy.x) - Math.abs(b.x - enemy.x))[0];
+                                nearest.hp = Math.max(0, nearest.hp - 1);
+                                if (nearest.hp <= 0) { nearest.alive = false; state = { ...state, enemiesDefeated: state.enemiesDefeated + 1 }; }
+                                particles.emit({ x: nearest.x, y: nearest.y, count: 12, color: '#ffd60a', speed: 4, size: 3, glow: 0.8, trail: true });
+                                // Lightning visual from killed enemy to nearest
+                                particles.emit({ x: (enemy.x + nearest.x) / 2, y: (enemy.y + nearest.y) / 2, count: 6, color: '#ffd60a', speed: 2, size: 2, trail: true });
+                            }
+                        }
 
                         // Score popup with chain indicator
                         // Double score power-up
