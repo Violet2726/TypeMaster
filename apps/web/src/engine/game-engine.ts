@@ -719,6 +719,19 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
         renderRhythmBar(ctx, w, h, time);
         renderSoundVisualizer(ctx, w, h, time);
         drawEnhancedHud(ctx, w, h, time, state, copy);
+        // Word reveal upgrade: show next wave enemies
+        if (hasUpgrade('word_reveal') && state.waveQueue && state.waveQueue.length > 0) {
+            const upcoming = state.waveQueue.slice(state.nextSpawnIndex, state.nextSpawnIndex + 3);
+            if (upcoming.length > 0) {
+                ctx.save();
+                ctx.font = '400 10px -apple-system, SF Pro Text, system-ui, sans-serif';
+                ctx.fillStyle = 'rgba(191,90,242,0.5)';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                ctx.fillText('Next: ' + upcoming.map(e => e.word).join(', '), 12, 8);
+                ctx.restore();
+            }
+        }
         // FPS counter (bottom-right, subtle)
         // Gamepad indicator (bottom-right, above FPS)
         if (isGamepadConnected()) {
@@ -1331,6 +1344,15 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
                         state = { ...state, enemies: [bossEnemy], enemiesTotal: 1 };
                         wavesTarget = 999;
                         playBossPhaseSound(1);
+                        // Time warp upgrade: freeze enemies for 3 seconds at boss start
+                        if (hasUpgrade('time_warp')) {
+                            state = { ...state, enemies: state.enemies.map((e: any) => ({ ...e, speed: e.speed * 0.05 })) };
+                            setTimeout(() => {
+                                if (state.mode === 'playing') {
+                                    state = { ...state, enemies: state.enemies.map((e: any) => ({ ...e, speed: e.speed / 0.05 })) };
+                                }
+                            }, 3000);
+                        }
                         bossIntroState = createBossIntro(encounterConfig.bossNameZh || "Boss", encounterConfig.bossHp, currentRun.acts[currentRun.currentAct].config.nameZh);
                         // Boss defeated when all enemies dead
                     }
