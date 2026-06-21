@@ -48,6 +48,7 @@ import { RhythmEngine } from "@typemaster/domain";
 import { BossBattleState, BOSS_PHASES } from "@typemaster/domain";
 import { generateRun, selectNode, completeCurrentNode, advanceToNextAct, getAvailableChoices, getCurrentNode, getEncounterConfig, getRunStats, NODE_TYPES, EVENTS, processEvent, restAction, purchaseUpgrade, getShopOffers } from "@typemaster/domain";
 import { renderRunMap, createRunMapState, handleRunMapKey } from "./run-map";
+import { renderEncounter, createEncounterState, handleEncounterKey } from "./encounter-ui";
 import { renderBossBattleUI } from "./boss-battle-ui";
 import { renderRhythmReward } from "./rhythm-reward-visual";
 import { triggerComboFlash, updateComboFx, drawComboFx, resetComboFx } from "./combo-fx";
@@ -162,6 +163,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     let encounterConfig: any = null;
     let wavesInEncounter = 0;
     let wavesTarget = 0;
+    let encounterState: any = null;
     const genVisuals = new GenerativeVisualSystem();
     let enemyVariants: Map<string, VariantState> = new Map();
     // Apply difficulty modifier
@@ -400,7 +402,11 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         // Typing flow aura (golden glow for consecutive correct inputs)
         renderFlowAura(ctx, width, height, time);
 
-        if (state.mode === "idle") {
+        if (state.mode === "encounter") {
+            renderEncounter(ctx, width, height, encounterState, time);
+        } else if (state.mode === "run_map") {
+            renderRunMap(ctx, width, height, runMapState, time);
+        } else if (state.mode === "idle") {
             renderIdle(ctx, width, height, time);
         } else if (state.mode === "playing" || state.mode === "resuming") {
             renderPlaying(ctx, width, height, time);
@@ -1130,24 +1136,52 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
             return;
         }
 
+        if (state.mode === "encounter") {
+            if (!encounterState) return;
+            const encResult = handleEncounterKey(e.key, encounterState);
+            encounterState = encResult;
+            if (encResult.action === "leave" || encResult.action === "rested" || encResult.action === "event_done" || encResult.action === "purchased") {
+                currentRun = encResult.run;
+                if (encResult.action === "leave" || encResult.action === "purchased") {
+                    // Return to map (shop allows multiple purchases)
+                    if (encResult.action === "leave") {
+                        runMapState = createRunMapState(currentRun);
+                        state = { ...state, mode: "run_map" } as any;
+                    }
+                } else {
+                    // rest/event: auto-advance to map
+                    currentRun = completeCurrentNode(currentRun, {});
+                    runMapState = createRunMapState(currentRun);
+                    state = { ...state, mode: "run_map" } as any;
+                }
+            }
+            return;
+        }
+
         if (state.mode === "run_map") {
             if (!runMapState) return;
             const mapResult = handleRunMapKey(e.key, runMapState);
             runMapState = mapResult;
             if (mapResult.action === "select" && currentRun) {
                 currentRun = selectNode(currentRun, mapResult.nodeId);
-                runMapState = createRunMapState(currentRun);
                 const currentNode = getCurrentNode(currentRun);
-                const actConfig = currentRun.acts[currentRun.currentAct].config;
-                encounterConfig = getEncounterConfig(currentNode, actConfig);
-                wavesInEncounter = 0;
-                wavesTarget = encounterConfig.waveCount;
-                // Start encounter
-                state = transitionGameMode(state, "start");
-                resetGameplayAura();
-                resetRhythm();
-                showTutorial();
-                { const perfScore = calculatePerformanceScore(state); state = { ...state, _performanceScore: perfScore } as any; state = startWave(state, pool, { canvasWidth, canvasHeight, kps: state.kps, performanceScore: perfScore }); }
+                const nodeType = currentNode.type;
+                // Route non-combat nodes to encounter UI
+                if (nodeType === "shop" || nodeType === "rest" || nodeType === "event") {
+                    encounterState = createEncounterState(nodeType, currentRun);
+                    state = { ...state, mode: "encounter" } as any;
+                } else {
+                    runMapState = createRunMapState(currentRun);
+                    const actConfig = currentRun.acts[currentRun.currentAct].config;
+                    encounterConfig = getEncounterConfig(currentNode, actConfig);
+                    wavesInEncounter = 0;
+                    wavesTarget = encounterConfig.waveCount;
+                    state = transitionGameMode(state, "start");
+                    resetGameplayAura();
+                    resetRhythm();
+                    showTutorial();
+                    { const perfScore = calculatePerformanceScore(state); state = { ...state, _performanceScore: perfScore } as any; state = startWave(state, pool, { canvasWidth, canvasHeight, kps: state.kps, performanceScore: perfScore }); }
+                }
             }
             return;
         }
