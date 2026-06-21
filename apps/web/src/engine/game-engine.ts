@@ -23,6 +23,7 @@ import { drawGlassPanel, drawProgressRing } from "../components/game/draw-helper
 import { initSound, playClickSound, playKillSound, playErrorSound, playComboSound, playChainSound, playPowerUpSound, playShieldBreakSound, playWaveClearSound, playGameOverSound, playAchievementSound, setSfxEnabled, playCountdownBeep, playCountdownGo, playBossPhaseSound, playBreathingWaveSound, playComboMilestoneSound, playThemeTransitionSound } from "../components/game/sound-engine";
 import { getBlendedTheme, drawThemedBackground } from "./environment-theme";
 import { initGameOver, renderGameOver, clearGameOver } from "./game-over";
+import { showWaveComplete, isWaveCompleteShowing, renderWaveComplete } from "./wave-complete";
 import { createMusicEngine } from "./music-engine";
 import { DynamicMusicManager } from "./dynamic-music";
 import { PerformanceManager } from "./performance-optimizer";
@@ -245,6 +246,11 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                 // Bomb screen flash handled by bomb power-up
                 const hasBombFlash = activePowerUps.some(ap => ap.type === "bomb");
 
+                // Show wave complete celebration
+                const waveKills = state.enemiesDefeated;
+                const waveCombo = state.combo;
+                showWaveComplete(state.wave, waveKills, !!evt.perfect, waveCombo, state.score);
+
                 if (evt.perfect) {
                     state = { ...state, perfectWaves: state.perfectWaves + 1 };
                     // Extra golden burst for perfect wave
@@ -371,86 +377,10 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     }
 
     function renderIdle(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
-        particles.update(1 / 60);
-        particles.draw(ctx);
-
-        // Fade-out when starting
-        const startAnimDuration = 500;
-        const startProgress = startTime ? Math.min(1, (time - startTime) / startAnimDuration) : 0;
-        if (startProgress > 0 && startProgress < 1) {
-            ctx.save();
-            const scale = 1 - startProgress * 0.5;
-            ctx.translate(w / 2, h / 2);
-            ctx.scale(scale, scale);
-            ctx.translate(-w / 2, -h / 2);
-            ctx.globalAlpha = 1 - startProgress;
-        }
-
-        drawGlassPanel(ctx, w / 2 - 180, h / 2 - 100, 360, 160, 20);
-
-        ctx.font = "700 42px -apple-system, SF Pro Display, system-ui, sans-serif";
-        ctx.fillStyle = COLORS.text;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(copy.title, w / 2, h / 2 - 50);
-
-        ctx.font = "400 16px -apple-system, SF Pro Text, system-ui, sans-serif";
-        ctx.fillStyle = COLORS.textSecondary;
-        ctx.fillText(copy.subtitle, w / 2, h / 2);
-
-        const pulse = Math.sin(time * 0.003) * 0.3 + 0.7;
-        ctx.globalAlpha *= pulse;
-        ctx.font = "500 14px -apple-system, SF Pro Text, system-ui, sans-serif";
-        ctx.fillStyle = COLORS.textTertiary;
-        ctx.fillText(copy.start, w / 2, h / 2 + 50);
-
-        // Daily challenge panel (below main panel)
-        if (startProgress === 0) {
-            const daily = getDailyChallenge();
-            const dailyBest = getDailyBestScore(daily.date);
-            
-            const dpY = h / 2 + 100;
-            const dpW = 300;
-            const dpH = 70;
-            
-            drawGlassPanel(ctx, w / 2 - dpW / 2, dpY, dpW, dpH, 14);
-            
-            // Challenge type label
-            ctx.font = "600 11px -apple-system, SF Pro Text, system-ui, sans-serif";
-            ctx.fillStyle = "#ffd700";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "top";
-            ctx.fillText("DAILY CHALLENGE", w / 2, dpY + 10);
-            
-            // Challenge name
-            ctx.font = "700 16px -apple-system, SF Pro Display, system-ui, sans-serif";
-            ctx.fillStyle = COLORS.text;
-            ctx.fillText(daily.nameZh, w / 2, dpY + 28);
-            
-            // Challenge description
-            ctx.font = "400 10px -apple-system, SF Pro Text, system-ui, sans-serif";
-            ctx.fillStyle = COLORS.textSecondary;
-            ctx.fillText(daily.desc, w / 2, dpY + 48);
-            
-            // Best score for today
-            if (dailyBest > 0) {
-                ctx.font = "600 9px -apple-system, SF Pro Text, system-ui, sans-serif";
-                ctx.fillStyle = "#ffd700";
-                ctx.textAlign = "right";
-                ctx.fillText("BEST: " + dailyBest, w / 2 + dpW / 2 - 10, dpY + 10);
-            }
-            
-            // Press D hint
-            const dpPulse = Math.sin(time * 0.004) * 0.2 + 0.6;
-            ctx.globalAlpha = dpPulse;
-            ctx.font = "500 10px -apple-system, SF Pro Text, system-ui, sans-serif";
-            ctx.fillStyle = COLORS.textTertiary;
-            ctx.textAlign = "center";
-            ctx.fillText("Press D to play daily challenge", w / 2, dpY + dpH + 18);
-            ctx.globalAlpha = 1;
-        }
-
-        if (startProgress > 0 && startProgress < 1) ctx.restore();
+        // Use Game Hub for the idle screen
+        gameHub.resize(w, h);
+        gameHub.update(1 / 60, time);
+        gameHub.render(ctx, w, h);
     }
 
     function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
@@ -476,6 +406,12 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         scorePopups.draw(ctx);
         typingFeedback.drawBursts(ctx);
         typingFeedback.drawRhythmPulse(ctx, w, h);
+
+        // Wave complete overlay
+        if (isWaveCompleteShowing()) {
+            renderWaveComplete(ctx, w, h, time);
+        }
+
         drawHUD(ctx, w, h, time);
 
         // Wave incoming overlay
@@ -889,40 +825,62 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     function handleKey(e: KeyboardEvent): void {
         if (state.mode === "idle") {
             if (e.key === "Escape") return;
-            // Achievement page
-            if (e.key === "a" || e.key === "A") { openAchievementPage(); return; }
-            // Leaderboard
-            if (e.key === "l" || e.key === "L") { openLeaderboard(); return; }
-            // Theme selection
-            if (e.key === "t" || e.key === "T") { openThemePage(); return; }
-            // Daily challenge mode
-            if (e.key === "d" || e.key === "D") {
-                dailyChallenge = getDailyChallenge();
-                initSound();
-                showTutorial();
-                music.start();
-                const s = getSettings();
-                music.setVolume(s.volume / 100);
-                music.setPlaying(s.musicEnabled);
-                setSfxEnabled(s.sfxEnabled);
-                startTime = performance.now();
-                state = transitionGameMode(state, "start");
-                state = { ...state, _dailyChallenge: dailyChallenge } as any;
-                { const perfScore = calculatePerformanceScore(state); state = { ...state, _performanceScore: perfScore } as any; state = startWave(state, pool, { canvasWidth, canvasHeight, kps: state.kps, performanceScore: perfScore }); }
+            
+            // Route through Game Hub
+            const hubAction = gameHub.handleKey(e.key);
+            
+            if (hubAction === null) {
+                // Game Hub consumed the key (navigation, etc.)
                 return;
             }
-        if (e.key === "h" || e.key === "H") { openStats(); return; }
-            initSound();
-            showTutorial();
-            music.start();
-            const s = getSettings();
-            music.setVolume(s.volume / 100);
-            music.setPlaying(s.musicEnabled);
-            setSfxEnabled(s.sfxEnabled);
-            startTime = performance.now();
-            state = transitionGameMode(state, "start");
-            { const perfScore = calculatePerformanceScore(state); state = { ...state, _performanceScore: perfScore } as any; state = startWave(state, pool, { canvasWidth, canvasHeight, kps: state.kps, performanceScore: perfScore }); }
-            return;
+            
+            // Handle Game Hub actions
+            switch (hubAction) {
+                case 'play':
+                    // Start classic mode
+                    initSound();
+                    showTutorial();
+                    music.start();
+                    const s = getSettings();
+                    music.setVolume(s.volume / 100);
+                    music.setPlaying(s.musicEnabled);
+                    setSfxEnabled(s.sfxEnabled);
+                    startTime = performance.now();
+                    state = transitionGameMode(state, "start");
+                    { const perfScore = calculatePerformanceScore(state); state = { ...state, _performanceScore: perfScore } as any; state = startWave(state, pool, { canvasWidth, canvasHeight, kps: state.kps, performanceScore: perfScore }); }
+                    return;
+                    
+                case 'leaderboard':
+                    openLeaderboard();
+                    return;
+                    
+                case 'achievements':
+                    openAchievementPage();
+                    return;
+                    
+                case 'settings':
+                    openSettings();
+                    return;
+                    
+                default:
+                    // Handle challenge:modeId format
+                    if (hubAction.startsWith('challenge:')) {
+                        dailyChallenge = getDailyChallenge();
+                        initSound();
+                        showTutorial();
+                        music.start();
+                        const s2 = getSettings();
+                        music.setVolume(s2.volume / 100);
+                        music.setPlaying(s2.musicEnabled);
+                        setSfxEnabled(s2.sfxEnabled);
+                        startTime = performance.now();
+                        state = transitionGameMode(state, "start");
+                        state = { ...state, _dailyChallenge: dailyChallenge } as any;
+                        { const perfScore = calculatePerformanceScore(state); state = { ...state, _performanceScore: perfScore } as any; state = startWave(state, pool, { canvasWidth, canvasHeight, kps: state.kps, performanceScore: perfScore }); }
+                        return;
+                    }
+                    return;
+            }
         }
 
         if (e.key === "Escape") {
@@ -1188,8 +1146,8 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     function resize(w: number, h: number): void {
         canvasWidth = w;
         canvasHeight = h;
+        gameHub.resize(w, h);
     }
-
     function destroy(): void {
         particles.clear();
         scorePopups.clear();
@@ -1212,6 +1170,9 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         saveGameResult() { return buildGameResult(state); },
     };
 }
+
+
+
 
 
 

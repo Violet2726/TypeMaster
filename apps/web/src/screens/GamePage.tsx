@@ -59,8 +59,8 @@ export default function GamePage() {
 
     // Testing hooks
     useEffect(() => {
-        const engine = engineRef.current;
         (window as any).render_game_to_text = function () {
+            const engine = engineRef.current;
             if (!engine) return '{}';
             const s = engine.state;
             return JSON.stringify({
@@ -75,6 +75,7 @@ export default function GamePage() {
             });
         };
         (window as any).advanceTime = function (ms: number) {
+            const engine = engineRef.current;
             if (!engine) return;
             const steps = Math.max(1, Math.round(ms / (1000 / 60)));
             for (let i = 0; i < steps; i++) engine.tick(1 / 60);

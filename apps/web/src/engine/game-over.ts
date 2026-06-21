@@ -69,14 +69,13 @@ export function calculateRating(result: GameOverResult): Rating {
     return "D";
 }
 
-export function checkAndSaveBest(result: GameOverResult): { isNewRecord: boolean; best: BestRecord } {
+export function checkAndSaveBest(result: GameOverResult): { isNewRecord: boolean; best: BestRecord; xpEarned: number; rankProgress: any; rankUp: boolean } {
     const best = loadBest();
     const isNew = result.score > best.score;
     if (isNew) {
         saveBest({ score: result.score, wave: result.wave, maxCombo: result.maxCombo, wpm: result.wpm });
     }
-    return { isNewRecord: isNew, best: isNew ? { score: result.score, wave: result.wave, maxCombo: result.maxCombo, wpm: result.wpm } : best };
-    
+
     // Calculate XP and update rank
     const xpEarned = calculateXp(result);
     const prevXp = loadTotalXp();
@@ -84,7 +83,10 @@ export function checkAndSaveBest(result: GameOverResult): { isNewRecord: boolean
     const rankProgress = getRankProgress(newXp);
     const prevRank = getRankProgress(prevXp);
     const rankUp = rankProgress.current.id !== prevRank.current.id;
+
+    return { isNewRecord: isNew, best: isNew ? { score: result.score, wave: result.wave, maxCombo: result.maxCombo, wpm: result.wpm } : best, xpEarned, rankProgress, rankUp };
 }
+
 
 // ---------------------------------------------------------------------------
 // Animated State
