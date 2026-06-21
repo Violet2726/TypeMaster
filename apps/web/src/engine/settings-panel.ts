@@ -135,8 +135,8 @@ export function handleSettingsKey(e: KeyboardEvent): boolean {
 export function renderSettingsPanel(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
     if (!isOpen) return;
 
-    const panelW = 340;
-    const panelH = 320;
+    const panelW = 380;
+    const panelH = 340;
     const panelX = w / 2 - panelW / 2;
     const panelY = h / 2 - panelH / 2;
 
@@ -150,7 +150,7 @@ export function renderSettingsPanel(ctx: CanvasRenderingContext2D, w: number, h:
     drawGlassPanel(ctx, panelX, panelY, panelW, panelH, 24);
 
     // Title
-    ctx.font = "700 22px -apple-system, SF Pro Display, system-ui, sans-serif";
+    ctx.font = "700 24px -apple-system, SF Pro Display, system-ui, sans-serif";
     ctx.fillStyle = COLORS.text;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -158,10 +158,10 @@ export function renderSettingsPanel(ctx: CanvasRenderingContext2D, w: number, h:
 
     // Settings items
     const items = [
-        { label: "Volume", value: settings.volume + "%", key: "volume" },
-        { label: "Music", value: settings.musicEnabled ? "ON" : "OFF", key: "music" },
-        { label: "SFX", value: settings.sfxEnabled ? "ON" : "OFF", key: "sfx" },
-        { label: "Difficulty", value: settings.difficulty.toUpperCase(), key: "difficulty" },
+        { label: "\u97f3\u91cf", value: settings.volume + "%", key: "volume" },
+        { label: "\u97f3\u4e50", value: settings.musicEnabled ? "ON" : "OFF", key: "music" },
+        { label: "\u97f3\u6548", value: settings.sfxEnabled ? "ON" : "OFF", key: "sfx" },
+        { label: "\u96be\u5ea6", value: settings.difficulty.toUpperCase(), key: "difficulty" },
     ];
 
     items.forEach((item, i) => {

@@ -108,7 +108,7 @@ export function handlePauseMenuKey(e: KeyboardEvent): PauseAction {
 // ---------------------------------------------------------------------------
 
 export function renderPauseMenu(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
-    const panelW = 380;
+    const panelW = 400;
     const panelH = 420;
     const panelX = w / 2 - panelW / 2;
     const panelY = h / 2 - panelH / 2;
@@ -125,11 +125,11 @@ export function renderPauseMenu(ctx: CanvasRenderingContext2D, w: number, h: num
     ctx.stroke();
 
     // Title
-    ctx.font = "700 26px -apple-system, SF Pro Display, system-ui, sans-serif";
+    ctx.font = "700 28px -apple-system, SF Pro Display, system-ui, sans-serif";
     ctx.fillStyle = COLORS.text;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("Paused", w / 2, panelY + 38);
+    ctx.fillText("\u5df2\u6682\u505c", w / 2, panelY + 38);
 
     // --- Segmented Control (Menu | Stats) ---
     const segW = 200;
@@ -157,10 +157,10 @@ export function renderPauseMenu(ctx: CanvasRenderingContext2D, w: number, h: num
     ctx.textBaseline = "middle";
 
     ctx.fillStyle = activeTab === "menu" ? "#ffffff" : COLORS.textTertiary;
-    ctx.fillText("Menu", segX + seg1W / 2, segY + segH / 2);
+    ctx.fillText("\u83dc\u5355", segX + seg1W / 2, segY + segH / 2);
 
     ctx.fillStyle = activeTab === "stats" ? "#ffffff" : COLORS.textTertiary;
-    ctx.fillText("Stats", segX + seg1W + seg1W / 2, segY + segH / 2);
+    ctx.fillText("\u7edf\u8ba1", segX + seg1W + seg1W / 2, segY + segH / 2);
 
     // --- Content Area ---
     if (activeTab === "menu") {
@@ -174,7 +174,7 @@ export function renderPauseMenu(ctx: CanvasRenderingContext2D, w: number, h: num
     ctx.fillStyle = COLORS.textTertiary;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("Tab switch  |  Arrow keys navigate  |  Enter select", w / 2, panelY + panelH - 18);
+    ctx.fillText("\u5207\u6362\u6807\u7b7e  |  \u65b9\u5411\u952e\u5bfc\u822a  |  \u56de\u8f66\u9009\u62e9", w / 2, panelY + panelH - 18);
 
     ctx.restore();
 }
