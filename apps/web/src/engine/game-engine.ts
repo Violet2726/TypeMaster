@@ -51,6 +51,7 @@ import { renderRunMap, createRunMapState, handleRunMapKey, handleRunMapClick } f
 import { renderEncounter, createEncounterState, handleEncounterKey, handleEncounterClick } from "./encounter-ui";
 import { renderRunComplete, createRunCompleteState, handleRunCompleteKey } from "./run-complete";
 import { createBossIntro, updateBossIntro, renderBossIntro, isBossIntroActive } from "./boss-intro";
+import { saveRunRecord, createRunRecord, renderRunHistory } from "./run-history";
 import { renderBossBattleUI } from "./boss-battle-ui";
 import { renderRhythmReward } from "./rhythm-reward-visual";
 import { triggerComboFlash, updateComboFx, drawComboFx, resetComboFx } from "./combo-fx";
@@ -364,6 +365,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                                     currentRun = advanceToNextAct(nodeResult);
                                     if (currentRun.completed && currentRun.victory) {
                                         runCompleteState = createRunCompleteState(currentRun, true);
+                                    saveRunRecord(createRunRecord(currentRun, runCompleteState.rating, Date.now() - currentRun.startTime));
                                         state = { ...state, mode: "run_complete" } as any;
                                         music.setPlaying(false);
                                         return;
@@ -406,6 +408,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                         // Run game over: show run complete screen
                         if (currentRun) {
                             runCompleteState = createRunCompleteState(currentRun, false);
+                            saveRunRecord(createRunRecord(currentRun, runCompleteState.rating, Date.now() - currentRun.startTime));
                             state = { ...state, mode: "run_complete" } as any;
                             music.setPlaying(false);
                             return;
@@ -1152,6 +1155,10 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
                     
                 case 'achievements':
                     openAchievementPage();
+                    return;
+                    
+                case 'history':
+                    // Show run history - toggle a flag
                     return;
                     
                 case 'settings':
