@@ -25,10 +25,12 @@ interface Popup {
 
 export class ScorePopupSystem {
     private popups: Popup[] = [];
+    private pool: Popup[] = [];
 
     emit(config: ScorePopupConfig): void {
         const { x, y, text, color = "#ffd60a", fontSize = 18, drift = -60 } = config;
-        this.popups.push({
+        const p = this.pool.pop() || ({} as Popup);
+        Object.assign(p, {
             x, y,
             targetY: y + drift,
             vx: (Math.random() - 0.5) * 20,
@@ -37,14 +39,15 @@ export class ScorePopupSystem {
             life: 0.8, maxLife: 0.8,
             trail: [],
             wobblePhase: Math.random() * Math.PI * 2,
-        });
+        } as Popup);
+        this.popups.push(p);
     }
 
     update(dt: number): void {
         for (let i = this.popups.length - 1; i >= 0; i--) {
             const p = this.popups[i];
             p.life -= dt;
-            if (p.life <= 0) { this.popups.splice(i, 1); continue; }
+            if (p.life <= 0) { this.pool.push(p); this.popups.splice(i, 1); continue; }
 
             // Store trail
             p.trail.push({ x: p.x, y: p.y, alpha: (p.life / p.maxLife) * 0.3 });

@@ -97,6 +97,9 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     let gameOverTime = 0;
     let lastCorrectEnemyIds: string[] = [];
     let dailyChallenge: any = null; // Active daily challenge config
+    let fpsFrames = 0;
+    let fpsLastTime = 0;
+    let fpsDisplay = 60;
 
     // Pause/resume countdown
     let resumeCountdown = 0;
@@ -131,6 +134,14 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     // --- Ticking ---
 
     function tick(dt: number): void {
+        // FPS tracking
+        fpsFrames++;
+        const now = performance.now();
+        if (now - fpsLastTime >= 1000) {
+            fpsDisplay = Math.round(fpsFrames * 1000 / (now - fpsLastTime));
+            fpsFrames = 0;
+            fpsLastTime = now;
+        }
         // Hitlag: freeze game for micro-moment on kill
         if (hitlagTimer > 0) {
             hitlagTimer -= dt;
@@ -505,6 +516,17 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
 
     function drawHUD(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
         drawEnhancedHud(ctx, w, h, time, state, copy);
+        // FPS counter (bottom-right, subtle)
+        if (fpsDisplay > 0) {
+            const fpsColor = fpsDisplay >= 55 ? "#34c759" : fpsDisplay >= 30 ? "#ffcc02" : "#ff3b5c";
+            ctx.font = "400 9px -apple-system, SF Pro Text, system-ui, sans-serif";
+            ctx.fillStyle = fpsColor;
+            ctx.globalAlpha = 0.4;
+            ctx.textAlign = "right";
+            ctx.textBaseline = "bottom";
+            ctx.fillText(fpsDisplay + " fps", w - 12, h - 8);
+            ctx.globalAlpha = 1;
+        }
     }
 
     // --- Enemy Drawing ---

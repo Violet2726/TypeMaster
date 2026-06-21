@@ -57,7 +57,7 @@ export class ParticleSystem {
             p.life -= dt;
             if (p.life <= 0) { this.pool.push(p); this.active.splice(i, 1); continue; }
             if (p.trail) {
-                p.trailHistory.push({ x: p.x, y: p.y });
+                p.trailHistory.push({ x: p.x, y: p.y }); if (p.trailHistory.length > p.trailLength) p.trailHistory.shift();
                 if (p.trailHistory.length > p.trailLength) p.trailHistory.shift();
             }
             if (p.turbulence > 0) {
