@@ -20,7 +20,7 @@ import { ParticleSystem, ScreenShake } from "./particle-system";
 import { ScorePopupSystem } from "./score-popup";
 import { COLORS } from "../components/game/colors";
 import { drawGlassPanel, drawProgressRing } from "../components/game/draw-helpers";
-import { initSound, playClickSound, playKillSound, playErrorSound, playComboSound, playChainSound, playPowerUpSound, playShieldBreakSound, playWaveClearSound, playGameOverSound, playAchievementSound, setSfxEnabled, playCountdownBeep, playCountdownGo, playBossPhaseSound, playBreathingWaveSound, playComboMilestoneSound, playThemeTransitionSound, playBossCounterSound, playBossWeakPointSound, playChainAttackSound } from "../components/game/sound-engine";
+import { initSound, playClickSound, playKillSound, playErrorSound, playComboSound, playChainSound, playPowerUpSound, playShieldBreakSound, playWaveClearSound, playGameOverSound, playAchievementSound, setSfxEnabled, playCountdownBeep, playCountdownGo, playBossPhaseSound, playBreathingWaveSound, playComboMilestoneSound, playThemeTransitionSound, playBossCounterSound, playBossWeakPointSound, playChainAttackSound, playMenuNavigate, playMenuSelect } from "../components/game/sound-engine";
 import { getBlendedTheme, drawThemedBackground } from "./environment-theme";
 import { GenerativeVisualSystem } from "./generative-visuals";
 import { initGameOver, renderGameOver, clearGameOver } from "./game-over";
@@ -491,6 +491,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         } else if (state.mode === "encounter") {
             renderEncounter(ctx, width, height, encounterState, time);
         } else if (state.mode === "run_map") {
+            if (!runMapState) return;
             renderRunMap(ctx, width, height, runMapState, time);
         } else if (state.mode === "idle") {
             renderIdle(ctx, width, height, time);
@@ -1244,6 +1245,7 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
 
         if (state.mode === "run_complete") {
             if (!runCompleteState) return;
+            playClickSound();
             const action = handleRunCompleteKey(e.key);
             if (action === "restart" || action === "menu") {
                 currentRun = null;
@@ -1260,10 +1262,19 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
             if (!encounterState) return;
             const encResult = handleEncounterKey(e.key, encounterState);
             encounterState = encResult;
+            if (encResult.action === "purchased") playPowerUpSound();
+            if (encResult.action === "rested") playComboSound(5);
+            if (encResult.action === "event_done") playAchievementSound();
             if (encResult.action === "leave" || encResult.action === "rested" || encResult.action === "event_done" || encResult.action === "purchased") {
                 currentRun = encResult.run;
+            if (encResult.action === "purchased") playPowerUpSound();
+            if (encResult.action === "rested") playComboSound(5);
+            if (encResult.action === "event_done") playAchievementSound();
                 if (encResult.action === "leave" || encResult.action === "purchased") {
                     // Return to map (shop allows multiple purchases)
+            if (encResult.action === "purchased") playPowerUpSound();
+            if (encResult.action === "rested") playComboSound(5);
+            if (encResult.action === "event_done") playAchievementSound();
                     if (encResult.action === "leave") {
                         runMapState = createRunMapState(currentRun);
                         state = { ...state, mode: "run_map" } as any;
@@ -1280,8 +1291,11 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
 
         if (state.mode === "run_map") {
             if (!runMapState) return;
+            const prevSel = runMapState.selectedIndex;
             const mapResult = handleRunMapKey(e.key, runMapState);
             runMapState = mapResult;
+            if (mapResult.action === null && e.key.length > 0) playMenuNavigate();
+            if (mapResult.action === 'select') playMenuSelect();
             if (mapResult.action === "select" && currentRun) {
                 currentRun = selectNode(currentRun, mapResult.nodeId);
                 const currentNode = getCurrentNode(currentRun);
@@ -1316,6 +1330,7 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
                         };
                         state = { ...state, enemies: [bossEnemy], enemiesTotal: 1 };
                         wavesTarget = 999;
+                        playBossPhaseSound(1);
                         bossIntroState = createBossIntro(encounterConfig.bossNameZh || "Boss", encounterConfig.bossHp, currentRun.acts[currentRun.currentAct].config.nameZh);
                         // Boss defeated when all enemies dead
                     }
