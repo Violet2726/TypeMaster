@@ -53,6 +53,7 @@ import { renderEncounter, createEncounterState, handleEncounterKey, handleEncoun
 import { renderRunComplete, createRunCompleteState, handleRunCompleteKey } from "./run-complete";
 import { createBossIntro, updateBossIntro, renderBossIntro, isBossIntroActive } from "./boss-intro";
 import { saveRunRecord, createRunRecord, renderRunHistory } from "./run-history";
+import { addRunXp, getMetaEffects } from "./meta-progression";
 import { renderBossBattleUI } from "./boss-battle-ui";
 import { renderRhythmReward } from "./rhythm-reward-visual";
 import { triggerComboFlash, updateComboFx, drawComboFx, resetComboFx } from "./combo-fx";
@@ -166,6 +167,15 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     let currentRun: any = null;
     function applyRunUpgrades() {
         if (!currentRun) return;
+        // Apply meta-progression effects
+        const metaFx = getMetaEffects();
+        if (metaFx.maxLivesBonus > 0) {
+            currentRun = { ...currentRun, maxLives: currentRun.maxLives + metaFx.maxLivesBonus, lives: currentRun.lives + metaFx.maxLivesBonus };
+        }
+        if (metaFx.startingCoins > 0) {
+            currentRun = { ...currentRun, coins: currentRun.coins + metaFx.startingCoins };
+        }
+        // Apply run upgrades
         const extraLives = getUpgradeStacks("extra_life");
         if (extraLives > 0) {
             currentRun = { ...currentRun, maxLives: 5 + extraLives, lives: Math.min(currentRun.lives, 5 + extraLives) };
