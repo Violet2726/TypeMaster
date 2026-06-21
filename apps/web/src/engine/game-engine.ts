@@ -347,6 +347,18 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                 // Extended delay for wave clear celebration
                 setTimeout(() => {
                     if (state.mode === "playing") {
+                        // Encounter progress: track waves in run mode
+                        if (currentRun && encounterConfig) {
+                            wavesInEncounter++;
+                            if (wavesInEncounter >= wavesTarget) {
+                                const nodeResult = completeCurrentNode(currentRun, { coinsEarned: encounterConfig.rewardCoins, score: state.score, kills: state.enemiesDefeated });
+                                currentRun = nodeResult;
+                                runMapState = createRunMapState(currentRun);
+                                state = { ...state, mode: "run_map" } as any;
+                                music.setPlaying(false);
+                                return;
+                            }
+                        }
                         { const perfScore = calculatePerformanceScore(state); state = { ...state, _performanceScore: perfScore } as any; state = startWave(state, pool, { canvasWidth, canvasHeight, performanceScore: perfScore }); }
                         // Spawn variant enemies for this wave
                         const variantType = shouldSpawnVariant(state.wave - 1);
@@ -362,6 +374,11 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                 }, 2000);
             }
             if (evt.type === "game_over") {
+                        // Run game over: reset run state
+                        if (currentRun) {
+                            currentRun = null;
+                            encounterConfig = null;
+                        }
                 gameOverTime = performance.now();
                 shake.trigger(12);
                 initGameOver(buildGameResult(state));
