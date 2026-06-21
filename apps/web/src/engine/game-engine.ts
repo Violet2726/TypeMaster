@@ -354,6 +354,18 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                             wavesInEncounter++;
                             if (wavesInEncounter >= wavesTarget) {
                                 const nodeResult = completeCurrentNode(currentRun, { coinsEarned: encounterConfig.rewardCoins, score: state.score, kills: state.enemiesDefeated });
+                                // Boss defeat: auto-advance to next act
+                                if (encounterConfig.isBoss) {
+                                    currentRun = advanceToNextAct(nodeResult);
+                                    if (currentRun.completed && currentRun.victory) {
+                                        runCompleteState = createRunCompleteState(currentRun, true);
+                                        state = { ...state, mode: "run_complete" } as any;
+                                        music.setPlaying(false);
+                                        return;
+                                    }
+                                } else {
+                                    currentRun = nodeResult;
+                                }
                                 currentRun = nodeResult;
                                 // Check if all nodes in act are completed
                                 const choices = getAvailableChoices(currentRun);
@@ -1277,6 +1289,27 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
                     wavesInEncounter = 0;
                     wavesTarget = encounterConfig.waveCount;
                     state = transitionGameMode(state, "start");
+                    // Boss encounter: inject boss enemy with configured HP
+                    if (encounterConfig.isBoss) {
+                        const bossWord = pool[Math.floor(Math.random() * pool.length)] || "boss";
+                        const bossEnemy = {
+                            id: "boss-" + Date.now().toString(36),
+                            type: "boss",
+                            word: bossWord,
+                            x: canvasWidth / 2,
+                            y: -40,
+                            speed: canvasHeight * 0.02,
+                            hp: encounterConfig.bossHp,
+                            maxHp: encounterConfig.bossHp,
+                            scoreMultiplier: 3,
+                            alive: true,
+                            typed: "",
+                            spawnTime: Date.now(),
+                        };
+                        state = { ...state, enemies: [bossEnemy], enemiesTotal: 1 };
+                        wavesTarget = 999;
+                        // Boss defeated when all enemies dead
+                    }
                     resetGameplayAura();
                     resetRhythm();
                     showTutorial();
