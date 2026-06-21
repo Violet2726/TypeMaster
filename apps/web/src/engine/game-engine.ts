@@ -49,6 +49,7 @@ import { BossBattleState, BOSS_PHASES } from "@typemaster/domain";
 import { generateRun, selectNode, completeCurrentNode, advanceToNextAct, getAvailableChoices, getCurrentNode, getEncounterConfig, getRunStats, NODE_TYPES, EVENTS, processEvent, restAction, purchaseUpgrade, getShopOffers, UPGRADE_DEFS } from "@typemaster/domain";
 import { renderRunMap, createRunMapState, handleRunMapKey } from "./run-map";
 import { renderEncounter, createEncounterState, handleEncounterKey } from "./encounter-ui";
+import { renderRunComplete, createRunCompleteState, handleRunCompleteKey } from "./run-complete";
 import { renderBossBattleUI } from "./boss-battle-ui";
 import { renderRhythmReward } from "./rhythm-reward-visual";
 import { triggerComboFlash, updateComboFx, drawComboFx, resetComboFx } from "./combo-fx";
@@ -171,6 +172,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     let wavesInEncounter = 0;
     let wavesTarget = 0;
     let encounterState: any = null;
+    let runCompleteState: any = null;
 
     // Upgrade effect helpers
     function getUpgradeStacks(id) {
@@ -353,6 +355,16 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                             if (wavesInEncounter >= wavesTarget) {
                                 const nodeResult = completeCurrentNode(currentRun, { coinsEarned: encounterConfig.rewardCoins, score: state.score, kills: state.enemiesDefeated });
                                 currentRun = nodeResult;
+                                // Check if all nodes in act are completed
+                                const choices = getAvailableChoices(currentRun);
+                                if (choices.length === 0) {
+                                    currentRun = advanceToNextAct(currentRun);
+                                    if (currentRun.completed && currentRun.victory) {
+                                        runCompleteState = createRunCompleteState(currentRun, true);
+                                        state = { ...state, mode: "run_complete" } as any;
+                                        return;
+                                    }
+                                }
                                 runMapState = createRunMapState(currentRun);
                                 state = { ...state, mode: "run_map" } as any;
                                 music.setPlaying(false);
@@ -374,10 +386,12 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                 }, 2000);
             }
             if (evt.type === "game_over") {
-                        // Run game over: reset run state
+                        // Run game over: show run complete screen
                         if (currentRun) {
-                            currentRun = null;
-                            encounterConfig = null;
+                            runCompleteState = createRunCompleteState(currentRun, false);
+                            state = { ...state, mode: "run_complete" } as any;
+                            music.setPlaying(false);
+                            return;
                         }
                 gameOverTime = performance.now();
                 shake.trigger(12);
@@ -454,7 +468,9 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         // Typing flow aura (golden glow for consecutive correct inputs)
         renderFlowAura(ctx, width, height, time);
 
-        if (state.mode === "encounter") {
+        if (state.mode === "run_complete") {
+            renderRunComplete(ctx, width, height, runCompleteState, time);
+        } else if (state.mode === "encounter") {
             renderEncounter(ctx, width, height, encounterState, time);
         } else if (state.mode === "run_map") {
             renderRunMap(ctx, width, height, runMapState, time);
@@ -1204,6 +1220,19 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
             resetComboFx();
             resetHud();
             resetTracker();
+            return;
+        }
+
+        if (state.mode === "run_complete") {
+            if (!runCompleteState) return;
+            const action = handleRunCompleteKey(e.key);
+            if (action === "restart" || action === "menu") {
+                currentRun = null;
+                encounterConfig = null;
+                runCompleteState = null;
+                state = createGameState();
+                runMapState = null;
+            }
             return;
         }
 
