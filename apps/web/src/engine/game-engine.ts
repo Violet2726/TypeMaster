@@ -20,7 +20,7 @@ import { ParticleSystem, ScreenShake } from "./particle-system";
 import { ScorePopupSystem } from "./score-popup";
 import { COLORS } from "../components/game/colors";
 import { drawGlassPanel, drawProgressRing } from "../components/game/draw-helpers";
-import { initSound, playClickSound, playKillSound, playErrorSound, playComboSound, playChainSound, playPowerUpSound, playShieldBreakSound, playWaveClearSound, playGameOverSound, playAchievementSound, setSfxEnabled, playCountdownBeep, playCountdownGo } from "../components/game/sound-engine";
+import { initSound, playClickSound, playKillSound, playErrorSound, playComboSound, playChainSound, playPowerUpSound, playShieldBreakSound, playWaveClearSound, playGameOverSound, playAchievementSound, setSfxEnabled, playCountdownBeep, playCountdownGo, playBossPhaseSound, playBreathingWaveSound, playComboMilestoneSound, playThemeTransitionSound } from "../components/game/sound-engine";
 import { getBlendedTheme, drawThemedBackground } from "./environment-theme";
 import { initGameOver, renderGameOver, clearGameOver } from "./game-over";
 import { createMusicEngine } from "./music-engine";
@@ -182,7 +182,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                     } else {
                         particles.emit({ x: leaked.x, y: canvasHeight - 20, count: 15, color: COLORS.error, spread: Math.PI, speed: 2, gravity: 3, turbulence: 0.5, trail: true });
                         shake.trigger(8);
-                playWaveClearSound(); haptic([20, 40, 20]);
+                playWaveClearSound(); if (isBreathingWave(state.wave)) playBreathingWaveSound(); haptic([20, 40, 20]);
                     }
                 }
             }
@@ -218,8 +218,8 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
 
                 // Update music theme based on wave
                 const waveNum = state.wave;
-                if (waveNum >= 13) music.setTheme("black-hole");
-                else if (waveNum >= 6) music.setTheme("nebula");
+                if (waveNum >= 13) { music.setTheme("black-hole"); playThemeTransitionSound("black-hole"); }
+                else if (waveNum >= 6) { music.setTheme("nebula"); playThemeTransitionSound("nebula"); }
 
                 // Extended delay for wave clear celebration
                 setTimeout(() => {
@@ -1028,7 +1028,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                         particles.emit({ x: enemy.x, y: enemy.y, count: 20 + chainBonus * 5, color, speed: 3 + chainBonus, size: 3 + chainBonus * 0.5, gravity: 2, turbulence: 0.5 + chainCount * 0.1, trail: true, trailLength: 6 + chainBonus * 2 });
                         particles.emit({ x: enemy.x, y: enemy.y, count: 8 + chainBonus * 2, color: "#ffffff", speed: 2, size: 2, lifetime: 0.4 });
                         shake.trigger(4 + chainBonus * 2);
-                        triggerComboFlash(state.combo); if (state.combo % 5 === 0 && state.combo > 0) haptic([10, 30, 10]);
+                        triggerComboFlash(state.combo); if (state.combo % 5 === 0 && state.combo > 0) { playComboMilestoneSound(state.combo); haptic([10, 30, 10]); }
                         if (chainCount > 1) playChainSound(chainCount);
 
                         // Chain kill tracking
@@ -1064,7 +1064,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                                 );
                                 // Phase transition effects
                                 shake.trigger(10);
-                                playComboSound(newPhase * 5);
+                                playBossPhaseSound(newPhase);
                                 const phaseColor = getBossPhaseColor(newPhase);
                                 particles.emit({ x: canvasWidth / 2, y: canvasHeight / 2, count: 40, color: phaseColor, speed: 6, size: 4, glow: 0.9, trail: true, trailLength: 15 });
                                 particles.emit({ x: enemy.x, y: enemy.y, count: 30, color: "#ffffff", speed: 5, size: 3, lifetime: 0.8 });

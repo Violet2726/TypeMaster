@@ -152,6 +152,91 @@ export function playAchievementSound() {
 }
 
 // ---------------------------------------------------------------------------
+// Boss Phase Transition Sounds
+// ---------------------------------------------------------------------------
+
+export function playBossPhaseSound(phase: number) {
+    if (phase === 1) {
+        // Phase 1: Deep rumble
+        tone(120, "sine", 0.4, 0.15);
+        tone(80, "triangle", 0.5, 0.12, 0.05);
+        noise(0.2, 2000, 0.08, 0.08);
+    } else if (phase === 2) {
+        // Phase 2: Rising tension
+        tone(200, "sawtooth", 0.3, 0.12);
+        tone(300, "sine", 0.25, 0.1, 0.05);
+        tone(400, "triangle", 0.2, 0.08, 0.1);
+        noise(0.15, 3000, 0.06, 0.12);
+    } else if (phase === 3) {
+        // Phase 3: Desperate alarm
+        tone(600, "sawtooth", 0.2, 0.08);
+        tone(800, "sine", 0.18, 0.06, 0.04);
+        tone(1000, "triangle", 0.15, 0.05, 0.08);
+        tone(1200, "sine", 0.12, 0.04, 0.12);
+        noise(0.2, 5000, 0.1, 0.06);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Breathing Wave Sound
+// ---------------------------------------------------------------------------
+
+export function playBreathingWaveSound() {
+    // Soothing, calming recovery wave
+    tone(330, "sine", 0.4, 0.15);
+    tone(440, "sine", 0.35, 0.12, 0.1);
+    tone(550, "sine", 0.3, 0.1, 0.2);
+    tone(660, "sine", 0.25, 0.08, 0.3);
+}
+
+// ---------------------------------------------------------------------------
+// Combo Progression Sounds
+// ---------------------------------------------------------------------------
+
+export function playComboMilestoneSound(combo: number) {
+    if (combo >= 20) {
+        // Epic: full chord + noise burst
+        tone(523, "sine", 0.25, 0.1);
+        tone(659, "sine", 0.22, 0.08);
+        tone(784, "sine", 0.2, 0.06);
+        tone(1047, "sine", 0.18, 0.05);
+        noise(0.15, 4000, 0.08, 0.08);
+    } else if (combo >= 15) {
+        // Intense: fast arpeggio
+        tone(600, "sine", 0.15, 0.06);
+        tone(750, "triangle", 0.12, 0.05, 0.03);
+        tone(900, "sine", 0.1, 0.04, 0.06);
+    } else if (combo >= 10) {
+        // Strong: rising pair
+        tone(500, "triangle", 0.12, 0.08);
+        tone(700, "sine", 0.1, 0.06, 0.04);
+    } else if (combo >= 5) {
+        // Building: single bright note
+        tone(600, "sine", 0.1, 0.08);
+        tone(800, "triangle", 0.08, 0.06, 0.02);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Environment Theme Sounds
+// ---------------------------------------------------------------------------
+
+export function playThemeTransitionSound(theme: string) {
+    if (theme === 'nebula') {
+        // Ethereal transition: soft pad
+        tone(220, "sine", 0.6, 0.2);
+        tone(330, "sine", 0.5, 0.15, 0.1);
+        tone(440, "sine", 0.4, 0.12, 0.2);
+    } else if (theme === 'black-hole') {
+        // Dark transition: deep rumble + dissonance
+        tone(80, "sawtooth", 0.5, 0.2);
+        tone(120, "sine", 0.4, 0.15, 0.05);
+        tone(160, "triangle", 0.35, 0.12, 0.1);
+        noise(0.3, 1500, 0.1, 0.15);
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Menu Navigation Sounds
 // ---------------------------------------------------------------------------
 
