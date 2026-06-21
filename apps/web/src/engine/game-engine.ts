@@ -45,6 +45,8 @@ import { openThemePage, closeThemePage, isThemePageOpen, handleThemePageKey, ren
 import { getThemeColors } from "@typemaster/domain";
 import { findChainMatch, getChainHint } from "@typemaster/domain";
 import { RhythmEngine } from "@typemaster/domain";
+import { BossBattleState, BOSS_PHASES } from "@typemaster/domain";
+import { renderBossBattleUI } from "./boss-battle-ui";
 import { renderRhythmReward } from "./rhythm-reward-visual";
 import { triggerComboFlash, updateComboFx, drawComboFx, resetComboFx } from "./combo-fx";
 import { updateHud, drawEnhancedHud, resetHud } from "./hud-overlay";
@@ -150,6 +152,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     const dynamicMusic = new DynamicMusicManager();
     const perfManager = new PerformanceManager();
     const rhythmEngine = new RhythmEngine();
+    const bossBattle = new BossBattleState();
     const genVisuals = new GenerativeVisualSystem();
     let enemyVariants: Map<string, VariantState> = new Map();
     // Apply difficulty modifier
@@ -184,6 +187,22 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
             fpsFrames = 0;
             fpsLastTime = now;
         }
+        // Update generative visuals (always, even during hitlag)
+        genVisuals.update(dt);
+
+        // Boss battle update
+        const activeBoss = state.enemies.find((e: any) => e.alive && e.type === "boss");
+        if (activeBoss) {
+            const bossEvent = bossBattle.update(dt, activeBoss.hp, activeBoss.maxHp);
+            if (bossEvent && bossEvent.type === "counter_attack") {
+                state = { ...state, lives: Math.max(0, state.lives - bossEvent.damage) };
+                shake.trigger(12);
+                particles.emit({ x: canvasWidth / 2, y: canvasHeight, count: 30, color: "#ef4444", speed: 5, size: 4, gravity: -2, turbulence: 0.8, trail: true });
+                playErrorSound();
+                haptic(50);
+            }
+        }
+
         // Hitlag: freeze game for micro-moment on kill
         if (hitlagTimer > 0) {
             hitlagTimer -= dt;
@@ -213,6 +232,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                 state = transitionGameMode(state, "resume");
                 resumeCountdown = 0;
                 rhythmEngine.reset();
+                bossBattle.reset();
             }
             return;
         }
@@ -500,6 +520,12 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
 
         renderChainHint(ctx, w, h, time);
         renderRhythmReward(ctx, w, h, rhythmEngine.getRhythmScore(), rhythmEngine.getDamageMultiplier(), rhythmEngine.getStreak(), time);
+        // Boss battle UI
+        const bossEnemy = state.enemies.find((e: any) => e.alive && e.type === "boss");
+        if (bossEnemy) {
+            const bossStateObj = { ...bossBattle, _phaseConfig: BOSS_PHASES[bossBattle.phase] };
+            renderBossBattleUI(ctx, w, h, bossStateObj, time);
+        }
         drawHUD(ctx, w, h, time);
 
         // Wave incoming overlay
@@ -1196,7 +1222,31 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
                         // Double score power-up
                         const hasDouble = activePowerUps.some(ap => ap.type === "double");
                         const baseScore = evt.score;
-                        const rhythmMult = rhythmEngine.getDamageMultiplier();
+                        let rhythmMult = rhythmEngine.getDamageMultiplier();
+                        // Boss battle modifiers
+                        if (enemy.type === "boss") {
+                            // Shield blocks damage
+                            if (bossBattle.isShieldActive()) {
+                                const shieldBroken = bossBattle.onShieldWordTyped();
+                                if (!shieldBroken) {
+                                    // Shield absorbs the hit - no kill, just shield damage
+                                    particles.emit({ x: enemy.x, y: enemy.y, count: 8, color: "#f59e0b", speed: 2, size: 2, lifetime: 0.3 });
+                                    scorePopups.emit({ x: enemy.x, y: enemy.y - 25, text: "SHIELD", color: "#f59e0b", fontSize: 12 });
+                                    return; // Don't kill the boss
+                                } else {
+                                    // Shield broken!
+                                    particles.emit({ x: enemy.x, y: enemy.y, count: 40, color: "#f59e0b", speed: 6, size: 4, gravity: 1, trail: true });
+                                    scorePopups.emit({ x: enemy.x, y: enemy.y - 30, text: "SHIELD BROKEN!", color: "#f59e0b", fontSize: 18 });
+                                    shake.trigger(10);
+                                }
+                            }
+                            // Weak point bonus
+                            if (bossBattle.isWeakPointActive()) {
+                                rhythmMult *= bossBattle.getDamageMultiplier();
+                                particles.emit({ x: enemy.x, y: enemy.y, count: 20, color: "#ef4444", speed: 4, size: 3, trail: true });
+                                scorePopups.emit({ x: enemy.x, y: enemy.y - 35, text: "WEAK POINT x3!", color: "#ef4444", fontSize: 16 });
+                            }
+                        }
                         const chainScore = Math.round(baseScore * chainMultiplier * rhythmMult * (hasDouble ? 2 : 1));
                         const chainLabel = chainCount > 1 ? " x" + chainCount : "";
                         const rhythmTag = rhythmMult >= 1.3 ? " [R]" : "";

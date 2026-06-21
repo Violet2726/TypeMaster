@@ -19,6 +19,7 @@ export * from './challenge.js';
 export * from './game.js';
 export * from './word-chains.js';
 export * from './rhythm-engine.js';
+export * from './boss-battle.js';
 export * from './growth.js';
 export * from './daily-challenge.js';
 export * from './achievements-system.js';
