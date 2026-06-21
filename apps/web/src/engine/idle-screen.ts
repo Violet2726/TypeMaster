@@ -420,3 +420,4 @@ export class IdleScreenManager {
     this.entranceStartTime = 0;
   }
 }
+
