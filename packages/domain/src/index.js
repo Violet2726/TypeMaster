@@ -1,7 +1,7 @@
-﻿/**
- * 缁冧範寮曟搸缁熶竴鍑哄彛銆?
+/**
+ * 练习引擎统一出口�?
  *
- * 澶栭儴妯″潡鍙渶瑕佷粠 `@typemaster/domain` 瀵煎叆锛? * 涓嶅繀鍏冲績鍏蜂綋閫昏緫琚媶鍒颁簡鍝釜缁嗗垎鏂囦欢涓€?
+ * 外部模块只需要从 `@typemaster/domain` 导入�? * 不必关心具体逻辑被拆到了哪个细分文件中�?
  */
 
 export * from './config.js';
@@ -19,7 +19,9 @@ export * from './game.js';
 export * from './growth.js';
 export * from './daily-challenge.js';
 export * from './achievements-system.js';
+export * from './hidden-achievements.js';
 export * from './visual-themes.js';
 export { commonWords } from './data/words.js';
+
 
 
