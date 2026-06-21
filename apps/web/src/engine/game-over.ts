@@ -177,8 +177,8 @@ export function renderGameOver(ctx: CanvasRenderingContext2D, w: number, h: numb
     ctx.globalAlpha = 1;
 
     // Main glass panel
-    const panelW = 440;
-    const panelH = 420;
+    const panelW = 480;
+    const panelH = 440;
     const panelX = w / 2 - panelW / 2;
     const panelY = h / 2 - panelH / 2;
     drawGlassPanel(ctx, panelX, panelY, panelW, panelH, 24);
@@ -200,7 +200,7 @@ export function renderGameOver(ctx: CanvasRenderingContext2D, w: number, h: numb
     ctx.textAlign = "center";
     ctx.fillText("SCORE", w / 2, scoreY - 18);
 
-    ctx.font = "700 48px -apple-system, SF Pro Display, system-ui, sans-serif";
+    ctx.font = "800 56px -apple-system, SF Pro Display, system-ui, sans-serif";
     ctx.fillStyle = ratingCfg.color;
     ctx.shadowColor = ratingCfg.glow;
     ctx.shadowBlur = 20 * anim.ratingGlow;
@@ -262,12 +262,12 @@ export function renderGameOver(ctx: CanvasRenderingContext2D, w: number, h: numb
 
     // Stats grid with staggered reveal
     const statsData = [
-        { label: "WAVE", value: String(result.wave), diff: result.wave - anim.best.wave },
-        { label: "WPM", value: String(result.wpm), diff: result.wpm - anim.best.wpm },
-        { label: "ACCURACY", value: result.accuracy + "%", diff: 0 },
-        { label: "COMBO", value: String(result.maxCombo), diff: result.maxCombo - anim.best.maxCombo },
-        { label: "KILLS", value: String(result.enemiesDefeated), diff: 0 },
-        { label: "PERFECT", value: String(result.perfectWaves), diff: 0 },
+        { label: "WAVE", value: String(result.wave), diff: result.wave - anim.best.wave, accent: "#3b82f6" },
+        { label: "WPM", value: String(result.wpm), diff: result.wpm - anim.best.wpm, accent: "#8b5cf6" },
+        { label: "ACCURACY", value: result.accuracy + "%", diff: 0, accent: "#06b6d4" },
+        { label: "COMBO", value: String(result.maxCombo), diff: result.maxCombo - anim.best.maxCombo, accent: "#f59e0b" },
+        { label: "KILLS", value: String(result.enemiesDefeated), diff: 0, accent: "#ef4444" },
+        { label: "PERFECT", value: String(result.perfectWaves), diff: 0, accent: "#22c55e" },
     ];
 
     const gridStartY = panelY + 200;
