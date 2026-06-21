@@ -102,6 +102,15 @@ export function playComboSound(combo: number) {
     }
 }
 
+export function playChainAttackSound() {
+    // Chain attack: dramatic ascending sweep
+    tone(300, "sawtooth", 0.2, 0.15);
+    tone(500, "triangle", 0.15, 0.1, 0.03);
+    tone(800, "sine", 0.1, 0.08, 0.06);
+    tone(1200, "sine", 0.08, 0.06, 0.09);
+    noise(0.1, 4000, 0.08, 0.03);
+}
+
 export function playChainSound(chain: number) {
     // Descending arpeggio for chain kills
     const base = 600 + chain * 100;
@@ -116,6 +125,21 @@ export function playPowerUpSound() {
     tone(659, "sine", 0.12, 0.1, 0.08);
     tone(784, "sine", 0.1, 0.08, 0.16);
     tone(1047, "sine", 0.08, 0.06, 0.24);
+}
+
+export function playBossCounterSound() {
+    // Warning: rising pitch siren
+    tone(300, "sawtooth", 0.15, 0.15);
+    tone(500, "sawtooth", 0.12, 0.1, 0.05);
+    tone(700, "square", 0.1, 0.08, 0.1);
+    noise(0.08, 2000, 0.06);
+}
+
+export function playBossWeakPointSound() {
+    // Weak point exposed: high chime
+    tone(1200, "sine", 0.15, 0.1);
+    tone(1500, "sine", 0.1, 0.08, 0.03);
+    tone(1800, "triangle", 0.08, 0.06, 0.06);
 }
 
 export function playShieldBreakSound() {
@@ -156,6 +180,25 @@ export function playAchievementSound() {
 // ---------------------------------------------------------------------------
 
 export function playBossPhaseSound(phase: number) {
+    // Phase-specific dramatic sounds
+    if (phase === 1) {
+        // Phase 1: Deep rumble
+        tone(80, "sine", 0.3, 0.2);
+        tone(120, "triangle", 0.15, 0.15, 0.05);
+    } else if (phase === 2) {
+        // Phase 2: Rising tension
+        tone(200, "sawtooth", 0.2, 0.15);
+        tone(300, "sine", 0.15, 0.1, 0.08);
+        tone(400, "triangle", 0.1, 0.08, 0.16);
+    } else {
+        // Phase 3: Chaos
+        tone(400, "sawtooth", 0.25, 0.12);
+        tone(600, "square", 0.15, 0.1, 0.05);
+        tone(800, "sine", 0.1, 0.08, 0.1);
+        noise(0.12, 3000, 0.1);
+    }
+    // Original sound
+
     if (phase === 1) {
         // Phase 1: Deep rumble
         tone(120, "sine", 0.4, 0.15);

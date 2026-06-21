@@ -20,7 +20,7 @@ import { ParticleSystem, ScreenShake } from "./particle-system";
 import { ScorePopupSystem } from "./score-popup";
 import { COLORS } from "../components/game/colors";
 import { drawGlassPanel, drawProgressRing } from "../components/game/draw-helpers";
-import { initSound, playClickSound, playKillSound, playErrorSound, playComboSound, playChainSound, playPowerUpSound, playShieldBreakSound, playWaveClearSound, playGameOverSound, playAchievementSound, setSfxEnabled, playCountdownBeep, playCountdownGo, playBossPhaseSound, playBreathingWaveSound, playComboMilestoneSound, playThemeTransitionSound } from "../components/game/sound-engine";
+import { initSound, playClickSound, playKillSound, playErrorSound, playComboSound, playChainSound, playPowerUpSound, playShieldBreakSound, playWaveClearSound, playGameOverSound, playAchievementSound, setSfxEnabled, playCountdownBeep, playCountdownGo, playBossPhaseSound, playBreathingWaveSound, playComboMilestoneSound, playThemeTransitionSound, playBossCounterSound, playBossWeakPointSound, playChainAttackSound } from "../components/game/sound-engine";
 import { getBlendedTheme, drawThemedBackground } from "./environment-theme";
 import { GenerativeVisualSystem } from "./generative-visuals";
 import { initGameOver, renderGameOver, clearGameOver } from "./game-over";
