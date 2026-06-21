@@ -44,6 +44,8 @@ import { initGamepad, pollGamepad, gamepadToKey, gamepadVibrate, isGamepadConnec
 import { openThemePage, closeThemePage, isThemePageOpen, handleThemePageKey, renderThemePage } from "./theme-page";
 import { getThemeColors } from "@typemaster/domain";
 import { findChainMatch, getChainHint } from "@typemaster/domain";
+import { RhythmEngine } from "@typemaster/domain";
+import { renderRhythmReward } from "./rhythm-reward-visual";
 import { triggerComboFlash, updateComboFx, drawComboFx, resetComboFx } from "./combo-fx";
 import { updateHud, drawEnhancedHud, resetHud } from "./hud-overlay";
 import { openStats, isStatsOpen, handleStatsKey, renderStatsHistory, saveGameRecord } from "./stats-history";
@@ -147,6 +149,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     const music = createMusicEngine();
     const dynamicMusic = new DynamicMusicManager();
     const perfManager = new PerformanceManager();
+    const rhythmEngine = new RhythmEngine();
     const genVisuals = new GenerativeVisualSystem();
     let enemyVariants: Map<string, VariantState> = new Map();
     // Apply difficulty modifier
@@ -209,6 +212,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                 playCountdownGo();
                 state = transitionGameMode(state, "resume");
                 resumeCountdown = 0;
+                rhythmEngine.reset();
             }
             return;
         }
@@ -495,6 +499,7 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
         }
 
         renderChainHint(ctx, w, h, time);
+        renderRhythmReward(ctx, w, h, rhythmEngine.getRhythmScore(), rhythmEngine.getDamageMultiplier(), rhythmEngine.getStreak(), time);
         drawHUD(ctx, w, h, time);
 
         // Wave incoming overlay
@@ -1160,7 +1165,7 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
                         return; // skip normal kill effects
                     }
                     const enemy = state.enemies.find((en: any) => en.id === evt.enemyId);
-                    playKillSound(enemy?.type); haptic(15); onCorrectKeystroke(); playKeystrokeNote(e.key, true); onCorrectKey(enemy.x, enemy.y, state.combo);
+                    playKillSound(enemy?.type); haptic(15); onCorrectKeystroke(); playKeystrokeNote(e.key, true); onCorrectKey(enemy.x, enemy.y, state.combo); rhythmEngine.onKeystroke(performance.now());
                     playComboSound(state.combo);
                     if (enemy) {
                         typingFeedback.onWordComplete(evt.enemyId, enemy.word, enemy.x, enemy.y, (COLORS as any)[enemy.type] || COLORS.normal);
@@ -1191,9 +1196,11 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
                         // Double score power-up
                         const hasDouble = activePowerUps.some(ap => ap.type === "double");
                         const baseScore = evt.score;
-                        const chainScore = Math.round(baseScore * chainMultiplier * (hasDouble ? 2 : 1));
+                        const rhythmMult = rhythmEngine.getDamageMultiplier();
+                        const chainScore = Math.round(baseScore * chainMultiplier * rhythmMult * (hasDouble ? 2 : 1));
                         const chainLabel = chainCount > 1 ? " x" + chainCount : "";
-                        scorePopups.emit({ x: enemy.x, y: enemy.y - 20, text: "+" + chainScore + chainLabel, color: chainCount > 3 ? "#ff6b6b" : chainCount > 1 ? COLORS.warning : COLORS.warning, fontSize: 18 + chainCount * 2 });
+                        const rhythmTag = rhythmMult >= 1.3 ? " [R]" : "";
+                        scorePopups.emit({ x: enemy.x, y: enemy.y - 20, text: "+" + chainScore + chainLabel + rhythmTag, color: chainCount > 3 ? "#ff6b6b" : chainCount > 1 ? COLORS.warning : COLORS.warning, fontSize: 18 + chainCount * 2 });
 
                         // Trigger hitlag
                         // Word chain detection
@@ -1274,6 +1281,7 @@ hitlagTimer = HITLAG_DURATION * (1 + chainCount * 0.3);
                 }
                 if (evt.type === "char_miss") {
                     lastCorrectEnemyIds = evt.matches || [];
+                    rhythmEngine.onError();
                 }
                 if (evt.type === "achievement_unlocked") {
                     enqueueAchievement(evt.achievementId);
