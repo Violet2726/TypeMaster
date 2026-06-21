@@ -150,3 +150,7 @@ export function renderThemePage(ctx, w, h, time) {
     ctx.textBaseline = 'bottom';
     ctx.fillText('���� select  |  Enter apply  |  T/Esc close', w / 2, h - 15);
 }
+
+
+
+

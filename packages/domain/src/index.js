@@ -22,8 +22,10 @@ export * from './achievements-system.js';
 export * from './hidden-achievements.js';
 export * from './achievement-chains.js';
 export * from './visual-themes.js';
+export * from './custom-themes.js';
 export * from './game-modes.js';
 export { commonWords } from './data/words.js';
+
 
 
 
