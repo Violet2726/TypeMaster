@@ -31,6 +31,8 @@ import { handlePauseMenuKey, renderPauseMenu, resetPauseMenu } from "./pause-men
 import { openAchievementPage, closeAchievementPage, isAchievementPageOpen, handleAchievementPageKey, renderAchievementPage } from "./achievement-page";
 import { openLeaderboard, closeLeaderboard, isLeaderboardOpen, handleLeaderboardKey, renderLeaderboard, saveToLeaderboard } from "./leaderboard";
 import { initGamepad, pollGamepad, gamepadToKey, gamepadVibrate, isGamepadConnected } from "./gamepad";
+import { openThemePage, closeThemePage, isThemePageOpen, handleThemePageKey, renderThemePage } from "./theme-page";
+import { getThemeColors } from "@typemaster/domain";
 import { triggerComboFlash, updateComboFx, drawComboFx, resetComboFx } from "./combo-fx";
 import { updateHud, drawEnhancedHud, resetHud } from "./hud-overlay";
 import { openStats, isStatsOpen, handleStatsKey, renderStatsHistory, saveGameRecord } from "./stats-history";
@@ -332,6 +334,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         renderStatsHistory(ctx, width, height, time);
         renderAchievementPage(ctx, width, height, time);
         renderLeaderboard(ctx, width, height, time);
+        renderThemePage(ctx, width, height, time);
         drawTouchIndicator(ctx, width, height, time);
 
         ctx.restore();
@@ -339,6 +342,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
 
     function drawBackground(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
         const theme = getBlendedTheme(state.wave);
+        const themeColors = getThemeColors();
         drawThemedBackground(ctx, w, h, time, theme, state.combo);
 
         // Theme-aware ambient particles
@@ -892,6 +896,8 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
             if (e.key === "a" || e.key === "A") { openAchievementPage(); return; }
             // Leaderboard
             if (e.key === "l" || e.key === "L") { openLeaderboard(); return; }
+            // Theme selection
+            if (e.key === "t" || e.key === "T") { openThemePage(); return; }
             // Daily challenge mode
             if (e.key === "d" || e.key === "D") {
                 dailyChallenge = getDailyChallenge();
@@ -984,6 +990,9 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
 
         // Leaderboard input
         if (isLeaderboardOpen()) { handleLeaderboardKey(e); return; }
+
+        // Theme page input
+        if (isThemePageOpen()) { handleThemePageKey(e); return; }
 
         // Tutorial overlay consumes first key
         if (isTutorialShowing()) {

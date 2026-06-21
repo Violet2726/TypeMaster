@@ -19,6 +19,7 @@ export * from './game.js';
 export * from './growth.js';
 export * from './daily-challenge.js';
 export * from './achievements-system.js';
+export * from './visual-themes.js';
 export { commonWords } from './data/words.js';
 
 
