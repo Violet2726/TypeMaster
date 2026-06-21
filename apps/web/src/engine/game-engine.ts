@@ -53,6 +53,7 @@ import { updateHud, drawEnhancedHud, resetHud } from "./hud-overlay";
 import { openStats, isStatsOpen, handleStatsKey, renderStatsHistory, saveGameRecord } from "./stats-history";
 import { drawTouchIndicator, isMobile, renderTouchRipples } from "./touch-input";
 import { updateTracker, drawAchievementTracker, resetTracker, trackPowerUp } from "./achievement-tracker";
+import { updateTracker as updateAutoTracker, resetTracker as resetAutoTracker } from "./achievement-tracker-auto";
 import { shouldSpawnVariant, createVariantState, updateVariant, processShieldInput, drawVariantOverlay, drawVariantBadge } from "./enemy-variant";
 import type { VariantState, VariantType } from "./enemy-variant";
 import { shouldDropPowerUp, createPowerUp, updatePowerUps, processPowerUpInput, drawPowerUp, drawActivePowerUps, getPowerUpConfig } from "./power-up";
@@ -233,6 +234,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                 resumeCountdown = 0;
                 rhythmEngine.reset();
                 bossBattle.reset();
+                resetAutoTracker();
             }
             return;
         }
@@ -350,6 +352,8 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         updateKeystrokeImpact();
         updateHud(dt, state.score, state.lives, state.combo);
         updateTracker({ combo: state.combo, wave: state.wave, wpm: 0, score: state.score, chain: chainCount, perfectWaves: state.perfectWaves });
+                    updateAutoTracker({ combo: state.combo, kills: state.enemiesDefeated, wave: state.wave, score: state.score });
+                    updateAutoTracker({ combo: state.combo, kills: state.enemiesDefeated, wave: state.wave, score: state.score });
 
         // Update power-ups
         powerUps = updatePowerUps(powerUps, dt);
