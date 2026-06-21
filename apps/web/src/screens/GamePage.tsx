@@ -8,6 +8,8 @@ import { createGameEngine } from '../engine/game-engine';
 import { initTouchInput, destroyTouchInput, focusInput, isMobile } from '../engine/touch-input';
 import type { GameEngine } from '../engine/game-engine';
 import IdleScreenOverlay from '../components/idle/IdleScreenOverlay';
+import PauseMenuOverlay from '../components/overlay/PauseMenuOverlay';
+import GameplayHud from '../components/overlay/GameplayHud';
 
 // ---------------------------------------------------------------------------
 // GamePage - thin React shell around the engine
@@ -16,10 +18,19 @@ import IdleScreenOverlay from '../components/idle/IdleScreenOverlay';
 export default function GamePage() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [idleMode, setIdleMode] = useState(true);
+    const [pausedMode, setPausedMode] = useState(false);
+    const [hudData, setHudData] = useState({ score: 0, wave: 1, combo: 0, maxCombo: 0, lives: 5, maxLives: 5, accuracy: 100 });
+    const [pauseData, setPauseData] = useState({ score: 0, wave: 1, combo: 0, maxCombo: 0, lives: 5, maxLives: 5, enemiesDefeated: 0, accuracy: 100, wpm: 0, duration: 0 });
     const engineRef = useRef<GameEngine | null>(null);
     const animRef = useRef<number>(0);
     const lastTimeRef = useRef(0);
     const { keyboardHotspots } = useGameStore();
+
+    const handlePauseAction = useCallback((action: string) => {
+        const engine = engineRef.current;
+        if (!engine) return;
+        engine.dispatchPauseAction(action);
+    }, []);
 
     const handleIdleAction = useCallback((action: string) => {
         const engine = engineRef.current;
@@ -160,6 +171,17 @@ export default function GamePage() {
 
             engine.tick(dt);
             setIdleMode(engine.state.mode === 'idle');
+            const isPaused = engine.state.mode === 'paused';
+            setPausedMode(isPaused);
+            if (isPaused) {
+                setPauseData(engine.getPauseData());
+                engine.suppressCanvasPause = true;
+            } else {
+                engine.suppressCanvasPause = false;
+            }
+            if (engine.state.mode === 'playing' || engine.state.mode === 'resuming') {
+                setHudData(engine.getHudData());
+            }
 
             const ctx = canvas!.getContext('2d');
             if (ctx) engine.render(ctx, canvas!.width, canvas!.height);
@@ -192,6 +214,10 @@ export default function GamePage() {
     return (
         <div className="game-container" role="application" aria-label="Typing Raid - ��Ϸ����">
             {idleMode && <IdleScreenOverlay onAction={handleIdleAction} />}
+            {pausedMode && <PauseMenuOverlay stats={pauseData} onAction={handlePauseAction} />}
+            {!idleMode && !pausedMode && engineRef.current && engineRef.current.state.mode !== 'gameover' && (
+                <GameplayHud data={hudData} />
+            )}
             <canvas
                 ref={canvasRef}
                 className="game-canvas"

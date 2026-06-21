@@ -114,6 +114,10 @@ export interface GameEngine {
     saveGameResult(): any;
     dispatchIdleAction(action: string): void;
     suppressIdleKeys: boolean;
+    suppressCanvasPause: boolean;
+    getPauseData(): any;
+    dispatchPauseAction(action: string): void;
+    getHudData(): any;
 }
 
 // ---------------------------------------------------------------------------
@@ -122,6 +126,7 @@ export interface GameEngine {
 
 export function createGameEngine(wordPool?: string[]): GameEngine {
     let suppressIdleKeys = false;
+    let suppressCanvasPause = false;
     let state = createGameState();
     initGamepad();
 
@@ -716,6 +721,7 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
     }
 
     function renderPaused(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
+        if (suppressCanvasPause) return;  // DOM overlay handles pause UI
         // Draw enemies dimmed
         state.enemies.filter((e: any) => e.alive).forEach((e: any) => {
             ctx.globalAlpha = 0.2;
@@ -1733,7 +1739,59 @@ hitlagTimer = HITLAG_DURATION * (1 + chainCount * 0.3);
         },
         get suppressIdleKeys() { return suppressIdleKeys; },
         set suppressIdleKeys(v: boolean) { suppressIdleKeys = v; },
-
+        get suppressCanvasPause() { return suppressCanvasPause; },
+        set suppressCanvasPause(v: boolean) { suppressCanvasPause = v; },
+        getPauseData() {
+            return {
+                score: state.score, wave: state.wave, combo: state.combo,
+                maxCombo: state.maxCombo, lives: state.lives,
+                maxLives: (state as any)._maxLives || 5,
+                enemiesDefeated: state.enemiesDefeated,
+                accuracy: state.totalCharsTyped > 0
+                    ? Math.round(state.totalCharsCorrect / state.totalCharsTyped * 100)
+                    : 100,
+                wpm: (state as any)._performanceScore || 0,
+                duration: startTime > 0 ? (performance.now() - startTime) / 1000 : 0,
+            };
+        },
+        dispatchPauseAction(action: string) {
+            if (state.mode !== 'paused') return;
+            if (action === 'continue') {
+                resumeCountdown = 3;
+                music.setPaused(false);
+                state = { ...state, mode: 'resuming' as any };
+            } else if (action === 'settings') {
+                openSettings();
+            } else if (action === 'restart') {
+                state = createGameState(); startTime = 0; gameOverTime = 0;
+                powerUps = []; activePowerUps = []; shieldCount = 0;
+                enemyVariants.clear(); clearGameOver(); resetRhythm();
+                clearAchievementQueue(); resetComboFx(); resetHud(); resetTracker();
+                music.stop(); initSound(); music.start();
+                const s = getSettings(); music.setVolume(s.volume / 100);
+                music.setPlaying(s.musicEnabled); setSfxEnabled(s.sfxEnabled);
+                startTime = performance.now();
+                state = transitionGameMode(state, 'start');
+                const perfScore = calculatePerformanceScore(state);
+                state = { ...state, _performanceScore: perfScore } as any;
+                state = startWave(state, pool, { canvasWidth, canvasHeight, performanceScore: perfScore });
+            } else if (action === 'quit') {
+                state = createGameState(); startTime = 0; gameOverTime = 0;
+                powerUps = []; activePowerUps = []; shieldCount = 0;
+                enemyVariants.clear(); clearGameOver(); clearAchievementQueue();
+                music.stop(); resetComboFx(); resetHud(); resetTracker();
+            }
+        },
+        getHudData() {
+            return {
+                score: state.score, wave: state.wave, combo: state.combo,
+                maxCombo: state.maxCombo, lives: state.lives,
+                maxLives: (state as any)._maxLives || 5,
+                accuracy: state.totalCharsTyped > 0
+                    ? Math.round(state.totalCharsCorrect / state.totalCharsTyped * 100)
+                    : 100,
+            };
+        },
     };
 }
 
