@@ -167,25 +167,78 @@ export function generateWaveEnemies(waveIndex, wordPool, options = {}) {
     addEnemies('tank', template.tanks);
     addEnemies('boss', template.bosses);
 
-    if (difficultyProfile) {
+    // Adaptive difficulty: adjust speed based on player performance
+    const perfScore = options.performanceScore;
+    if (perfScore !== undefined) {
+        const adaptiveMod = getAdaptiveModifier(perfScore);
+        const isBreathing = isBreathingWave(waveIndex + 1);
+        const effectiveMod = isBreathing ? adaptiveMod * 0.75 : adaptiveMod;
+        enemies.forEach((e) => {
+            e.speed *= effectiveMod;
+        });
+    } else if (difficultyProfile) {
+        // Fallback to static difficulty profile
         let speedMod = getDifficultyModifier(difficultyProfile);
-        
-        // Dynamic KPS adaptation
-        // Assuming average comfortable KPS is 4. 
-        // If KPS > 4, speed up. If KPS < 4, slow down.
-        // Cap the multiplier between 0.8 and 1.2 to avoid extreme changes.
         const kps = options.kps || 0;
         if (kps > 0) {
             const kpsFactor = 1 + (kps - 4) * 0.05;
             speedMod *= Math.max(0.8, Math.min(1.2, kpsFactor));
         }
-        
         enemies.forEach((e) => {
             e.speed *= speedMod;
         });
     }
 
     return enemies;
+}
+
+
+// ---------------------------------------------------------------------------
+// Adaptive difficulty engine
+// ---------------------------------------------------------------------------
+
+/**
+ * Calculate a performance score (0-1) from recent player state.
+ * Higher score = player is doing well = should face harder challenge.
+ */
+export function calculatePerformanceScore(state) {
+    if (!state) return 0.5;
+    const kps = state.kps || 0;
+    const kpsScore = Math.min(1, kps / 8);
+    const totalTyped = state.totalCharsTyped || 0;
+    const totalCorrect = state.totalCharsCorrect || 0;
+    const accuracyScore = totalTyped > 0 ? totalCorrect / totalTyped : 0.5;
+    const livesRatio = (state.lives || 5) / (state.maxLives || 5);
+    const combo = state.combo || 0;
+    const comboScore = Math.min(1, combo / 15);
+    return kpsScore * 0.35 + accuracyScore * 0.25 + livesRatio * 0.2 + comboScore * 0.2;
+}
+
+/**
+ * Map performance score to adaptive difficulty modifier (0.65 - 1.35).
+ */
+export function getAdaptiveModifier(performanceScore) {
+    const clamped = Math.max(0, Math.min(1, performanceScore));
+    return 0.65 + clamped * 0.7;
+}
+
+/**
+ * Breathing wave: every 5th wave is easier for recovery.
+ */
+export function isBreathingWave(waveNumber) {
+    return waveNumber > 0 && waveNumber % 5 === 0;
+}
+
+/**
+ * Get spawn interval adjusted for adaptive difficulty and breathing waves.
+ */
+export function getAdaptiveSpawnInterval(waveIndex, performanceScore) {
+    const base = getSpawnInterval(waveIndex);
+    if (isBreathingWave(waveIndex + 1)) {
+        return Math.round(base * 1.3);
+    }
+    const mod = getAdaptiveModifier(performanceScore);
+    return Math.round(base / mod);
 }
 
 // ---------------------------------------------------------------------------
@@ -546,7 +599,9 @@ export function processSpawns(state, deltaTime) {
     if (state.mode !== 'playing') return state;
     if (state.nextSpawnIndex >= state.waveQueue.length) return state;
 
-    const interval = getSpawnInterval(state.wave - 1) / 1000;
+    const interval = state._performanceScore !== undefined
+        ? getAdaptiveSpawnInterval(state.wave - 1, state._performanceScore) / 1000
+        : getSpawnInterval(state.wave - 1) / 1000;
     let timer = state.spawnTimer + deltaTime;
     let spawnIndex = state.nextSpawnIndex;
     const newEnemies = [...state.enemies];

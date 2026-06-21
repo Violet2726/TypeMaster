@@ -11,6 +11,7 @@ import {
     createGameState, transitionGameMode, processInput, updateGameState,
     startWave, processSpawns, buildGameResult, getGameCopy,
     getEnemyTypeConfig, getComboMultiplier, commonWords, biasWordPool,
+    calculatePerformanceScore, isBreathingWave,
 } from "@typemaster/domain";
 import { ParticleSystem, ScreenShake } from "./particle-system";
 import { ScorePopupSystem } from "./score-popup";
@@ -219,7 +220,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                 // Extended delay for wave clear celebration
                 setTimeout(() => {
                     if (state.mode === "playing") {
-                        state = startWave(state, pool, { canvasWidth, canvasHeight });
+                        { const perfScore = calculatePerformanceScore(state); state = { ...state, _performanceScore: perfScore } as any; state = startWave(state, pool, { canvasWidth, canvasHeight, performanceScore: perfScore }); }
                         // Spawn variant enemies for this wave
                         const variantType = shouldSpawnVariant(state.wave - 1);
                         if (variantType && state.enemies) {
@@ -788,7 +789,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
             setSfxEnabled(s.sfxEnabled);
             startTime = performance.now();
             state = transitionGameMode(state, "start");
-            state = startWave(state, pool, { canvasWidth, canvasHeight, kps: state.kps });
+            { const perfScore = calculatePerformanceScore(state); state = { ...state, _performanceScore: perfScore } as any; state = startWave(state, pool, { canvasWidth, canvasHeight, kps: state.kps, performanceScore: perfScore }); }
             return;
         }
 
@@ -830,7 +831,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                 music.setVolume(s.volume / 100);
                 music.setPlaying(s.musicEnabled);
                 state = transitionGameMode(state, "start");
-                state = startWave(state, pool, { canvasWidth, canvasHeight, kps: state.kps });
+                { const perfScore = calculatePerformanceScore(state); state = { ...state, _performanceScore: perfScore } as any; state = startWave(state, pool, { canvasWidth, canvasHeight, kps: state.kps, performanceScore: perfScore }); }
             } else if (action === "quit") {
                 state = createGameState();
                 startTime = 0;

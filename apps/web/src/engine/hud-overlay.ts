@@ -195,6 +195,30 @@ export function drawEnhancedHud(
         ctx.fillText(state.typedInput, w / 2, inputY + Math.round(14 * s));
     }
 
+    // --- Breathing wave indicator (top-right corner) ---
+    if (state.wave > 0 && state.wave % 5 === 0) {
+        const breathAlpha = 0.4 + Math.sin(time * 0.003) * 0.2;
+        ctx.font = "600 " + Math.round(11 * s) + "px -apple-system, SF Pro Text, system-ui, sans-serif";
+        ctx.fillStyle = "rgba(52, 199, 89, " + breathAlpha + ")";
+        ctx.textAlign = "right";
+        ctx.textBaseline = "top";
+        ctx.fillText("BREATHING WAVE", w - 20, Math.round(18 * s));
+    }
+
+    // --- Performance indicator (bottom-left) ---
+    if (state._performanceScore !== undefined) {
+        const score = state._performanceScore;
+        const label = score >= 0.7 ? "FLOW" : score >= 0.4 ? "STEADY" : "RECOVERING";
+        const color = score >= 0.7 ? "#34c759" : score >= 0.4 ? "#ffcc02" : "#ff3b5c";
+        ctx.font = "500 10px -apple-system, SF Pro Text, system-ui, sans-serif";
+        ctx.fillStyle = color;
+        ctx.globalAlpha = 0.5;
+        ctx.textAlign = "left";
+        ctx.textBaseline = "bottom";
+        ctx.fillText(label, 20, h - 30);
+        ctx.globalAlpha = 1;
+    }
+
     // --- KPS indicator (bottom-left) ---
     if (state.kps > 0) {
         ctx.font = "400 11px -apple-system, SF Pro Text, system-ui, sans-serif";
