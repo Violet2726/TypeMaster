@@ -26,6 +26,7 @@ import { initGameOver, renderGameOver, clearGameOver } from "./game-over";
 import { showWaveComplete, isWaveCompleteShowing, renderWaveComplete } from "./wave-complete";
 import { updateGameplayAura, renderGameplayAura, renderDangerIndicator, triggerTypingRipple, resetGameplayAura } from "./gameplay-reactive-aura";
 import { spawnDeathEffect, updateDeathEffects, renderDeathEffects } from "./enemy-death-fx";
+import { onCorrectKey, onWrongKey, onComboMilestone, updateKeystrokeImpact, renderImpactRings, getEnemyShakeOffset, getEnemyErrorFlash, renderComboMilestones } from "./keystroke-impact";
 import { onCorrectKeystroke, onIncorrectKeystroke, updateRhythm, renderRhythmBar, renderFlowAura, renderSpeedRing, resetRhythm, getFlowLevel } from "./typing-rhythm-visual";
 import { createMusicEngine } from "./music-engine";
 import { DynamicMusicManager } from "./dynamic-music";
@@ -313,6 +314,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         updateGameplayAura(dt, state.combo, state.enemies.filter((e: any) => e.alive), canvasHeight, state.score);
         updateDeathEffects();
         updateRhythm(dt);
+        updateKeystrokeImpact();
         updateHud(dt, state.score, state.lives, state.combo);
         updateTracker({ combo: state.combo, wave: state.wave, wpm: 0, score: state.score, chain: chainCount, perfectWaves: state.perfectWaves });
 
@@ -426,6 +428,12 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
 
         // Enemy death effects
         renderDeathEffects(ctx, time);
+
+        // Keystroke impact rings
+        renderImpactRings(ctx, time);
+
+        // Combo milestone celebrations
+        renderComboMilestones(ctx, w, h, time);
 
         // Wave complete overlay
         if (isWaveCompleteShowing()) {
@@ -548,7 +556,9 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         const innerColor = (COLORS as any)[enemy.type + "Inner"] || "#ffffff";
 
         const size = enemy.type === "boss" ? 36 : enemy.type === "tank" ? 28 : enemy.type === "fast" ? 20 : 20;
-        const wobble = Math.sin(time * 0.002 + enemy.x * 0.01) * 2;
+        const shakeOff = getEnemyShakeOffset(enemy.id, time);
+        const errorFlash = getEnemyErrorFlash(enemy.id, time);
+        const wobble = Math.sin(time * 0.002 + enemy.x * 0.01) * 2 + shakeOff.x;
 
         const spawnDuration = 400;
         const spawnProgress = Math.min(1, (time - (enemy.spawnTime || 0)) / spawnDuration);
@@ -559,7 +569,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         const flashAlpha = flashProgress < 1 ? 0.9 * (1 - flashProgress) : 0;
 
         ctx.save();
-        ctx.translate(enemy.x + wobble, enemy.y);
+        ctx.translate(enemy.x + wobble, enemy.y + shakeOff.y);
         ctx.scale(scale, scale);
 
         // Potential match highlight
@@ -1052,6 +1062,10 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
             }
 
             const result = processInput(state, e.key);
+            // Detect wrong key: if no kill event and active enemy exists, it's an error
+            if (state.activeEnemyId && !result.events.some((evt: any) => evt.type === "enemy_killed")) {
+                onWrongKey(state.activeEnemyId);
+            }
             state = result.state;
 
             // Trigger typing ripple on the active enemy
@@ -1080,7 +1094,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                         return; // skip normal kill effects
                     }
                     const enemy = state.enemies.find((en: any) => en.id === evt.enemyId);
-                    playKillSound(enemy?.type); haptic(15); onCorrectKeystroke();
+                    playKillSound(enemy?.type); haptic(15); onCorrectKeystroke(); onCorrectKey(enemy.x, enemy.y, state.combo);
                     playComboSound(state.combo);
                     if (enemy) {
                         typingFeedback.onWordComplete(evt.enemyId, enemy.word, enemy.x, enemy.y, (COLORS as any)[enemy.type] || COLORS.normal);
@@ -1090,7 +1104,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                         particles.emit({ x: enemy.x, y: enemy.y, count: 20 + chainBonus * 5, color, speed: 3 + chainBonus, size: 3 + chainBonus * 0.5, gravity: 2, turbulence: 0.5 + chainCount * 0.1, trail: true, trailLength: 6 + chainBonus * 2 });
                         particles.emit({ x: enemy.x, y: enemy.y, count: 8 + chainBonus * 2, color: "#ffffff", speed: 2, size: 2, lifetime: 0.4 });
                         shake.trigger(4 + chainBonus * 2);
-                        triggerComboFlash(state.combo); if (state.combo % 5 === 0 && state.combo > 0) { playComboMilestoneSound(state.combo); haptic([10, 30, 10]); }
+                        triggerComboFlash(state.combo); onComboMilestone(state.combo); if (state.combo % 5 === 0 && state.combo > 0) { playComboMilestoneSound(state.combo); haptic([10, 30, 10]); }
                         if (chainCount > 1) playChainSound(chainCount);
 
                         // Chain kill tracking
