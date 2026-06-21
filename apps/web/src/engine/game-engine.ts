@@ -24,6 +24,7 @@ import { initSound, playClickSound, playKillSound, playErrorSound, playComboSoun
 import { getBlendedTheme, drawThemedBackground } from "./environment-theme";
 import { initGameOver, renderGameOver, clearGameOver } from "./game-over";
 import { showWaveComplete, isWaveCompleteShowing, renderWaveComplete } from "./wave-complete";
+import { updateGameplayAura, renderGameplayAura, renderDangerIndicator, triggerTypingRipple, resetGameplayAura } from "./gameplay-reactive-aura";
 import { createMusicEngine } from "./music-engine";
 import { DynamicMusicManager } from "./dynamic-music";
 import { PerformanceManager } from "./performance-optimizer";
@@ -307,6 +308,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         updateAchievementModal(performance.now());
         updateTutorial(performance.now());
         updateComboFx(dt, state.combo);
+        updateGameplayAura(dt, state.combo, state.enemies.filter((e: any) => e.alive), canvasHeight, state.score);
         updateHud(dt, state.score, state.lives, state.combo);
         updateTracker({ combo: state.combo, wave: state.wave, wpm: 0, score: state.score, chain: chainCount, perfectWaves: state.perfectWaves });
 
@@ -338,6 +340,9 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         ctx.translate(offset.x, offset.y);
 
         drawBackground(ctx, width, height, time);
+
+        // Gameplay reactive aura (danger, combo atmosphere, ripples)
+        renderGameplayAura(ctx, width, height, time);
 
         if (state.mode === "idle") {
             renderIdle(ctx, width, height, time);
@@ -486,6 +491,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     // --- HUD ---
 
     function drawHUD(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
+        renderDangerIndicator(ctx, w, h);
         drawEnhancedHud(ctx, w, h, time, state, copy);
         // FPS counter (bottom-right, subtle)
         // Gamepad indicator (bottom-right, above FPS)
@@ -846,6 +852,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                     music.setPlaying(s.musicEnabled);
                     setSfxEnabled(s.sfxEnabled);
                     startTime = performance.now();
+                    resetGameplayAura();
                     state = transitionGameMode(state, "start");
                     { const perfScore = calculatePerformanceScore(state); state = { ...state, _performanceScore: perfScore } as any; state = startWave(state, pool, { canvasWidth, canvasHeight, kps: state.kps, performanceScore: perfScore }); }
                     return;
@@ -1022,6 +1029,14 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
 
             const result = processInput(state, e.key);
             state = result.state;
+
+            // Trigger typing ripple on the active enemy
+            if (state.activeEnemyId) {
+                const activeEnemy = state.enemies.find((e: any) => e.id === state.activeEnemyId);
+                if (activeEnemy) {
+                    triggerTypingRipple(activeEnemy.x, activeEnemy.y, true);
+                }
+            }
 
             result.events.forEach((evt: any) => {
                 if (evt.type === "enemy_killed") {
