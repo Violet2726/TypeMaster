@@ -9,13 +9,13 @@ export const CHALLENGE_MODES = {
   speedRun: {
     id: 'speedRun',
     name: 'Speed Run',
-    nameZh: 'ËÙÍ¨ÌôÕ½',
+    nameZh: 'é€Ÿé€šæŒ‘æˆ˜',
     description: 'Clear 10 waves as fast as possible',
-    descriptionZh: '¾¡¿ìÇå³ı10²¨µĞÈË',
-    icon: '??',
+    descriptionZh: 'å°½å¿«æ¸…é™¤10æ³¢æ•Œäºº',
+    icon: '\u26A1',
     color: '#ff9f0a',
     objective: 'Clear 10 waves',
-    objectiveZh: 'Çå³ı10²¨',
+    objectiveZh: 'æ¸…é™¤10æ³¢',
     targetWaves: 10,
     settings: {
       lives: 3,
@@ -34,13 +34,13 @@ export const CHALLENGE_MODES = {
   survival: {
     id: 'survival',
     name: 'Survival',
-    nameZh: 'Éú´æÌôÕ½',
+    nameZh: 'ç”Ÿå­˜æŒ‘æˆ˜',
     description: 'Survive as long as possible with 1 life',
-    descriptionZh: 'Ö»ÓĞ1ÌõÃü£¬¾¡¿ÉÄÜ´æ»î',
-    icon: '??',
+    descriptionZh: 'åªæœ‰1æ¡å‘½ï¼Œå°½å¯èƒ½å­˜æ´»',
+    icon: '\u2764\uFE0F',
     color: '#ff3b5c',
     objective: 'Survive',
-    objectiveZh: '´æ»î',
+    objectiveZh: 'å­˜æ´»',
     targetWaves: Infinity,
     settings: {
       lives: 1,
@@ -59,13 +59,13 @@ export const CHALLENGE_MODES = {
   accuracy: {
     id: 'accuracy',
     name: 'Accuracy Test',
-    nameZh: '¾«×¼²âÊÔ',
+    nameZh: 'ç²¾å‡†æµ‹è¯•',
     description: 'Complete 5 waves with 90%+ accuracy',
-    descriptionZh: 'ÒÔ90%+×¼È·¶ÈÍê³É5²¨',
-    icon: '??',
+    descriptionZh: 'ä»¥90%+å‡†ç¡®åº¦å®Œæˆ5æ³¢',
+    icon: '\uD83C\uDFAF',
     color: '#34c759',
     objective: '90% accuracy',
-    objectiveZh: '90%×¼È·¶È',
+    objectiveZh: '90%å‡†ç¡®åº¦',
     targetWaves: 5,
     settings: {
       lives: 5,
@@ -85,19 +85,19 @@ export const CHALLENGE_MODES = {
   combo: {
     id: 'combo',
     name: 'Combo Master',
-    nameZh: 'Á¬»÷´óÊ¦',
+    nameZh: 'è¿å‡»å¤§å¸ˆ',
     description: 'Reach 30 combo in a single wave',
-    descriptionZh: 'ÔÚµ¥²¨ÖĞ´ïµ½30Á¬»÷',
-    icon: '??',
+    descriptionZh: 'åœ¨å•æ³¢ä¸­è¾¾åˆ°30è¿å‡»',
+    icon: '\uD83D\uDD25',
     color: '#bf5af2',
     objective: '30 combo',
-    objectiveZh: '30Á¬»÷',
+    objectiveZh: '30è¿å‡»',
     targetWaves: Infinity,
     settings: {
       lives: 5,
       maxLives: 5,
       waveLimit: Infinity,
-      timeLimit: 180000, // 3 minutes
+      timeLimit: 180000,
       enemySpeedMultiplier: 0.8,
       spawnRateMultiplier: 1.2,
       scoreMultiplier: 1.0,
@@ -111,13 +111,13 @@ export const CHALLENGE_MODES = {
   boss: {
     id: 'boss',
     name: 'Boss Rush',
-    nameZh: 'BossÁ¬Õ½',
+    nameZh: 'Bossè¿æˆ˜',
     description: 'Defeat 5 bosses in a row',
-    descriptionZh: 'Á¬Ğø»÷°Ü5¸öBoss',
-    icon: '??',
+    descriptionZh: 'è¿ç»­å‡»è´¥5ä¸ªBoss',
+    icon: '\uD83D\uDC80',
     color: '#ffd700',
     objective: '5 bosses',
-    objectiveZh: '5¸öBoss',
+    objectiveZh: '5ä¸ªBoss',
     targetWaves: 5,
     settings: {
       lives: 3,
@@ -202,7 +202,7 @@ export function checkChallengeWin(state) {
     case 'bosses':
       return state.enemiesDefeated >= settings.targetBosses;
     case 'survive':
-      return false; // Never wins, just survives
+      return false;
     default:
       return false;
   }

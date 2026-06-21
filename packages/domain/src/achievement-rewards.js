@@ -1,96 +1,36 @@
 /**
  * Achievement Rewards - Unlockable content through achievements
  * 
- * Apple philosophy: rewards should feel earned and meaningful.
- * Each reward enhances the gameplay experience.
+ * Apple philosophy: rewards should feel meaningful and visual.
  */
 
+export const REWARD_TYPES = {
+  THEME: 'theme',
+  TRAIL: 'trail',
+  XP: 'xp',
+  TITLE: 'title',
+};
+
 export const ACHIEVEMENT_REWARDS = {
-  // Theme unlocks
-  'boss-nodamage': {
-    type: 'theme',
-    id: 'gold',
-    name: 'Gold Edition Theme',
-    nameZh: '½ðÉ«Ö÷Ìâ',
-    description: 'Unlock by killing a boss without losing a life',
-    descriptionZh: 'ÎÞÉË»÷É±Boss½âËø',
-  },
-  'highscore-10000': {
-    type: 'theme',
-    id: 'purple',
-    name: 'Neon Purple Theme',
-    nameZh: 'ÄÞºç×ÏÉ«Ö÷Ìâ',
-    description: 'Unlock by scoring 10000+ in a single game',
-    descriptionZh: 'µ¥¾ÖµÃ·Ö10000+½âËø',
-  },
-  'wpm-100': {
-    type: 'trail',
-    id: 'lightning',
-    name: 'Lightning Trail',
-    nameZh: 'ÉÁµç¹ì¼£',
-    description: 'Unlock by reaching 100 WPM',
-    descriptionZh: '´ïµ½100 WPM½âËø',
-  },
-  
-  // XP bonuses
-  'first-blood': {
-    type: 'xp',
-    amount: 10,
-    name: 'First Kill Bonus',
-    nameZh: 'Ê×´Î»÷É±½±Àø',
-  },
-  'combo-10': {
-    type: 'xp',
-    amount: 20,
-    name: 'Combo Starter Bonus',
-    nameZh: 'Á¬»÷ÈëÃÅ½±Àø',
-  },
-  'wave-5': {
-    type: 'xp',
-    amount: 30,
-    name: 'Wave 5 Bonus',
-    nameZh: '²¨´Î5½±Àø',
-  },
-  'boss-kill': {
-    type: 'xp',
-    amount: 50,
-    name: 'Boss Slayer Bonus',
-    nameZh: 'BossÉ±ÊÖ½±Àø',
-  },
-  
-  // Title unlocks
-  'hunter-500': {
-    type: 'title',
-    id: 'destroyer',
-    name: 'Destroyer',
-    nameZh: '»ÙÃðÕß',
-    description: 'Kill 500 enemies',
-    descriptionZh: '»÷É±500¸öµÐÈË',
-  },
-  'combo-50': {
-    type: 'title',
-    id: 'unstoppable',
-    name: 'Unstoppable',
-    nameZh: 'ÊÆ²»¿Éµ²',
-    description: 'Reach 50 combo',
-    descriptionZh: '´ïµ½50Á¬»÷',
-  },
-  'wave-30': {
-    type: 'title',
-    id: 'legendary',
-    name: 'Legendary',
-    nameZh: '´«Ææ',
-    description: 'Reach wave 30',
-    descriptionZh: 'µ½´ï²¨´Î30',
-  },
-  'wpm-100': {
-    type: 'title',
-    id: 'typing-god',
-    name: 'Typing God',
-    nameZh: '´ò×ÖÖ®Éñ',
-    description: 'Reach 100 WPM',
-    descriptionZh: '´ïµ½100 WPM',
-  },
+  'first-blood': { type: REWARD_TYPES.XP, value: 50, name: '50 XP', nameZh: '50ç»éªŒ' },
+  'hunter-50': { type: REWARD_TYPES.TITLE, value: 'Destroyer', name: 'Destroyer Title', nameZh: 'æ¯ç­è€…å¤´è¡”' },
+  'hunter-200': { type: REWARD_TYPES.TRAIL, value: 'lightning', name: 'Lightning Trail', nameZh: 'é—ªç”µè½¨è¿¹' },
+  'hunter-500': { type: REWARD_TYPES.THEME, value: 'golden', name: 'Golden Theme', nameZh: 'é‡‘è‰²ä¸»é¢˜' },
+  'combo-10': { type: REWARD_TYPES.XP, value: 100, name: '100 XP', nameZh: '100ç»éªŒ' },
+  'combo-25': { type: REWARD_TYPES.TRAIL, value: 'neon', name: 'Neon Trail', nameZh: 'éœ“è™¹è½¨è¿¹' },
+  'combo-50': { type: REWARD_TYPES.TITLE, value: 'Unstoppable', name: 'Unstoppable Title', nameZh: 'åŠ¿ä¸å¯æŒ¡å¤´è¡”' },
+  'wave-5': { type: REWARD_TYPES.XP, value: 75, name: '75 XP', nameZh: '75ç»éªŒ' },
+  'wave-15': { type: REWARD_TYPES.THEME, value: 'neon-purple', name: 'Neon Purple Theme', nameZh: 'éœ“è™¹ç´«ä¸»é¢˜' },
+  'wave-30': { type: REWARD_TYPES.TITLE, value: 'Legendary', name: 'Legendary Title', nameZh: 'ä¼ å¥‡å¤´è¡”' },
+  'boss-1': { type: REWARD_TYPES.XP, value: 150, name: '150 XP', nameZh: '150ç»éªŒ' },
+  'boss-10': { type: REWARD_TYPES.TRAIL, value: 'fire', name: 'Fire Trail', nameZh: 'ç«ç„°è½¨è¿¹' },
+  'boss-25': { type: REWARD_TYPES.TITLE, value: 'Typing God', name: 'Typing God Title', nameZh: 'æ‰“å­—ä¹‹ç¥žå¤´è¡”' },
+  'wpm-40': { type: REWARD_TYPES.XP, value: 100, name: '100 XP', nameZh: '100ç»éªŒ' },
+  'wpm-60': { type: REWARD_TYPES.TRAIL, value: 'plasma', name: 'Plasma Trail', nameZh: 'ç­‰ç¦»å­è½¨è¿¹' },
+  'wpm-80': { type: REWARD_TYPES.TITLE, value: 'Speed Demon', name: 'Speed Demon Title', nameZh: 'é€Ÿåº¦æ¶é­”å¤´è¡”' },
+  'score-5k': { type: REWARD_TYPES.XP, value: 100, name: '100 XP', nameZh: '100ç»éªŒ' },
+  'score-15k': { type: REWARD_TYPES.TRAIL, value: 'rainbow', name: 'Rainbow Trail', nameZh: 'å½©è™¹è½¨è¿¹' },
+  'score-30k': { type: REWARD_TYPES.TITLE, value: 'Typing God', name: 'Typing God Title', nameZh: 'æ‰“å­—ä¹‹ç¥žå¤´è¡”' },
 };
 
 export function getReward(achievementId) {
@@ -99,57 +39,7 @@ export function getReward(achievementId) {
 
 export function getAllRewards() {
   return Object.entries(ACHIEVEMENT_REWARDS).map(([id, reward]) => ({
-    achievementId: id,
-    ...reward,
+    id,
+    ...reward
   }));
-}
-
-export function getRewardsByType(type) {
-  return Object.entries(ACHIEVEMENT_REWARDS)
-    .filter(([_, reward]) => reward.type === type)
-    .map(([id, reward]) => ({
-      achievementId: id,
-      ...reward,
-    }));
-}
-
-export function getUnlockedRewards(achievementState) {
-  const rewards = [];
-  
-  for (const [achievementId, reward] of Object.entries(ACHIEVEMENT_REWARDS)) {
-    if (achievementState[achievementId] && achievementState[achievementId].unlocked) {
-      rewards.push({
-        achievementId,
-        ...reward,
-      });
-    }
-  }
-  
-  return rewards;
-}
-
-export function getLockedRewards(achievementState) {
-  const rewards = [];
-  
-  for (const [achievementId, reward] of Object.entries(ACHIEVEMENT_REWARDS)) {
-    if (!achievementState[achievementId] || !achievementState[achievementId].unlocked) {
-      rewards.push({
-        achievementId,
-        ...reward,
-      });
-    }
-  }
-  
-  return rewards;
-}
-
-export function getRewardProgress(achievementState) {
-  const total = Object.keys(ACHIEVEMENT_REWARDS).length;
-  const unlocked = getUnlockedRewards(achievementState).length;
-  
-  return {
-    unlocked,
-    total,
-    percentage: Math.round((unlocked / total) * 100),
-  };
 }

@@ -1,97 +1,51 @@
 /**
  * Game Modes - Multiple ways to play
  * 
+ * Apple philosophy: choice empowers users.
  * Different game modes for varied experiences:
- * 1. Classic - Standard wave-based gameplay
- * 2. Endless - No wave limits, play until you die
+ * 1. Classic - Standard wave progression
+ * 2. Endless - Survive as long as possible
  * 3. Time Attack - Score as much as possible in limited time
- * 4. Zen Mode - Relaxed mode with no enemies reaching bottom
+ * 4. Zen - Practice without pressure
  */
 
 export const GAME_MODES = {
   classic: {
     id: 'classic',
     name: 'Classic',
-    nameZh: '¾­µäÄ£Ê½',
-    description: 'Standard wave-based gameplay',
-    descriptionZh: '±ê×¼²¨´ÎÍæ·¨',
-    icon: '??',
-    color: '#0a84ff',
-    settings: {
-      lives: 5,
-      maxLives: 5,
-      waveLimit: Infinity,
-      timeLimit: Infinity,
-      enemySpeedMultiplier: 1.0,
-      spawnRateMultiplier: 1.0,
-      scoreMultiplier: 1.0,
-      enemiesReachBottom: true,
-      bossWaves: true,
-    }
+    nameZh: 'ç»å…¸æ¨¡å¼',
+    description: 'Standard wave progression',
+    descriptionZh: 'æ ‡å‡†æ³¢æ¬¡æ¨è¿›',
+    icon: '\u2694\uFE0F',
+    color: '#3b9eff',
   },
-  
   endless: {
     id: 'endless',
     name: 'Endless',
-    nameZh: 'ÎŞ¾¡Ä£Ê½',
-    description: 'Play until you die, no wave limits',
-    descriptionZh: 'Íæµ½ËÀÎªÖ¹£¬ÎŞ²¨´ÎÏŞÖÆ',
-    icon: '??',
-    color: '#34c759',
-    settings: {
-      lives: 3,
-      maxLives: 3,
-      waveLimit: Infinity,
-      timeLimit: Infinity,
-      enemySpeedMultiplier: 1.2,
-      spawnRateMultiplier: 1.3,
-      scoreMultiplier: 1.5,
-      enemiesReachBottom: true,
-      bossWaves: true,
-    }
+    nameZh: 'æ— å°½æ¨¡å¼',
+    description: 'Survive as long as possible',
+    descriptionZh: 'å°½å¯èƒ½å­˜æ´»',
+    icon: '\u221E',
+    color: '#ff9f0a',
   },
-  
   timeAttack: {
     id: 'timeAttack',
     name: 'Time Attack',
-    nameZh: 'ÏŞÊ±ÌôÕ½',
+    nameZh: 'é™æ—¶æŒ‘æˆ˜',
     description: 'Score as much as possible in 2 minutes',
-    descriptionZh: '2·ÖÖÓÄÚ¾¡¿ÉÄÜ¶àµÃ·Ö',
-    icon: '??',
-    color: '#ff9f0a',
-    settings: {
-      lives: Infinity,
-      maxLives: Infinity,
-      waveLimit: Infinity,
-      timeLimit: 120000, // 2 minutes in ms
-      enemySpeedMultiplier: 0.8,
-      spawnRateMultiplier: 1.5,
-      scoreMultiplier: 2.0,
-      enemiesReachBottom: false,
-      bossWaves: false,
-    }
+    descriptionZh: 'åœ¨2åˆ†é’Ÿå†…è·å¾—å°½å¯èƒ½é«˜çš„åˆ†æ•°',
+    icon: '\u23F1\uFE0F',
+    color: '#ff3b5c',
   },
-  
   zen: {
     id: 'zen',
-    name: 'Zen Mode',
-    nameZh: 'ìøÄ£Ê½',
-    description: 'Relaxed mode, enemies don\'t reach bottom',
-    descriptionZh: '·ÅËÉÄ£Ê½£¬µĞÈË²»»áµ½´ïµ×²¿',
-    icon: '??',
-    color: '#bf5af2',
-    settings: {
-      lives: Infinity,
-      maxLives: Infinity,
-      waveLimit: 10,
-      timeLimit: Infinity,
-      enemySpeedMultiplier: 0.6,
-      spawnRateMultiplier: 0.7,
-      scoreMultiplier: 0.5,
-      enemiesReachBottom: false,
-      bossWaves: false,
-    }
-  }
+    name: 'Zen',
+    nameZh: 'ç¦…æ¨¡å¼',
+    description: 'Practice without pressure',
+    descriptionZh: 'æ— å‹åŠ›ç»ƒä¹ ',
+    icon: '\uD83E\uDDD8',
+    color: '#34c759',
+  },
 };
 
 export function getGameMode(modeId) {
@@ -100,70 +54,4 @@ export function getGameMode(modeId) {
 
 export function getAllGameModes() {
   return Object.values(GAME_MODES);
-}
-
-export function createGameStateWithMode(modeId, options = {}) {
-  const mode = getGameMode(modeId);
-  const settings = mode.settings;
-  
-  return {
-    mode: 'idle',
-    gameMode: modeId,
-    score: 0,
-    wave: 0,
-    combo: 0,
-    kps: 0,
-    keyTimestamps: [],
-    maxCombo: 0,
-    enemiesTotal: 0,
-    enemiesDefeated: 0,
-    enemiesLeaked: 0,
-    lives: settings.lives === Infinity ? 999 : settings.lives,
-    maxLives: settings.maxLives === Infinity ? 999 : settings.maxLives,
-    enemies: [],
-    activeEnemyId: null,
-    typedInput: '',
-    totalCharsTyped: 0,
-    totalCharsCorrect: 0,
-    startTime: null,
-    endTime: null,
-    waveStartTime: null,
-    spawnTimer: 0,
-    nextSpawnIndex: 0,
-    waveQueue: [],
-    perfectWaves: 0,
-    timeRemaining: settings.timeLimit === Infinity ? null : settings.timeLimit,
-    ...options
-  };
-}
-
-export function isTimeAttackMode(state) {
-  return state.gameMode === 'timeAttack';
-}
-
-export function isEndlessMode(state) {
-  return state.gameMode === 'endless';
-}
-
-export function isZenMode(state) {
-  return state.gameMode === 'zen';
-}
-
-export function getModeSettings(modeId) {
-  const mode = getGameMode(modeId);
-  return mode.settings;
-}
-
-export function getTimeRemaining(state) {
-  if (!state.timeRemaining) return null;
-  return Math.max(0, state.timeRemaining);
-}
-
-export function updateTimeRemaining(state, dt) {
-  if (!state.timeRemaining) return state;
-  const newTime = state.timeRemaining - dt * 1000;
-  if (newTime <= 0) {
-    return { ...state, timeRemaining: 0, mode: 'gameover' };
-  }
-  return { ...state, timeRemaining: newTime };
 }
