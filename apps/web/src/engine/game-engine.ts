@@ -118,6 +118,9 @@ export interface GameEngine {
     getPauseData(): any;
     dispatchPauseAction(action: string): void;
     getHudData(): any;
+    suppressCanvasGameOver: boolean;
+    getGameOverData(): any;
+    dispatchGameOverAction(action: string): void;
 }
 
 // ---------------------------------------------------------------------------
@@ -127,6 +130,7 @@ export interface GameEngine {
 export function createGameEngine(wordPool?: string[]): GameEngine {
     let suppressIdleKeys = false;
     let suppressCanvasPause = false;
+    let suppressCanvasGameOver = false;
     let state = createGameState();
     initGamepad();
 
@@ -747,6 +751,7 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
     }
 
     function drawGameOverScreen(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
+        if (suppressCanvasGameOver) return;
         renderGameOver(ctx, w, h, time);
     }
 
@@ -1791,6 +1796,43 @@ hitlagTimer = HITLAG_DURATION * (1 + chainCount * 0.3);
                     ? Math.round(state.totalCharsCorrect / state.totalCharsTyped * 100)
                     : 100,
             };
+        },
+        get suppressCanvasGameOver() { return suppressCanvasGameOver; },
+        set suppressCanvasGameOver(v: boolean) { suppressCanvasGameOver = v; },
+        getGameOverData() {
+            const best = parseInt(localStorage.getItem("typing-raid-best") || "0", 10);
+            return {
+                score: state.score, wave: state.wave,
+                wpm: (state as any)._performanceScore || 0,
+                accuracy: state.totalCharsTyped > 0
+                    ? Math.round(state.totalCharsCorrect / state.totalCharsTyped * 100) : 100,
+                maxCombo: state.maxCombo,
+                enemiesDefeated: state.enemiesDefeated,
+                duration: startTime > 0 ? (performance.now() - startTime) / 1000 : 0,
+                isBest: state.score > best,
+            };
+        },
+        dispatchGameOverAction(action: string) {
+            if (state.mode !== "gameover") return;
+            if (action === "retry") {
+                state = createGameState(); startTime = 0; gameOverTime = 0;
+                powerUps = []; activePowerUps = []; shieldCount = 0;
+                enemyVariants.clear(); clearGameOver(); resetRhythm();
+                clearAchievementQueue(); resetComboFx(); resetHud(); resetTracker();
+                music.stop(); initSound(); music.start();
+                const s = getSettings(); music.setVolume(s.volume / 100);
+                music.setPlaying(s.musicEnabled); setSfxEnabled(s.sfxEnabled);
+                startTime = performance.now();
+                state = transitionGameMode(state, "start");
+                const perfScore = calculatePerformanceScore(state);
+                state = { ...state, _performanceScore: perfScore } as any;
+                state = startWave(state, pool, { canvasWidth, canvasHeight, performanceScore: perfScore });
+            } else if (action === "menu") {
+                state = createGameState(); startTime = 0; gameOverTime = 0;
+                powerUps = []; activePowerUps = []; shieldCount = 0;
+                enemyVariants.clear(); clearGameOver(); clearAchievementQueue();
+                music.stop(); resetComboFx(); resetHud(); resetTracker();
+            }
         },
     };
 }

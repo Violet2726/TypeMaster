@@ -10,6 +10,7 @@ import type { GameEngine } from '../engine/game-engine';
 import IdleScreenOverlay from '../components/idle/IdleScreenOverlay';
 import PauseMenuOverlay from '../components/overlay/PauseMenuOverlay';
 import GameplayHud from '../components/overlay/GameplayHud';
+import GameOverOverlay from '../components/overlay/GameOverOverlay';
 
 // ---------------------------------------------------------------------------
 // GamePage - thin React shell around the engine
@@ -21,6 +22,8 @@ export default function GamePage() {
     const [pausedMode, setPausedMode] = useState(false);
     const [hudData, setHudData] = useState({ score: 0, wave: 1, combo: 0, maxCombo: 0, lives: 5, maxLives: 5, accuracy: 100 });
     const [pauseData, setPauseData] = useState({ score: 0, wave: 1, combo: 0, maxCombo: 0, lives: 5, maxLives: 5, enemiesDefeated: 0, accuracy: 100, wpm: 0, duration: 0 });
+    const [gameOverMode, setGameOverMode] = useState(false);
+    const [gameOverData, setGameOverData] = useState({ score: 0, wave: 1, wpm: 0, accuracy: 100, maxCombo: 0, enemiesDefeated: 0, duration: 0, isBest: false });
     const engineRef = useRef<GameEngine | null>(null);
     const animRef = useRef<number>(0);
     const lastTimeRef = useRef(0);
@@ -30,6 +33,12 @@ export default function GamePage() {
         const engine = engineRef.current;
         if (!engine) return;
         engine.dispatchPauseAction(action);
+    }, []);
+
+    const handleGameOverAction = useCallback((action: string) => {
+        const engine = engineRef.current;
+        if (!engine) return;
+        engine.dispatchGameOverAction(action);
     }, []);
 
     const handleIdleAction = useCallback((action: string) => {
@@ -182,6 +191,14 @@ export default function GamePage() {
             if (engine.state.mode === 'playing' || engine.state.mode === 'resuming') {
                 setHudData(engine.getHudData());
             }
+            const isGameOver = engine.state.mode === 'gameover';
+            setGameOverMode(isGameOver);
+            if (isGameOver) {
+                setGameOverData(engine.getGameOverData());
+                engine.suppressCanvasGameOver = true;
+            } else {
+                engine.suppressCanvasGameOver = false;
+            }
 
             const ctx = canvas!.getContext('2d');
             if (ctx) engine.render(ctx, canvas!.width, canvas!.height);
@@ -215,9 +232,10 @@ export default function GamePage() {
         <div className="game-container" role="application" aria-label="Typing Raid - ��Ϸ����">
             {idleMode && <IdleScreenOverlay onAction={handleIdleAction} />}
             {pausedMode && <PauseMenuOverlay stats={pauseData} onAction={handlePauseAction} />}
-            {!idleMode && !pausedMode && engineRef.current && engineRef.current.state.mode !== 'gameover' && (
+            {!idleMode && !pausedMode && !gameOverMode && engineRef.current && (
                 <GameplayHud data={hudData} />
             )}
+            {gameOverMode && <GameOverOverlay data={gameOverData} onAction={handleGameOverAction} />}
             <canvas
                 ref={canvasRef}
                 className="game-canvas"
