@@ -29,6 +29,7 @@ import { openSettings, closeSettings, isSettingsOpen, handleSettingsKey, renderS
 import { showTutorial, isTutorialShowing, handleTutorialKey, updateTutorial, renderTutorial } from "./tutorial-overlay";
 import { handlePauseMenuKey, renderPauseMenu, resetPauseMenu } from "./pause-menu";
 import { openAchievementPage, closeAchievementPage, isAchievementPageOpen, handleAchievementPageKey, renderAchievementPage } from "./achievement-page";
+import { openLeaderboard, closeLeaderboard, isLeaderboardOpen, handleLeaderboardKey, renderLeaderboard, saveToLeaderboard } from "./leaderboard";
 import { triggerComboFlash, updateComboFx, drawComboFx, resetComboFx } from "./combo-fx";
 import { updateHud, drawEnhancedHud, resetHud } from "./hud-overlay";
 import { openStats, isStatsOpen, handleStatsKey, renderStatsHistory, saveGameRecord } from "./stats-history";
@@ -319,6 +320,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         renderTutorial(ctx, width, height, time);
         renderStatsHistory(ctx, width, height, time);
         renderAchievementPage(ctx, width, height, time);
+        renderLeaderboard(ctx, width, height, time);
         drawTouchIndicator(ctx, width, height, time);
 
         ctx.restore();
@@ -866,6 +868,8 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
             if (e.key === "Escape") return;
             // Achievement page
             if (e.key === "a" || e.key === "A") { openAchievementPage(); return; }
+            // Leaderboard
+            if (e.key === "l" || e.key === "L") { openLeaderboard(); return; }
             // Daily challenge mode
             if (e.key === "d" || e.key === "D") {
                 dailyChallenge = getDailyChallenge();
@@ -955,6 +959,9 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
 
         // Achievement page input
         if (isAchievementPageOpen()) { handleAchievementPageKey(e); return; }
+
+        // Leaderboard input
+        if (isLeaderboardOpen()) { handleLeaderboardKey(e); return; }
 
         // Tutorial overlay consumes first key
         if (isTutorialShowing()) {
