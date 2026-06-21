@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import '../../src/styles/game-page.css';
 import { useGameStore } from '../features/game/state/game-store';
 import { appendSession } from '../services/storage/sessions-repo';
 import { createGameEngine } from '../engine/game-engine';
 import { initTouchInput, destroyTouchInput, focusInput, isMobile } from '../engine/touch-input';
 import type { GameEngine } from '../engine/game-engine';
+import IdleScreenOverlay from '../components/idle/IdleScreenOverlay';
 
 // ---------------------------------------------------------------------------
 // GamePage - thin React shell around the engine
@@ -14,10 +15,17 @@ import type { GameEngine } from '../engine/game-engine';
 
 export default function GamePage() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [idleMode, setIdleMode] = useState(true);
     const engineRef = useRef<GameEngine | null>(null);
     const animRef = useRef<number>(0);
     const lastTimeRef = useRef(0);
     const { keyboardHotspots } = useGameStore();
+
+    const handleIdleAction = useCallback((action: string) => {
+        const engine = engineRef.current;
+        if (!engine) return;
+        engine.dispatchIdleAction(action);
+    }, []);
 
     const saveResult = useCallback(() => {
         const engine = engineRef.current;
@@ -98,6 +106,7 @@ export default function GamePage() {
 
         const engine = createGameEngine();
         engineRef.current = engine;
+        engine.suppressIdleKeys = true;
 
         // Initialize touch input for mobile
         if (isMobile()) {
@@ -150,6 +159,7 @@ export default function GamePage() {
             const wasGameOver = engine.state.mode === 'gameover';
 
             engine.tick(dt);
+            setIdleMode(engine.state.mode === 'idle');
 
             const ctx = canvas!.getContext('2d');
             if (ctx) engine.render(ctx, canvas!.width, canvas!.height);
@@ -181,6 +191,7 @@ export default function GamePage() {
 
     return (
         <div className="game-container" role="application" aria-label="Typing Raid - ��Ϸ����">
+            {idleMode && <IdleScreenOverlay onAction={handleIdleAction} />}
             <canvas
                 ref={canvasRef}
                 className="game-canvas"

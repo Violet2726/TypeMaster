@@ -112,6 +112,8 @@ export interface GameEngine {
     resize(width: number, height: number): void;
     destroy(): void;
     saveGameResult(): any;
+    dispatchIdleAction(action: string): void;
+    suppressIdleKeys: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -119,6 +121,7 @@ export interface GameEngine {
 // ---------------------------------------------------------------------------
 
 export function createGameEngine(wordPool?: string[]): GameEngine {
+    let suppressIdleKeys = false;
     let state = createGameState();
     initGamepad();
 
@@ -1132,6 +1135,7 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
 
     function handleKey(e: KeyboardEvent): void {
         if (state.mode === "idle") {
+            if (suppressIdleKeys) return;
             if (e.key === "Escape") return;
             
             // Route through Game Hub
@@ -1721,6 +1725,15 @@ hitlagTimer = HITLAG_DURATION * (1 + chainCount * 0.3);
         resize,
         destroy,
         saveGameResult() { return buildGameResult(state); },
+        dispatchIdleAction(action: string) {
+            const fakeKey = action === "adventure" ? "Enter" : action === "daily" ? "D" : action;
+            if (state.mode === "idle") {
+                handleKey(new KeyboardEvent("keydown", { key: fakeKey }));
+            }
+        },
+        get suppressIdleKeys() { return suppressIdleKeys; },
+        set suppressIdleKeys(v: boolean) { suppressIdleKeys = v; },
+
     };
 }
 
