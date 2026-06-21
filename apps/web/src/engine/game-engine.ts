@@ -25,6 +25,7 @@ import { getBlendedTheme, drawThemedBackground } from "./environment-theme";
 import { initGameOver, renderGameOver, clearGameOver } from "./game-over";
 import { showWaveComplete, isWaveCompleteShowing, renderWaveComplete } from "./wave-complete";
 import { updateGameplayAura, renderGameplayAura, renderDangerIndicator, triggerTypingRipple, resetGameplayAura } from "./gameplay-reactive-aura";
+import { spawnDeathEffect, updateDeathEffects, renderDeathEffects } from "./enemy-death-fx";
 import { createMusicEngine } from "./music-engine";
 import { DynamicMusicManager } from "./dynamic-music";
 import { PerformanceManager } from "./performance-optimizer";
@@ -309,6 +310,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         updateTutorial(performance.now());
         updateComboFx(dt, state.combo);
         updateGameplayAura(dt, state.combo, state.enemies.filter((e: any) => e.alive), canvasHeight, state.score);
+        updateDeathEffects();
         updateHud(dt, state.score, state.lives, state.combo);
         updateTracker({ combo: state.combo, wave: state.wave, wpm: 0, score: state.score, chain: chainCount, perfectWaves: state.perfectWaves });
 
@@ -411,6 +413,9 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         scorePopups.draw(ctx);
         typingFeedback.drawBursts(ctx);
         typingFeedback.drawRhythmPulse(ctx, w, h);
+
+        // Enemy death effects
+        renderDeathEffects(ctx, time);
 
         // Wave complete overlay
         if (isWaveCompleteShowing()) {
