@@ -33,7 +33,7 @@ import { PerformanceManager } from "./performance-optimizer";
 import { enqueueAchievement, updateAchievementModal, renderAchievementModal, clearAchievementQueue } from "./achievement-modal";
 import { openSettings, closeSettings, isSettingsOpen, handleSettingsKey, renderSettingsPanel, getSettings } from "./settings-panel";
 import { showTutorial, isTutorialShowing, handleTutorialKey, updateTutorial, renderTutorial } from "./tutorial-overlay";
-import { handlePauseMenuKey, renderPauseMenu, resetPauseMenu } from "./pause-menu";
+import { handlePauseMenuKey, renderPauseMenu, resetPauseMenu, updateLiveStats } from "./pause-menu";
 import { openAchievementPage, closeAchievementPage, isAchievementPageOpen, handleAchievementPageKey, renderAchievementPage } from "./achievement-page";
 import { openLeaderboard, closeLeaderboard, isLeaderboardOpen, handleLeaderboardKey, renderLeaderboard, saveToLeaderboard } from "./leaderboard";
 import { initGamepad, pollGamepad, gamepadToKey, gamepadVibrate, isGamepadConnected } from "./gamepad";
@@ -496,7 +496,14 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         ctx.fillRect(0, 0, w, h);
 
         // Pause menu
-        renderPauseMenu(ctx, w, h, time);
+        updateLiveStats({
+                score: state.score, wave: state.wave, combo: state.combo,
+                maxCombo: state.maxCombo, lives: state.lives,
+                enemiesDefeated: state.enemiesDefeated, enemiesLeaked: state.enemiesLeaked,
+                accuracy: state.totalCharsTyped > 0 ? Math.round(state.totalCharsCorrect / state.totalCharsTyped * 100) : 100,
+                wpm: (state as any)._performanceScore || 0, duration: startTime > 0 ? (performance.now() - startTime) / 1000 : 0,
+            });
+            renderPauseMenu(ctx, w, h, time);
     }
 
     function drawGameOverScreen(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
