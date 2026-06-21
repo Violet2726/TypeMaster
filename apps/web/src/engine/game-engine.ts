@@ -26,6 +26,7 @@ import { initGameOver, renderGameOver, clearGameOver } from "./game-over";
 import { showWaveComplete, isWaveCompleteShowing, renderWaveComplete } from "./wave-complete";
 import { updateGameplayAura, renderGameplayAura, renderDangerIndicator, triggerTypingRipple, resetGameplayAura } from "./gameplay-reactive-aura";
 import { spawnDeathEffect, updateDeathEffects, renderDeathEffects } from "./enemy-death-fx";
+import { onCorrectKeystroke, onIncorrectKeystroke, updateRhythm, renderRhythmBar, renderFlowAura, renderSpeedRing, resetRhythm, getFlowLevel } from "./typing-rhythm-visual";
 import { createMusicEngine } from "./music-engine";
 import { DynamicMusicManager } from "./dynamic-music";
 import { PerformanceManager } from "./performance-optimizer";
@@ -311,6 +312,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         updateComboFx(dt, state.combo);
         updateGameplayAura(dt, state.combo, state.enemies.filter((e: any) => e.alive), canvasHeight, state.score);
         updateDeathEffects();
+        updateRhythm(dt);
         updateHud(dt, state.score, state.lives, state.combo);
         updateTracker({ combo: state.combo, wave: state.wave, wpm: 0, score: state.score, chain: chainCount, perfectWaves: state.perfectWaves });
 
@@ -345,6 +347,9 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
 
         // Gameplay reactive aura (danger, combo atmosphere, ripples)
         renderGameplayAura(ctx, width, height, time);
+
+        // Typing flow aura (golden glow for consecutive correct inputs)
+        renderFlowAura(ctx, width, height, time);
 
         if (state.mode === "idle") {
             renderIdle(ctx, width, height, time);
@@ -394,6 +399,11 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         // Enemies with variant overlays
         state.enemies.filter((e: any) => e.alive).forEach((e: any) => {
             drawEnemyAppleStyle(ctx, e, time, lastCorrectEnemyIds.includes(e.id));
+                // Speed ring around active enemy
+                if (e.id === state.activeEnemyId) {
+                    const enemySize = e.type === "boss" ? 36 : e.type === "tank" ? 28 : 20;
+                    renderSpeedRing(ctx, e.x, e.y, enemySize, time);
+                }
             const variant = enemyVariants.get(e.id);
             if (variant) {
                 const enemySize = e.type === "boss" ? 32 : e.type === "tank" ? 24 : 18;
@@ -497,6 +507,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
 
     function drawHUD(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
         renderDangerIndicator(ctx, w, h);
+        renderRhythmBar(ctx, w, h, time);
         drawEnhancedHud(ctx, w, h, time, state, copy);
         // FPS counter (bottom-right, subtle)
         // Gamepad indicator (bottom-right, above FPS)
@@ -858,6 +869,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                     setSfxEnabled(s.sfxEnabled);
                     startTime = performance.now();
                     resetGameplayAura();
+                    resetRhythm();
                     state = transitionGameMode(state, "start");
                     { const perfScore = calculatePerformanceScore(state); state = { ...state, _performanceScore: perfScore } as any; state = startWave(state, pool, { canvasWidth, canvasHeight, kps: state.kps, performanceScore: perfScore }); }
                     return;
@@ -921,7 +933,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                 activePowerUps = [];
                 shieldCount = 0;
                 enemyVariants.clear();
-                clearGameOver();
+                clearGameOver(); resetRhythm();
                 clearAchievementQueue();
                 resetComboFx();
                 resetHud();
@@ -1061,7 +1073,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                         return; // skip normal kill effects
                     }
                     const enemy = state.enemies.find((en: any) => en.id === evt.enemyId);
-                    playKillSound(enemy?.type); haptic(15);
+                    playKillSound(enemy?.type); haptic(15); onCorrectKeystroke();
                     playComboSound(state.combo);
                     if (enemy) {
                         typingFeedback.onWordComplete(evt.enemyId, enemy.word, enemy.x, enemy.y, (COLORS as any)[enemy.type] || COLORS.normal);
