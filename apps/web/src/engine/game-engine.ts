@@ -43,6 +43,7 @@ import { openLeaderboard, closeLeaderboard, isLeaderboardOpen, handleLeaderboard
 import { initGamepad, pollGamepad, gamepadToKey, gamepadVibrate, isGamepadConnected } from "./gamepad";
 import { openThemePage, closeThemePage, isThemePageOpen, handleThemePageKey, renderThemePage } from "./theme-page";
 import { getThemeColors } from "@typemaster/domain";
+import { findChainMatch, getChainHint } from "@typemaster/domain";
 import { triggerComboFlash, updateComboFx, drawComboFx, resetComboFx } from "./combo-fx";
 import { updateHud, drawEnhancedHud, resetHud } from "./hud-overlay";
 import { openStats, isStatsOpen, handleStatsKey, renderStatsHistory, saveGameRecord } from "./stats-history";
@@ -405,7 +406,49 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         gameHub.render(ctx, w, h);
     }
 
-    function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
+        function renderChainHint(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
+        if (!state.completedWords || state.completedWords.length === 0) return;
+        const hint = getChainHint(state.completedWords);
+        if (!hint) return;
+
+        // Draw chain progress at top-center
+        const x = w / 2;
+        const y = 50;
+
+        ctx.save();
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        // Chain label
+        ctx.font = "600 11px -apple-system, SF Pro Display, system-ui, sans-serif";
+        ctx.fillStyle = hint.chain.color + "cc";
+        ctx.fillText(hint.chain.labelZh, x, y - 14);
+
+        // Progress dots
+        const dotSpacing = 20;
+        const startX = x - ((hint.total - 1) * dotSpacing) / 2;
+        for (let i = 0; i < hint.total; i++) {
+            const dx = startX + i * dotSpacing;
+            ctx.beginPath();
+            ctx.arc(dx, y + 6, 4, 0, Math.PI * 2);
+            if (i < hint.progress) {
+                ctx.fillStyle = hint.chain.color;
+                ctx.fill();
+            } else {
+                ctx.strokeStyle = hint.chain.color + "60";
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+        }
+
+        // Next word hint
+        ctx.font = "500 10px -apple-system, SF Pro Text, system-ui, sans-serif";
+        ctx.fillStyle = hint.chain.color + "90";
+        ctx.fillText("next: " + hint.nextWord, x, y + 20);
+
+        ctx.restore();
+    }
+function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
         // Enemies with variant overlays
         state.enemies.filter((e: any) => e.alive).forEach((e: any) => {
             drawEnemyAppleStyle(ctx, e, time, lastCorrectEnemyIds.includes(e.id));
@@ -451,6 +494,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
             renderWaveComplete(ctx, w, h, time);
         }
 
+        renderChainHint(ctx, w, h, time);
         drawHUD(ctx, w, h, time);
 
         // Wave incoming overlay
@@ -1152,7 +1196,26 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                         scorePopups.emit({ x: enemy.x, y: enemy.y - 20, text: "+" + chainScore + chainLabel, color: chainCount > 3 ? "#ff6b6b" : chainCount > 1 ? COLORS.warning : COLORS.warning, fontSize: 18 + chainCount * 2 });
 
                         // Trigger hitlag
-                        hitlagTimer = HITLAG_DURATION * (1 + chainCount * 0.3);
+                        // Word chain detection
+                        if (state.completedWords && state.completedWords.length >= 2) {
+                            const chainMatch = findChainMatch(state.completedWords);
+                            if (chainMatch) {
+                                const chainScore = chainMatch.bonus * 100;
+                                state.enemies.filter((en) => en.alive).forEach((en) => {
+                                    const dx = en.x - enemy.x;
+                                    const dy = en.y - enemy.y;
+                                    const dist = Math.sqrt(dx * dx + dy * dy);
+                                    if (dist < 300 && en.id !== enemy.id) {
+                                        particles.emit({ x: en.x, y: en.y, count: 12, color: chainMatch.color, speed: 4, size: 3, gravity: 1, trail: true });
+                                        scorePopups.emit({ x: en.x, y: en.y - 15, text: "CHAIN!", color: chainMatch.color, fontSize: 14 });
+                                    }
+                                });
+                                genVisuals.triggerBurst(enemy.x, enemy.y, chainMatch.color, 1.5);
+                                scorePopups.emit({ x: enemy.x, y: enemy.y - 40, text: chainMatch.labelZh + " +" + chainScore, color: chainMatch.color, fontSize: 20 });
+                                shake.trigger(10);
+                            }
+                        }
+hitlagTimer = HITLAG_DURATION * (1 + chainCount * 0.3);
                         
                         // Boss phase transition check
                         if (enemy && enemy.type === "boss" && enemy.alive) {

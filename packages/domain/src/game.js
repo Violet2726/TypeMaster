@@ -389,6 +389,7 @@ export function createGameState(options = {}) {
         nextSpawnIndex: 0,
         waveQueue: [],
         perfectWaves: 0,
+        completedWords: [],
         ...options
     };
 }
@@ -450,6 +451,7 @@ export function processInput(state, char) {
                         combo: state.combo + 1,
                         maxCombo: Math.max(state.maxCombo, state.combo + 1),
                         enemiesDefeated: state.enemiesDefeated + 1,
+                        completedWords: [...(state.completedWords || []).slice(-9), match.word],
                         totalCharsTyped: state.totalCharsTyped + 1,
                         totalCharsCorrect: state.totalCharsCorrect + 1,
                         enemies: state.enemies.map((e) =>
@@ -515,6 +517,7 @@ export function processInput(state, char) {
                     combo: state.combo + 1,
                     maxCombo: Math.max(state.maxCombo, state.combo + 1),
                     enemiesDefeated: state.enemiesDefeated + 1,
+                    completedWords: [...(state.completedWords || []).slice(-9), active.word],
                     totalCharsTyped: state.totalCharsTyped + 1,
                     totalCharsCorrect: state.totalCharsCorrect + 1,
                     enemies: state.enemies.map((e) =>
