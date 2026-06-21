@@ -42,6 +42,7 @@ import { shouldSpawnVariant, createVariantState, updateVariant, processShieldInp
 import type { VariantState, VariantType } from "./enemy-variant";
 import { shouldDropPowerUp, createPowerUp, updatePowerUps, processPowerUpInput, drawPowerUp, drawActivePowerUps, getPowerUpConfig } from "./power-up";
 import type { PowerUp, ActivePowerUp, PowerUpType } from "./power-up";
+import { TypingFeedbackManager } from "./typing-feedback";
 
 // ---------------------------------------------------------------------------
 // Hue shift for dynamic background
@@ -91,9 +92,11 @@ export interface GameEngine {
 export function createGameEngine(wordPool?: string[]): GameEngine {
     let state = createGameState();
     initGamepad();
+
     const particles = new ParticleSystem();
     const scorePopups = new ScorePopupSystem();
     const shake = new ScreenShake();
+    const typingFeedback = new TypingFeedbackManager();
     const pool = biasWordPool(commonWords, []);
 
     let canvasWidth = 800;
@@ -279,6 +282,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         particles.update(dt);
         scorePopups.update(dt);
         shake.update(dt);
+        typingFeedback.update(dt);
         music.setCombo(state.combo);
         // Update enemy variants
         enemyVariants.forEach((v, id) => { enemyVariants.set(id, updateVariant(v, dt)); });
@@ -458,6 +462,8 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
 
         particles.draw(ctx);
         scorePopups.draw(ctx);
+        typingFeedback.drawBursts(ctx);
+        typingFeedback.drawRhythmPulse(ctx, w, h);
         drawHUD(ctx, w, h, time);
 
         // Wave incoming overlay
@@ -624,33 +630,12 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
             drawProgressRing(ctx, 0, 0, size + 6, progress, baseColor);
         }
 
-        // Word rendering
+        // Word rendering with typing feedback
         const word = enemy.word;
         const typed = enemy.typed || "";
         const wordY = size + 18;
-
-        ctx.font = "600 13px -apple-system, SF Pro Text, system-ui, sans-serif";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "top";
-
-        if (typed.length > 0) {
-            const typedWidth = ctx.measureText(typed).width;
-            const fullWidth = ctx.measureText(word).width;
-            const startX = -fullWidth / 2;
-            // Typed part - bright green with glow
-            ctx.fillStyle = COLORS.success;
-            ctx.shadowColor = COLORS.success;
-            ctx.shadowBlur = 10;
-            ctx.textAlign = "left";
-            ctx.fillText(typed, startX, wordY);
-            // Remaining part - dimmer
-            ctx.shadowBlur = 0;
-            ctx.fillStyle = COLORS.textSecondary;
-            ctx.fillText(word.slice(typed.length), startX + typedWidth, wordY);
-        } else {
-            ctx.fillStyle = COLORS.text;
-            ctx.fillText(word, 0, wordY);
-        }
+        
+        typingFeedback.drawWord(ctx, enemy.id, word, typed, 0, wordY, 13);
 
         ctx.restore();
     }
@@ -1089,6 +1074,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                     playKillSound(enemy?.type); haptic(15);
                     playComboSound(state.combo);
                     if (enemy) {
+                        typingFeedback.onWordComplete(evt.enemyId, enemy.word, enemy.x, enemy.y, (COLORS as any)[enemy.type] || COLORS.normal);
                         const color = (COLORS as any)[enemy.type] || COLORS.normal;
                         // Scale particles by chain count
                         const chainBonus = Math.min(chainCount + 1, 5);
@@ -1168,11 +1154,13 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                     const activeEnemy = state.enemies.find((en: any) => en.id === evt.enemyId);
                     if (activeEnemy) {
                         particles.emit({ x: activeEnemy.x, y: activeEnemy.y, count: 3, color: COLORS.success, speed: 1, size: 2, lifetime: 0.3 });
+                        typingFeedback.onCharCorrect(evt.enemyId, (activeEnemy.typed || '').length - 1, activeEnemy.typed.slice(-1), activeEnemy.x, activeEnemy.y);
                     }
                 }
                 if (evt.type === "char_error") {
                     playErrorSound();
                     shake.trigger(2);
+                    typingFeedback.onCharError(evt.enemyId, 0, 0);
                 }
                 if (evt.type === "char_miss") {
                     lastCorrectEnemyIds = evt.matches || [];
@@ -1193,6 +1181,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     function destroy(): void {
         particles.clear();
         scorePopups.clear();
+        typingFeedback.clear();
         powerUps = [];
         activePowerUps = [];
         music.stop();
@@ -1211,3 +1200,13 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         saveGameResult() { return buildGameResult(state); },
     };
 }
+
+
+
+
+
+
+
+
+
+
