@@ -12,6 +12,7 @@
 import { COLORS } from "../components/game/colors";
 import { calculateXp, getRankProgress, loadTotalXp, addXp } from "@typemaster/domain";
 import { drawGlassPanel } from "../components/game/draw-helpers";
+import { generateShareText, copyToClipboard, drawFriendLeaderboard } from "./social-features";
 
 function getScale(w: number, h: number): number { return Math.max(0.6, Math.min(1.2, w / 800)); }
 
@@ -414,3 +415,35 @@ export function renderGameOver(ctx: CanvasRenderingContext2D, w: number, h: numb
 
     ctx.restore();
 }
+
+
+
+// ---------------------------------------------------------------------------
+// Share Functions
+// ---------------------------------------------------------------------------
+
+export function shareResult(): void {
+    if (!anim?.result) return;
+    
+    const shareText = generateShareText({
+        score: anim.result.score,
+        wave: anim.result.wave,
+        wpm: anim.result.wpm,
+        accuracy: anim.result.accuracy,
+        maxCombo: anim.result.maxCombo,
+        gameMode: 'classic',
+        date: new Date().toLocaleDateString(),
+    });
+    
+    copyToClipboard(shareText).then(success => {
+        if (success) {
+            console.log('Copied to clipboard!');
+        }
+    });
+}
+
+export function showFriendLeaderboard(): void {
+    if (!anim?.result) return;
+    console.log('Show friend leaderboard');
+}
+
