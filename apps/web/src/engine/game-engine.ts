@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Typing Raid Game Engine
  *
  * Central orchestrator: game loop, event dispatch, effect coordination.
@@ -45,7 +45,7 @@ import type { VariantState, VariantType } from "./enemy-variant";
 import { shouldDropPowerUp, createPowerUp, updatePowerUps, processPowerUpInput, drawPowerUp, drawActivePowerUps, getPowerUpConfig } from "./power-up";
 import type { PowerUp, ActivePowerUp, PowerUpType } from "./power-up";
 import { TypingFeedbackManager } from "./typing-feedback";
-import { IdleScreenManager } from "./idle-screen";
+import { GameHubManager } from "./game-hub";
 import { BattleVfxManager } from "./battle-vfx";
 import { initRhythmEngine, onTypingKeystroke, getTypingIntensity, startAmbient, stopAmbient, cleanup as cleanupRhythm } from "../components/game/rhythm-engine";
 import { startTutorial, isTutorialActive, updateTutorialState, renderTutorialOverlay, skipTutorial, getLastReward } from "./interactive-tutorial";
@@ -105,7 +105,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
 
     const typingFeedback = new TypingFeedbackManager();
 
-    const idleScreen = new IdleScreenManager();
+    const gameHub = new GameHubManager();
     const battleVfx = new BattleVfxManager();
     const pool = biasWordPool(commonWords, []);
 
@@ -1212,6 +1212,13 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         saveGameResult() { return buildGameResult(state); },
     };
 }
+
+
+
+
+
+
+
 
 
 
