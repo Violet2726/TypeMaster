@@ -22,6 +22,7 @@ export interface GameSettings {
     musicEnabled: boolean;
     sfxEnabled: boolean;
     difficulty: "easy" | "normal" | "hard";
+    highContrast: boolean;  // Accessibility: high contrast mode
 }
 
 const STORAGE_KEY = "typing-raid-settings";
@@ -31,6 +32,7 @@ const DEFAULT_SETTINGS: GameSettings = {
     musicEnabled: true,
     sfxEnabled: true,
     difficulty: "normal",
+    highContrast: false,
 };
 
 const DIFFICULTY_OPTIONS: { value: GameSettings["difficulty"]; label: string; desc: string }[] = [

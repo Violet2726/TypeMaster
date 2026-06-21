@@ -161,8 +161,21 @@ export default function GamePage() {
     }, []);
 
     return (
-        <div className="game-container">
-            <canvas ref={canvasRef} className="game-canvas" />
+        <div className="game-container" role="application" aria-label="Typing Raid - ��Ϸ����">
+            <canvas
+                ref={canvasRef}
+                className="game-canvas"
+                role="img"
+                aria-label="����ͻϮ��Ϸ���� - ���뵥���������"
+                tabIndex={0}
+            />
+            {/* Live region for screen reader announcements */}
+            <div
+                className="sr-only"
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+            />
         </div>
     );
 }

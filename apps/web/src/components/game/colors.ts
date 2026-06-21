@@ -42,3 +42,20 @@ export const COLORS = {
     combo15: '#ff3b5c',
     combo20: '#ffd700',
 };
+
+// High contrast mode overrides (for accessibility)
+export const COLORS_HIGH_CONTRAST = {
+    ...COLORS,
+    normal: '#60b8ff',
+    fast: '#ffe066',
+    tank: '#ff9944',
+    boss: '#ff6680',
+    text: '#ffffff',
+    textSecondary: 'rgba(255, 255, 255, 0.8)',
+    textTertiary: 'rgba(255, 255, 255, 0.6)',
+    success: '#4ade80',
+    error: '#ff6680',
+    warning: '#ffe066',
+    glassBg: 'rgba(255, 255, 255, 0.15)',
+    glassBorder: 'rgba(255, 255, 255, 0.3)',
+};
