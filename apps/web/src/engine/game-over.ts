@@ -10,6 +10,7 @@
  */
 
 import { COLORS } from "../components/game/colors";
+import { calculateXp, getRankProgress, loadTotalXp, addXp } from "@typemaster/domain";
 import { drawGlassPanel } from "../components/game/draw-helpers";
 
 function getScale(w: number, h: number): number { return Math.max(0.6, Math.min(1.2, w / 800)); }
@@ -74,6 +75,14 @@ export function checkAndSaveBest(result: GameOverResult): { isNewRecord: boolean
         saveBest({ score: result.score, wave: result.wave, maxCombo: result.maxCombo, wpm: result.wpm });
     }
     return { isNewRecord: isNew, best: isNew ? { score: result.score, wave: result.wave, maxCombo: result.maxCombo, wpm: result.wpm } : best };
+    
+    // Calculate XP and update rank
+    const xpEarned = calculateXp(result);
+    const prevXp = loadTotalXp();
+    const newXp = addXp(xpEarned);
+    const rankProgress = getRankProgress(newXp);
+    const prevRank = getRankProgress(prevXp);
+    const rankUp = rankProgress.current.id !== prevRank.current.id;
 }
 
 // ---------------------------------------------------------------------------
@@ -92,6 +101,10 @@ interface AnimState {
     actionsVisible: boolean;
     ratingScale: number;
     ratingGlow: number;
+    // Growth/progression
+    xpEarned?: number;
+    rankProgress?: any;
+    rankUp?: boolean;
 }
 
 let anim: AnimState | null = null;
@@ -300,6 +313,80 @@ export function renderGameOver(ctx: CanvasRenderingContext2D, w: number, h: numb
 
         ctx.restore();
     });
+
+    // XP earned display (appears with stats)
+    if (anim.revealedStats >= 6 && anim.xpEarned !== undefined) {
+        const xpAlpha = Math.min(1, (elapsed - 3.0) / 0.3);
+        ctx.save();
+        ctx.globalAlpha = xpAlpha;
+        
+        const xpY = panelY + 340;
+        
+        // XP label and value
+        ctx.font = "400 10px -apple-system, SF Pro Text, system-ui, sans-serif";
+        ctx.fillStyle = COLORS.textTertiary;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+        ctx.fillText("EXPERIENCE EARNED", w / 2, xpY - 14);
+        
+        ctx.font = "700 22px -apple-system, SF Pro Display, system-ui, sans-serif";
+        ctx.fillStyle = "#ffd700";
+        ctx.shadowColor = "rgba(255,215,0,0.4)";
+        ctx.shadowBlur = 8;
+        ctx.fillText("+" + anim.xpEarned + " XP", w / 2, xpY + 2);
+        ctx.shadowBlur = 0;
+        
+        // Rank progress bar
+        if (anim.rankProgress) {
+            const rp = anim.rankProgress;
+            const barW = 200;
+            const barH = 4;
+            const barX = w / 2 - barW / 2;
+            const barY = xpY + 28;
+            
+            // Background
+            ctx.fillStyle = "rgba(255,255,255,0.08)";
+            ctx.beginPath();
+            ctx.roundRect(barX, barY, barW, barH, 2);
+            ctx.fill();
+            
+            // Fill
+            ctx.fillStyle = rp.current.color;
+            ctx.beginPath();
+            ctx.roundRect(barX, barY, barW * rp.progress, barH, 2);
+            ctx.fill();
+            
+            // Rank label
+            ctx.font = "600 9px -apple-system, SF Pro Text, system-ui, sans-serif";
+            ctx.fillStyle = rp.current.color;
+            ctx.textAlign = "left";
+            ctx.textBaseline = "top";
+            ctx.fillText(rp.current.nameZh + " " + rp.current.icon, barX, barY + 8);
+            
+            // Next rank
+            if (rp.next) {
+                ctx.textAlign = "right";
+                ctx.fillStyle = COLORS.textTertiary;
+                ctx.fillText(rp.next.nameZh + " " + rp.next.icon, barX + barW, barY + 8);
+            } else {
+                ctx.textAlign = "right";
+                ctx.fillStyle = rp.current.color;
+                ctx.fillText("MAX", barX + barW, barY + 8);
+            }
+        }
+        
+        // Rank up celebration
+        if (anim.rankUp) {
+            const rankUpPulse = Math.sin(time * 0.006) * 0.2 + 0.8;
+            ctx.globalAlpha = xpAlpha * rankUpPulse;
+            ctx.font = "700 14px -apple-system, SF Pro Display, system-ui, sans-serif";
+            ctx.fillStyle = anim.rankProgress.current.color;
+            ctx.textAlign = "center";
+            ctx.fillText("RANK UP!", w / 2, xpY + 50);
+        }
+        
+        ctx.restore();
+    }
 
     // Action prompts
     if (anim.actionsVisible) {
