@@ -31,6 +31,8 @@ export class ParticleSystem {
     private active: Particle[] = [];
 
     emit(config: ParticleConfig): void {
+        // Performance: cap active particles to prevent frame drops
+        if (this.active.length > 500) return;
         const { x, y, count, color, spread = Math.PI * 2, speed = 3, size = 3, lifetime = 0.8, gravity = 0, turbulence = 0, glow = 0.6, trail = false, trailLength = 8 } = config;
         for (let i = 0; i < count; i++) {
             const angle = (Math.PI * 2 / count) * i + (Math.random() - 0.5) * spread;

@@ -120,11 +120,11 @@ export class GenerativeVisualSystem {
     private initParticles(): void {
         this.particles = [];
         const area = this.w * this.h;
-        const farCount = Math.floor(area / 8000);
+        const farCount = Math.floor(area / 12000);
         for (let i = 0; i < farCount; i++) this.particles.push(this.createParticle('far'));
-        const midCount = Math.floor(area / 12000);
+        const midCount = Math.floor(area / 18000);
         for (let i = 0; i < midCount; i++) this.particles.push(this.createParticle('mid'));
-        const nearCount = Math.floor(area / 20000);
+        const nearCount = Math.floor(area / 28000);
         for (let i = 0; i < nearCount; i++) this.particles.push(this.createParticle('near'));
     }
 
