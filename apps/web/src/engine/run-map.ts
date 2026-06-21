@@ -220,6 +220,42 @@ export function renderRunMap(ctx, w, h, state, time) {
   }
 }
 
+// Touch/click handling for run map
+export function handleRunMapClick(x, y, state, w, h) {
+  const { run, selectedIndex } = state;
+  const nodes = getCurrentActNodes(run);
+  if (nodes.length === 0) return { ...state, action: null };
+  const positions = getNodePositions(nodes, w, h);
+  const available = getAvailableChoices(run);
+
+  // Check if click is on an available node
+  for (const pos of positions) {
+    const node = pos.node;
+    const isAvailable = node.available && available.some(a => a.id === node.id);
+    if (!isAvailable) continue;
+    const dx = x - pos.x;
+    const dy = y - pos.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const hitRadius = node.type === "boss" ? 35 : 28;
+    if (dist < hitRadius) {
+      const selIdx = available.indexOf(available.find(a => a.id === node.id));
+      return { ...state, selectedIndex: selIdx, action: "select", nodeId: node.id };
+    }
+  }
+
+  // Check if click is on HUD area (bottom)
+  if (y > h - 60) {
+    // Left/right halves for navigation
+    if (x < w / 2) {
+      return handleRunMapKey("ArrowLeft", state);
+    } else {
+      return handleRunMapKey("ArrowRight", state);
+    }
+  }
+
+  return { ...state, action: null };
+}
+
 export function handleRunMapKey(key, state) {
   const available = getAvailableChoices(state.run);
   if (available.length === 0) return { ...state, action: null };

@@ -123,6 +123,24 @@ export default function GamePage() {
         resize();
         window.addEventListener('resize', resize);
 
+        // Canvas click/touch for run map and encounter UI
+        function handleCanvasClick(e: MouseEvent | TouchEvent) {
+            const rect = canvas!.getBoundingClientRect();
+            let clientX: number, clientY: number;
+            if ('touches' in e) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+            if (engine.handleCanvasClick) engine.handleCanvasClick(x, y);
+        }
+        canvas.addEventListener('click', handleCanvasClick);
+        canvas.addEventListener('touchend', (e) => { e.preventDefault(); handleCanvasClick(e); });
+
         function gameLoop(ts: number) {
             if (lastTimeRef.current === 0) lastTimeRef.current = ts;
             const dt = Math.min((ts - lastTimeRef.current) / 1000, 0.05);

@@ -320,6 +320,58 @@ export function renderEncounter(ctx, w, h, state, time) {
 // Input handling
 // ---------------------------------------------------------------------------
 
+// Touch/click handling for encounter UI
+export function handleEncounterClick(x, y, state, w, h) {
+  if (!state || !state.type) return { ...state, action: null };
+
+  if (state.type === "shop") {
+    const offers = state.offers;
+    const cardW = Math.min(180, (w - 80) / Math.max(1, offers.length) - 12);
+    const cardH = 180;
+    const startX = (w - (cardW + 12) * offers.length + 12) / 2;
+    const cardY = 100;
+    for (let i = 0; i < offers.length; i++) {
+      const cx = startX + i * (cardW + 12);
+      if (x >= cx && x <= cx + cardW && y >= cardY && y <= cardY + cardH) {
+        return { ...state, selectedIndex: i };
+      }
+    }
+    // Bottom area = leave
+    if (y > h - 60) return { ...state, action: "leave" };
+  }
+
+  if (state.type === "rest") {
+    const cardW = 220;
+    const cardH = 140;
+    const gap = 24;
+    const startX = (w - cardW * 2 - gap) / 2;
+    const cardY = h / 2 - cardH / 2;
+    for (let i = 0; i < 2; i++) {
+      const cx = startX + i * (cardW + gap);
+      if (x >= cx && x <= cx + cardW && y >= cardY && y <= cardY + cardH) {
+        return handleEncounterSelect({ ...state, selectedIndex: i });
+      }
+    }
+  }
+
+  if (state.type === "event" && state.event) {
+    const choices = state.event.choices;
+    const cardW = 240;
+    const cardH = 130;
+    const gap = 24;
+    const startX = (w - cardW * choices.length - gap * (choices.length - 1)) / 2;
+    const cardY = h / 2 - cardH / 2;
+    for (let i = 0; i < choices.length; i++) {
+      const cx = startX + i * (cardW + gap);
+      if (x >= cx && x <= cx + cardW && y >= cardY && y <= cardY + cardH) {
+        return handleEncounterSelect({ ...state, selectedIndex: i });
+      }
+    }
+  }
+
+  return { ...state, action: null };
+}
+
 export function handleEncounterKey(key, state) {
   if (!state || !state.type) return { ...state, action: null };
 

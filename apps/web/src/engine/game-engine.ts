@@ -47,8 +47,8 @@ import { findChainMatch, getChainHint } from "@typemaster/domain";
 import { RhythmEngine } from "@typemaster/domain";
 import { BossBattleState, BOSS_PHASES } from "@typemaster/domain";
 import { generateRun, selectNode, completeCurrentNode, advanceToNextAct, getAvailableChoices, getCurrentNode, getEncounterConfig, getRunStats, NODE_TYPES, EVENTS, processEvent, restAction, purchaseUpgrade, getShopOffers, UPGRADE_DEFS } from "@typemaster/domain";
-import { renderRunMap, createRunMapState, handleRunMapKey } from "./run-map";
-import { renderEncounter, createEncounterState, handleEncounterKey } from "./encounter-ui";
+import { renderRunMap, createRunMapState, handleRunMapKey, handleRunMapClick } from "./run-map";
+import { renderEncounter, createEncounterState, handleEncounterKey, handleEncounterClick } from "./encounter-ui";
 import { renderRunComplete, createRunCompleteState, handleRunCompleteKey } from "./run-complete";
 import { createBossIntro, updateBossIntro, renderBossIntro, isBossIntroActive } from "./boss-intro";
 import { renderBossBattleUI } from "./boss-battle-ui";
@@ -105,6 +105,7 @@ export interface GameEngine {
     tick(dt: number): void;
     render(ctx: CanvasRenderingContext2D, width: number, height: number): void;
     handleKey(e: KeyboardEvent): void;
+    handleCanvasClick?(x: number, y: number): void;
     resize(width: number, height: number): void;
     destroy(): void;
     saveGameResult(): any;
@@ -1635,6 +1636,49 @@ hitlagTimer = HITLAG_DURATION * (1 + chainCount * 0.3);
         music.stop();
     }
 
+    function handleCanvasClick(x: number, y: number): void {
+        if (state.mode === 'run_map' && runMapState) {
+            const mapResult = handleRunMapClick(x, y, runMapState, canvasWidth, canvasHeight);
+            if (mapResult.action === 'select' && currentRun) {
+                playMenuSelect();
+                currentRun = selectNode(currentRun, mapResult.nodeId);
+                const currentNode = getCurrentNode(currentRun);
+                const nodeType = currentNode.type;
+                if (nodeType === 'shop' || nodeType === 'rest' || nodeType === 'event') {
+                    encounterState = createEncounterState(nodeType, currentRun);
+                    state = { ...state, mode: 'encounter' } as any;
+                } else {
+                    runMapState = createRunMapState(currentRun);
+                    const actConfig = currentRun.acts[currentRun.currentAct].config;
+                    encounterConfig = getEncounterConfig(currentNode, actConfig);
+                    wavesInEncounter = 0;
+                    wavesTarget = encounterConfig.waveCount;
+                    state = transitionGameMode(state, 'start');
+                    resetGameplayAura();
+                    resetRhythm();
+                    { const perfScore = calculatePerformanceScore(state); state = { ...state, _performanceScore: perfScore } as any; state = startWave(state, pool, { canvasWidth, canvasHeight, performanceScore: perfScore }); }
+                }
+            } else {
+                runMapState = mapResult;
+            }
+        }
+        if (state.mode === 'encounter' && encounterState) {
+            const encResult = handleEncounterClick(x, y, encounterState, canvasWidth, canvasHeight);
+            encounterState = encResult;
+            if (encResult.action === 'leave' || encResult.action === 'rested' || encResult.action === 'event_done') {
+                currentRun = encResult.run;
+                if (encResult.action === 'leave') {
+                    runMapState = createRunMapState(currentRun);
+                    state = { ...state, mode: 'run_map' } as any;
+                } else {
+                    currentRun = completeCurrentNode(currentRun, {});
+                    runMapState = createRunMapState(currentRun);
+                    state = { ...state, mode: 'run_map' } as any;
+                }
+            }
+        }
+    }
+
     return {
         get state() { return state; },
         particles,
@@ -1643,6 +1687,7 @@ hitlagTimer = HITLAG_DURATION * (1 + chainCount * 0.3);
         tick,
         render,
         handleKey,
+        handleCanvasClick,
         resize,
         destroy,
         saveGameResult() { return buildGameResult(state); },
