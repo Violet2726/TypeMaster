@@ -28,6 +28,7 @@ import { enqueueAchievement, updateAchievementModal, renderAchievementModal, cle
 import { openSettings, closeSettings, isSettingsOpen, handleSettingsKey, renderSettingsPanel, getSettings } from "./settings-panel";
 import { showTutorial, isTutorialShowing, handleTutorialKey, updateTutorial, renderTutorial } from "./tutorial-overlay";
 import { handlePauseMenuKey, renderPauseMenu, resetPauseMenu } from "./pause-menu";
+import { openAchievementPage, closeAchievementPage, isAchievementPageOpen, handleAchievementPageKey, renderAchievementPage } from "./achievement-page";
 import { triggerComboFlash, updateComboFx, drawComboFx, resetComboFx } from "./combo-fx";
 import { updateHud, drawEnhancedHud, resetHud } from "./hud-overlay";
 import { openStats, isStatsOpen, handleStatsKey, renderStatsHistory, saveGameRecord } from "./stats-history";
@@ -306,6 +307,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         renderSettingsPanel(ctx, width, height, time);
         renderTutorial(ctx, width, height, time);
         renderStatsHistory(ctx, width, height, time);
+        renderAchievementPage(ctx, width, height, time);
         drawTouchIndicator(ctx, width, height, time);
 
         ctx.restore();
@@ -840,6 +842,8 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     function handleKey(e: KeyboardEvent): void {
         if (state.mode === "idle") {
             if (e.key === "Escape") return;
+            // Achievement page
+            if (e.key === "a" || e.key === "A") { openAchievementPage(); return; }
             // Daily challenge mode
             if (e.key === "d" || e.key === "D") {
                 dailyChallenge = getDailyChallenge();
@@ -926,6 +930,9 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
 
         // Stats history input
         if (isStatsOpen()) { handleStatsKey(e); return; }
+
+        // Achievement page input
+        if (isAchievementPageOpen()) { handleAchievementPageKey(e); return; }
 
         // Tutorial overlay consumes first key
         if (isTutorialShowing()) {
