@@ -46,7 +46,7 @@ import { getThemeColors } from "@typemaster/domain";
 import { findChainMatch, getChainHint } from "@typemaster/domain";
 import { RhythmEngine } from "@typemaster/domain";
 import { BossBattleState, BOSS_PHASES } from "@typemaster/domain";
-import { generateRun, selectNode, completeCurrentNode, advanceToNextAct, getAvailableChoices, getCurrentNode, getEncounterConfig, getRunStats, NODE_TYPES, EVENTS, processEvent, restAction, purchaseUpgrade, getShopOffers } from "@typemaster/domain";
+import { generateRun, selectNode, completeCurrentNode, advanceToNextAct, getAvailableChoices, getCurrentNode, getEncounterConfig, getRunStats, NODE_TYPES, EVENTS, processEvent, restAction, purchaseUpgrade, getShopOffers, UPGRADE_DEFS } from "@typemaster/domain";
 import { renderRunMap, createRunMapState, handleRunMapKey } from "./run-map";
 import { renderEncounter, createEncounterState, handleEncounterKey } from "./encounter-ui";
 import { renderBossBattleUI } from "./boss-battle-ui";
@@ -159,11 +159,26 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     const bossBattle = new BossBattleState();
     // Run system state
     let currentRun: any = null;
+    function applyRunUpgrades() {
+        if (!currentRun) return;
+        const extraLives = getUpgradeStacks("extra_life");
+        if (extraLives > 0) {
+            currentRun = { ...currentRun, maxLives: 5 + extraLives, lives: Math.min(currentRun.lives, 5 + extraLives) };
+        }
+    }
     let runMapState: any = null;
     let encounterConfig: any = null;
     let wavesInEncounter = 0;
     let wavesTarget = 0;
     let encounterState: any = null;
+
+    // Upgrade effect helpers
+    function getUpgradeStacks(id) {
+        if (!currentRun) return 0;
+        const u = currentRun.upgrades.find(u => u.id === id);
+        return u ? u.stacks : 0;
+    }
+    function hasUpgrade(id) { return getUpgradeStacks(id) > 0; }
     const genVisuals = new GenerativeVisualSystem();
     let enemyVariants: Map<string, VariantState> = new Map();
     // Apply difficulty modifier
@@ -262,7 +277,14 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                 const leaked = state.enemies.find((e: any) => e.id === evt.enemyId);
                 if (leaked) {
                     // Shield absorbs leak
-                    if (shieldCount > 0) {
+                    // Combo shield upgrade: auto-shield when combo >= 10
+                    const comboShieldActive = hasUpgrade("combo_shield") && state.combo >= 10;
+                    if (comboShieldActive) {
+                        state = { ...state, combo: Math.max(0, state.combo - 5) };
+                        particles.emit({ x: leaked.x, y: canvasHeight - 20, count: 20, color: "#0a84ff", speed: 3, size: 3, glow: 0.8, trail: true });
+                        shake.trigger(4);
+                        state = { ...state, lives: Math.min(state.maxLives, state.lives + 1), enemiesLeaked: state.enemiesLeaked - 1 };
+                    } else if (shieldCount > 0) {
                         shieldCount--;
                         particles.emit({ x: leaked.x, y: canvasHeight - 20, count: 20, color: "#0a84ff", speed: 3, size: 3, glow: 0.8, trail: true });
                         shake.trigger(4);
@@ -298,6 +320,12 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                 const waveKills = state.enemiesDefeated;
                 const waveCombo = state.combo;
                 showWaveComplete(state.wave, waveKills, !!evt.perfect, waveCombo, state.score);
+
+                // Vampiric keys upgrade: heal on perfect wave
+                if (evt.perfect && hasUpgrade("vampiric_keys")) {
+                    state = { ...state, lives: Math.min(state.maxLives, state.lives + 1) };
+                    particles.emit({ x: canvasWidth / 2, y: canvasHeight / 2, count: 25, color: "#ff453a", speed: 3, size: 3, glow: 0.8, trail: true });
+                }
 
                 if (evt.perfect) {
                     state = { ...state, perfectWaves: state.perfectWaves + 1 };
@@ -372,6 +400,13 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
 
         // Update active power-up durations
         activePowerUps = activePowerUps.map(ap => ({ ...ap, remaining: ap.remaining - dt })).filter(ap => ap.remaining > 0);
+
+        // Slow field upgrade: reduce enemy speed permanently
+        const slowStacks = getUpgradeStacks("slow_field");
+        if (slowStacks > 0 && state.enemies) {
+            const slowMod = Math.pow(0.7, slowStacks);
+            state = { ...state, enemies: state.enemies.map((e: any) => e.alive ? { ...e, speed: e.speed * slowMod } : e) };
+        }
 
         // Slow power-up effect: reduce enemy speed
         const hasSlow = activePowerUps.some(ap => ap.type === "slow");
@@ -642,6 +677,25 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
             ctx.fillText("GAMEPAD", w - 12, h - 20);
             ctx.globalAlpha = 1;
         }
+        // Active upgrades display (top-left, above FPS)
+        if (currentRun && currentRun.upgrades.length > 0) {
+            const upgradeY = h - 36;
+            ctx.font = "500 9px -apple-system, SF Pro Text, system-ui, sans-serif";
+            ctx.textAlign = "left";
+            ctx.textBaseline = "bottom";
+            let ux = 12;
+            for (const u of currentRun.upgrades) {
+                const def = UPGRADE_DEFS.find(d => d.id === u.id);
+                if (!def) continue;
+                ctx.fillStyle = def.color + "aa";
+                ctx.globalAlpha = 0.7;
+                ctx.fillText(def.icon + (u.stacks > 1 ? "x" + u.stacks : ""), ux, upgradeY);
+                ux += ctx.measureText(def.icon + (u.stacks > 1 ? "x" + u.stacks : "")).width + 8;
+            }
+            ctx.globalAlpha = 1;
+        }
+
+        // FPS counter
         if (fpsDisplay > 0) {
             const fpsColor = fpsDisplay >= 55 ? "#34c759" : fpsDisplay >= 30 ? "#ffcc02" : "#ff3b5c";
             ctx.font = "400 9px -apple-system, SF Pro Text, system-ui, sans-serif";
