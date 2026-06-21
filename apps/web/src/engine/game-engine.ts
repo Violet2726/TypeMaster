@@ -50,6 +50,7 @@ import { generateRun, selectNode, completeCurrentNode, advanceToNextAct, getAvai
 import { renderRunMap, createRunMapState, handleRunMapKey } from "./run-map";
 import { renderEncounter, createEncounterState, handleEncounterKey } from "./encounter-ui";
 import { renderRunComplete, createRunCompleteState, handleRunCompleteKey } from "./run-complete";
+import { createBossIntro, updateBossIntro, renderBossIntro, isBossIntroActive } from "./boss-intro";
 import { renderBossBattleUI } from "./boss-battle-ui";
 import { renderRhythmReward } from "./rhythm-reward-visual";
 import { triggerComboFlash, updateComboFx, drawComboFx, resetComboFx } from "./combo-fx";
@@ -173,6 +174,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     let wavesTarget = 0;
     let encounterState: any = null;
     let runCompleteState: any = null;
+    let bossIntroState: any = null;
 
     // Upgrade effect helpers
     function getUpgradeStacks(id) {
@@ -217,6 +219,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         }
         // Update generative visuals (always, even during hitlag)
         genVisuals.update(dt);
+        if (bossIntroState) bossIntroState = updateBossIntro(bossIntroState);
         // run_map tick: animate map
         if (state.mode === "run_map" && runMapState) { runMapState.animTime += dt * 1000; }
 
@@ -480,6 +483,9 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         // Typing flow aura (golden glow for consecutive correct inputs)
         renderFlowAura(ctx, width, height, time);
 
+        // Block input during boss intro
+        if (bossIntroState && isBossIntroActive(bossIntroState)) return;
+
         if (state.mode === "run_complete") {
             renderRunComplete(ctx, width, height, runCompleteState, time);
         } else if (state.mode === "encounter") {
@@ -627,6 +633,7 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
             renderBossBattleUI(ctx, w, h, bossStateObj, time);
         }
         drawHUD(ctx, w, h, time);
+        if (bossIntroState && isBossIntroActive(bossIntroState)) renderBossIntro(ctx, w, h, bossIntroState, time);
 
         // Wave incoming overlay
         if (state.wave > 0 && state.waveQueue.length > 0 && state.nextSpawnIndex < state.waveQueue.length) {
@@ -1241,6 +1248,7 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
             if (action === "restart" || action === "menu") {
                 currentRun = null;
                 encounterConfig = null;
+                                bossIntroState = null;
                 runCompleteState = null;
                 state = createGameState();
                 runMapState = null;
@@ -1308,6 +1316,7 @@ function renderPlaying(ctx: CanvasRenderingContext2D, w: number, h: number, time
                         };
                         state = { ...state, enemies: [bossEnemy], enemiesTotal: 1 };
                         wavesTarget = 999;
+                        bossIntroState = createBossIntro(encounterConfig.bossNameZh || "Boss", encounterConfig.bossHp, currentRun.acts[currentRun.currentAct].config.nameZh);
                         // Boss defeated when all enemies dead
                     }
                     resetGameplayAura();
