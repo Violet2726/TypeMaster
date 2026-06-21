@@ -28,6 +28,7 @@ import { addGameResult, saveReplay } from "../services/storage/game-save";
 import { updateGameplayAura, renderGameplayAura, renderDangerIndicator, triggerTypingRipple, resetGameplayAura } from "./gameplay-reactive-aura";
 import { spawnDeathEffect, updateDeathEffects, renderDeathEffects } from "./enemy-death-fx";
 import { onCorrectKey, onWrongKey, onComboMilestone, updateKeystrokeImpact, renderImpactRings, getEnemyShakeOffset, getEnemyErrorFlash, renderComboMilestones } from "./keystroke-impact";
+import { initKeystrokeSound, playKeystrokeNote, renderSoundVisualizer } from "./keystroke-sound";
 import { onCorrectKeystroke, onIncorrectKeystroke, updateRhythm, renderRhythmBar, renderFlowAura, renderSpeedRing, resetRhythm, getFlowLevel } from "./typing-rhythm-visual";
 import { createMusicEngine } from "./music-engine";
 import { DynamicMusicManager } from "./dynamic-music";
@@ -530,6 +531,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     function drawHUD(ctx: CanvasRenderingContext2D, w: number, h: number, time: number): void {
         renderDangerIndicator(ctx, w, h);
         renderRhythmBar(ctx, w, h, time);
+        renderSoundVisualizer(ctx, w, h, time);
         drawEnhancedHud(ctx, w, h, time, state, copy);
         // FPS counter (bottom-right, subtle)
         // Gamepad indicator (bottom-right, above FPS)
@@ -1101,7 +1103,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                         return; // skip normal kill effects
                     }
                     const enemy = state.enemies.find((en: any) => en.id === evt.enemyId);
-                    playKillSound(enemy?.type); haptic(15); onCorrectKeystroke(); onCorrectKey(enemy.x, enemy.y, state.combo);
+                    playKillSound(enemy?.type); haptic(15); onCorrectKeystroke(); playKeystrokeNote(e.key, true); onCorrectKey(enemy.x, enemy.y, state.combo);
                     playComboSound(state.combo);
                     if (enemy) {
                         typingFeedback.onWordComplete(evt.enemyId, enemy.word, enemy.x, enemy.y, (COLORS as any)[enemy.type] || COLORS.normal);
