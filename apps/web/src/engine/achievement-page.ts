@@ -234,3 +234,6 @@ export function renderAchievementPage(
     ctx.fillText("�� �� switch categories  |  �� �� scroll  |  A/Esc close", w / 2, h - 15);
 }
 
+
+
+
