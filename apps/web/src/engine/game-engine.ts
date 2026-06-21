@@ -45,6 +45,7 @@ import type { PowerUp, ActivePowerUp, PowerUpType } from "./power-up";
 import { TypingFeedbackManager } from "./typing-feedback";
 import { IdleScreenManager } from "./idle-screen";
 import { BattleVfxManager } from "./battle-vfx";
+import { initRhythmEngine, onTypingKeystroke, getTypingIntensity, startAmbient, stopAmbient, cleanup as cleanupRhythm } from "../components/game/rhythm-engine";
 
 // ---------------------------------------------------------------------------
 // Hue shift for dynamic background
@@ -1206,6 +1207,10 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         saveGameResult() { return buildGameResult(state); },
     };
 }
+
+
+
+
 
 
 
