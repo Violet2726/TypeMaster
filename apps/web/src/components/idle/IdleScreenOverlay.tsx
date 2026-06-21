@@ -17,9 +17,9 @@ interface GameMode {
 }
 
 const GAME_MODES: GameMode[] = [
-  { id: 'adventure', key: 'Enter', icon: '\u2694\uFE0F', label: '\u5192\u9669\u6A21\u5F0F', desc: '\u4E09\u5E55Roguelike\u6253\u5B57\u5192\u9669', color: '#0a84ff' },
-  { id: 'daily', key: 'D', icon: '\uD83D\uDCC5', label: '\u6BCF\u65E5\u6311\u6218', desc: '\u4ECA\u65E5\u7279\u522B\u8BCD\u5E93+\u6392\u884C', color: '#ff9f0a' },
-  { id: 'practice', key: 'P', icon: '\uD83C\uDFB2', label: '\u7EC3\u4E60\u6A21\u5F0F', desc: '\u65E0\u538B\u529B\u81EA\u7531\u6253\u5B57', color: '#34c759' },
+  { id: 'adventure', key: 'Enter', icon: '★', label: '冒险模式', desc: '三幕Roguelike打字冒险', color: '#0a84ff' },
+  { id: 'daily', key: 'D', icon: '◆', label: '每日挑战', desc: '今日特别词库+排行', color: '#ff9f0a' },
+  { id: 'practice', key: 'P', icon: '●', label: '练习模式', desc: '无压力自由打字', color: '#34c759' },
 ];
 
 // ---------------------------------------------------------------------------
@@ -91,12 +91,12 @@ export default function IdleScreenOverlay({ onAction }: IdleScreenOverlayProps) 
   }, [handleKey]);
 
   return (
-    <div className="idle-overlay" ref={containerRef}>
+    <div className="idle-overlay idle-overlay--dim" ref={containerRef}>
       {/* Hero */}
       <div className="idle-hero">
         <p className="idle-hero__eyebrow">TYPING MASTER</p>
-        <h1 className="idle-hero__title"><span>{'\u6253\u5B57\u7A81\u88AD'}</span></h1>
-        <p className="idle-hero__subtitle">{'\u7528\u952E\u76D8\u5F81\u670D\u4E00\u5207'}</p>
+        <h1 className="idle-hero__title"><span>{'打字突袭'}</span></h1>
+        <p className="idle-hero__subtitle">{'用键盘征服一切'}</p>
       </div>
 
       {/* Stats */}
@@ -104,19 +104,19 @@ export default function IdleScreenOverlay({ onAction }: IdleScreenOverlayProps) 
         <div className="idle-stats">
           <div className="idle-stats__item">
             <div className="idle-stats__value">{stats.totalGames}</div>
-            <div className="idle-stats__label">{'\u603B\u5C40\u6570'}</div>
+            <div className="idle-stats__label">{'总局数'}</div>
           </div>
           <div className="idle-stats__item">
             <div className="idle-stats__value">{stats.bestScore.toLocaleString()}</div>
-            <div className="idle-stats__label">{'\u6700\u9AD8\u5206'}</div>
+            <div className="idle-stats__label">{'最高分'}</div>
           </div>
           <div className="idle-stats__item">
             <div className="idle-stats__value">{stats.bestWpm}</div>
-            <div className="idle-stats__label">{'\u5CF0\u503CWPM'}</div>
+            <div className="idle-stats__label">{'峰值WPM'}</div>
           </div>
           <div className="idle-stats__item">
             <div className="idle-stats__value">{stats.avgAccuracy}%</div>
-            <div className="idle-stats__label">{'\u5E73\u5747\u51C6\u786E'}</div>
+            <div className="idle-stats__label">{'平均准确'}</div>
           </div>
         </div>
       )}
@@ -143,13 +143,13 @@ export default function IdleScreenOverlay({ onAction }: IdleScreenOverlayProps) 
 
       {/* CTA */}
       <button className="idle-cta" onClick={() => onAction('adventure')}>
-        <span className="idle-cta__key">{'\u23CE'}</span>
-        {'\u5F00\u59CB\u5192\u9669'}
+        <span className="idle-cta__key">{'⏎'}</span>
+        {'开始冒险'}
       </button>
 
       {/* Hint */}
       <div className="idle-hint">
-        <kbd>{'\u2190'}</kbd> <kbd>{'\u2192'}</kbd> {'\u5BFC\u822A'} &nbsp; <kbd>Enter</kbd> {'\u9009\u62E9'} &nbsp; {'\u6216\u76F4\u63A5\u70B9\u51FB\u5361\u7247'}
+        <kbd>{'←'}</kbd> <kbd>{'→'}</kbd> {'导航'} &nbsp; <kbd>Enter</kbd> {'选择'} &nbsp; {'或直接点击卡片'}
       </div>
     </div>
   );
