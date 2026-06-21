@@ -12,6 +12,7 @@ import {
     startWave, processSpawns, buildGameResult, getGameCopy,
     getEnemyTypeConfig, getComboMultiplier, commonWords, biasWordPool,
     calculatePerformanceScore, isBreathingWave,
+    getDailyChallenge, getDailyBestScore, saveDailyScore,
     getBossPhase, getBossPhaseSpeedMultiplier, getBossPhaseColor,
     checkBossPhaseTransition,
 } from "@typemaster/domain";
@@ -94,6 +95,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     let startTime = 0;
     let gameOverTime = 0;
     let lastCorrectEnemyIds: string[] = [];
+    let dailyChallenge: any = null; // Active daily challenge config
 
     // Pause/resume countdown
     let resumeCountdown = 0;
@@ -176,11 +178,11 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                         particles.emit({ x: leaked.x, y: canvasHeight - 20, count: 20, color: "#0a84ff", speed: 3, size: 3, glow: 0.8, trail: true });
                         shake.trigger(4);
                         // Restore the life that was lost
-                        state = { ...state, lives: Math.min(state.maxLives, state.lives + 1), enemiesLeaked: state.enemiesLeaked - 1 };
+                        state = { ...state, lives: Math.min(state.maxLives, state.lives + 1), enemiesLeaked: state.enemiesLeaked - 1 }; haptic(50);
                     } else {
                         particles.emit({ x: leaked.x, y: canvasHeight - 20, count: 15, color: COLORS.error, spread: Math.PI, speed: 2, gravity: 3, turbulence: 0.5, trail: true });
                         shake.trigger(8);
-                playWaveClearSound();
+                playWaveClearSound(); haptic([20, 40, 20]);
                     }
                 }
             }
@@ -243,6 +245,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                 music.setPlaying(false);
                 playGameOverSound();
                 const result = buildGameResult(state);
+                if (dailyChallenge) { saveDailyScore(dailyChallenge.date, result.score); }
                 saveGameRecord({ score: result.score, wave: result.wave, wpm: result.wpm, accuracy: result.accuracy, maxCombo: result.maxCombo, date: new Date().toLocaleDateString() });
             }
         });
@@ -354,6 +357,52 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
         ctx.font = "500 14px -apple-system, SF Pro Text, system-ui, sans-serif";
         ctx.fillStyle = COLORS.textTertiary;
         ctx.fillText(copy.start, w / 2, h / 2 + 50);
+
+        // Daily challenge panel (below main panel)
+        if (startProgress === 0) {
+            const daily = getDailyChallenge();
+            const dailyBest = getDailyBestScore(daily.date);
+            
+            const dpY = h / 2 + 100;
+            const dpW = 300;
+            const dpH = 70;
+            
+            drawGlassPanel(ctx, w / 2 - dpW / 2, dpY, dpW, dpH, 14);
+            
+            // Challenge type label
+            ctx.font = "600 11px -apple-system, SF Pro Text, system-ui, sans-serif";
+            ctx.fillStyle = "#ffd700";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "top";
+            ctx.fillText("DAILY CHALLENGE", w / 2, dpY + 10);
+            
+            // Challenge name
+            ctx.font = "700 16px -apple-system, SF Pro Display, system-ui, sans-serif";
+            ctx.fillStyle = COLORS.text;
+            ctx.fillText(daily.nameZh, w / 2, dpY + 28);
+            
+            // Challenge description
+            ctx.font = "400 10px -apple-system, SF Pro Text, system-ui, sans-serif";
+            ctx.fillStyle = COLORS.textSecondary;
+            ctx.fillText(daily.desc, w / 2, dpY + 48);
+            
+            // Best score for today
+            if (dailyBest > 0) {
+                ctx.font = "600 9px -apple-system, SF Pro Text, system-ui, sans-serif";
+                ctx.fillStyle = "#ffd700";
+                ctx.textAlign = "right";
+                ctx.fillText("BEST: " + dailyBest, w / 2 + dpW / 2 - 10, dpY + 10);
+            }
+            
+            // Press D hint
+            const dpPulse = Math.sin(time * 0.004) * 0.2 + 0.6;
+            ctx.globalAlpha = dpPulse;
+            ctx.font = "500 10px -apple-system, SF Pro Text, system-ui, sans-serif";
+            ctx.fillStyle = COLORS.textTertiary;
+            ctx.textAlign = "center";
+            ctx.fillText("Press D to play daily challenge", w / 2, dpY + dpH + 18);
+            ctx.globalAlpha = 1;
+        }
 
         if (startProgress > 0 && startProgress < 1) ctx.restore();
     }
@@ -775,7 +824,12 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     }
 
     // Easing function: overshoot for spawn
-    function easeOutBack(t: number): number {
+    // Haptic feedback via Vibration API (mobile)
+    function haptic(pattern: number | number[]) {
+        try { if (navigator.vibrate) navigator.vibrate(pattern); } catch {}
+    }
+
+        function easeOutBack(t: number): number {
         const c1 = 1.70158;
         const c3 = c1 + 1;
         return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
@@ -786,6 +840,22 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
     function handleKey(e: KeyboardEvent): void {
         if (state.mode === "idle") {
             if (e.key === "Escape") return;
+            // Daily challenge mode
+            if (e.key === "d" || e.key === "D") {
+                dailyChallenge = getDailyChallenge();
+                initSound();
+                showTutorial();
+                music.start();
+                const s = getSettings();
+                music.setVolume(s.volume / 100);
+                music.setPlaying(s.musicEnabled);
+                setSfxEnabled(s.sfxEnabled);
+                startTime = performance.now();
+                state = transitionGameMode(state, "start");
+                state = { ...state, _dailyChallenge: dailyChallenge } as any;
+                { const perfScore = calculatePerformanceScore(state); state = { ...state, _performanceScore: perfScore } as any; state = startWave(state, pool, { canvasWidth, canvasHeight, kps: state.kps, performanceScore: perfScore }); }
+                return;
+            }
         if (e.key === "h" || e.key === "H") { openStats(); return; }
             initSound();
             showTutorial();
@@ -949,7 +1019,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                         return; // skip normal kill effects
                     }
                     const enemy = state.enemies.find((en: any) => en.id === evt.enemyId);
-                    playKillSound(enemy?.type);
+                    playKillSound(enemy?.type); haptic(15);
                     playComboSound(state.combo);
                     if (enemy) {
                         const color = (COLORS as any)[enemy.type] || COLORS.normal;
@@ -958,7 +1028,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                         particles.emit({ x: enemy.x, y: enemy.y, count: 20 + chainBonus * 5, color, speed: 3 + chainBonus, size: 3 + chainBonus * 0.5, gravity: 2, turbulence: 0.5 + chainCount * 0.1, trail: true, trailLength: 6 + chainBonus * 2 });
                         particles.emit({ x: enemy.x, y: enemy.y, count: 8 + chainBonus * 2, color: "#ffffff", speed: 2, size: 2, lifetime: 0.4 });
                         shake.trigger(4 + chainBonus * 2);
-                        triggerComboFlash(state.combo);
+                        triggerComboFlash(state.combo); if (state.combo % 5 === 0 && state.combo > 0) haptic([10, 30, 10]);
                         if (chainCount > 1) playChainSound(chainCount);
 
                         // Chain kill tracking
@@ -998,7 +1068,7 @@ export function createGameEngine(wordPool?: string[]): GameEngine {
                                 const phaseColor = getBossPhaseColor(newPhase);
                                 particles.emit({ x: canvasWidth / 2, y: canvasHeight / 2, count: 40, color: phaseColor, speed: 6, size: 4, glow: 0.9, trail: true, trailLength: 15 });
                                 particles.emit({ x: enemy.x, y: enemy.y, count: 30, color: "#ffffff", speed: 5, size: 3, lifetime: 0.8 });
-                                scorePopups.emit({ x: canvasWidth / 2, y: canvasHeight / 2 - 40, text: "PHASE " + newPhase + "!", color: phaseColor, fontSize: 28 });
+                                scorePopups.emit({ x: canvasWidth / 2, y: canvasHeight / 2 - 40, text: "PHASE " + newPhase + "!", color: phaseColor, fontSize: 28 }); haptic([30, 20, 30, 20, 30]);
                                 hitlagTimer = HITLAG_DURATION * 3; // Extra hitlag for phase transition
                             }
                         }
