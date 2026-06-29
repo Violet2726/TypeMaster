@@ -6,9 +6,9 @@ import {
     updateRaidState
 } from '@typemaster/domain';
 
-export type RaidPhase = 'idle' | 'playing' | 'paused' | 'complete' | 'gameover';
-export type RaidMode = 'standard' | 'daily-focus';
-export type RaidCommand = 'start' | 'pause' | 'resume' | 'retry' | 'quit' | 'type-char';
+export type RaidPhase = 'idle' | 'playing' | 'paused' | 'gameover';
+export type RaidMode = 'endless' | 'daily-focus';
+export type RaidCommand = 'start' | 'pause' | 'resume' | 'retry' | 'quit' | 'extract' | 'type-char';
 
 export interface RaidEngineOptions {
     language?: string;
@@ -48,7 +48,7 @@ export function createGameEngine(options: RaidEngineOptions = {}): GameEngine {
     let height = 600;
     let engineOptions: RaidEngineOptions = {
         language: 'zh-CN',
-        raidMode: 'standard',
+        raidMode: 'endless',
         seed: `raid-${todaySeed()}`,
         focusChars: [],
         ...options
@@ -66,11 +66,11 @@ export function createGameEngine(options: RaidEngineOptions = {}): GameEngine {
             engineOptions = {
                 ...engineOptions,
                 ...payload,
-                raidMode: (payload.raidMode as RaidMode) || engineOptions.raidMode || 'standard',
+                raidMode: (payload.raidMode as RaidMode) || engineOptions.raidMode || 'endless',
                 seed: (payload.seed as string) || (
                     payload.raidMode === 'daily-focus'
                         ? `daily-${todaySeed()}`
-                        : `raid-${Date.now().toString(36)}`
+                        : `endless-${Date.now().toString(36)}`
                 )
             };
         }
@@ -105,10 +105,10 @@ export function createGameEngine(options: RaidEngineOptions = {}): GameEngine {
 
         if (key === 'Enter' && state.phase === 'idle') {
             event.preventDefault();
-            return dispatch('start', { raidMode: 'standard' });
+            return dispatch('start', { raidMode: 'endless' });
         }
 
-        if ((key === 'r' || key === 'R') && (state.phase === 'complete' || state.phase === 'gameover')) {
+        if ((key === 'r' || key === 'R') && state.phase === 'gameover') {
             event.preventDefault();
             return dispatch('retry');
         }
