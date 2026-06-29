@@ -29,7 +29,6 @@ export function AppFrame({ children }: AppFrameProps) {
     } = useAppShellStore();
     const {
         closeSettings,
-        hasTrainingPlan,
         openSettings,
         settingsOpen,
         toggleTheme
@@ -45,18 +44,39 @@ export function AppFrame({ children }: AppFrameProps) {
     const isPracticeRoute = pathname === '/practice';
     const isFocusedLayout = settings.focusMode && isPracticeRoute;
     const route = getRouteForPath(pathname || '/');
+    const isFullscreenLayout = route.layout === 'fullscreen';
     const footerText = useMemo(() => (
         isFocusedLayout
             ? copy.shell.footerFocus
             : `${copy.common.appName}${getInlineSeparator(settings.language)}${copy.shell.footerDefault}`
     ), [copy, isFocusedLayout, settings.language]);
 
+    if (isFullscreenLayout) {
+        return (
+            <div className={`app-shell app-shell--${route.id} app-shell--fullscreen ${settingsOpen ? 'is-settings-open' : ''}`}>
+                {children}
+                <SettingsDrawer
+                    isOpen={settingsOpen}
+                    settings={settings}
+                    copy={copy}
+                    account={account}
+                    accountStatus={accountStatus}
+                    onClose={closeSettings}
+                    onChange={updateSettings}
+                    onSignIn={signInToAccount}
+                    onSignOut={signOutFromAccount}
+                    onExportData={exportTrainingData}
+                    onImportData={importTrainingData}
+                />
+            </div>
+        );
+    }
+
     return (
         <div className={`app-shell app-shell--${route.id} ${isFocusedLayout ? 'is-focus-layout' : ''} ${settingsOpen ? 'is-settings-open' : ''}`}>
             <Header
                 settings={settings}
                 copy={copy}
-                hasTrainingPlan={hasTrainingPlan}
                 onToggleTheme={toggleTheme}
                 onOpenSettings={openSettings}
             />

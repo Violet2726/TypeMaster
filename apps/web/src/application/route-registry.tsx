@@ -1,7 +1,7 @@
-import { BarChart3, Brain, Home, Keyboard, Swords, Target } from 'lucide-react';
+import { BarChart3, Flag, Home, Keyboard, Swords } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
-export type ShellRouteId = 'today' | 'practice' | 'plan' | 'challenge' | 'insights' | 'raid' | 'result';
+export type ShellRouteId = 'today' | 'raid' | 'practice' | 'missions' | 'insights' | 'result';
 export type ShellLayoutMode = 'standard' | 'focus' | 'fullscreen';
 
 export type ShellRoute = {
@@ -9,10 +9,8 @@ export type ShellRoute = {
     href: string,
     icon: LucideIcon,
     labelKey?: 'home' | 'practice' | 'insights',
-    trainingLabelKey?: 'plan' | 'challenge',
     fallbackLabel: string,
     showInNav: boolean,
-    requiresPlan?: boolean,
     layout: ShellLayoutMode
 };
 
@@ -27,40 +25,28 @@ export const SHELL_ROUTES: ShellRoute[] = [
         layout: 'standard'
     },
     {
-        id: 'practice',
-        href: '/practice',
-        icon: Keyboard,
-        labelKey: 'practice',
-        fallbackLabel: 'Practice',
-        showInNav: true,
-        layout: 'focus'
-    },
-    {
-        id: 'plan',
-        href: '/plan',
-        icon: Brain,
-        trainingLabelKey: 'plan',
-        fallbackLabel: 'Plan',
-        showInNav: true,
-        requiresPlan: true,
-        layout: 'standard'
-    },
-    {
-        id: 'challenge',
-        href: '/challenge',
-        icon: Target,
-        trainingLabelKey: 'challenge',
-        fallbackLabel: 'Challenge',
-        showInNav: true,
-        layout: 'standard'
-    },
-    {
         id: 'raid',
-        href: '/game',
+        href: '/raid',
         icon: Swords,
         fallbackLabel: 'Raid',
         showInNav: true,
         layout: 'fullscreen'
+    },
+    {
+        id: 'practice',
+        href: '/practice',
+        icon: Keyboard,
+        fallbackLabel: 'Focus Lab',
+        showInNav: true,
+        layout: 'focus'
+    },
+    {
+        id: 'missions',
+        href: '/missions',
+        icon: Flag,
+        fallbackLabel: 'Missions',
+        showInNav: true,
+        layout: 'standard'
     },
     {
         id: 'insights',
@@ -89,8 +75,6 @@ export function getRouteForPath(pathname = '/') {
     )) || SHELL_ROUTES[0];
 }
 
-export function getVisibleShellRoutes(hasTrainingPlan: boolean) {
-    return SHELL_ROUTES.filter((route) => (
-        route.showInNav && (!route.requiresPlan || hasTrainingPlan)
-    ));
+export function getVisibleShellRoutes() {
+    return SHELL_ROUTES.filter((route) => route.showInNav);
 }

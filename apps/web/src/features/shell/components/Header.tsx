@@ -7,7 +7,6 @@ import { IconButton } from '@typemaster/ui';
 import { StoredSettingsSchema } from '@typemaster/contracts/storage';
 import { getVisibleShellRoutes } from '../../../application/route-registry';
 import { getCopy } from '../../../i18n';
-import { getTrainingCopy } from '../../../training/copy';
 
 type Settings = ReturnType<typeof StoredSettingsSchema.parse>;
 type AppCopy = ReturnType<typeof getCopy>;
@@ -15,18 +14,13 @@ type AppCopy = ReturnType<typeof getCopy>;
 type HeaderProps = {
     settings: Settings,
     copy: AppCopy,
-    hasTrainingPlan?: boolean,
     onToggleTheme: () => void,
     onOpenSettings: () => void,
 };
 
-function resolveRouteLabel(route, copy: AppCopy, trainingCopy: any) {
+function resolveRouteLabel(route, copy: AppCopy) {
     if (route.labelKey) {
         return copy.nav[route.labelKey] || route.fallbackLabel;
-    }
-
-    if (route.trainingLabelKey) {
-        return trainingCopy.nav[route.trainingLabelKey] || route.fallbackLabel;
     }
 
     return route.fallbackLabel;
@@ -43,14 +37,13 @@ function getNavProps(pathname: string, href: string) {
     };
 }
 
-export function Header({ settings, copy, hasTrainingPlan = false, onToggleTheme, onOpenSettings }: HeaderProps) {
+export function Header({ settings, copy, onToggleTheme, onOpenSettings }: HeaderProps) {
     const pathname = usePathname();
     const compact = settings.focusMode && pathname === '/practice';
-    const trainingCopy = getTrainingCopy(settings.language);
     const ThemeIcon = settings.theme === 'serika-dark' ? Sun : Moon;
-    const navItems = getVisibleShellRoutes(hasTrainingPlan).map((route) => ({
+    const navItems = getVisibleShellRoutes().map((route) => ({
         ...route,
-        label: resolveRouteLabel(route, copy, trainingCopy)
+        label: resolveRouteLabel(route, copy)
     }));
 
     return (
