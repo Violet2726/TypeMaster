@@ -211,29 +211,27 @@ export const SessionSourceTextMetaSchema = z.object({
 export const TrainingSurfaceSchema = z.enum([
     'today',
     'practice',
-    'diagnostic',
-    'plan',
-    'challenge',
+    'missions',
     'insights',
     'raid',
-    'result',
-    'coach'
+    'result'
 ]);
 
 export const SessionIntentSchema = z.enum([
     'free-practice',
-    'diagnostic-assessment',
-    'plan-step',
-    'challenge-attempt',
-    'raid-standard',
-    'raid-daily-focus',
+    'baseline-mission',
+    'daily-mission',
+    'focus-drill',
+    'challenge-mission',
+    'endless-raid',
+    'daily-focus-raid',
     'adaptive-drill',
     'keyboard-zone-drill',
     'recovery-drill'
 ]);
 
 export const SessionTrainingMetaSchema = z.object({
-    type: z.enum(['free', 'diagnostic', 'plan', 'challenge', 'raid']).optional(),
+    type: z.enum(['free', 'practice', 'mission', 'raid']).optional(),
     surface: TrainingSurfaceSchema.optional(),
     intent: SessionIntentSchema.optional(),
     focus: z.string().nullable().optional(),
@@ -244,6 +242,14 @@ export const SessionTrainingMetaSchema = z.object({
 
 export const SessionRecordSchema = z.object({
     id: z.string(),
+    kind: z.enum(['raid', 'practice', 'mission']).optional(),
+    intent: SessionIntentSchema.optional(),
+    startedAt: z.string().optional(),
+    completedAt: z.string().optional(),
+    durationSeconds: z.number().optional(),
+    focus: z.string().nullable().optional(),
+    source: z.string().optional(),
+    gameMeta: z.record(z.unknown()).optional(),
     config: TrainingConfigSchema.optional(),
     result: SessionResultSchema.optional(),
     timeline: SessionTimelineSchema.optional(),

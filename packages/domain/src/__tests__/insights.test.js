@@ -152,6 +152,10 @@ describe('insights.js', () => {
                         type: 'raid',
                         surface: 'raid',
                         score: 2400,
+                        threatLevel: 6,
+                        durationSeconds: 420,
+                        endReason: 'extract',
+                        monstersDefeated: 44,
                         maxCombo: 24,
                         perfectWaves: 2,
                         focusChars: ['a', 's']
@@ -175,6 +179,9 @@ describe('insights.js', () => {
                 count: 1,
                 bestScore: 2400,
                 maxCombo: 24,
+                highestThreatLevel: 6,
+                longestDurationSeconds: 420,
+                extractionRate: 100,
                 perfectWaves: 2,
                 focusChars: ['a', 's']
             });

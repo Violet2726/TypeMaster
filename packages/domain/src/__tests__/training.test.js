@@ -64,7 +64,9 @@ describe('training.js', () => {
                     type: 'raid',
                     surface: 'raid',
                     score: 3200,
-                    maxCombo: 28
+                    maxCombo: 28,
+                    threatLevel: 6,
+                    durationSeconds: 420
                 },
                 result: {
                     wpm: 54,
@@ -94,6 +96,8 @@ describe('training.js', () => {
         });
         expect(profile.metrics.raidBestScore).toBe(3200);
         expect(profile.metrics.raidMaxCombo).toBe(28);
+        expect(profile.metrics.raidHighestThreatLevel).toBe(6);
+        expect(profile.metrics.raidLongestDurationSeconds).toBe(420);
     });
 
     it('creates a 7-day starter plan and advances through it', () => {

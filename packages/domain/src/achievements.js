@@ -62,7 +62,7 @@ export function buildAchievements({
         {
             id: 'first-raid',
             title: 'First Raid',
-            description: 'Complete your first Typing Raid game.',
+            description: 'Finish your first Endless Raid run.',
             unlockedAt: firstMatchDate(safeSessions, (session) => session?.trainingMeta?.type === 'raid')
         },
         {
@@ -73,15 +73,25 @@ export function buildAchievements({
         },
         {
             id: 'wave-10',
-            title: 'Wave Survivor',
-            description: 'Survive to wave 10 in Typing Raid.',
-            unlockedAt: firstMatchDate(safeSessions, (session) => session?.trainingMeta?.type === 'raid' && (session?.trainingMeta?.wave || 0) >= 10)
+            title: 'Threat Survivor',
+            description: 'Survive to Threat Level 10 in Endless Raid.',
+            unlockedAt: firstMatchDate(safeSessions, (session) => (
+                session?.trainingMeta?.type === 'raid'
+                && (session?.trainingMeta?.threatLevel || session?.trainingMeta?.wave || 0) >= 10
+            ))
         },
         {
             id: 'raid-perfect',
-            title: 'Perfect Raid',
-            description: 'Complete a Typing Raid wave without losing any lives.',
-            unlockedAt: firstMatchDate(safeSessions, (session) => session?.trainingMeta?.type === 'raid' && (session?.trainingMeta?.perfectWaves || 0) > 0)
+            title: 'Clean Extraction',
+            description: 'Extract from Endless Raid with lives remaining.',
+            unlockedAt: firstMatchDate(safeSessions, (session) => (
+                session?.trainingMeta?.type === 'raid'
+                && (
+                    session?.trainingMeta?.endReason === 'extract'
+                    || (session?.trainingMeta?.perfectWaves || 0) > 0
+                )
+                && (session?.trainingMeta?.livesRemaining ?? 1) > 0
+            ))
         },
         {
             id: 'raid-1000',

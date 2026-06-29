@@ -1,17 +1,35 @@
-export const API_FALLBACK_CACHE_KEY = 'typemaster:v5:api-fallback-cache';
+export const API_FALLBACK_CACHE_KEY = 'typemaster:v6:api-fallback-cache';
 export const API_BASE = '/api';
 export const REMOTE_API_FLAG = '1';
 export const SESSION_LIMIT = 50;
 
 export const STORAGE_KEYS = {
-    settings: 'typemaster:v5:preferences',
-    sessions: 'typemaster:v5:sessions-cache',
-    coachAdvices: 'typemaster:v5:coach-cache',
-    skillProfile: 'typemaster:v5:skill-profile-cache',
-    trainingPlan: 'typemaster:v5:training-plan-cache',
-    diagnosticJourney: 'typemaster:v5:diagnostic-resume',
-    activeSessionContext: 'typemaster:v5:active-session-context'
+    install: 'typemaster:v6:install',
+    settings: 'typemaster:v6:settings',
+    sessions: 'typemaster:v6:sessions',
+    coachAdvices: 'typemaster:v6:coach-advice-cache',
+    skillProfile: 'typemaster:v6:skill-profile-cache',
+    trainingPlan: 'typemaster:v6:missions-cache',
+    achievements: 'typemaster:v6:achievements-cache',
+    diagnosticJourney: 'typemaster:v6:baseline-mission-cache',
+    activeSessionContext: 'typemaster:v6:active-mission-context'
 };
+
+export const OBSOLETE_STORAGE_KEYS = [
+    'typemaster:v5:preferences',
+    'typemaster:v5:sessions-cache',
+    'typemaster:v5:coach-cache',
+    'typemaster:v5:skill-profile-cache',
+    'typemaster:v5:training-plan-cache',
+    'typemaster:v5:diagnostic-resume',
+    'typemaster:v5:active-session-context',
+    'typemaster:v5:api-fallback-cache',
+    'typemaster-stats',
+    'typing-raid-history',
+    'typing-raid-settings',
+    'typing-raid-profile',
+    'typing-raid-achievements'
+];
 
 export const CHALLENGE_TEXT_BY_LANGUAGE = {
     'zh-CN': 'steady focus clear rhythm numbers 2048 calm punctuation smooth control steady finish daily challenge mode active',

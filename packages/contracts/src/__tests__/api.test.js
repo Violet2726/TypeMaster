@@ -56,7 +56,7 @@ describe('api contracts', () => {
                 }
             }).bundle
         ).toMatchObject({
-            version: 1,
+            version: 6,
             sessions: [{ id: 'session-1' }]
         });
 

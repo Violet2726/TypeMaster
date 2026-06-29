@@ -271,19 +271,22 @@ describe('training state contracts', () => {
         });
     });
 
-    test('parses training surface and session intent metadata compatibly', () => {
+    test('parses vNext training surface and session intent metadata', () => {
         expect(TrainingSurfaceSchema.parse('practice')).toBe('practice');
-        expect(SessionIntentSchema.parse('raid-daily-focus')).toBe('raid-daily-focus');
+        expect(TrainingSurfaceSchema.parse('missions')).toBe('missions');
+        expect(SessionIntentSchema.parse('endless-raid')).toBe('endless-raid');
+        expect(SessionIntentSchema.parse('daily-focus-raid')).toBe('daily-focus-raid');
+        expect(SessionIntentSchema.parse('baseline-mission')).toBe('baseline-mission');
 
         expect(SessionTrainingMetaSchema.parse({
-            type: 'free',
+            type: 'practice',
             surface: 'practice',
             intent: 'adaptive-drill',
             focus: 'accuracy',
             sourceSessionId: 'session-0',
             title: 'Adaptive accuracy drill'
         })).toMatchObject({
-            type: 'free',
+            type: 'practice',
             surface: 'practice',
             intent: 'adaptive-drill',
             focus: 'accuracy',
@@ -292,15 +295,26 @@ describe('training state contracts', () => {
 
         expect(normalizeSessionRecord({
             id: 'session-free',
+            kind: 'practice',
+            intent: 'free-practice',
+            startedAt: '2026-06-08T08:00:00.000Z',
+            completedAt: '2026-06-08T08:01:00.000Z',
+            durationSeconds: 60,
+            focus: 'speed',
+            source: 'builtin',
             trainingMeta: {
-                type: 'free',
+                type: 'practice',
                 surface: 'practice',
                 intent: 'free-practice'
             }
-        }).trainingMeta).toMatchObject({
-            type: 'free',
-            surface: 'practice',
-            intent: 'free-practice'
+        })).toMatchObject({
+            kind: 'practice',
+            intent: 'free-practice',
+            trainingMeta: {
+                type: 'practice',
+                surface: 'practice',
+                intent: 'free-practice'
+            }
         });
     });
 });

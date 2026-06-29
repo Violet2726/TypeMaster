@@ -232,6 +232,9 @@ function buildRaidSummary(sessions) {
             count: 0,
             bestScore: 0,
             maxCombo: 0,
+            highestThreatLevel: 0,
+            longestDurationSeconds: 0,
+            extractionRate: 0,
             perfectWaves: 0,
             focusChars: []
         };
@@ -241,10 +244,15 @@ function buildRaidSummary(sessions) {
         raidSessions.flatMap((session) => session?.trainingMeta?.focusChars || session?.result?.topErrorChars || [])
     ), 5).map((item) => item.label);
 
+    const extractCount = raidSessions.filter((session) => session?.trainingMeta?.endReason === 'extract').length;
+
     return {
         count: raidSessions.length,
         bestScore: Math.max(...raidSessions.map((session) => session?.trainingMeta?.score || session?.result?.score || 0)),
         maxCombo: Math.max(...raidSessions.map((session) => session?.trainingMeta?.maxCombo || 0)),
+        highestThreatLevel: Math.max(...raidSessions.map((session) => session?.trainingMeta?.threatLevel || session?.trainingMeta?.wave || 0)),
+        longestDurationSeconds: Math.max(...raidSessions.map((session) => session?.trainingMeta?.durationSeconds || session?.result?.durationSeconds || 0)),
+        extractionRate: Math.round((extractCount / raidSessions.length) * 100),
         perfectWaves: raidSessions.reduce((sum, session) => sum + Number(session?.trainingMeta?.perfectWaves || 0), 0),
         focusChars
     };

@@ -4,7 +4,7 @@ import { buildAchievements } from '../achievements.js';
 function makeRaidSession(overrides = {}) {
     return {
         id: 'raid-1',
-        trainingMeta: { type: 'raid', maxCombo: 10, wave: 5, perfectWaves: 1 },
+        trainingMeta: { type: 'raid', maxCombo: 10, threatLevel: 5, endReason: 'extract', livesRemaining: 2 },
         result: { completedAt: '2026-06-20T12:00:00Z', score: 500, wpm: 60, accuracy: 95 },
         ...overrides
     };
@@ -53,7 +53,7 @@ describe('Game achievements', () => {
     });
 
     it('combo-20 unlocks when maxCombo >= 20', () => {
-        const result = buildAchievements({ sessions: [makeRaidSession({ trainingMeta: { type: 'raid', maxCombo: 20, wave: 5 } })] });
+        const result = buildAchievements({ sessions: [makeRaidSession({ trainingMeta: { type: 'raid', maxCombo: 20, threatLevel: 5 } })] });
         const combo = result.find((a) => a.id === 'combo-20');
         expect(combo.unlocked).toBe(true);
     });
@@ -64,14 +64,14 @@ describe('Game achievements', () => {
         expect(combo.unlocked).toBe(false);
     });
 
-    it('wave-10 unlocks when wave >= 10', () => {
-        const result = buildAchievements({ sessions: [makeRaidSession({ trainingMeta: { type: 'raid', wave: 10 } })] });
+    it('wave-10 unlocks when threatLevel >= 10', () => {
+        const result = buildAchievements({ sessions: [makeRaidSession({ trainingMeta: { type: 'raid', threatLevel: 10 } })] });
         const wave = result.find((a) => a.id === 'wave-10');
         expect(wave.unlocked).toBe(true);
     });
 
-    it('raid-perfect unlocks when perfectWaves > 0', () => {
-        const result = buildAchievements({ sessions: [makeRaidSession({ trainingMeta: { type: 'raid', perfectWaves: 1 } })] });
+    it('raid-perfect unlocks when the player extracts cleanly', () => {
+        const result = buildAchievements({ sessions: [makeRaidSession({ trainingMeta: { type: 'raid', endReason: 'extract', livesRemaining: 2 } })] });
         const perfect = result.find((a) => a.id === 'raid-perfect');
         expect(perfect.unlocked).toBe(true);
     });

@@ -28,15 +28,13 @@ export const StoredDiagnosticJourneySchema = DiagnosticJourneySchema.nullable();
 export const StoredActiveSessionContextSchema = ActiveSessionContextSchema.nullable();
 
 export const TrainingDataBundleSchema = z.object({
-    version: z.literal(1).optional().default(1),
+    version: z.literal(6).optional().default(6),
     exportedAt: z.string().optional(),
     settings: StoredSettingsSchema.nullable().optional(),
     sessions: StoredSessionsSchema.optional().default([]),
     coachAdviceRecords: StoredCoachAdviceRecordsSchema.optional().default([]),
     skillProfile: StoredSkillProfileSchema.optional().default(null),
-    trainingPlan: StoredTrainingPlanSchema.optional().default(null),
-    diagnosticJourney: StoredDiagnosticJourneySchema.optional().default(null),
-    activeSessionContext: StoredActiveSessionContextSchema.optional().default(null)
+    trainingPlan: StoredTrainingPlanSchema.optional().default(null)
 }).catchall(z.unknown());
 
 export function parseStoredSettings(value) {

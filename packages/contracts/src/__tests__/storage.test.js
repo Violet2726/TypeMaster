@@ -50,7 +50,7 @@ describe('storage contracts', () => {
         });
 
         expect(parseTrainingDataBundle(bundle)).toMatchObject({
-            version: 1,
+            version: 6,
             settings: { language: 'en-US' },
             sessions: [{ id: 'session-1' }],
             coachAdviceRecords: [],
