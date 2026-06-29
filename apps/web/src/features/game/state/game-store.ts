@@ -2,12 +2,14 @@ import { useMemo } from 'react';
 import { usePlanSnapshot } from '../../../store/app-state-derived';
 import { useHistorySnapshot } from '../../../store/app-state-derived';
 import { useShellSnapshot } from '../../../store/app-state-derived';
+import { useAppActions } from '../../../store/use-app-action-set';
 import { buildKeyboardHotspots, buildInsights } from '@typemaster/domain';
 
 export function useGameStore() {
     const plan = usePlanSnapshot();
     const history = useHistorySnapshot();
     const shell = useShellSnapshot();
+    const { sessionActions } = useAppActions();
 
     const skillProfile = plan.skillProfile;
     const sessions = history.sessions;
@@ -43,11 +45,16 @@ export function useGameStore() {
         if (!sessions || sessions.length === 0) return null;
         return buildInsights(sessions.slice(0, 30));
     }, [sessions]);
+    const raidBestScore = useMemo(() => Math.max(0, ...(sessions || [])
+        .filter((session: any) => session?.trainingMeta?.type === 'raid')
+        .map((session: any) => Number(session?.trainingMeta?.score || session?.result?.score || 0))), [sessions]);
 
     return {
         skillProfile,
         keyboardHotspots,
         insights,
-        language
+        language,
+        raidBestScore,
+        recordCompletedRaidSession: sessionActions.recordCompletedRaidSession
     };
 }

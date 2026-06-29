@@ -128,6 +128,7 @@ export function useInsightsPageModel({
     sessions,
     sessionStreak,
     skillProfile,
+    startDiagnosticJourney,
     startKeyboardZoneDrill,
     weeklyGoal,
     weeklySessions
@@ -149,10 +150,15 @@ export function useInsightsPageModel({
         navigate('/practice');
         return draft;
     }, [insights.keyboardHotspots.primaryZone, navigate, startKeyboardZoneDrill]);
+    const handleAssessment = useCallback(() => {
+        startDiagnosticJourney();
+        navigate('/practice');
+    }, [navigate, startDiagnosticJourney]);
 
     return {
         achievements,
         copy,
+        handleAssessment,
         handleKeyboardZoneDrill,
         insights,
         language,

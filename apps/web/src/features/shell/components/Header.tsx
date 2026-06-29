@@ -2,8 +2,10 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Moon, Sun, Home, Keyboard, Target, BarChart3, Brain, Settings } from 'lucide-react';
+import { Moon, Settings, Sun } from 'lucide-react';
+import { IconButton } from '@typemaster/ui';
 import { StoredSettingsSchema } from '@typemaster/contracts/storage';
+import { getVisibleShellRoutes } from '../../../application/route-registry';
 import { getCopy } from '../../../i18n';
 import { getTrainingCopy } from '../../../training/copy';
 
@@ -18,16 +20,16 @@ type HeaderProps = {
     onOpenSettings: () => void,
 };
 
-type NavItem = { href: string; label: string; icon: typeof Home; show: boolean };
+function resolveRouteLabel(route, copy: AppCopy, trainingCopy: any) {
+    if (route.labelKey) {
+        return copy.nav[route.labelKey] || route.fallbackLabel;
+    }
 
-function buildNavItems(copy: AppCopy, trainingCopy: any, hasTrainingPlan: boolean): NavItem[] {
-    return [
-        { href: '/', label: copy.nav.home, icon: Home, show: true },
-        { href: '/practice', label: copy.nav.practice, icon: Keyboard, show: true },
-        { href: '/plan', label: trainingCopy.nav.plan, icon: Brain, show: hasTrainingPlan },
-        { href: '/challenge', label: trainingCopy.nav.challenge, icon: Target, show: true },
-        { href: '/insights', label: copy.nav.insights, icon: BarChart3, show: true },
-    ].filter((item) => item.show);
+    if (route.trainingLabelKey) {
+        return trainingCopy.nav[route.trainingLabelKey] || route.fallbackLabel;
+    }
+
+    return route.fallbackLabel;
 }
 
 function getNavProps(pathname: string, href: string) {
@@ -46,8 +48,10 @@ export function Header({ settings, copy, hasTrainingPlan = false, onToggleTheme,
     const compact = settings.focusMode && pathname === '/practice';
     const trainingCopy = getTrainingCopy(settings.language);
     const ThemeIcon = settings.theme === 'serika-dark' ? Sun : Moon;
-    const themeLabel = settings.theme === 'serika-dark' ? copy.settings.themeLight : copy.settings.themeDark;
-    const navItems = buildNavItems(copy, trainingCopy, hasTrainingPlan);
+    const navItems = getVisibleShellRoutes(hasTrainingPlan).map((route) => ({
+        ...route,
+        label: resolveRouteLabel(route, copy, trainingCopy)
+    }));
 
     return (
         <>
@@ -69,24 +73,18 @@ export function Header({ settings, copy, hasTrainingPlan = false, onToggleTheme,
                     )}
 
                     <div className="nav-actions">
-                        <button
+                        <IconButton
                             className="nav-icon nav-icon--tool"
-                            type="button"
                             onClick={onToggleTheme}
-                            title={themeLabel}
-                            aria-label={copy.nav.toggleTheme}
-                        >
-                            <ThemeIcon aria-hidden="true" size={17} strokeWidth={2.2} />
-                        </button>
-                        <button
+                            label={copy.nav.toggleTheme}
+                            icon={ThemeIcon}
+                        />
+                        <IconButton
                             className="nav-icon nav-icon--tool"
-                            type="button"
                             onClick={onOpenSettings}
-                            title={copy.nav.openSettings}
-                            aria-label={copy.nav.openSettings}
-                        >
-                            <Settings aria-hidden="true" size={17} strokeWidth={2.2} />
-                        </button>
+                            label={copy.nav.openSettings}
+                            icon={Settings}
+                        />
                     </div>
                 </div>
             </header>

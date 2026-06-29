@@ -130,7 +130,7 @@ body[data-theme='serika-light'] .practice-workshop-shell {
 }
 
 body[data-theme='serika-light'] .segmented-group {
-    background: rgba(255, 255, 255, 0.62);
+    background: var(--tm-white-alpha-620);
 }
 
 .segment-btn {
@@ -171,7 +171,7 @@ body[data-theme='serika-light'] .segment-btn[aria-pressed='true'] {
 }
 
 body[data-theme='serika-light'] .segment-btn:hover {
-    background: rgba(255, 255, 255, 0.78);
+    background: var(--tm-white-alpha-780);
 }
 
 .config-strip__actions .ghost-btn {
@@ -214,7 +214,7 @@ body[data-theme='serika-light'] .segment-btn:hover {
 }
 
 body[data-theme='serika-light'] .typing-stage .words-shell {
-    background: rgba(255, 255, 255, 0.96);
+    background: var(--tm-white-alpha-960);
 }
 
 body[data-theme='serika-light'] .typing-stage--unavailable .words-shell {
@@ -408,7 +408,7 @@ body[data-theme='serika-light'] .typing-stage--unavailable .words-shell {
 .typing-empty-state__preview span:nth-child(3) { width: 52%; }
 
 body[data-theme='serika-light'] .typing-empty-state__step,
-body[data-theme='serika-light'] .typing-empty-state__preview { background: rgba(255, 255, 255, 0.82); }
+body[data-theme='serika-light'] .typing-empty-state__preview { background: var(--tm-white-alpha-820); }
 body[data-theme='serika-light'] .typing-empty-state__preview span { background: rgba(60, 60, 67, 0.14); }
 body[data-theme='serika-light'] .typing-empty-state__preview span:nth-child(1) { background: rgba(0, 113, 227, 0.38); }
 body[data-theme='serika-light'] .typing-empty-state__preview span:nth-child(2) { background: rgba(52, 199, 89, 0.3); }
@@ -425,7 +425,7 @@ body[data-theme='serika-light'] .typing-empty-state__preview span:nth-child(2) {
     background: var(--surface-2);
 }
 
-body[data-theme='serika-light'] .ai-custom-panel { background: rgba(255, 255, 255, 0.94); }
+body[data-theme='serika-light'] .ai-custom-panel { background: var(--tm-white-alpha-940); }
 
 .ai-custom-panel__head {
     display: grid;
@@ -520,7 +520,7 @@ body[data-theme='serika-light'] .ai-custom-panel { background: rgba(255, 255, 25
     background: var(--bg-soft);
 }
 
-body[data-theme='serika-light'] .ai-custom-panel--ai .workshop-field { background: rgba(255, 255, 255, 0.94); }
+body[data-theme='serika-light'] .ai-custom-panel--ai .workshop-field { background: var(--tm-white-alpha-940); }
 
 .workshop-field select,
 .workshop-field textarea {
@@ -529,7 +529,7 @@ body[data-theme='serika-light'] .ai-custom-panel--ai .workshop-field { backgroun
 }
 
 body[data-theme='serika-light'] .workshop-field select,
-body[data-theme='serika-light'] .workshop-field textarea { background: rgba(255, 255, 255, 0.96); }
+body[data-theme='serika-light'] .workshop-field textarea { background: var(--tm-white-alpha-960); }
 
 .workshop-field textarea { min-height: 8.6rem; line-height: 1.55; }
 
@@ -546,7 +546,7 @@ body[data-theme='serika-light'] .workshop-field textarea { background: rgba(255,
     background: var(--bg-soft);
 }
 
-body[data-theme='serika-light'] .ai-custom-panel__state { background: rgba(255, 255, 255, 0.94); }
+body[data-theme='serika-light'] .ai-custom-panel__state { background: var(--tm-white-alpha-940); }
 
 .ai-custom-panel__state::before {
     content: '';
@@ -599,7 +599,7 @@ body[data-theme='serika-light'] .ai-custom-panel__state-grid span { background: 
     background: var(--bg-soft);
 }
 
-body[data-theme='serika-light'] .custom-text-workshop__editor { background: rgba(255, 255, 255, 0.94); }
+body[data-theme='serika-light'] .custom-text-workshop__editor { background: var(--tm-white-alpha-940); }
 
 .custom-text-workshop__editor textarea { min-height: 10.6rem; resize: vertical; }
 
@@ -699,7 +699,7 @@ body[data-theme='serika-light'] .custom-text-workshop__editor { background: rgba
 }
 
 body[data-theme='serika-light'] .keyboard-hotspots__primary,
-body[data-theme='serika-light'] .keyboard-zone-row { background: rgba(255, 255, 255, 0.94); }
+body[data-theme='serika-light'] .keyboard-zone-row { background: var(--tm-white-alpha-940); }
 body[data-theme='serika-light'] .keyboard-zone-row__bar { background: rgba(0, 0, 0, 0.08); }
 
 /* --- Responsive --- */
