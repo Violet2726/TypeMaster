@@ -53,6 +53,10 @@
     font-weight: 650;
 }
 
+.raid-hud__metric span {
+    white-space: nowrap;
+}
+
 .raid-hud__metric--score {
     color: #ffd60a;
     min-width: 104px;
@@ -60,6 +64,12 @@
 
 .raid-hud__metric--combo {
     color: #ff9f0a;
+}
+
+.raid-hud__metric.is-ready {
+    color: #34c759;
+    border-color: rgba(52, 199, 89, 0.36);
+    background: rgba(52, 199, 89, 0.12);
 }
 
 .raid-hud__progress {
@@ -182,6 +192,14 @@
     line-height: 1;
     font-weight: 780;
     letter-spacing: 0;
+}
+
+.raid-panel__heading p {
+    max-width: 32rem;
+    margin: 4px auto 0;
+    color: var(--tm-white-alpha-640);
+    font-size: 13px;
+    line-height: 1.45;
 }
 
 .raid-pause-summary,
@@ -335,6 +353,17 @@
     background: #2997ff;
 }
 
+.raid-action--extract {
+    border-color: rgba(52, 199, 89, 0.38);
+    background: rgba(52, 199, 89, 0.14);
+    color: #7ee198;
+}
+
+.raid-action:disabled {
+    cursor: not-allowed;
+    opacity: 0.48;
+}
+
 .raid-action--quiet {
     flex: 0.9;
 }
@@ -349,18 +378,31 @@
     }
 
     .raid-hud__cluster {
-        min-height: 40px;
+        min-height: 44px;
         padding: 4px;
     }
 
-    .raid-hud__cluster--primary,
-    .raid-hud__cluster--secondary {
+    .raid-hud__cluster--primary {
         justify-content: space-between;
+    }
+
+    .raid-hud__cluster--secondary {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+        justify-content: stretch;
+    }
+
+    .raid-hud__cluster--secondary .raid-hud__metric,
+    .raid-hud__cluster--secondary .raid-hud__lives {
+        width: 100%;
+        min-width: 0;
+        justify-content: center;
     }
 
     .raid-hud__target {
         order: 3;
-        min-height: 40px;
+        min-height: 44px;
         padding: 4px 12px;
     }
 
@@ -399,7 +441,7 @@
     .raid-hud__metric {
         min-width: auto;
         padding: 0 8px;
-        min-height: 40px;
+        min-height: 44px;
     }
 
     .raid-hud__metric--score {
