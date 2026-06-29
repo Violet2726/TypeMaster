@@ -4,6 +4,7 @@ import InsightsPage from '../InsightsPage';
 import { renderWithProvider } from '../../test/render-with-provider';
 import { mockRouterPush, resetMockNavigation } from '../../test/next-navigation';
 import { usePracticeRuntimeStore } from '../../features/practice/state/practice-runtime-store';
+import { STORAGE_KEYS } from '@typemaster/contracts';
 
 describe('InsightsPage', () => {
     beforeEach(() => {
@@ -14,7 +15,7 @@ describe('InsightsPage', () => {
         renderWithProvider(<InsightsPage />, {
             route: '/insights',
             storageState: {
-                'typemaster:v5:preferences': {
+                [STORAGE_KEYS.settings]: {
                     language: 'en-US',
                     keyboardLayout: 'qwerty',
                     lastConfig: {
@@ -28,7 +29,7 @@ describe('InsightsPage', () => {
                         difficulty: 'medium'
                     }
                 },
-                'typemaster:v5:sessions-cache': []
+                [STORAGE_KEYS.sessions]: []
             }
         });
 
@@ -54,7 +55,7 @@ describe('InsightsPage', () => {
         renderWithProvider(<InsightsPage />, {
             route: '/insights',
             storageState: {
-                'typemaster:v5:preferences': {
+                [STORAGE_KEYS.settings]: {
                     language: 'en-US',
                     keyboardLayout: 'qwerty',
                     lastConfig: {
@@ -68,7 +69,7 @@ describe('InsightsPage', () => {
                         difficulty: 'medium'
                     }
                 },
-                'typemaster:v5:sessions-cache': [
+                [STORAGE_KEYS.sessions]: [
                     {
                         id: 'session-1',
                         config: { source: 'builtin' },
@@ -133,7 +134,7 @@ describe('InsightsPage', () => {
         renderWithProvider(<InsightsPage />, {
             route: '/insights',
             storageState: {
-                'typemaster:v5:preferences': {
+                [STORAGE_KEYS.settings]: {
                     language: 'en-US',
                     keyboardLayout: 'qwerty',
                     lastConfig: {
@@ -147,7 +148,7 @@ describe('InsightsPage', () => {
                         difficulty: 'medium'
                     }
                 },
-                'typemaster:v5:sessions-cache': [
+                [STORAGE_KEYS.sessions]: [
                     {
                         id: 'session-zone-latest',
                         config: { source: 'builtin' },

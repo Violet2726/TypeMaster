@@ -1,6 +1,7 @@
 import { describe, expect, test, vi } from 'vitest';
 import {
     publishChallengeAttempt,
+    recordRaidSessionCompletion,
     recordSessionCompletion,
     resolveSessionCompletionContext
 } from '../session-completion-use-cases';
@@ -125,9 +126,16 @@ describe('session completion use cases', () => {
         });
 
         expect(session.trainingMeta).toMatchObject({
-            type: 'plan',
+            type: 'mission',
+            surface: 'missions',
+            intent: 'focus-drill',
             stepId: 'step-1',
             title: 'Reset accuracy'
+        });
+        expect(session).toMatchObject({
+            kind: 'mission',
+            intent: 'focus-drill',
+            source: 'builtin'
         });
         expect(appendSessionMock).toHaveBeenCalledWith(session);
         expect(environment.setSessions).toHaveBeenCalledWith([session]);
@@ -185,7 +193,7 @@ describe('session completion use cases', () => {
         });
 
         expect(session.trainingMeta).toMatchObject({
-            type: 'free',
+            type: 'practice',
             surface: 'practice',
             intent: 'adaptive-drill',
             focus: 'accuracy',
@@ -194,6 +202,10 @@ describe('session completion use cases', () => {
         });
         expect(environment.setActiveSessionContext).toHaveBeenCalledWith(null);
         expect(appendSessionMock).toHaveBeenCalledWith(session);
+        expect(session).toMatchObject({
+            kind: 'practice',
+            intent: 'adaptive-drill'
+        });
     });
 
     test('does not submit a challenge result without a resolved challenge id', () => {
@@ -221,5 +233,69 @@ describe('session completion use cases', () => {
         expect(environment.setActiveSessionContext).toHaveBeenCalledWith(null);
         expect(environment.setDailyChallenge).not.toHaveBeenCalled();
         expect(submitChallengeResultMock).not.toHaveBeenCalled();
+    });
+
+    test('records Endless Raid results through the unified session writer', () => {
+        const environment = createPlanEnvironment({
+            activeSessionContext: null,
+            trainingPlan: null
+        });
+
+        const session = recordRaidSessionCompletion(environment, {
+            mode: 'endless',
+            score: 12400,
+            wpm: 78,
+            accuracy: 96,
+            durationSeconds: 514,
+            threatLevel: 7,
+            maxCombo: 34,
+            livesRemaining: 2,
+            monstersDefeated: 86,
+            eliteDefeated: 1,
+            enemiesLeaked: 3,
+            totalCharsTyped: 420,
+            totalCharsCorrect: 404,
+            focusChars: ['r', 't'],
+            weakestChars: ['t', '7'],
+            endReason: 'extract'
+        });
+
+        expect(session.sourceTextMeta).toMatchObject({
+            label: 'Endless Raid',
+            generatedBy: 'raid'
+        });
+        expect(session.trainingMeta).toMatchObject({
+            type: 'raid',
+            surface: 'raid',
+            intent: 'endless-raid',
+            score: 12400,
+            threatLevel: 7,
+            durationSeconds: 514,
+            monstersDefeated: 86,
+            eliteDefeated: 1,
+            endReason: 'extract',
+            focusChars: ['r', 't']
+        });
+        expect(session).toMatchObject({
+            kind: 'raid',
+            intent: 'endless-raid',
+            durationSeconds: 514,
+            gameMeta: {
+                threatLevel: 7,
+                monstersDefeated: 86,
+                eliteDefeated: 1,
+                endReason: 'extract'
+            }
+        });
+        expect(session.result).toMatchObject({
+            wpm: 78,
+            accuracy: 96,
+            durationSeconds: 514,
+            topErrorChars: ['t', '7']
+        });
+        expect(appendSessionMock).toHaveBeenCalledTimes(1);
+        expect(appendSessionMock).toHaveBeenCalledWith(session);
+        expect(saveSessionMock).toHaveBeenCalledWith(session);
+        expect(environment.setActiveSessionContext).toHaveBeenCalledWith(null);
     });
 });

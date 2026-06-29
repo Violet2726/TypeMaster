@@ -245,12 +245,12 @@ export function useHomePageModel({
         }
 
         if (action === 'planRoute') {
-            navigate('/plan');
+            navigate('/missions');
             return;
         }
 
         if (action === 'leaderboard') {
-            navigate('/challenge');
+            navigate('/missions');
             return;
         }
 

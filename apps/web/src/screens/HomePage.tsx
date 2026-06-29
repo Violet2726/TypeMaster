@@ -1,52 +1,39 @@
-﻿'use client';
+'use client';
 
 import type { ReactNode } from 'react';
-import { ArrowRight, BarChart3, CalendarClock, Gauge, Keyboard, ShieldCheck, Swords, Target, TrendingUp, Trophy } from 'lucide-react';
+import { BarChart3, DoorOpen, Flame, Gauge, Keyboard, ShieldCheck, Swords, Target, Trophy } from 'lucide-react';
 import { MetricStrip } from '@typemaster/ui';
 import { formatDateTime } from '../i18n';
 import { useAppNavigate } from '../application/use-app-navigate';
-import { useHomePageModel } from '../features/home/use-home-page-model';
 import { useHomePageStore } from '../store/app-state-selectors';
 import './home-page.css';
 
-function getHomeSessionTone(session: any) {
-    return session.trainingMeta?.type || 'free';
+function getRaidSessions(sessions: any[]) {
+    return sessions.filter((session) => session.kind === 'raid' || session.trainingMeta?.type === 'raid');
 }
 
-function getHomeSessionLabel(session: any, trainingCopy: any) {
-    if (session.trainingMeta?.type === 'challenge') {
-        return trainingCopy.practice.challengeBadge;
+function getWeakFocus(skillProfile: any, sessions: any[]) {
+    const latestRaid = getRaidSessions(sessions)[0];
+    const raidWeakChars = latestRaid?.gameMeta?.weakestChars || latestRaid?.trainingMeta?.focusChars || latestRaid?.result?.topErrorChars;
+    if (Array.isArray(raidWeakChars) && raidWeakChars.length) {
+        return raidWeakChars.slice(0, 3).join(' / ');
     }
-
-    if (session.trainingMeta?.type === 'plan') {
-        return trainingCopy.practice.planBadge;
-    }
-
-    if (session.trainingMeta?.type === 'diagnostic') {
-        return trainingCopy.practice.diagnosticBadge;
-    }
-
-    return trainingCopy.home.freePractice;
+    return skillProfile?.topErrorChars?.slice(0, 3).join(' / ')
+        || skillProfile?.weakZones?.[0]?.label
+        || '节奏稳定';
 }
 
-function HomeSessionIcon({ tone }: { tone: string }) {
-    const Icon = tone === 'challenge'
-        ? Trophy
-        : tone === 'plan'
-            ? CalendarClock
-            : tone === 'diagnostic'
-                ? Gauge
-                : Keyboard;
-
-    return <Icon aria-hidden="true" size={16} strokeWidth={2.2} />;
+function formatDuration(seconds = 0) {
+    const minutes = Math.floor(seconds / 60);
+    const rest = Math.floor(seconds % 60);
+    return `${minutes}:${String(rest).padStart(2, '0')}`;
 }
 
-function HomeQuickCard({ icon: Icon, kicker, label, description, tone = 'default', disabled, onClick }: { icon: any; kicker: string; label: string; description: string; tone?: string; disabled?: boolean; onClick: () => void }) {
+function HomeQuickCard({ icon: Icon, kicker, label, description, tone = 'default', onClick }: { icon: any; kicker: string; label: string; description: string; tone?: string; onClick: () => void }) {
     return (
         <button
             type="button"
             className={`home-quick-card home-quick-card--${tone}`}
-            disabled={disabled}
             onClick={onClick}
         >
             <span className="home-quick-card__icon" aria-hidden="true">
@@ -73,205 +60,150 @@ function HomeRecentChip({ icon: Icon, children, accent = false }: { icon: any; c
 export function HomePage() {
     const navigate = useAppNavigate();
     const store = useHomePageStore();
-    const {
-        challengeDecisionModel,
-        challengeIsPrimaryDecision,
-        challengePerformanceText,
-        challengeSessions,
-        challengeStrategyModel,
-        copy,
-        homeDecision,
-        insights,
-        isLaunchingChallenge,
-        language,
-        recentBestAccuracy,
-        recentSessions,
-        sessionStreak,
-        skillProfile,
-        trainingCopy,
-        trainingPlan,
-        unlockedAchievements,
-        handleDecisionAction
-    } = useHomePageModel({
-        ...store,
-        navigate
-    });
-
-    const hasSessions = insights.totalSessions > 0;
-    const hasDashboardEvidence = Boolean(skillProfile || trainingPlan || hasSessions || unlockedAchievements.length);
-    const isStarterHome = !hasDashboardEvidence;
-    const pendingLabel = trainingCopy.diagnostic.pending;
-    const homeStreakLabel = sessionStreak || pendingLabel;
-    const homeAverageWpmLabel = hasSessions ? `${insights.recent7.avgWpm} ${copy.common.wpm}` : copy.statuses.ready;
-    const homeBestAccuracyLabel = recentBestAccuracy ? `${recentBestAccuracy}%` : pendingLabel;
-    const homeMetricItems = [
+    const { language, sessions, sessionStreak, skillProfile, weeklyGoal } = store;
+    const raidSessions = getRaidSessions(sessions);
+    const latestRaid = raidSessions[0] || null;
+    const weakFocus = getWeakFocus(skillProfile, sessions);
+    const bestThreat = raidSessions.reduce((best, session) => Math.max(best, Number(session.gameMeta?.threatLevel || session.trainingMeta?.threatLevel || 0)), 0);
+    const extractCount = raidSessions.filter((session) => (session.gameMeta?.endReason || session.trainingMeta?.endReason) === 'extract').length;
+    const extractRate = raidSessions.length ? Math.round((extractCount / raidSessions.length) * 100) : 0;
+    const metricItems = [
         {
             id: 'streak',
-            icon: TrendingUp,
-            label: trainingCopy.home.streakLabel,
-            value: homeStreakLabel,
+            icon: Flame,
+            label: '连续训练',
+            value: sessionStreak ? `${sessionStreak} 天` : '待启动',
             tone: 'streak'
         },
         {
-            id: 'wpm',
+            id: 'threat',
             icon: Gauge,
-            label: copy.home.avgWpm,
-            value: homeAverageWpmLabel,
+            label: '最高威胁',
+            value: bestThreat || '--',
             tone: 'speed'
         },
         {
-            id: 'accuracy',
-            icon: ShieldCheck,
-            label: copy.home.bestAccuracy,
-            value: homeBestAccuracyLabel,
+            id: 'extract',
+            icon: DoorOpen,
+            label: '稳定撤离率',
+            value: raidSessions.length ? `${extractRate}%` : '--',
             tone: 'accuracy'
         }
     ];
-    const statusBadge = skillProfile
-        ? (hasSessions ? copy.statuses.ready : copy.statuses.idle)
-        : trainingCopy.home.levelLabel;
-    const primaryDescription = challengeIsPrimaryDecision ? challengePerformanceText : homeDecision.body;
-    const quickActions = [
-        {
-            key: challengeIsPrimaryDecision ? 'challenge' : 'primary',
-            icon: ArrowRight,
-            kicker: challengeIsPrimaryDecision ? trainingCopy.challenge.strategyTitle : trainingCopy.home.todayKicker,
-            label: challengeIsPrimaryDecision
-                ? (challengeDecisionModel?.primaryLabel || challengeStrategyModel.primaryLabel)
-                : homeDecision.primaryLabel,
-            description: primaryDescription,
-            tone: 'primary',
-            disabled: challengeIsPrimaryDecision
-                ? isLaunchingChallenge && (challengeDecisionModel?.primaryAction || challengeStrategyModel.primaryAction) === 'challenge'
-                : isLaunchingChallenge && homeDecision.primaryAction === 'challenge',
-            onClick: () => handleDecisionAction(challengeIsPrimaryDecision
-                ? (challengeDecisionModel?.primaryAction || challengeStrategyModel.primaryAction)
-                : homeDecision.primaryAction)
-        },
-        {
-            key: 'leaderboard',
-            icon: BarChart3,
-            kicker: trainingCopy.challenge.kicker,
-            label: trainingCopy.challenge.viewBoard,
-            description: trainingCopy.challenge.strategyTitle,
-            tone: 'default',
-            onClick: () => handleDecisionAction('leaderboard')
-        },
-        {
-            key: 'free',
-            icon: Keyboard,
-            kicker: trainingCopy.home.freePracticeKicker,
-            label: trainingCopy.home.freePractice,
-            description: trainingCopy.home.freePracticeBody,
-            tone: 'default',
-            onClick: () => handleDecisionAction('free')
-        },
-        {
-            key: 'game',
-            icon: Swords,
-            kicker: 'Game Mode',
-            label: 'Typing Raid',
-            description: 'Type words to destroy enemies',
-            tone: 'default',
-            onClick: () => navigate('/game')
-        }
-    ] satisfies Array<{ key: string; icon: any; kicker: string; label: string; description: string; tone?: string; disabled?: boolean; onClick: () => void }>;
 
     return (
-        <div className={`page-stack page-stack--home home-status-page-stack ${isStarterHome ? 'home-status-page-stack--starter' : 'home-status-page-stack--dashboard'}`}>
-            <section className="home-starter-hero" aria-label={copy.home.statsTitle}>
+        <div className="page-stack page-stack--home home-status-page-stack home-status-page-stack--dashboard">
+            <section className="home-starter-hero" aria-label="Raid Command Center">
                 <div className="home-starter-hero__copy">
                     <span className="home-starter-hero__status">
-                        <Target aria-hidden="true" size={15} strokeWidth={2.2} />
-                        {statusBadge}
+                        <Swords aria-hidden="true" size={15} strokeWidth={2.2} />
+                        Arcade Coach
                     </span>
-                    <h1>{skillProfile ? trainingCopy.home.dashboardTitle : trainingCopy.home.diagnosticTitle}</h1>
+                    <h1>无尽突袭指挥台</h1>
                     <p className="hero-body">
-                        {skillProfile ? trainingCopy.home.dashboardBody : trainingCopy.home.diagnosticBody}
+                        先进入无尽突袭，用真实压力暴露弱区；结算后再用 Focus Lab 和 Missions 修复下一局表现。
                     </p>
                     <div className="home-starter-hero__actions">
                         <button
                             type="button"
                             className="action-btn primary"
-                            aria-label={`Primary action: ${challengeIsPrimaryDecision ? (challengeDecisionModel?.primaryLabel || challengeStrategyModel.primaryLabel) : homeDecision.primaryLabel}`}
-                            onClick={() => handleDecisionAction(challengeIsPrimaryDecision
-                                ? (challengeDecisionModel?.primaryAction || challengeStrategyModel.primaryAction)
-                                : homeDecision.primaryAction)}
-                            disabled={challengeIsPrimaryDecision
-                                ? isLaunchingChallenge && (challengeDecisionModel?.primaryAction || challengeStrategyModel.primaryAction) === 'challenge'
-                                : isLaunchingChallenge && homeDecision.primaryAction === 'challenge'}
+                            aria-label="开始无尽突袭"
+                            onClick={() => navigate('/raid')}
                         >
-                            <ArrowRight aria-hidden="true" size={17} strokeWidth={2.25} />
-                            {isLaunchingChallenge && (
-                                challengeIsPrimaryDecision
-                                    ? (challengeDecisionModel?.primaryAction || challengeStrategyModel.primaryAction) === 'challenge'
-                                    : homeDecision.primaryAction === 'challenge'
-                            )
-                                ? copy.common.loading
-                                : (challengeIsPrimaryDecision
-                                    ? (challengeDecisionModel?.primaryLabel || challengeStrategyModel.primaryLabel)
-                                    : homeDecision.primaryLabel)}
+                            <Swords aria-hidden="true" size={17} strokeWidth={2.25} />
+                            开始无尽突袭
+                        </button>
+                        <button type="button" className="action-btn" onClick={() => navigate('/missions')}>
+                            <Trophy aria-hidden="true" size={17} strokeWidth={2.25} />
+                            查看任务
                         </button>
                     </div>
                 </div>
             </section>
 
-            {!isStarterHome ? (
-                <MetricStrip
-                    className="home-starter-metrics"
-                    ariaLabel={copy.home.statsTitle}
-                    items={homeMetricItems}
-                />
-            ) : null}
+            <MetricStrip
+                className="home-starter-metrics"
+                ariaLabel="Raid progress"
+                items={metricItems}
+            />
 
-            <section className="home-quick-cards" aria-label={trainingCopy.home.todayFlowTitle}>
-                {quickActions.map((action) => (
-                    <HomeQuickCard
-                        key={action.key}
-                        icon={action.icon}
-                        kicker={action.kicker}
-                        label={action.label}
-                        description={action.description}
-                        tone={action.tone}
-                        disabled={action.disabled}
-                        onClick={action.onClick}
-                    />
-                ))}
+            <section className="home-quick-cards" aria-label="Raid loop actions">
+                <HomeQuickCard
+                    icon={Swords}
+                    kicker="Primary"
+                    label="Endless Raid"
+                    description="输入怪物词，守住裂隙，在营门选择撤离或继续挑战。"
+                    tone="primary"
+                    onClick={() => navigate('/raid')}
+                />
+                <HomeQuickCard
+                    icon={Keyboard}
+                    kicker="Focus Lab"
+                    label={`修复弱区：${weakFocus}`}
+                    description="用两分钟短训练修正 Raid 暴露出的字符、节奏和准确率问题。"
+                    onClick={() => navigate('/practice')}
+                />
+                <HomeQuickCard
+                    icon={Target}
+                    kicker="Missions"
+                    label="今日任务"
+                    description={`本周进度 ${weeklyGoal.completed}/${weeklyGoal.target}，完成任务后回到 Raid 验证。`}
+                    onClick={() => navigate('/missions')}
+                />
+                <HomeQuickCard
+                    icon={BarChart3}
+                    kicker="Insights"
+                    label="查看画像"
+                    description="复盘速度、准确率、弱字符、Raid 存活时间和撤离稳定性。"
+                    onClick={() => navigate('/insights')}
+                />
             </section>
 
-            {hasDashboardEvidence && recentSessions.length ? (
+            {latestRaid ? (
                 <section className="home-recent">
                     <div className="home-recent__head">
-                        <p className="panel-kicker">{copy.home.statsTitle}</p>
-                        <h2>{copy.home.recentHistoryTitle}</h2>
+                        <p className="panel-kicker">Latest Raid</p>
+                        <h2>上一局反馈</h2>
                     </div>
 
                     <div className="home-recent-list">
-                        {recentSessions.map((session: any) => {
-                            const tone = getHomeSessionTone(session);
-
-                            return (
-                                <div key={session.id} className="home-recent-item">
-                                    <span className="home-recent-item__icon" aria-hidden="true">
-                                        <HomeSessionIcon tone={tone} />
-                                    </span>
-                                    <div className="home-recent-item__body">
-                                        <strong>{session.trainingMeta?.title || session.sourceTextMeta?.label || copy.common.emptyValue}</strong>
-                                        <p>{getHomeSessionLabel(session, trainingCopy)} · {formatDateTime(session.result.completedAt, language)}</p>
-                                    </div>
-                                    <div className="home-recent-item__metrics">
-                                        <HomeRecentChip icon={TrendingUp}>{session.result.wpm} {copy.common.wpm}</HomeRecentChip>
-                                        <HomeRecentChip icon={ShieldCheck} accent>{session.result.accuracy}%</HomeRecentChip>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                        <div className="home-recent-item">
+                            <span className="home-recent-item__icon" aria-hidden="true">
+                                <Swords size={16} strokeWidth={2.2} />
+                            </span>
+                            <div className="home-recent-item__body">
+                                <strong>{latestRaid.trainingMeta?.title || 'Endless Raid'}</strong>
+                                <p>{formatDateTime(latestRaid.completedAt || latestRaid.result?.completedAt, language)}</p>
+                            </div>
+                            <div className="home-recent-item__metrics">
+                                <HomeRecentChip icon={Gauge}>威胁 {latestRaid.gameMeta?.threatLevel || latestRaid.trainingMeta?.threatLevel || 1}</HomeRecentChip>
+                                <HomeRecentChip icon={ShieldCheck} accent>{latestRaid.result?.accuracy || 0}%</HomeRecentChip>
+                                <HomeRecentChip icon={DoorOpen}>{formatDuration(latestRaid.durationSeconds || latestRaid.result?.durationSeconds || 0)}</HomeRecentChip>
+                            </div>
+                        </div>
                     </div>
                 </section>
-            ) : null}
+            ) : (
+                <section className="home-recent">
+                    <div className="home-recent__head">
+                        <p className="panel-kicker">First run</p>
+                        <h2>先留下一次 Raid 样本</h2>
+                    </div>
+                    <div className="home-recent-list">
+                        <div className="home-recent-item">
+                            <span className="home-recent-item__icon" aria-hidden="true">
+                                <Swords size={16} strokeWidth={2.2} />
+                            </span>
+                            <div className="home-recent-item__body">
+                                <strong>无历史迁移，vNext 会从第一局重新建立画像。</strong>
+                                <p>旧训练数据不会进入新主线，避免推荐和成就被历史逻辑污染。</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            )}
         </div>
     );
 }
 
 export default HomePage;
-

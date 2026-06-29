@@ -1,4 +1,4 @@
-import { API_FALLBACK_CACHE_KEY, STORAGE_KEYS } from '@typemaster/contracts';
+import { API_FALLBACK_CACHE_KEY, OBSOLETE_STORAGE_KEYS, STORAGE_KEYS } from '@typemaster/contracts';
 
 type SchemaLike<T = unknown> = {
     parse: (value: unknown) => T;
@@ -14,6 +14,7 @@ const CLIENT_CACHE_STORE_NAME = 'entries';
 const CLIENT_CACHE_VERSION = 1;
 const CLIENT_CACHE_KEYS = [
     API_FALLBACK_CACHE_KEY,
+    STORAGE_KEYS.install,
     STORAGE_KEYS.sessions,
     STORAGE_KEYS.coachAdvices,
     STORAGE_KEYS.skillProfile,
@@ -21,6 +22,10 @@ const CLIENT_CACHE_KEYS = [
     STORAGE_KEYS.diagnosticJourney,
     STORAGE_KEYS.activeSessionContext
 ];
+const V6_INSTALL_PAYLOAD = {
+    version: 6,
+    installedAt: new Date().toISOString()
+};
 
 const clientCacheMemory = new Map<string, unknown>();
 let hydrationPromise: Promise<void> | null = null;
@@ -82,9 +87,24 @@ function removeObsoleteLocalCacheKeys() {
         return;
     }
 
-    CLIENT_CACHE_KEYS.forEach((key) => {
+    OBSOLETE_STORAGE_KEYS.forEach((key) => {
         storage.removeItem(key);
     });
+}
+
+function markV6Install() {
+    const storage = getBrowserLocalStorage();
+    if (!storage) {
+        return;
+    }
+
+    try {
+        if (!storage.getItem(STORAGE_KEYS.install)) {
+            storage.setItem(STORAGE_KEYS.install, JSON.stringify(V6_INSTALL_PAYLOAD));
+        }
+    } catch (error) {
+        console.warn('Failed to mark TypeMaster v6 install', error);
+    }
 }
 
 function openClientCacheDb() {
@@ -128,6 +148,18 @@ async function readIndexedDbEntries() {
     }
 }
 
+async function deleteIndexedDbEntries(keys: string[]) {
+    const db = await openClientCacheDb();
+    try {
+        const transaction = db.transaction(CLIENT_CACHE_STORE_NAME, 'readwrite');
+        const store = transaction.objectStore(CLIENT_CACHE_STORE_NAME);
+        keys.forEach((key) => store.delete(key));
+        await waitForTransaction(transaction);
+    } finally {
+        db.close();
+    }
+}
+
 async function writeIndexedDbEntry(key: string, value: unknown) {
     const db = await openClientCacheDb();
     try {
@@ -157,8 +189,10 @@ export function hydrateClientCache() {
 
     hydrationPromise = (async () => {
         removeObsoleteLocalCacheKeys();
+        markV6Install();
 
         if (canUseIndexedDb()) {
+            await deleteIndexedDbEntries(OBSOLETE_STORAGE_KEYS);
             const entries = await readIndexedDbEntries();
             entries.forEach((entry) => {
                 clientCacheMemory.set(entry.key, entry.value);

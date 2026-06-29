@@ -48,11 +48,11 @@ describe('GamePage', () => {
         delete window.advanceTime;
     });
 
-    test('starts the raid and opens the DOM pause layer', async () => {
-        renderWithProvider(<GamePage />, { route: '/game' });
+    test('starts endless raid and opens the DOM pause layer', async () => {
+        renderWithProvider(<GamePage />, { route: '/raid' });
 
         await waitFor(() => expect(typeof window.render_game_to_text).toBe('function'));
-        fireEvent.click(await screen.findByRole('button', { name: '开始突袭' }));
+        fireEvent.click(await screen.findByRole('button', { name: '开始无尽突袭' }));
 
         await waitFor(() => {
             const snapshot = JSON.parse(window.render_game_to_text());
@@ -64,10 +64,12 @@ describe('GamePage', () => {
         });
         const active = JSON.parse(window.render_game_to_text());
         expect(active.enemies.length).toBeGreaterThan(0);
+        expect(active.hud.threatLevel).toBe(1);
 
         fireEvent.keyDown(window, { key: 'Escape' });
 
-        expect(await screen.findByRole('dialog', { name: '突袭已暂停' })).toBeInTheDocument();
+        expect(await screen.findByRole('dialog', { name: '无尽突袭已暂停' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: '继续' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: '撤离并结算' })).toBeDisabled();
     });
 });

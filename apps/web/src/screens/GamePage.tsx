@@ -4,7 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type
 import '../../src/styles/game-page.css';
 import { useGameStore } from '../features/game/state/game-store';
 import { createGameEngine, type GameEngine, type RaidMode } from '../engine/game-engine';
-import { RaidRenderer } from '../engine/raid-renderer';
+import { MonsterRaidRenderer } from '../engine/raid-renderer';
+import { useAppNavigate } from '../application/use-app-navigate';
 import IdleScreenOverlay from '../components/idle/IdleScreenOverlay';
 import PauseMenuOverlay from '../components/overlay/PauseMenuOverlay';
 import GameplayHud from '../components/overlay/GameplayHud';
@@ -20,11 +21,12 @@ function getFocusChars(keyboardHotspots: any) {
 }
 
 export default function GamePage() {
+    const navigate = useAppNavigate();
     const containerRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const engineRef = useRef<GameEngine | null>(null);
-    const rendererRef = useRef<RaidRenderer | null>(null);
+    const rendererRef = useRef<MonsterRaidRenderer | null>(null);
     const frameRef = useRef<number>(0);
     const lastFrameTimeRef = useRef(0);
     const lastUiCommitRef = useRef(0);
@@ -58,7 +60,7 @@ export default function GamePage() {
     }, []);
 
     const maybeSaveResult = useCallback((nextSnapshot: any) => {
-        if (!nextSnapshot || (nextSnapshot.phase !== 'complete' && nextSnapshot.phase !== 'gameover')) return;
+        if (!nextSnapshot || nextSnapshot.phase !== 'gameover') return;
         const result = nextSnapshot.overlay?.result;
         if (!result) return;
 
@@ -92,7 +94,7 @@ export default function GamePage() {
     }, [commitUpdate, maybeSaveResult]);
 
     const handleIdleAction = useCallback((action: string) => {
-        const raidMode: RaidMode = action === 'daily-focus' ? 'daily-focus' : 'standard';
+        const raidMode: RaidMode = action === 'daily-focus' ? 'daily-focus' : 'endless';
         dispatchAction('start', {
             raidMode,
             focusChars
@@ -102,13 +104,14 @@ export default function GamePage() {
     const handlePauseAction = useCallback((action: string) => {
         if (action === 'resume') dispatchAction('resume');
         if (action === 'retry') dispatchAction('retry', { focusChars });
-        if (action === 'quit') dispatchAction('quit');
-    }, [dispatchAction, focusChars]);
+        if (action === 'extract') dispatchAction('extract');
+        if (action === 'quit') navigate('/');
+    }, [dispatchAction, focusChars, navigate]);
 
     const handleResultAction = useCallback((action: string) => {
         if (action === 'retry') dispatchAction('retry', { focusChars });
-        if (action === 'menu') dispatchAction('quit');
-    }, [dispatchAction, focusChars]);
+        if (action === 'menu') navigate('/');
+    }, [dispatchAction, focusChars, navigate]);
 
     useEffect(() => {
         bestScoreRef.current = raidBestScore;
@@ -124,7 +127,7 @@ export default function GamePage() {
             language: language || 'zh-CN',
             focusChars
         });
-        const renderer = new RaidRenderer();
+        const renderer = new MonsterRaidRenderer();
         const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
         renderer.setReducedMotion(reducedMotion.matches);
 
@@ -282,14 +285,14 @@ export default function GamePage() {
             ref={containerRef}
             className="game-container"
             role="application"
-            aria-label="Typing Raid 打字突袭游戏"
+            aria-label="Typing Raid 无尽突袭游戏"
             onPointerDown={() => inputRef.current?.focus({ preventScroll: true })}
         >
             <canvas
                 ref={canvasRef}
                 className="game-canvas"
                 role="img"
-                aria-label="打字突袭战场，输入敌方单词以清除目标"
+                aria-label="无尽突袭战场，输入怪物身上的词以清除目标"
             />
             <input
                 ref={inputRef}

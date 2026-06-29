@@ -18,7 +18,7 @@ export default defineConfig({
         }
     ],
     webServer: {
-        command: 'pnpm.cmd exec next dev -H 127.0.0.1 -p 4174',
+        command: 'node ./node_modules/next/dist/bin/next dev -H 127.0.0.1 -p 4174',
         url: 'http://127.0.0.1:4174',
         reuseExistingServer: false,
         timeout: 60000

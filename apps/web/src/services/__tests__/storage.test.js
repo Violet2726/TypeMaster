@@ -77,19 +77,19 @@ describe('storage', () => {
         });
 
         it('should keep client cache outside localStorage writes', () => {
-            writeClientCache('typemaster:v5:sessions-cache', [{ id: 'session-1' }]);
+            writeClientCache(STORAGE_KEYS.sessions, [{ id: 'session-1' }]);
 
-            expect(readClientCache('typemaster:v5:sessions-cache', [])).toEqual([{ id: 'session-1' }]);
-            expect(window.localStorage.getItem('typemaster:v5:sessions-cache')).toBeNull();
+            expect(readClientCache(STORAGE_KEYS.sessions, [])).toEqual([{ id: 'session-1' }]);
+            expect(window.localStorage.getItem(STORAGE_KEYS.sessions)).toBeNull();
         });
 
         it('should ignore and remove obsolete localStorage client cache keys', async () => {
-            window.localStorage.setItem(STORAGE_KEYS.sessions, JSON.stringify([{ id: 'legacy-session' }]));
+            window.localStorage.setItem('typemaster:v5:sessions-cache', JSON.stringify([{ id: 'legacy-session' }]));
 
             await hydrateClientCache();
 
             expect(loadSessions()).toEqual([]);
-            expect(window.localStorage.getItem(STORAGE_KEYS.sessions)).toBeNull();
+            expect(window.localStorage.getItem('typemaster:v5:sessions-cache')).toBeNull();
         });
     });
 
@@ -112,7 +112,7 @@ describe('storage', () => {
                     wordCount: 100
                 }
             };
-            window.localStorage.setItem('typemaster:v5:preferences', JSON.stringify(savedSettings));
+            window.localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(savedSettings));
             
             const settings = loadSettings();
             expect(settings.theme).toBe('serika-light');
@@ -122,7 +122,7 @@ describe('storage', () => {
         });
 
         it('should handle invalid JSON in localStorage', () => {
-            window.localStorage.setItem('typemaster:v5:preferences', 'invalid-json');
+            window.localStorage.setItem(STORAGE_KEYS.settings, 'invalid-json');
             
             const settings = loadSettings();
             expect(settings).toEqual({
@@ -134,7 +134,7 @@ describe('storage', () => {
         });
 
         it('should handle null in localStorage', () => {
-            window.localStorage.setItem('typemaster:v5:preferences', 'null');
+            window.localStorage.setItem(STORAGE_KEYS.settings, 'null');
             
             const settings = loadSettings();
             expect(settings).toEqual({
@@ -149,7 +149,7 @@ describe('storage', () => {
             const savedSettings = {
                 language: 'en-US'
             };
-            window.localStorage.setItem('typemaster:v5:preferences', JSON.stringify(savedSettings));
+            window.localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(savedSettings));
             
             const settings = loadSettings();
             expect(settings.language).toBe('en-US');
@@ -170,7 +170,7 @@ describe('storage', () => {
             
             saveSettings(settings);
             
-            const saved = JSON.parse(window.localStorage.getItem('typemaster:v5:preferences'));
+            const saved = JSON.parse(window.localStorage.getItem(STORAGE_KEYS.settings));
             expect(saved).toEqual(settings);
         });
 

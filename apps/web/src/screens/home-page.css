@@ -111,7 +111,7 @@ body[data-theme='serika-light'] .home-starter-hero {
 }
 
 .home-quick-cards {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 0.72rem;
 }
 
@@ -127,6 +127,16 @@ body[data-theme='serika-light'] .home-starter-hero {
     background: linear-gradient(180deg, var(--surface-2), var(--bg-soft));
     text-align: left;
     transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+}
+
+article.home-quick-card {
+    align-items: stretch;
+}
+
+article.home-quick-card .action-btn {
+    grid-column: 1 / -1;
+    justify-self: start;
+    margin-top: 0.2rem;
 }
 
 .home-quick-card:hover {

@@ -347,11 +347,7 @@ describe('account sync use cases', () => {
         }));
         expect(environment.setSkillProfile).toHaveBeenCalledWith(skillProfile);
         expect(environment.setTrainingPlan).toHaveBeenCalledWith(trainingPlan);
-        expect(environment.setActiveSessionContext).toHaveBeenCalledWith({
-            type: 'plan',
-            planId: trainingPlan.id,
-            stepId: 'step-1'
-        });
+        expect(environment.setActiveSessionContext).toHaveBeenCalledWith(null);
         expect(saveSettingsMock).toHaveBeenCalled();
         expect(saveSessionsMock).toHaveBeenCalledWith([
             expect.objectContaining({

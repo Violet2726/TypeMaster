@@ -525,7 +525,7 @@ export function useResultPageModel({
         }
 
         if (action === 'leaderboard') {
-            navigate('/challenge');
+            navigate('/missions');
             return;
         }
 
