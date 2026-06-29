@@ -1,11 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo } from 'react';
 import { DEFAULT_CONFIG, createBuiltinDraft } from '@typemaster/domain';
 import {
-    loadActiveSessionContext,
-    loadDiagnosticJourney,
     loadSettings,
-    saveActiveSessionContext,
-    saveDiagnosticJourney,
     saveSettings,
     saveSkillProfile,
     saveTrainingPlan
@@ -20,8 +16,8 @@ export function useAppInitialState() {
         return {
             settings,
             config,
-            diagnosticJourney: loadDiagnosticJourney(),
-            activeSessionContext: loadActiveSessionContext()
+            diagnosticJourney: null,
+            activeSessionContext: null
         };
     }, []);
 }
@@ -54,9 +50,7 @@ export function useHydrateAppStores({
 }
 
 export function usePersistAppState({
-    activeSessionContext,
     config,
-    diagnosticJourney,
     setCurrentDraft,
     settings,
     skillProfile,
@@ -76,14 +70,6 @@ export function usePersistAppState({
     useEffect(() => {
         saveTrainingPlan(trainingPlan);
     }, [trainingPlan]);
-
-    useEffect(() => {
-        saveDiagnosticJourney(diagnosticJourney);
-    }, [diagnosticJourney]);
-
-    useEffect(() => {
-        saveActiveSessionContext(activeSessionContext);
-    }, [activeSessionContext]);
 
     useEffect(() => {
         setCurrentDraft((previous) => relabelDraft(previous, settings.language));

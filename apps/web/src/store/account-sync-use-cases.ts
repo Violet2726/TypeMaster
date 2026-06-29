@@ -2,9 +2,7 @@ import { createBuiltinDraft } from '@typemaster/domain';
 import { createTrainingDataBundle, parseTrainingDataBundle } from '@typemaster/contracts/storage';
 import { authGateway, planGateway, sessionGateway } from '../services/api';
 import {
-    saveActiveSessionContext,
     saveCoachAdvices,
-    saveDiagnosticJourney,
     saveSessions,
     saveSettings,
     saveSkillProfile,
@@ -22,14 +20,12 @@ function getSkillProfileSyncExtras(environment) {
     };
 }
 
-function persistImportedTrainingData(payload, nextActiveSessionContext) {
+function persistImportedTrainingData(payload) {
     saveSettings(payload.settings);
     saveSessions(payload.sessions);
     saveCoachAdvices(payload.coachAdviceRecords);
     saveSkillProfile(payload.skillProfile || null);
     saveTrainingPlan(payload.trainingPlan || null);
-    saveDiagnosticJourney(payload.diagnosticJourney || null);
-    saveActiveSessionContext(nextActiveSessionContext);
 }
 
 function syncImportedTrainingDataToApi(environment, payload) {
@@ -106,9 +102,7 @@ export function exportTrainingData(environment) {
         sessions: environment.sessions,
         coachAdviceRecords: environment.coachAdviceRecords,
         skillProfile: environment.skillProfile,
-        trainingPlan: environment.trainingPlan,
-        diagnosticJourney: environment.diagnosticJourney,
-        activeSessionContext: environment.activeSessionContext
+        trainingPlan: environment.trainingPlan
     }), null, 2);
 }
 
@@ -118,7 +112,6 @@ export function importTrainingData(environment, rawPayload) {
     const nextSessions = payload.sessions;
     const nextCoachAdviceRecords = payload.coachAdviceRecords;
     const nextConfig = normalizeConfig(nextSettings.lastConfig || environment.config);
-    const nextActiveSessionContext = payload.activeSessionContext || null;
 
     environment.setSettingsState(nextSettings);
     environment.setConfigState(nextConfig);
@@ -130,15 +123,15 @@ export function importTrainingData(environment, rawPayload) {
     environment.setCoachAdviceRecords(nextCoachAdviceRecords);
     environment.setSkillProfile(payload.skillProfile || null);
     environment.setTrainingPlan(payload.trainingPlan || null);
-    environment.setDiagnosticJourney(payload.diagnosticJourney || null);
-    environment.setActiveSessionContext(nextActiveSessionContext);
+    environment.setDiagnosticJourney(null);
+    environment.setActiveSessionContext(null);
 
     persistImportedTrainingData({
         ...payload,
         settings: nextSettings,
         sessions: nextSessions,
         coachAdviceRecords: nextCoachAdviceRecords
-    }, nextActiveSessionContext);
+    });
     syncImportedTrainingDataToApi(environment, {
         ...payload,
         sessions: nextSessions

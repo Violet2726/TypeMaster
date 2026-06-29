@@ -64,9 +64,9 @@ function resolveSessionIntent(environment, completionContext) {
     const sourceMeta = environment.currentDraft?.sourceTextMeta || {};
     const generatedBy = sourceMeta.generatedBy;
 
-    if (completionContext.type === 'diagnostic') return 'diagnostic-assessment';
-    if (completionContext.type === 'plan') return 'plan-step';
-    if (completionContext.type === 'challenge') return 'challenge-attempt';
+    if (completionContext.type === 'diagnostic') return 'baseline-mission';
+    if (completionContext.type === 'plan') return 'focus-drill';
+    if (completionContext.type === 'challenge') return 'daily-mission';
     if (generatedBy === 'adaptive') return 'adaptive-drill';
     if (generatedBy === 'keyboard-zone') return 'keyboard-zone-drill';
     if (sourceMeta.adaptiveSourceSessionId) return 'recovery-drill';
@@ -87,16 +87,12 @@ function resolveSessionFocus(environment, completionContext) {
 function resolveSessionTrainingMeta(environment, completionContext) {
     const sourceMeta = environment.currentDraft?.sourceTextMeta || {};
     const type = completionContext.type || 'free';
-    const surface = type === 'diagnostic'
-        ? 'diagnostic'
-        : type === 'plan'
-            ? 'plan'
-            : type === 'challenge'
-                ? 'challenge'
-                : 'practice';
+    const surface = type === 'diagnostic' || type === 'plan' || type === 'challenge'
+        ? 'missions'
+        : 'practice';
 
     return {
-        type,
+        type: type === 'free' ? 'practice' : (type === 'raid' ? 'raid' : 'mission'),
         surface,
         intent: resolveSessionIntent(environment, completionContext),
         focus: resolveSessionFocus(environment, completionContext),
@@ -107,21 +103,36 @@ function resolveSessionTrainingMeta(environment, completionContext) {
 }
 
 export function createCompletedSessionRecord(environment, { result, timeline }, completionContext = resolveSessionCompletionContext(environment)) {
+    const trainingMeta = resolveSessionTrainingMeta(environment, completionContext);
+    const completedAt = result?.completedAt || new Date().toISOString();
+    const durationSeconds = Number(result?.durationSeconds || 0);
+
     return normalizeSessionRecord({
         id: createSessionId(),
+        kind: trainingMeta.type === 'mission' ? 'mission' : 'practice',
+        intent: trainingMeta.intent,
+        startedAt: completedAt,
+        completedAt,
+        durationSeconds,
+        focus: trainingMeta.focus,
+        source: environment.currentDraft?.sourceTextMeta?.source || environment.config.source || 'builtin',
         config: environment.config,
-        result,
+        result: {
+            ...result,
+            completedAt,
+            durationSeconds
+        },
         timeline,
         sourceTextMeta: environment.currentDraft?.sourceTextMeta || {
             source: environment.config.source || 'builtin',
             label: 'Practice text'
         },
         coachAdviceId: null,
-        trainingMeta: resolveSessionTrainingMeta(environment, completionContext)
+        trainingMeta
     });
 }
 
-export function recordSession(environment, session) {
+export function completeSession(environment, session) {
     const nextSessions = appendSession(session);
 
     environment.setSessions(nextSessions);
@@ -132,12 +143,42 @@ export function recordSession(environment, session) {
     return nextSessions;
 }
 
+export function recordSession(environment, session) {
+    return completeSession(environment, session);
+}
+
 export function createRaidSessionRecord(result) {
     const focusChars = Array.isArray(result?.focusChars) ? result.focusChars : [];
+    const weakestChars = Array.isArray(result?.weakestChars) ? result.weakestChars : focusChars;
     const durationSeconds = Number(result?.durationSeconds || 0);
+    const completedAt = new Date().toISOString();
+    const intent = result?.mode === 'daily-focus' ? 'daily-focus-raid' : 'endless-raid';
+    const threatLevel = Number(result?.threatLevel || 1);
+    const monstersDefeated = Number(result?.monstersDefeated || result?.enemiesDefeated || 0);
+    const eliteDefeated = Number(result?.eliteDefeated || 0);
+    const endReason = result?.endReason || null;
 
     return normalizeSessionRecord({
         id: `raid-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+        kind: 'raid',
+        intent,
+        startedAt: completedAt,
+        completedAt,
+        durationSeconds,
+        focus: focusChars.length ? focusChars.join('') : 'speed',
+        source: 'raid',
+        gameMeta: {
+            score: Number(result?.score || 0),
+            threatLevel,
+            durationSeconds,
+            maxCombo: Number(result?.maxCombo || 0),
+            monstersDefeated,
+            eliteDefeated,
+            endReason,
+            livesRemaining: Number(result?.livesRemaining || 0),
+            focusChars,
+            weakestChars
+        },
         config: {
             mode: 'words',
             wordCount: 0,
@@ -159,31 +200,33 @@ export function createRaidSessionRecord(result) {
             extraChars: 0,
             missedChars: Number(result?.enemiesLeaked || 0),
             durationSeconds,
-            completedAt: new Date().toISOString(),
+            completedAt,
             errors: Math.max(0, Number(result?.totalCharsTyped || 0) - Number(result?.totalCharsCorrect || 0)),
-            topErrorChars: focusChars,
+            topErrorChars: weakestChars,
             topErrorWords: [],
-            errorCharStats: focusChars.map((label) => ({ label, count: 1 })),
+            errorCharStats: weakestChars.map((label) => ({ label, count: 1 })),
             errorWordStats: []
         },
         sourceTextMeta: {
             source: 'builtin',
-            label: 'Typing Raid',
+            label: 'Endless Raid',
             generatedBy: 'raid'
         },
         coachAdviceId: null,
         trainingMeta: {
             type: 'raid',
             surface: 'raid',
-            intent: result?.mode === 'daily-focus' ? 'raid-daily-focus' : 'raid-standard',
+            intent,
             focus: focusChars.length ? focusChars.join('') : 'speed',
             sourceSessionId: null,
-            title: 'Typing Raid',
+            title: 'Endless Raid',
             score: Number(result?.score || 0),
-            wave: Number(result?.wavesCleared || 0),
+            threatLevel,
+            durationSeconds,
             maxCombo: Number(result?.maxCombo || 0),
-            enemiesDefeated: Number(result?.enemiesDefeated || 0),
-            perfectWaves: Number(result?.perfectWaves || 0),
+            monstersDefeated,
+            eliteDefeated,
+            endReason,
             livesRemaining: Number(result?.livesRemaining || 0),
             focusChars
         }
@@ -192,7 +235,7 @@ export function createRaidSessionRecord(result) {
 
 export function recordRaidSessionCompletion(environment, result) {
     const session = createRaidSessionRecord(result);
-    recordSession(environment, session);
+    completeSession(environment, session);
     environment.setActiveSessionContext(null);
     return session;
 }
@@ -282,7 +325,7 @@ export function publishChallengeAttempt(environment, session, completionContext)
 export function recordSessionCompletion(environment, payload) {
     const completionContext = resolveSessionCompletionContext(environment);
     const session = createCompletedSessionRecord(environment, payload, completionContext);
-    const nextSessions = recordSession(environment, session);
+    const nextSessions = completeSession(environment, session);
 
     if (advanceAssessment(environment, session, nextSessions)) {
         return session;

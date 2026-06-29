@@ -23,9 +23,7 @@ export function AppStateBootstrap({ children }: AppStateBootstrapProps) {
     });
 
     usePersistAppState({
-        activeSessionContext: environment.activeSessionContext,
         config: environment.config,
-        diagnosticJourney: environment.diagnosticJourney,
         setCurrentDraft: environment.setCurrentDraft,
         settings: environment.settings,
         skillProfile: environment.skillProfile,
