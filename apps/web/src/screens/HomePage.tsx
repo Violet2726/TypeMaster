@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { ArrowRight, BarChart3, CalendarClock, Gauge, Keyboard, ShieldCheck, Swords, Target, TrendingUp, Trophy } from 'lucide-react';
+import { MetricStrip } from '@typemaster/ui';
 import { formatDateTime } from '../i18n';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { useHomePageModel } from '../features/home/use-home-page-model';
@@ -103,6 +104,29 @@ export function HomePage() {
     const homeStreakLabel = sessionStreak || pendingLabel;
     const homeAverageWpmLabel = hasSessions ? `${insights.recent7.avgWpm} ${copy.common.wpm}` : copy.statuses.ready;
     const homeBestAccuracyLabel = recentBestAccuracy ? `${recentBestAccuracy}%` : pendingLabel;
+    const homeMetricItems = [
+        {
+            id: 'streak',
+            icon: TrendingUp,
+            label: trainingCopy.home.streakLabel,
+            value: homeStreakLabel,
+            tone: 'streak'
+        },
+        {
+            id: 'wpm',
+            icon: Gauge,
+            label: copy.home.avgWpm,
+            value: homeAverageWpmLabel,
+            tone: 'speed'
+        },
+        {
+            id: 'accuracy',
+            icon: ShieldCheck,
+            label: copy.home.bestAccuracy,
+            value: homeBestAccuracyLabel,
+            tone: 'accuracy'
+        }
+    ];
     const statusBadge = skillProfile
         ? (hasSessions ? copy.statuses.ready : copy.statuses.idle)
         : trainingCopy.home.levelLabel;
@@ -193,20 +217,11 @@ export function HomePage() {
             </section>
 
             {!isStarterHome ? (
-                <section className="home-starter-metrics" aria-label={copy.home.statsTitle}>
-                    <div className="home-starter-metric">
-                        <span>{trainingCopy.home.streakLabel}</span>
-                        <strong>{homeStreakLabel}</strong>
-                    </div>
-                    <div className="home-starter-metric">
-                        <span>{copy.home.avgWpm}</span>
-                        <strong>{homeAverageWpmLabel}</strong>
-                    </div>
-                    <div className="home-starter-metric">
-                        <span>{copy.home.bestAccuracy}</span>
-                        <strong>{homeBestAccuracyLabel}</strong>
-                    </div>
-                </section>
+                <MetricStrip
+                    className="home-starter-metrics"
+                    ariaLabel={copy.home.statsTitle}
+                    items={homeMetricItems}
+                />
             ) : null}
 
             <section className="home-quick-cards" aria-label={trainingCopy.home.todayFlowTitle}>

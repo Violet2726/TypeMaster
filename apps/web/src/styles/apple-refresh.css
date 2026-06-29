@@ -11,7 +11,7 @@
 }
 
 body[data-theme='serika-light'] .words-shell {
-    background: rgba(255, 255, 255, 0.82);
+    background: var(--tm-white-alpha-820);
 }
 
 .words-shell.is-focused {
@@ -31,11 +31,11 @@ body[data-theme='serika-light'] .words-shell.is-focused {
 }
 
 body[data-theme='serika-light'] .words-shell::before {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), transparent);
+    background: linear-gradient(180deg, var(--tm-white-alpha-960), transparent);
 }
 
 body[data-theme='serika-light'] .words-shell::after {
-    background: linear-gradient(0deg, rgba(255, 255, 255, 0.96), transparent);
+    background: linear-gradient(0deg, var(--tm-white-alpha-960), transparent);
 }
 
 .words {
@@ -98,7 +98,7 @@ body[data-theme='serika-light'] .word[data-line-state='current'] .letter.pending
 }
 
 body[data-theme='serika-light'] .focus-overlay {
-    background: rgba(255, 255, 255, 0.64);
+    background: var(--tm-white-alpha-640);
     color: var(--text-strong);
 }
 
@@ -173,7 +173,7 @@ body[data-theme='serika-light'] .focus-overlay {
 
 .grid-line,
 .replay-grid-line {
-    stroke: rgba(255, 255, 255, 0.1);
+    stroke: var(--tm-white-alpha-100);
 }
 
 body[data-theme='serika-light'] .grid-line,
@@ -197,7 +197,7 @@ body[data-theme='serika-light'] .replay-grid-line {
 
 body[data-theme='serika-light'] .chart-tooltip,
 body[data-theme='serika-light'] .replay-floating-inspect {
-    background: rgba(255, 255, 255, 0.94);
+    background: var(--tm-white-alpha-940);
 }
 
 /* --- Responsive --- */

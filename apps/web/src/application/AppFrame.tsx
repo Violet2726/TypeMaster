@@ -3,6 +3,7 @@
 import { useMemo, type ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import { getInlineSeparator } from '../i18n';
+import { getRouteForPath } from './route-registry';
 import { Header } from '../features/shell/components/Header';
 import { SettingsDrawer } from '../features/shell/components/SettingsDrawer';
 import { useAppShellModel } from '../features/shell/use-app-shell-model';
@@ -43,6 +44,7 @@ export function AppFrame({ children }: AppFrameProps) {
 
     const isPracticeRoute = pathname === '/practice';
     const isFocusedLayout = settings.focusMode && isPracticeRoute;
+    const route = getRouteForPath(pathname || '/');
     const footerText = useMemo(() => (
         isFocusedLayout
             ? copy.shell.footerFocus
@@ -50,7 +52,7 @@ export function AppFrame({ children }: AppFrameProps) {
     ), [copy, isFocusedLayout, settings.language]);
 
     return (
-        <div className={`app-shell ${isFocusedLayout ? 'is-focus-layout' : ''} ${settingsOpen ? 'is-settings-open' : ''}`}>
+        <div className={`app-shell app-shell--${route.id} ${isFocusedLayout ? 'is-focus-layout' : ''} ${settingsOpen ? 'is-settings-open' : ''}`}>
             <Header
                 settings={settings}
                 copy={copy}

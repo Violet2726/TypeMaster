@@ -10,6 +10,7 @@ import '../src/styles/panels.css';
 import '../src/styles/base-page.css';
 import '../src/styles/typography.css';
 import '../src/styles/apple-refresh.css';
+import '../src/styles/design-system.css';
 import '../src/styles/animations.css';
 import '../src/styles/toggle-switch.css';
 import '../src/styles/typing-experience.css';
@@ -21,7 +22,6 @@ import '../src/styles/settings.css';
 import '../src/styles/dialogs.css';
 import '../src/styles/mobile.css';
 import '../src/styles/challenge-page-full.css';
-import '../src/styles/coach-page-full.css';
 import '../src/styles/training-plan-page-full.css';
 
 export const metadata: Metadata = {

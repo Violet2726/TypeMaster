@@ -1,6 +1,7 @@
 'use client';
 
-import { CalendarClock, Gauge, Keyboard, LineChart, ShieldCheck, Target, Trophy } from 'lucide-react';
+import { CalendarClock, Gauge, Keyboard, LineChart, ShieldCheck, Swords, Target, Trophy } from 'lucide-react';
+import { MetricStrip } from '@typemaster/ui';
 import { formatDateTime, formatShortDate, getInlineSeparator } from '../i18n';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { useInsightsPageModel } from '../features/insights/use-insights-page-model';
@@ -241,6 +242,7 @@ export function InsightsPage() {
     const {
         achievements,
         copy,
+        handleAssessment,
         handleKeyboardZoneDrill,
         insights,
         language,
@@ -263,7 +265,7 @@ export function InsightsPage() {
                 copy={copy}
                 trainingCopy={trainingCopy}
                 onStart={() => navigate('/practice')}
-                onAssess={() => navigate('/diagnostic')}
+                onAssess={handleAssessment}
             />
         );
     }
@@ -320,6 +322,35 @@ export function InsightsPage() {
             value: String(weeklySessions)
         }
     ];
+    const surfaceCounts = (insights.surfaceBreakdown?.counts || {}) as Record<string, number>;
+    const surfaceMetrics = [
+        {
+            id: 'practice',
+            icon: Keyboard,
+            label: copy.nav.practice,
+            value: String(surfaceCounts.practice || 0)
+        },
+        {
+            id: 'challenge',
+            icon: Target,
+            label: trainingCopy.nav.challenge,
+            value: String(surfaceCounts.challenge || 0)
+        },
+        {
+            id: 'raid',
+            icon: Swords,
+            label: 'Raid',
+            value: insights.raidSummary?.count
+                ? `${insights.raidSummary.count} / ${insights.raidSummary.bestScore}`
+                : '0'
+        },
+        {
+            id: 'plan',
+            icon: CalendarClock,
+            label: trainingCopy.nav.plan,
+            value: String((surfaceCounts.plan || 0) + (surfaceCounts.diagnostic || 0))
+        }
+    ];
 
     return (
         <div className="page-stack insights-page">
@@ -345,6 +376,12 @@ export function InsightsPage() {
                         </div>
                     ))}
                 </div>
+
+                <MetricStrip
+                    className="insights-surface-strip"
+                    ariaLabel={copy.common.sessions}
+                    items={surfaceMetrics}
+                />
 
                 <div className="insights-command-center__coach">
                     <div>

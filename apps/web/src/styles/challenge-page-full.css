@@ -694,7 +694,7 @@
 body[data-theme='serika-light'] .challenge-starter-panel,
 body[data-theme='serika-light'] .challenge-hero,
 body[data-theme='serika-light'] .challenge-first-run-panel {
-    background: rgba(255, 255, 255, 0.94);
+    background: var(--tm-white-alpha-940);
 }
 
 body[data-theme='serika-light'] .challenge-starter-brief,
@@ -702,11 +702,11 @@ body[data-theme='serika-light'] .challenge-starter-route span,
 body[data-theme='serika-light'] .challenge-empty-status,
 body[data-theme='serika-light'] .challenge-replay-empty,
 body[data-theme='serika-light'] .challenge-first-run-card {
-    background: rgba(255, 255, 255, 0.82);
+    background: var(--tm-white-alpha-820);
 }
 
 body[data-theme='serika-light'] .challenge-page .history-table {
-    background: rgba(255, 255, 255, 0.88);
+    background: var(--tm-white-alpha-880);
 }
 
 body[data-theme='serika-light'] .challenge-page .history-row:hover {
@@ -714,7 +714,7 @@ body[data-theme='serika-light'] .challenge-page .history-row:hover {
 }
 
 body[data-theme='serika-light'] .challenge-status-card {
-    background: rgba(255, 255, 255, 0.92);
+    background: var(--tm-white-alpha-920);
 }
 
 body[data-theme='serika-light'] .challenge-metric-pill {

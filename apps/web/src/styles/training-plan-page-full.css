@@ -534,7 +534,7 @@
     width: 2.35rem;
     height: 2.35rem;
     border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--tm-white-alpha-100);
     background: var(--surface-2);
     color: var(--text-strong);
     font-size: 0.88rem;
@@ -617,7 +617,7 @@ body[data-theme='serika-light'] .training-plan-hero,
 body[data-theme='serika-light'] .training-plan-onboarding,
 body[data-theme='serika-light'] .training-plan-step,
 body[data-theme='serika-light'] .training-plan-empty {
-    background: rgba(255, 255, 255, 0.94);
+    background: var(--tm-white-alpha-940);
 }
 
 body[data-theme='serika-light'] .training-plan-gateway,
@@ -626,7 +626,7 @@ body[data-theme='serika-light'] .training-plan-route-map__item,
 body[data-theme='serika-light'] .training-plan-unlock-panel,
 body[data-theme='serika-light'] .training-plan-current,
 body[data-theme='serika-light'] .training-plan-hero__metric {
-    background: rgba(255, 255, 255, 0.82);
+    background: var(--tm-white-alpha-820);
 }
 
 body[data-theme='serika-light'] .training-plan-ring::after {

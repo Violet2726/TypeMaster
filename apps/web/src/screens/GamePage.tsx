@@ -1,255 +1,325 @@
 'use client';
 
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import '../../src/styles/game-page.css';
 import { useGameStore } from '../features/game/state/game-store';
-import { appendSession } from '../services/storage/sessions-repo';
-import { createGameEngine } from '../engine/game-engine';
-import { initTouchInput, destroyTouchInput, focusInput, isMobile } from '../engine/touch-input';
-import type { GameEngine } from '../engine/game-engine';
+import { createGameEngine, type GameEngine, type RaidMode } from '../engine/game-engine';
+import { RaidRenderer } from '../engine/raid-renderer';
 import IdleScreenOverlay from '../components/idle/IdleScreenOverlay';
 import PauseMenuOverlay from '../components/overlay/PauseMenuOverlay';
 import GameplayHud from '../components/overlay/GameplayHud';
 import GameOverOverlay from '../components/overlay/GameOverOverlay';
 
-// ---------------------------------------------------------------------------
-// GamePage - thin React shell around the engine
-// ---------------------------------------------------------------------------
+function getFocusChars(keyboardHotspots: any) {
+    const chars = keyboardHotspots?.primaryZone?.chars;
+    if (!Array.isArray(chars)) return [];
+    return chars
+        .map((item) => String(item?.label || '').toLowerCase())
+        .filter((char) => char.length === 1)
+        .slice(0, 5);
+}
 
 export default function GamePage() {
+    const containerRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [idleMode, setIdleMode] = useState(true);
-    const [pausedMode, setPausedMode] = useState(false);
-    const [hudData, setHudData] = useState({ score: 0, wave: 1, combo: 0, maxCombo: 0, lives: 5, maxLives: 5, accuracy: 100 });
-    const [pauseData, setPauseData] = useState({ score: 0, wave: 1, combo: 0, maxCombo: 0, lives: 5, maxLives: 5, enemiesDefeated: 0, accuracy: 100, wpm: 0, duration: 0 });
-    const [gameOverMode, setGameOverMode] = useState(false);
-    const [gameOverData, setGameOverData] = useState({ score: 0, wave: 1, wpm: 0, accuracy: 100, maxCombo: 0, enemiesDefeated: 0, duration: 0, isBest: false });
+    const inputRef = useRef<HTMLInputElement>(null);
     const engineRef = useRef<GameEngine | null>(null);
-    const animRef = useRef<number>(0);
-    const lastTimeRef = useRef(0);
-    const { keyboardHotspots } = useGameStore();
+    const rendererRef = useRef<RaidRenderer | null>(null);
+    const frameRef = useRef<number>(0);
+    const lastFrameTimeRef = useRef(0);
+    const lastUiCommitRef = useRef(0);
+    const snapshotRef = useRef<any>(null);
+    const savedResultKeyRef = useRef('');
+    const bestScoreRef = useRef(0);
+    const bestResultKeyRef = useRef('');
+    const { keyboardHotspots, language, raidBestScore, recordCompletedRaidSession } = useGameStore();
+    const focusChars = useMemo(() => getFocusChars(keyboardHotspots), [keyboardHotspots]);
+    const [snapshot, setSnapshot] = useState<any>(null);
+    const [bestScore, setBestScore] = useState(0);
 
-    const handlePauseAction = useCallback((action: string) => {
-        const engine = engineRef.current;
-        if (!engine) return;
-        engine.dispatchPauseAction(action);
+    const commitUpdate = useCallback((update: any, immediate = false) => {
+        const renderer = rendererRef.current;
+        const previous = snapshotRef.current;
+        const next = update.snapshot;
+
+        if (renderer) {
+            renderer.handleEvents(update.events || [], next);
+        }
+
+        snapshotRef.current = next;
+        const now = performance.now();
+        const phaseChanged = previous?.phase !== next?.phase;
+        const hasEvents = (update.events || []).length > 0;
+
+        if (immediate || phaseChanged || hasEvents || now - lastUiCommitRef.current >= 100) {
+            lastUiCommitRef.current = now;
+            setSnapshot(next);
+        }
     }, []);
 
-    const handleGameOverAction = useCallback((action: string) => {
+    const maybeSaveResult = useCallback((nextSnapshot: any) => {
+        if (!nextSnapshot || (nextSnapshot.phase !== 'complete' && nextSnapshot.phase !== 'gameover')) return;
+        const result = nextSnapshot.overlay?.result;
+        if (!result) return;
+
+        const key = `${nextSnapshot.phase}:${result.score}:${result.durationSeconds}:${result.maxCombo}`;
+        if (savedResultKeyRef.current === key) return;
+        savedResultKeyRef.current = key;
+        if (result.score > bestScoreRef.current) {
+            bestResultKeyRef.current = key;
+        }
+
+        recordCompletedRaidSession(result);
+        setBestScore((current) => {
+            const next = Math.max(current, result.score);
+            bestScoreRef.current = next;
+            return next;
+        });
+    }, [recordCompletedRaidSession]);
+
+    const dispatchAction = useCallback((command: string, payload: Record<string, unknown> = {}) => {
         const engine = engineRef.current;
         if (!engine) return;
-        engine.dispatchGameOverAction(action);
-    }, []);
+
+        if (command === 'start' || command === 'retry') {
+            savedResultKeyRef.current = '';
+        }
+
+        const update = engine.dispatch(command as any, payload);
+        commitUpdate(update, true);
+        maybeSaveResult(update.snapshot);
+        inputRef.current?.focus({ preventScroll: true });
+    }, [commitUpdate, maybeSaveResult]);
 
     const handleIdleAction = useCallback((action: string) => {
-        const engine = engineRef.current;
-        if (!engine) return;
-        engine.dispatchIdleAction(action);
-    }, []);
-
-    const saveResult = useCallback(() => {
-        const engine = engineRef.current;
-        if (!engine) return;
-        const result = engine.saveGameResult();
-        const sessionId = 'raid-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 6);
-        appendSession({
-            id: sessionId,
-            config: { mode: 'words', wordCount: 0, durationSeconds: 0, includePunctuation: false, includeNumbers: false, source: 'builtin', aiTemplate: 'daily', difficulty: 'medium' },
-            result: {
-                wpm: result.wpm,
-                rawWpm: result.wpm,
-                accuracy: result.accuracy,
-                consistency: 0,
-                correctChars: result.totalCharsCorrect,
-                incorrectChars: result.totalCharsTyped - result.totalCharsCorrect,
-                extraChars: 0,
-                missedChars: 0,
-                durationSeconds: result.durationSeconds,
-                completedAt: new Date().toISOString(),
-                errors: 0,
-                topErrorChars: [],
-                topErrorWords: [],
-                errorCharStats: [],
-                errorWordStats: []
-            },
-            trainingMeta: {
-                type: 'raid' as const,
-                title: 'Typing Raid',
-                score: result.score,
-                wave: result.wave,
-                maxCombo: result.maxCombo,
-                enemiesDefeated: result.enemiesDefeated,
-                perfectWaves: result.perfectWaves,
-                livesRemaining: result.livesRemaining
-            }
+        const raidMode: RaidMode = action === 'daily-focus' ? 'daily-focus' : 'standard';
+        dispatchAction('start', {
+            raidMode,
+            focusChars
         });
-    }, []);
+    }, [dispatchAction, focusChars]);
 
-    // Testing hooks
+    const handlePauseAction = useCallback((action: string) => {
+        if (action === 'resume') dispatchAction('resume');
+        if (action === 'retry') dispatchAction('retry', { focusChars });
+        if (action === 'quit') dispatchAction('quit');
+    }, [dispatchAction, focusChars]);
+
+    const handleResultAction = useCallback((action: string) => {
+        if (action === 'retry') dispatchAction('retry', { focusChars });
+        if (action === 'menu') dispatchAction('quit');
+    }, [dispatchAction, focusChars]);
+
+    useEffect(() => {
+        bestScoreRef.current = raidBestScore;
+        setBestScore(raidBestScore);
+    }, [raidBestScore]);
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        const container = containerRef.current;
+        if (!canvas || !container) return;
+
+        const engine = createGameEngine({
+            language: language || 'zh-CN',
+            focusChars
+        });
+        const renderer = new RaidRenderer();
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        renderer.setReducedMotion(reducedMotion.matches);
+
+        engineRef.current = engine;
+        rendererRef.current = renderer;
+        commitUpdate({ snapshot: engine.snapshot, events: [] }, true);
+
+        function resize() {
+            const rect = container!.getBoundingClientRect();
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const width = Math.max(1, Math.floor(rect.width));
+            const height = Math.max(1, Math.floor(rect.height));
+
+            canvas!.width = Math.floor(width * dpr);
+            canvas!.height = Math.floor(height * dpr);
+            canvas!.style.width = `${width}px`;
+            canvas!.style.height = `${height}px`;
+
+            const ctx = canvas!.getContext('2d');
+            if (ctx) {
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            }
+
+            engine.resize(width, height);
+            renderer.resize(width, height, dpr);
+        }
+
+        const resizeObserver = new ResizeObserver(resize);
+        resizeObserver.observe(container);
+        resize();
+
+        function loop(timestamp: number) {
+            const ctx = canvas!.getContext('2d');
+            if (!ctx) return;
+
+            if (document.hidden) {
+                lastFrameTimeRef.current = timestamp;
+                frameRef.current = requestAnimationFrame(loop);
+                return;
+            }
+
+            if (!lastFrameTimeRef.current) lastFrameTimeRef.current = timestamp;
+            const delta = Math.min((timestamp - lastFrameTimeRef.current) / 1000, 0.08);
+            lastFrameTimeRef.current = timestamp;
+
+            const update = engine.tick(delta);
+            commitUpdate(update);
+            renderer.render(ctx, update.snapshot, delta);
+            maybeSaveResult(update.snapshot);
+
+            frameRef.current = requestAnimationFrame(loop);
+        }
+
+        frameRef.current = requestAnimationFrame(loop);
+
+        function handleReducedMotionChange(event: MediaQueryListEvent) {
+            renderer.setReducedMotion(event.matches);
+        }
+
+        reducedMotion.addEventListener('change', handleReducedMotionChange);
+
+        return () => {
+            cancelAnimationFrame(frameRef.current);
+            resizeObserver.disconnect();
+            reducedMotion.removeEventListener('change', handleReducedMotionChange);
+            engine.destroy();
+            engineRef.current = null;
+            rendererRef.current = null;
+        };
+    }, [commitUpdate, language, maybeSaveResult]);
+
+    useEffect(() => {
+        function handleKey(event: KeyboardEvent) {
+            if (event.target === inputRef.current) return;
+            const engine = engineRef.current;
+            if (!engine) return;
+            const update = engine.handleKey(event);
+            commitUpdate(update, update.events.length > 0);
+            maybeSaveResult(update.snapshot);
+        }
+
+        window.addEventListener('keydown', handleKey);
+        return () => window.removeEventListener('keydown', handleKey);
+    }, [commitUpdate, maybeSaveResult]);
+
     useEffect(() => {
         (window as any).render_game_to_text = function () {
-            const engine = engineRef.current;
-            if (!engine) return '{}';
-            const s = engine.state;
+            const current = snapshotRef.current;
+            if (!current) return '{}';
             return JSON.stringify({
-                mode: s.mode, score: s.score, wave: s.wave, combo: s.combo,
-                maxCombo: s.maxCombo, lives: s.lives, enemiesDefeated: s.enemiesDefeated,
-                enemiesLeaked: s.enemiesLeaked, enemiesTotal: s.enemiesTotal,
-                activeEnemyId: s.activeEnemyId, typedInput: s.typedInput,
-                enemies: s.enemies.filter((e: any) => e.alive).map((e: any) => ({
-                    id: e.id, type: e.type, word: e.word,
-                    x: Math.round(e.x), y: Math.round(e.y), typed: e.typed
+                phase: current.phase,
+                hud: current.hud,
+                enemies: current.arena.enemies.map((enemy: any) => ({
+                    id: enemy.id,
+                    type: enemy.type,
+                    word: enemy.word,
+                    typed: enemy.typed,
+                    y: Number(enemy.y.toFixed(3))
                 }))
             });
         };
+
         (window as any).advanceTime = function (ms: number) {
             const engine = engineRef.current;
-            if (!engine) return;
-            const steps = Math.max(1, Math.round(ms / (1000 / 60)));
-            for (let i = 0; i < steps; i++) engine.tick(1 / 60);
+            const renderer = rendererRef.current;
             const canvas = canvasRef.current;
-            if (canvas) {
-                const ctx = canvas.getContext('2d');
-                if (ctx) engine.render(ctx, canvas.width, canvas.height);
+            const ctx = canvas?.getContext('2d');
+            if (!engine || !renderer || !ctx) return;
+
+            const steps = Math.max(1, Math.round(ms / 16));
+            let update = { snapshot: engine.snapshot, events: [] as any[] };
+            for (let i = 0; i < steps; i += 1) {
+                update = engine.tick(1 / 60);
             }
+            commitUpdate(update, true);
+            renderer.render(ctx, update.snapshot, 1 / 60);
+            maybeSaveResult(update.snapshot);
         };
+
         return () => {
             delete (window as any).render_game_to_text;
             delete (window as any).advanceTime;
         };
-    }, []);
+    }, [commitUpdate, maybeSaveResult]);
 
-    // Game loop
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
+    const handleVirtualBeforeInput = useCallback((event: FormEvent<HTMLInputElement>) => {
+        const nativeEvent = event.nativeEvent as InputEvent;
+        const char = String(nativeEvent.data || '').slice(-1).toLowerCase();
+        if (!char) return;
+        event.preventDefault();
+        dispatchAction('type-char', { char });
+        if (inputRef.current) inputRef.current.value = '';
+    }, [dispatchAction]);
 
-        const engine = createGameEngine();
-        engineRef.current = engine;
-        engine.suppressIdleKeys = true;
+    const handleInputKeyDown = useCallback((event: ReactKeyboardEvent<HTMLInputElement>) => {
+        const engine = engineRef.current;
+        if (!engine) return;
+        if (event.key.length === 1) return;
+        const update = engine.handleKey(event.nativeEvent);
+        commitUpdate(update, update.events.length > 0);
+        maybeSaveResult(update.snapshot);
+    }, [commitUpdate, maybeSaveResult]);
 
-        // Initialize touch input for mobile
-        if (isMobile()) {
-            initTouchInput({
-                onChar: (ch) => {
-                    const fakeEvent = new KeyboardEvent('keydown', { key: ch, bubbles: true });
-                    engine.handleKey(fakeEvent);
-                },
-                onKey: (key) => {
-                    const fakeEvent = new KeyboardEvent('keydown', { key, bubbles: true });
-                    engine.handleKey(fakeEvent);
-                },
-            });
+    const resultOverlay = snapshot?.overlay?.type === 'result'
+        ? {
+            ...snapshot.overlay.result,
+            isVictory: snapshot.overlay.isVictory,
+            isBest: bestResultKeyRef.current === `${snapshot.phase}:${snapshot.overlay.result?.score}:${snapshot.overlay.result?.durationSeconds}:${snapshot.overlay.result?.maxCombo}`
+                || (snapshot.overlay.result?.score || 0) > bestScore
         }
-
-        function resize() {
-            const container = canvas!.parentElement;
-            if (!container) return;
-            canvas!.width = container.clientWidth;
-            canvas!.height = container.clientHeight;
-            engine.resize(canvas!.width, canvas!.height);
-        }
-        resize();
-        window.addEventListener('resize', resize);
-
-        // Canvas click/touch for run map and encounter UI
-        function handleCanvasClick(e: MouseEvent | TouchEvent) {
-            const rect = canvas!.getBoundingClientRect();
-            let clientX: number, clientY: number;
-            if ('touches' in e) {
-                clientX = e.touches[0].clientX;
-                clientY = e.touches[0].clientY;
-            } else {
-                clientX = e.clientX;
-                clientY = e.clientY;
-            }
-            const x = clientX - rect.left;
-            const y = clientY - rect.top;
-            if (engine.handleCanvasClick) engine.handleCanvasClick(x, y);
-        }
-        canvas.addEventListener('click', handleCanvasClick);
-        canvas.addEventListener('touchend', (e) => { e.preventDefault(); handleCanvasClick(e); });
-
-        function gameLoop(ts: number) {
-            if (lastTimeRef.current === 0) lastTimeRef.current = ts;
-            const dt = Math.min((ts - lastTimeRef.current) / 1000, 0.05);
-            lastTimeRef.current = ts;
-
-            // Auto-save on game over transition
-            const wasGameOver = engine.state.mode === 'gameover';
-
-            engine.tick(dt);
-            setIdleMode(engine.state.mode === 'idle');
-            const isPaused = engine.state.mode === 'paused';
-            setPausedMode(isPaused);
-            if (isPaused) {
-                setPauseData(engine.getPauseData());
-                engine.suppressCanvasPause = true;
-            } else {
-                engine.suppressCanvasPause = false;
-            }
-            if (engine.state.mode === 'playing' || engine.state.mode === 'resuming') {
-                setHudData(engine.getHudData());
-            }
-            const isGameOver = engine.state.mode === 'gameover';
-            setGameOverMode(isGameOver);
-            if (isGameOver) {
-                setGameOverData(engine.getGameOverData());
-                engine.suppressCanvasGameOver = true;
-            } else {
-                engine.suppressCanvasGameOver = false;
-            }
-
-            const ctx = canvas!.getContext('2d');
-            if (ctx) engine.render(ctx, canvas!.width, canvas!.height);
-
-            if (!wasGameOver && engine.state.mode === 'gameover') {
-                saveResult();
-            }
-
-            animRef.current = requestAnimationFrame(gameLoop);
-        }
-        animRef.current = requestAnimationFrame(gameLoop);
-
-        return () => {
-            window.removeEventListener('resize', resize);
-            cancelAnimationFrame(animRef.current);
-            engine.destroy();
-            destroyTouchInput();
-        };
-    }, [saveResult]);
-
-    // Keyboard
-    useEffect(() => {
-        function handleKey(e: KeyboardEvent) {
-            engineRef.current?.handleKey(e);
-        }
-        window.addEventListener('keydown', handleKey);
-        return () => window.removeEventListener('keydown', handleKey);
-    }, []);
+        : null;
 
     return (
-        <div className="game-container" role="application" aria-label="Typing Raid - ��Ϸ����">
-            {idleMode && <IdleScreenOverlay onAction={handleIdleAction} />}
-            {pausedMode && <PauseMenuOverlay stats={pauseData} onAction={handlePauseAction} />}
-            {!idleMode && !pausedMode && !gameOverMode && engineRef.current && (
-                <GameplayHud data={hudData} />
-            )}
-            {gameOverMode && <GameOverOverlay data={gameOverData} onAction={handleGameOverAction} />}
+        <div
+            ref={containerRef}
+            className="game-container"
+            role="application"
+            aria-label="Typing Raid 打字突袭游戏"
+            onPointerDown={() => inputRef.current?.focus({ preventScroll: true })}
+        >
             <canvas
                 ref={canvasRef}
                 className="game-canvas"
                 role="img"
-                aria-label="����ͻϮ��Ϸ���� - ���뵥���������"
-                tabIndex={0}
+                aria-label="打字突袭战场，输入敌方单词以清除目标"
             />
-            {/* Live region for screen reader announcements */}
-            <div
-                className="sr-only"
-                role="status"
-                aria-live="polite"
-                aria-atomic="true"
+            <input
+                ref={inputRef}
+                className="game-keyboard-input"
+                aria-label="Typing Raid input"
+                autoCapitalize="none"
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck={false}
+                inputMode="text"
+                onBeforeInput={handleVirtualBeforeInput}
+                onKeyDown={handleInputKeyDown}
             />
+            {snapshot?.phase === 'idle' && (
+                <IdleScreenOverlay
+                    focusChars={focusChars}
+                    bestScore={bestScore}
+                    onAction={handleIdleAction}
+                />
+            )}
+            {snapshot?.phase === 'playing' && <GameplayHud data={snapshot.hud} />}
+            {snapshot?.phase === 'paused' && (
+                <PauseMenuOverlay stats={snapshot.hud} onAction={handlePauseAction} />
+            )}
+            {resultOverlay && (
+                <GameOverOverlay data={resultOverlay} onAction={handleResultAction} />
+            )}
+            <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+                {snapshot?.liveMessage || ''}
+            </div>
         </div>
     );
 }

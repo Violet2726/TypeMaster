@@ -1,5 +1,5 @@
-import DiagnosticPage from '../../src/screens/DiagnosticPage';
+import { redirect } from 'next/navigation';
 
-export default function Page() {
-    return <DiagnosticPage />;
+export default function DiagnosticRedirect() {
+    redirect('/practice');
 }

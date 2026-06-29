@@ -4,9 +4,9 @@
     --bg-color: #070708;
     --bg-elevated: rgba(28, 28, 30, 0.74);
     --bg-panel: rgba(20, 20, 22, 0.9);
-    --bg-soft: rgba(255, 255, 255, 0.06);
-    --surface-2: rgba(255, 255, 255, 0.08);
-    --surface-3: rgba(255, 255, 255, 0.10);
+    --bg-soft: var(--tm-white-alpha-060);
+    --surface-2: var(--tm-white-alpha-080);
+    --surface-3: var(--tm-white-alpha-100);
 
     --main-color: #0a84ff;
     --main-soft: rgba(10, 132, 255, 0.16);
@@ -24,7 +24,7 @@
     --free-color: #30d158;
     --free-soft: rgba(48, 209, 88, 0.12);
 
-    /* Accent palette ¡ª challenge / streak / icon surfaces */
+    /* Accent palette for challenge, streak, and icon surfaces */
     --accent-blue: #8ecaff;
     --accent-blue-bg: rgba(10, 132, 255, 0.14);
     --accent-blue-border: rgba(10, 132, 255, 0.28);
@@ -40,7 +40,7 @@
     --text-strong: #f5f5f7;
     --text-dim: #8e8e93;
 
-    --panel-stroke: rgba(255, 255, 255, 0.10);
+    --panel-stroke: var(--tm-white-alpha-100);
     --shadow-soft: 0 2px 12px rgba(0, 0, 0, 0.08);
     --shadow-focus: 0 0 0 4px rgba(10, 132, 255, 0.24);
     --radius-sm: 12px;
@@ -70,8 +70,8 @@
 
 body[data-theme='serika-light'] {
     --bg-color: #f5f5f7;
-    --bg-elevated: rgba(255, 255, 255, 0.74);
-    --bg-panel: rgba(255, 255, 255, 0.92);
+    --bg-elevated: var(--tm-white-alpha-740);
+    --bg-panel: var(--tm-white-alpha-920);
     --bg-soft: rgba(0, 0, 0, 0.04);
     --surface-2: rgba(0, 0, 0, 0.055);
     --surface-3: rgba(0, 0, 0, 0.085);
@@ -91,7 +91,7 @@ body[data-theme='serika-light'] {
     --free-color: #1f8b3d;
     --free-soft: rgba(31, 139, 61, 0.10);
 
-    /* Accent palette ¡ª light overrides */
+    /* Accent palette for light theme overrides */
     --accent-blue: #0a6fcc;
     --accent-blue-bg: rgba(10, 132, 255, 0.10);
     --accent-blue-border: rgba(10, 132, 255, 0.20);

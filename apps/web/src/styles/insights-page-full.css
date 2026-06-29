@@ -110,16 +110,16 @@
 }
 
 body[data-theme='serika-light'] .insights-empty-preview {
-    background: rgba(255, 255, 255, 0.94);
+    background: var(--tm-white-alpha-940);
 }
 
 body[data-theme='serika-light'] .insights-empty-preview__metric {
-    background: rgba(255, 255, 255, 0.82);
+    background: var(--tm-white-alpha-820);
 }
 
 body[data-theme='serika-light'] .insights-empty-panel__signals span,
 body[data-theme='serika-light'] .insights-empty-preview__route span {
-    background: rgba(255, 255, 255, 0.74);
+    background: var(--tm-white-alpha-740);
 }
 
 body[data-theme='serika-light'] .insights-empty-preview__unlock p {
@@ -215,6 +215,18 @@ body[data-theme='serika-light'] .insights-empty-preview__unlock p {
 .insights-empty-preview__unlock-list {
     display: grid;
     gap: 0;
+}
+
+.insights-surface-strip {
+    grid-column: 1 / -1;
+}
+
+.insights-surface-strip .tm-metric {
+    min-height: 68px;
+}
+
+.insights-surface-strip .tm-metric strong {
+    font-size: 1.2rem;
 }
 
 .insights-empty-preview__unlock {
@@ -500,7 +512,7 @@ body[data-theme='serika-light'] .insights-command-center__coach,
 body[data-theme='serika-light'] .insights-command-center__radar,
 body[data-theme='serika-light'] .insights-command-center__radar-metrics div {
     border-color: rgba(60, 60, 67, 0.1);
-    background: rgba(255, 255, 255, 0.94);
+    background: var(--tm-white-alpha-940);
 }
 
 body[data-theme='serika-light'] .insights-command-center h1,
@@ -544,7 +556,7 @@ body[data-theme='serika-light'] .insights-command-center__radar p {
 
 body[data-theme='serika-light'] .insights-trend-panel .mini-series__row {
     border-color: rgba(60, 60, 67, 0.1);
-    background: rgba(255, 255, 255, 0.94);
+    background: var(--tm-white-alpha-940);
 }
 
 /* --- Data panels --- */
@@ -557,7 +569,7 @@ body[data-theme='serika-light'] .insights-trend-panel .mini-series__row {
 
 body[data-theme='serika-light'] .insights-keyboard-panel,
 body[data-theme='serika-light'] .insights-history-panel {
-    background: rgba(255, 255, 255, 0.94);
+    background: var(--tm-white-alpha-940);
 }
 
 /* --- History table --- */
@@ -596,7 +608,7 @@ body[data-theme='serika-light'] .insights-history-panel {
 }
 
 body[data-theme='serika-light'] .home-records-panel .history-table {
-    background: rgba(255, 255, 255, 0.76);
+    background: var(--tm-white-alpha-760);
 }
 
 /* --- History panel (moved from practice-workshop.css) --- */
@@ -634,7 +646,7 @@ body[data-theme='serika-light'] .home-records-panel .history-table {
 }
 
 body[data-theme='serika-light'] .history-metric-pill {
-    background: rgba(255, 255, 255, 0.72);
+    background: var(--tm-white-alpha-720);
 }
 
 /* --- Responsive --- */

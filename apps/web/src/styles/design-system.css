@@ -1,0 +1,308 @@
+:root {
+    --tm-radius-control: 8px;
+    --tm-radius-panel: 8px;
+    --tm-touch-target: 44px;
+    /* White alpha scale for material, strokes, and text overlays. */
+    --tm-white-alpha-000: color-mix(in srgb, #fff 0%, transparent);
+    --tm-white-alpha-012: color-mix(in srgb, #fff 1.2%, transparent);
+    --tm-white-alpha-015: color-mix(in srgb, #fff 1.5%, transparent);
+    --tm-white-alpha-045: color-mix(in srgb, #fff 4.5%, transparent);
+    --tm-white-alpha-060: color-mix(in srgb, #fff 6%, transparent);
+    --tm-white-alpha-065: color-mix(in srgb, #fff 6.5%, transparent);
+    --tm-white-alpha-068: color-mix(in srgb, #fff 6.8%, transparent);
+    --tm-white-alpha-070: color-mix(in srgb, #fff 7%, transparent);
+    --tm-white-alpha-080: color-mix(in srgb, #fff 8%, transparent);
+    --tm-white-alpha-090: color-mix(in srgb, #fff 9%, transparent);
+    --tm-white-alpha-100: color-mix(in srgb, #fff 10%, transparent);
+    --tm-white-alpha-110: color-mix(in srgb, #fff 11%, transparent);
+    --tm-white-alpha-120: color-mix(in srgb, #fff 12%, transparent);
+    --tm-white-alpha-180: color-mix(in srgb, #fff 18%, transparent);
+    --tm-white-alpha-200: color-mix(in srgb, #fff 20%, transparent);
+    --tm-white-alpha-220: color-mix(in srgb, #fff 22%, transparent);
+    --tm-white-alpha-240: color-mix(in srgb, #fff 24%, transparent);
+    --tm-white-alpha-350: color-mix(in srgb, #fff 35%, transparent);
+    --tm-white-alpha-420: color-mix(in srgb, #fff 42%, transparent);
+    --tm-white-alpha-460: color-mix(in srgb, #fff 46%, transparent);
+    --tm-white-alpha-480: color-mix(in srgb, #fff 48%, transparent);
+    --tm-white-alpha-500: color-mix(in srgb, #fff 50%, transparent);
+    --tm-white-alpha-550: color-mix(in srgb, #fff 55%, transparent);
+    --tm-white-alpha-580: color-mix(in srgb, #fff 58%, transparent);
+    --tm-white-alpha-620: color-mix(in srgb, #fff 62%, transparent);
+    --tm-white-alpha-640: color-mix(in srgb, #fff 64%, transparent);
+    --tm-white-alpha-720: color-mix(in srgb, #fff 72%, transparent);
+    --tm-white-alpha-740: color-mix(in srgb, #fff 74%, transparent);
+    --tm-white-alpha-760: color-mix(in srgb, #fff 76%, transparent);
+    --tm-white-alpha-780: color-mix(in srgb, #fff 78%, transparent);
+    --tm-white-alpha-820: color-mix(in srgb, #fff 82%, transparent);
+    --tm-white-alpha-840: color-mix(in srgb, #fff 84%, transparent);
+    --tm-white-alpha-860: color-mix(in srgb, #fff 86%, transparent);
+    --tm-white-alpha-880: color-mix(in srgb, #fff 88%, transparent);
+    --tm-white-alpha-920: color-mix(in srgb, #fff 92%, transparent);
+    --tm-white-alpha-940: color-mix(in srgb, #fff 94%, transparent);
+    --tm-white-alpha-960: color-mix(in srgb, #fff 96%, transparent);
+    --tm-white-alpha-980: color-mix(in srgb, #fff 98%, transparent);
+    --tm-surface: rgba(20, 21, 25, 0.82);
+    --tm-surface-soft: var(--bg-soft);
+    --tm-surface-strong: var(--surface-2);
+    --tm-border: var(--panel-stroke);
+    --tm-border-strong: var(--text-muted);
+    --tm-shadow-panel: 0 18px 52px rgba(0, 0, 0, 0.28);
+    --tm-motion-standard: 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+body {
+    background:
+        linear-gradient(180deg, var(--bg-soft), transparent 240px),
+        var(--bg-color);
+}
+
+body[data-theme='serika-light'] {
+    --tm-surface: var(--bg-elevated);
+    --tm-surface-soft: rgba(0, 0, 0, 0.035);
+    --tm-surface-strong: rgba(0, 0, 0, 0.06);
+    --tm-border: rgba(0, 0, 0, 0.08);
+    --tm-border-strong: rgba(0, 0, 0, 0.14);
+    --tm-shadow-panel: 0 16px 42px rgba(0, 0, 0, 0.08);
+}
+
+.tm-button,
+.tm-icon-button,
+.tm-segmented button {
+    min-height: var(--tm-touch-target);
+    border: 1px solid var(--tm-border);
+    border-radius: var(--tm-radius-control);
+    transition:
+        border-color var(--tm-motion-standard),
+        background-color var(--tm-motion-standard),
+        color var(--tm-motion-standard),
+        transform var(--tm-motion-standard);
+}
+
+.tm-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0 1rem;
+    color: var(--text-strong);
+    background: var(--tm-surface-soft);
+    font-weight: 720;
+}
+
+.tm-button--primary {
+    border-color: rgba(10, 132, 255, 0.44);
+    background: var(--main-color);
+    color: #ffffff;
+}
+
+.tm-button--quiet,
+.tm-icon-button--ghost {
+    background: transparent;
+}
+
+.tm-button--sm,
+.tm-icon-button--sm {
+    min-height: 36px;
+}
+
+.tm-button:hover,
+.tm-button:focus-visible,
+.tm-icon-button:hover,
+.tm-icon-button:focus-visible,
+.tm-segmented button:hover,
+.tm-segmented button:focus-visible {
+    border-color: var(--tm-border-strong);
+    background: var(--tm-surface-strong);
+    transform: translateY(-1px);
+}
+
+.tm-button--primary:hover,
+.tm-button--primary:focus-visible {
+    background: #2997ff;
+}
+
+.tm-icon-button {
+    display: inline-grid;
+    width: var(--tm-touch-target);
+    padding: 0;
+    place-items: center;
+    color: var(--text-color);
+    background: var(--tm-surface-soft);
+}
+
+.tm-surface,
+.tm-inspector,
+.tm-empty-state {
+    border: 1px solid var(--tm-border);
+    border-radius: var(--tm-radius-panel);
+    background: var(--tm-surface);
+    box-shadow: var(--tm-shadow-panel);
+}
+
+.tm-surface {
+    padding: clamp(1rem, 2vw, 1.4rem);
+}
+
+.tm-surface--quiet {
+    background: transparent;
+    box-shadow: none;
+}
+
+.tm-metric-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+    gap: 0.7rem;
+}
+
+.tm-metric {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.15rem 0.5rem;
+    min-height: 64px;
+    padding: 0.75rem;
+    border: 1px solid var(--tm-border);
+    border-radius: var(--tm-radius-panel);
+    background: var(--tm-surface-soft);
+    align-items: center;
+}
+
+.tm-metric span {
+    color: var(--text-dim);
+    font-size: 0.78rem;
+    font-weight: 650;
+}
+
+.tm-metric strong {
+    grid-column: 1 / -1;
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: 1.55rem;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.tm-inspector {
+    display: grid;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.tm-inspector__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.tm-inspector__head p,
+.tm-empty-state p {
+    margin: 0 0 0.2rem;
+    color: var(--text-dim);
+    font-size: 0.74rem;
+    font-weight: 750;
+}
+
+.tm-inspector__head h2,
+.tm-empty-state h2 {
+    margin: 0;
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+}
+
+.tm-inspector__badge {
+    padding: 0.28rem 0.55rem;
+    border: 1px solid var(--tm-border);
+    border-radius: var(--tm-radius-control);
+    color: var(--text-color);
+    background: var(--tm-surface-soft);
+    font-size: 0.72rem;
+    font-weight: 720;
+}
+
+.tm-inspector__body,
+.tm-inspector__actions {
+    display: grid;
+    gap: 0.8rem;
+}
+
+.tm-empty-state {
+    display: grid;
+    justify-items: start;
+    gap: 0.75rem;
+    padding: clamp(1.2rem, 3vw, 2rem);
+}
+
+.tm-empty-state > span:not(.tm-empty-state__icon) {
+    max-width: 58ch;
+    color: var(--text-color);
+}
+
+.tm-empty-state__icon {
+    display: inline-grid;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+    border-radius: 50%;
+    color: var(--main-color);
+    background: var(--main-soft);
+}
+
+.tm-empty-state__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.tm-segmented {
+    display: inline-grid;
+    grid-auto-flow: column;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border: 1px solid var(--tm-border);
+    border-radius: var(--tm-radius-control);
+    background: var(--tm-surface-soft);
+}
+
+.tm-segmented button {
+    min-height: 36px;
+    padding: 0 0.75rem;
+    color: var(--text-color);
+    background: transparent;
+    font-weight: 680;
+}
+
+.tm-segmented button.is-selected {
+    color: var(--text-strong);
+    background: var(--tm-surface-strong);
+}
+
+.apple-command-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+    gap: clamp(1rem, 2.4vw, 1.6rem);
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .apple-command-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tm-button,
+    .tm-icon-button,
+    .tm-segmented button {
+        transition: none;
+    }
+
+    .tm-button:hover,
+    .tm-button:focus-visible,
+    .tm-icon-button:hover,
+    .tm-icon-button:focus-visible,
+    .tm-segmented button:hover,
+    .tm-segmented button:focus-visible {
+        transform: none;
+    }
+}

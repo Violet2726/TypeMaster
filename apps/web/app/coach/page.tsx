@@ -1,5 +1,5 @@
-import CoachPage from '../../src/screens/CoachPage';
+import { redirect } from 'next/navigation';
 
-export default function Page() {
-    return <CoachPage />;
+export default function CoachRedirect() {
+    redirect('/insights');
 }

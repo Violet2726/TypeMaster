@@ -95,9 +95,9 @@
     }
 
     .nav-icon {
-        width: 2.3rem;
-        min-width: 2.3rem;
-        min-height: 2.3rem;
+        width: 44px;
+        min-width: 44px;
+        min-height: 44px;
     }
 
     .action-btn,
@@ -105,6 +105,7 @@
     .segment-btn,
     .toggle-btn {
         width: 100%;
+        min-height: 44px;
     }
 
     .sticky-action-bar {
@@ -129,7 +130,7 @@
 /* Practice mobile focus refinement */
 .practice-toolbar,
 .typing-stage {
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--tm-white-alpha-100);
     backdrop-filter: saturate(180%) blur(22px);
     -webkit-backdrop-filter: saturate(180%) blur(22px);
 }
@@ -137,7 +138,7 @@
 .practice-toolbar {
     background:
         linear-gradient(135deg, rgba(10, 132, 255, 0.1), transparent 34%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.068), var(--bg-soft)),
+        linear-gradient(180deg, var(--tm-white-alpha-068), var(--bg-soft)),
         rgba(28, 28, 30, 0.76);
 }
 
@@ -153,8 +154,8 @@ body[data-theme='serika-light'] .typing-stage {
     border-color: rgba(60, 60, 67, 0.1);
     background:
         linear-gradient(135deg, rgba(0, 113, 227, 0.08), transparent 38%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 250, 255, 0.78)),
-        rgba(255, 255, 255, 0.86);
+        linear-gradient(180deg, var(--tm-white-alpha-940), rgba(248, 250, 255, 0.78)),
+        var(--tm-white-alpha-860);
 }
 
 .practice-toolbar .segmented-group {
@@ -187,16 +188,16 @@ body[data-theme='serika-light'] .practice-toolbar .segmented-group {
 
 body[data-theme='serika-light'] .practice-toolbar .segment-btn.active,
 body[data-theme='serika-light'] .practice-toolbar .segment-btn[aria-pressed='true'] {
-    background: rgba(255, 255, 255, 0.86);
+    background: var(--tm-white-alpha-860);
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.92),
+        inset 0 1px 0 var(--tm-white-alpha-920),
         0 8px 18px rgba(0, 0, 0, 0.06);
 }
 
 .typing-stage .words-shell {
     border-color: rgba(10, 132, 255, 0.32);
     background:
-        linear-gradient(180deg, var(--bg-soft), rgba(255, 255, 255, 0.012)),
+        linear-gradient(180deg, var(--bg-soft), var(--tm-white-alpha-012)),
         rgba(7, 7, 9, 0.46);
 }
 
@@ -209,7 +210,7 @@ body[data-theme='serika-light'] .practice-toolbar .segment-btn[aria-pressed='tru
 }
 
 .typing-stage .live-stat {
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--tm-white-alpha-100);
     background:
         linear-gradient(180deg, var(--surface-2), var(--bg-soft)),
         rgba(118, 118, 128, 0.12);
@@ -219,8 +220,8 @@ body[data-theme='serika-light'] .typing-stage .words-shell,
 body[data-theme='serika-light'] .typing-stage .live-stat {
     border-color: rgba(60, 60, 67, 0.1);
     background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 255, 0.78)),
-        rgba(255, 255, 255, 0.82);
+        linear-gradient(180deg, var(--tm-white-alpha-960), rgba(248, 250, 255, 0.78)),
+        var(--tm-white-alpha-820);
 }
 
 @media (max-width: 720px) {

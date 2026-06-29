@@ -3,14 +3,15 @@
 import { type ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import { AppFrame } from './AppFrame';
+import { getRouteForPath } from './route-registry';
 
 type Props = { children: ReactNode };
 
 export function AppFrameWrapper({ children }: Props) {
     const pathname = usePathname();
-    const isGameRoute = pathname?.startsWith('/game');
+    const route = getRouteForPath(pathname || '/');
 
-    if (isGameRoute) {
+    if (route.layout === 'fullscreen') {
         return <>{children}</>;
     }
 

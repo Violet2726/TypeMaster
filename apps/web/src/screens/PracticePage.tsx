@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { BadgeCheck, FileText, PencilLine, WandSparkles } from 'lucide-react';
-import { ConfirmDialog } from '@typemaster/ui';
+import { ConfirmDialog, Inspector, MetricStrip } from '@typemaster/ui';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { AIWorkshop } from '../features/practice/components/AIWorkshop';
 import { ConfigPanel } from '../features/practice/components/ConfigPanel';
@@ -323,24 +323,20 @@ export function PracticePage() {
                 </div>
 
                 <aside className="practice-workbench__rail" aria-label={store.copy.practice.configTitle}>
-                    <section className="panel practice-toolbar">
-                        <div className="practice-toolbar__row">
-                            <div className="practice-toolbar__header">
-                                <h2>{store.copy.practice.configTitle}</h2>
-                                <span className={`panel-badge badge-${typingSession.status === 'running' ? 'loading' : typingSession.status === 'complete' ? 'success' : 'ready'}`}>
-                                    {sessionStatusLabel}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="practice-toolbar__snapshot">
-                            {toolbarHighlights.map((item) => (
-                                <div key={item.label} className="practice-toolbar__snapshot-item">
-                                    <small>{item.label}</small>
-                                    <strong>{item.value}</strong>
-                                </div>
-                            ))}
-                        </div>
+                    <Inspector
+                        className="practice-toolbar"
+                        eyebrow={store.copy.practice.sessionLabel}
+                        title={store.copy.practice.configTitle}
+                        badge={sessionStatusLabel}
+                    >
+                        <MetricStrip
+                            className="practice-toolbar__snapshot"
+                            items={toolbarHighlights.map((item) => ({
+                                id: item.label,
+                                label: item.label,
+                                value: item.value
+                            }))}
+                        />
 
                         <ConfigPanel
                             copy={store.copy}
@@ -385,7 +381,7 @@ export function PracticePage() {
                                 />
                             </div>
                         ) : null}
-                    </section>
+                    </Inspector>
                 </aside>
             </div>
 

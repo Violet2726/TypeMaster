@@ -1,101 +1,67 @@
-﻿'use client';
+'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { Activity, Heart, Target, Zap } from 'lucide-react';
 import './overlays.css';
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
 
 interface HudData {
   score: number;
-  wave: number;
+  waveLabel: string;
   combo: number;
-  maxCombo: number;
   lives: number;
   maxLives: number;
   accuracy: number;
+  wpm: number;
+  targetWord: string;
+  progress: number;
 }
 
 interface GameplayHudProps {
   data: HudData;
 }
 
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
-
 export default function GameplayHud({ data }: GameplayHudProps) {
-  const [displayScore, setDisplayScore] = useState(0);
-  const animRef = useRef<number>(0);
-  const targetRef = useRef(0);
-  const velocityRef = useRef(0);
-
-  // Smooth score animation
-  useEffect(() => {
-    targetRef.current = data.score;
-  }, [data.score]);
-
-  useEffect(() => {
-    let active = true;
-    const tick = () => {
-      if (!active) return;
-      const target = targetRef.current;
-      const diff = target - displayScore;
-      velocityRef.current += diff * 8 * (1 / 60);
-      velocityRef.current *= 0.85;
-      const next = displayScore + velocityRef.current;
-      if (Math.abs(diff) < 1) {
-        setDisplayScore(target);
-        velocityRef.current = 0;
-      } else {
-        setDisplayScore(next);
-      }
-      animRef.current = requestAnimationFrame(tick);
-    };
-    animRef.current = requestAnimationFrame(tick);
-    return () => { active = false; cancelAnimationFrame(animRef.current); };
-  }, [displayScore]);
-
-  const comboPercent = data.combo > 0 ? Math.min(100, ((data.combo % 10) / 10) * 100) : 0;
+  const progress = `${Math.round((data.progress || 0) * 100)}%`;
 
   return (
-    <div className="gameplay-hud">
-      {/* Left: Score + Combo */}
-      <div className="gameplay-hud__left">
-        <div className="hud-glass hud-glass--score">
-          <span className="hud-glass__icon">{'\u2605'}</span>
-          <span className="hud-glass__value">{Math.round(displayScore).toLocaleString()}</span>
+    <header className="raid-hud" aria-label="Raid 状态">
+      <div className="raid-hud__cluster raid-hud__cluster--primary">
+        <div className="raid-hud__metric raid-hud__metric--score">
+          <Activity aria-hidden="true" size={16} strokeWidth={2.2} />
+          <span>{Math.round(data.score).toLocaleString()}</span>
         </div>
-        {data.combo > 2 && (
-          <div className="hud-glass hud-glass--combo">
-            <span className="hud-glass__icon">{'\u26A1'}</span>
-            <span className="hud-glass__value">x{data.combo}</span>
-            <div className="hud-combo-bar">
-              <div className="hud-combo-bar__fill" style={{ width: `${comboPercent}%` }} />
-            </div>
-          </div>
-        )}
+        <div className="raid-hud__metric">
+          <Target aria-hidden="true" size={16} strokeWidth={2.2} />
+          <span>{data.waveLabel}</span>
+        </div>
+        <div className="raid-hud__progress" aria-hidden="true">
+          <span style={{ width: progress }} />
+        </div>
       </div>
 
-      {/* Right: Wave + Lives */}
-      <div className="gameplay-hud__right">
-        <div className="hud-glass hud-glass--wave">
-          <span className="hud-glass__icon">{'\u25B6'}</span>
-          <span className="hud-glass__value">{data.wave}</span>
-          <span className="hud-glass__label">WAVE</span>
+      <div className="raid-hud__target" aria-label={`当前目标 ${data.targetWord || '无'}`}>
+        <span>目标</span>
+        <strong>{data.targetWord || '...'}</strong>
+      </div>
+
+      <div className="raid-hud__cluster raid-hud__cluster--secondary">
+        <div className="raid-hud__metric raid-hud__metric--combo">
+          <Zap aria-hidden="true" size={16} strokeWidth={2.2} />
+          <span>{data.combo}</span>
         </div>
-        <div className="hud-glass hud-glass--lives">
-          <div className="hud-lives">
-            {Array.from({ length: data.maxLives }).map((_, i) => (
-              <div
-                key={i}
-                className={`hud-lives__dot${i >= data.lives ? ' hud-lives__dot--empty' : ''}`}
-              />
-            ))}
-          </div>
+        <div className="raid-hud__metric">
+          <span>{data.wpm}</span>
+          <small>WPM</small>
+        </div>
+        <div className="raid-hud__metric">
+          <span>{data.accuracy}%</span>
+        </div>
+        <div className="raid-hud__lives" aria-label={`剩余 ${data.lives} 点生命`}>
+          <Heart aria-hidden="true" size={16} strokeWidth={2.2} />
+          {Array.from({ length: data.maxLives }).map((_, index) => (
+            <span key={index} className={index >= data.lives ? 'is-empty' : ''} />
+          ))}
         </div>
       </div>
-    </div>
+    </header>
   );
 }

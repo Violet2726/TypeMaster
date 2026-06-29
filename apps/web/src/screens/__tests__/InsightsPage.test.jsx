@@ -47,7 +47,7 @@ describe('InsightsPage', () => {
 
         fireEvent.click(screen.getByRole('button', { name: 'Run 3-minute assessment' }));
 
-        await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith('/diagnostic'));
+        await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith('/practice'));
     });
 
     test('groups frequent error characters by keyboard area', async () => {

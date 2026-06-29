@@ -41,7 +41,7 @@ body[data-theme='serika-light'] .settings-overlay {
 
 body[data-theme='serika-light'] .settings-drawer {
     border-color: rgba(0, 0, 0, 0.08);
-    background: rgba(255, 255, 255, 0.92);
+    background: var(--tm-white-alpha-920);
     box-shadow: 0 32px 96px rgba(0, 0, 0, 0.12);
 }
 
@@ -213,7 +213,7 @@ body[data-language='zh-CN'] .settings-group__label {
 }
 
 body[data-theme='serika-light'] .settings-group__items {
-    background: rgba(255, 255, 255, 0.72);
+    background: var(--tm-white-alpha-720);
     border-color: rgba(0, 0, 0, 0.06);
 }
 
@@ -375,7 +375,7 @@ body[data-theme='serika-light'] .settings-account__avatar {
 body[data-theme='serika-light'] .field input,
 body[data-theme='serika-light'] .field textarea,
 body[data-theme='serika-light'] .field select {
-    background: rgba(255, 255, 255, 0.82);
+    background: var(--tm-white-alpha-820);
     border-color: rgba(0, 0, 0, 0.08);
 }
 
