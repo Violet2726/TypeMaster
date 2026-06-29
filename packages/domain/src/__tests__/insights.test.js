@@ -32,6 +32,8 @@ describe('insights.js', () => {
             expect(result).toHaveProperty('topErrorChars');
             expect(result).toHaveProperty('topErrorWords');
             expect(result).toHaveProperty('keyboardHotspots');
+            expect(result).toHaveProperty('surfaceBreakdown');
+            expect(result).toHaveProperty('raidSummary');
             expect(result).toHaveProperty('daily7');
             expect(result).toHaveProperty('daily30');
         });
@@ -140,6 +142,41 @@ describe('insights.js', () => {
             });
             expect(result.keyboardHotspots.zones.find((zone) => zone.id === 'symbolLayer')).toMatchObject({
                 count: 1
+            });
+        });
+
+        it('summarizes training surfaces and raid performance from unified sessions', () => {
+            const sessions = [
+                createMockSession({
+                    trainingMeta: {
+                        type: 'raid',
+                        surface: 'raid',
+                        score: 2400,
+                        maxCombo: 24,
+                        perfectWaves: 2,
+                        focusChars: ['a', 's']
+                    },
+                    result: { wpm: 58, accuracy: 94, topErrorChars: ['a'], topErrorWords: [], score: 2400 }
+                }),
+                createMockSession({ trainingMeta: { type: 'challenge', surface: 'challenge' } }),
+                createMockSession({ trainingMeta: { type: 'free', surface: 'practice' } })
+            ];
+            const result = buildInsights(sessions);
+
+            expect(result.surfaceBreakdown).toMatchObject({
+                dominant: 'practice',
+                counts: {
+                    practice: 1,
+                    challenge: 1,
+                    raid: 1
+                }
+            });
+            expect(result.raidSummary).toMatchObject({
+                count: 1,
+                bestScore: 2400,
+                maxCombo: 24,
+                perfectWaves: 2,
+                focusChars: ['a', 's']
             });
         });
 

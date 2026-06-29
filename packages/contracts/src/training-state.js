@@ -208,8 +208,36 @@ export const SessionSourceTextMetaSchema = z.object({
     keyboardZoneShare: z.number().optional().default(0)
 }).catchall(z.unknown());
 
+export const TrainingSurfaceSchema = z.enum([
+    'today',
+    'practice',
+    'diagnostic',
+    'plan',
+    'challenge',
+    'insights',
+    'raid',
+    'result',
+    'coach'
+]);
+
+export const SessionIntentSchema = z.enum([
+    'free-practice',
+    'diagnostic-assessment',
+    'plan-step',
+    'challenge-attempt',
+    'raid-standard',
+    'raid-daily-focus',
+    'adaptive-drill',
+    'keyboard-zone-drill',
+    'recovery-drill'
+]);
+
 export const SessionTrainingMetaSchema = z.object({
-    type: z.enum(['diagnostic', 'plan', 'challenge', 'raid']).optional(),
+    type: z.enum(['free', 'diagnostic', 'plan', 'challenge', 'raid']).optional(),
+    surface: TrainingSurfaceSchema.optional(),
+    intent: SessionIntentSchema.optional(),
+    focus: z.string().nullable().optional(),
+    sourceSessionId: z.string().nullable().optional(),
     stepId: z.string().optional(),
     title: z.string().optional()
 }).catchall(z.unknown());

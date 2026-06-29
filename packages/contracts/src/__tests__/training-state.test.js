@@ -6,7 +6,10 @@ import {
     CoachAdviceRecordSchema,
     DiagnosticJourneySchema,
     SessionRecordSchema,
+    SessionIntentSchema,
+    SessionTrainingMetaSchema,
     SkillProfileSchema,
+    TrainingSurfaceSchema,
     TrainingPlanSchema,
     normalizeCoachAdviceComparison,
     normalizeCoachAdviceContent,
@@ -265,6 +268,39 @@ describe('training state contracts', () => {
             summary: '',
             wpmDelta: null,
             accuracyDelta: null
+        });
+    });
+
+    test('parses training surface and session intent metadata compatibly', () => {
+        expect(TrainingSurfaceSchema.parse('practice')).toBe('practice');
+        expect(SessionIntentSchema.parse('raid-daily-focus')).toBe('raid-daily-focus');
+
+        expect(SessionTrainingMetaSchema.parse({
+            type: 'free',
+            surface: 'practice',
+            intent: 'adaptive-drill',
+            focus: 'accuracy',
+            sourceSessionId: 'session-0',
+            title: 'Adaptive accuracy drill'
+        })).toMatchObject({
+            type: 'free',
+            surface: 'practice',
+            intent: 'adaptive-drill',
+            focus: 'accuracy',
+            sourceSessionId: 'session-0'
+        });
+
+        expect(normalizeSessionRecord({
+            id: 'session-free',
+            trainingMeta: {
+                type: 'free',
+                surface: 'practice',
+                intent: 'free-practice'
+            }
+        }).trainingMeta).toMatchObject({
+            type: 'free',
+            surface: 'practice',
+            intent: 'free-practice'
         });
     });
 });

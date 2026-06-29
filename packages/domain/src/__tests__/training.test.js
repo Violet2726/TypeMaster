@@ -57,6 +57,23 @@ describe('training.js', () => {
                     topErrorChars: ['a', 'd'],
                     topErrorWords: ['alpha', 'delta']
                 }
+            },
+            {
+                config: { includeNumbers: false, includePunctuation: false },
+                trainingMeta: {
+                    type: 'raid',
+                    surface: 'raid',
+                    score: 3200,
+                    maxCombo: 28
+                },
+                result: {
+                    wpm: 54,
+                    accuracy: 94,
+                    consistency: 86,
+                    durationSeconds: 180,
+                    topErrorChars: ['s'],
+                    topErrorWords: []
+                }
             }
         ];
 
@@ -71,6 +88,12 @@ describe('training.js', () => {
             zoneId: 'leftHome',
             repeatedSessionCount: 2
         });
+        expect(profile.metrics.surfaces).toMatchObject({
+            practice: 2,
+            raid: 1
+        });
+        expect(profile.metrics.raidBestScore).toBe(3200);
+        expect(profile.metrics.raidMaxCombo).toBe(28);
     });
 
     it('creates a 7-day starter plan and advances through it', () => {

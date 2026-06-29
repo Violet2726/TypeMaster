@@ -187,6 +187,69 @@ function summarizeSlice(sessions) {
     };
 }
 
+function resolveSessionSurface(session) {
+    const explicit = session?.trainingMeta?.surface;
+    if (explicit) return explicit;
+
+    const type = session?.trainingMeta?.type;
+    if (type === 'raid') return 'raid';
+    if (type === 'challenge') return 'challenge';
+    if (type === 'plan') return 'plan';
+    if (type === 'diagnostic') return 'diagnostic';
+
+    return 'practice';
+}
+
+function buildSurfaceBreakdown(sessions) {
+    const counts = {
+        practice: 0,
+        diagnostic: 0,
+        plan: 0,
+        challenge: 0,
+        raid: 0
+    };
+
+    sessions.forEach((session) => {
+        const surface = resolveSessionSurface(session);
+        if (Object.prototype.hasOwnProperty.call(counts, surface)) {
+            counts[surface] += 1;
+        }
+    });
+
+    return {
+        counts,
+        dominant: Object.entries(counts)
+            .sort((left, right) => right[1] - left[1])
+            .find(([, count]) => count > 0)?.[0] || 'practice'
+    };
+}
+
+function buildRaidSummary(sessions) {
+    const raidSessions = sessions.filter((session) => resolveSessionSurface(session) === 'raid');
+
+    if (!raidSessions.length) {
+        return {
+            count: 0,
+            bestScore: 0,
+            maxCombo: 0,
+            perfectWaves: 0,
+            focusChars: []
+        };
+    }
+
+    const focusChars = topCounts(buildCounter(
+        raidSessions.flatMap((session) => session?.trainingMeta?.focusChars || session?.result?.topErrorChars || [])
+    ), 5).map((item) => item.label);
+
+    return {
+        count: raidSessions.length,
+        bestScore: Math.max(...raidSessions.map((session) => session?.trainingMeta?.score || session?.result?.score || 0)),
+        maxCombo: Math.max(...raidSessions.map((session) => session?.trainingMeta?.maxCombo || 0)),
+        perfectWaves: raidSessions.reduce((sum, session) => sum + Number(session?.trainingMeta?.perfectWaves || 0), 0),
+        focusChars
+    };
+}
+
 function buildDailySeries(sessions, days = 7) {
     const now = new Date();
     const slots = Array.from({ length: days }, (_, index) => {
@@ -250,6 +313,8 @@ export function buildInsights(sessions, options = {}) {
         keyboardHotspots: buildKeyboardHotspots(recent30ErrorChars, {
             keyboardLayout: options.keyboardLayout
         }),
+        surfaceBreakdown: buildSurfaceBreakdown(recent30),
+        raidSummary: buildRaidSummary(recent30),
         daily7: buildDailySeries(recent30, 7),
         daily30: buildDailySeries(recent30, 30)
     };

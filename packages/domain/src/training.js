@@ -242,6 +242,33 @@ function buildWeakZones(sessions, metrics, language) {
     return weakZones.sort((left, right) => left.score - right.score);
 }
 
+function resolveSessionSurface(session) {
+    const explicit = session?.trainingMeta?.surface;
+    if (explicit) return explicit;
+
+    const type = session?.trainingMeta?.type;
+    if (type === 'raid') return 'raid';
+    if (type === 'challenge') return 'challenge';
+    if (type === 'plan') return 'plan';
+    if (type === 'diagnostic') return 'diagnostic';
+
+    return 'practice';
+}
+
+function countSessionSurfaces(sessions) {
+    return sessions.reduce((counts, session) => {
+        const surface = resolveSessionSurface(session);
+        counts[surface] = (counts[surface] || 0) + 1;
+        return counts;
+    }, {
+        practice: 0,
+        diagnostic: 0,
+        plan: 0,
+        challenge: 0,
+        raid: 0
+    });
+}
+
 function buildWeakSpotText(skillProfile) {
     const topWords = (skillProfile?.topErrorWords || []).slice(0, 4);
     const topChars = (skillProfile?.topErrorChars || []).slice(0, 3);
@@ -479,7 +506,14 @@ export function buildSkillProfile(sessions, languageOrOptions = 'zh-CN') {
         avgWpm: average(safeSessions.map((session) => session?.result?.wpm || 0)),
         avgAccuracy: average(safeSessions.map((session) => session?.result?.accuracy || 0)),
         avgConsistency: average(safeSessions.map((session) => session?.result?.consistency || 0)),
-        avgDuration: average(safeSessions.map((session) => session?.result?.durationSeconds || 0))
+        avgDuration: average(safeSessions.map((session) => session?.result?.durationSeconds || 0)),
+        surfaces: countSessionSurfaces(safeSessions),
+        raidBestScore: Math.max(0, ...safeSessions
+            .filter((session) => resolveSessionSurface(session) === 'raid')
+            .map((session) => session?.trainingMeta?.score || session?.result?.score || 0)),
+        raidMaxCombo: Math.max(0, ...safeSessions
+            .filter((session) => resolveSessionSurface(session) === 'raid')
+            .map((session) => session?.trainingMeta?.maxCombo || 0))
     };
 
     const topErrorChars = countLabels(
