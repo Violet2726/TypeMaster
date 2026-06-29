@@ -112,7 +112,7 @@ export function useInsightsPageStore() {
     const plan = usePlanSnapshot();
     const history = useHistorySnapshot();
     const achievements = useAchievementSnapshot();
-    const { configActions } = useAppActions();
+    const { configActions, planActions } = useAppActions();
 
     return {
         achievements: achievements.achievements,
@@ -123,22 +123,10 @@ export function useInsightsPageStore() {
         sessions: history.sessions,
         sessionStreak: achievements.sessionStreak,
         skillProfile: plan.skillProfile,
+        startDiagnosticJourney: planActions.startDiagnosticJourney,
         startKeyboardZoneDrill: configActions.setKeyboardZoneDrillDraft,
         weeklyGoal: achievements.weeklyGoal,
         weeklySessions: achievements.weeklySessions
-    };
-}
-
-export function useDiagnosticPageStore() {
-    const shell = useShellSnapshot();
-    const plan = usePlanSnapshot();
-    const { planActions } = useAppActions();
-
-    return {
-        diagnosticJourney: plan.diagnosticJourney,
-        language: shell.language,
-        skillProfile: plan.skillProfile,
-        startDiagnosticJourney: planActions.startDiagnosticJourney
     };
 }
 

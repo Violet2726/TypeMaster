@@ -1,3 +1,5 @@
+import { buildResultPrescription } from '@typemaster/domain';
+
 function uniqueActions(actions) {
     const seen = new Set();
     return actions.filter((action) => {
@@ -33,6 +35,8 @@ function buildDoseValue(copy, config) {
 }
 
 export function buildResultPrescriptionModel({ copy, session, coachRecord }) {
+    const prescription = buildResultPrescription(session);
+    const primaryCause = prescription.causeSignals[0];
     const accuracy = Number(session?.result?.accuracy || 0);
     const consistency = Number(session?.result?.consistency || 0);
     const wpm = Number(session?.result?.wpm || 0);
@@ -49,7 +53,7 @@ export function buildResultPrescriptionModel({ copy, session, coachRecord }) {
         note: fillTemplate(copy.result.prescriptionCheckpointAccuracy, Math.max(96, accuracy || 96))
     };
 
-    if (accuracy && accuracy < 96) {
+    if (primaryCause?.id === 'accuracy') {
         focus = {
             tone: 'error',
             value: copy.result.prescriptionAccuracyFocus,
@@ -59,7 +63,7 @@ export function buildResultPrescriptionModel({ copy, session, coachRecord }) {
             value: fillTemplate(copy.result.prescriptionCheckpointAccuracy, Math.min(99, accuracy + 2)),
             note: fillTemplate(copy.result.prescriptionCheckpointClean, Math.max(1, missCount - 1))
         };
-    } else if (consistency && consistency < 88) {
+    } else if (primaryCause?.id === 'stability') {
         focus = {
             tone: 'stale',
             value: copy.result.prescriptionConsistencyFocus,
@@ -69,7 +73,7 @@ export function buildResultPrescriptionModel({ copy, session, coachRecord }) {
             value: fillTemplate(copy.result.prescriptionCheckpointConsistency, 90),
             note: fillTemplate(copy.result.prescriptionCheckpointAccuracy, Math.max(96, accuracy || 96))
         };
-    } else if (rawGap >= 8) {
+    } else if (primaryCause?.id === 'correction-cost') {
         focus = {
             tone: 'stale',
             value: copy.result.prescriptionRawFocus,

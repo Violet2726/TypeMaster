@@ -1,4 +1,4 @@
-/* TypeMaster ¨C Apple Design System */
+/* TypeMaster ï¿½C Apple Design System */
 /* Variables, themes, and font sizes are declared in the Apple refresh section at the bottom. */
 
 
@@ -689,7 +689,7 @@ body[data-language='zh-CN'] .control-label {
 .field textarea {
     width: 100%;
     border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--tm-white-alpha-100);
     background: var(--bg-soft);
     color: var(--text-strong);
     padding: 0.78rem 0.88rem;
@@ -779,7 +779,7 @@ body[data-language='zh-CN'] .control-label {
     min-width: 0;
     min-height: 6rem;
     padding: 0.78rem 0.82rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--tm-white-alpha-100);
     border-radius: var(--radius-sm);
     background:
         linear-gradient(180deg, var(--surface-2), var(--bg-soft)),
@@ -817,8 +817,8 @@ body[data-language='zh-CN'] .control-label {
 body[data-theme='serika-light'] .result-challenge-route__item {
     border-color: rgba(60, 60, 67, 0.1);
     background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 250, 255, 0.74)),
-        rgba(255, 255, 255, 0.84);
+        linear-gradient(180deg, var(--tm-white-alpha-940), rgba(248, 250, 255, 0.74)),
+        var(--tm-white-alpha-840);
 }
 
 .typing-stage__head {
@@ -869,7 +869,7 @@ body[data-theme='serika-light'] .result-challenge-route__item {
 }
 
 .words-shell.is-locked {
-    background: rgba(255, 255, 255, 0.015);
+    background: var(--tm-white-alpha-015);
 }
 
 .words-shell::before,
@@ -894,11 +894,11 @@ body[data-theme='serika-light'] .result-challenge-route__item {
 }
 
 body[data-theme='serika-light'] .words-shell::before {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), transparent);
+    background: linear-gradient(180deg, var(--tm-white-alpha-960), transparent);
 }
 
 body[data-theme='serika-light'] .words-shell::after {
-    background: linear-gradient(0deg, rgba(255, 255, 255, 0.96), transparent);
+    background: linear-gradient(0deg, var(--tm-white-alpha-960), transparent);
 }
 
 .words-container {
@@ -1752,7 +1752,7 @@ body[data-theme='serika-light'] .words-shell::after {
 
 .replay-canvas {
     border-radius: var(--radius-md);
-    background: rgba(255, 255, 255, 0.015);
+    background: var(--tm-white-alpha-015);
     border: 1px solid var(--bg-soft);
     padding: 0.4rem;
 }
@@ -2151,7 +2151,7 @@ body[data-theme='serika-light'] .chart-point {
 }
 
 body[data-theme='serika-light'] .chart-tooltip {
-    background: rgba(255, 255, 255, 0.94);
+    background: var(--tm-white-alpha-940);
     border-color: rgba(19, 120, 200, 0.12);
 }
 
@@ -2164,7 +2164,7 @@ body[data-theme='serika-light'] .replay-focus-point {
 }
 
 body[data-theme='serika-light'] .replay-floating-inspect {
-    background: rgba(255, 255, 255, 0.94);
+    background: var(--tm-white-alpha-940);
     border-color: rgba(19, 120, 200, 0.12);
 }
 
@@ -2210,7 +2210,7 @@ body[data-theme='serika-light'] .replay-accuracy-band {
     padding: 1rem;
     border-radius: var(--radius-md);
     background: var(--surface-2);
-    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border: 1px dashed var(--tm-white-alpha-100);
 }
 
 .confirm-dialog {

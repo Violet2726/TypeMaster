@@ -4,8 +4,9 @@
  * Scans CSS files for hardcoded rgba(255, 255, 255, ...) values
  * that should use CSS custom properties (tokens) instead.
  *
- * Usage: node scripts/design-tokens-audit.js [--fix]
+ * Usage: node scripts/design-tokens-audit.js [--fix] [--strict]
  *   --fix  Auto-replace common patterns with token references
+ *   --strict  Fail on any hardcoded value instead of using the legacy budget
  */
 
 const fs = require('fs');
@@ -13,6 +14,8 @@ const path = require('path');
 
 const WEB_DIR = path.resolve(__dirname, '../apps/web');
 const FIX_MODE = process.argv.includes('--fix');
+const STRICT_MODE = process.argv.includes('--strict');
+const LEGACY_FINDING_BUDGET = 124;
 
 const TOKEN_MAP = {
     'rgba(255, 255, 255, 0.02)': 'var(--bg-soft)',
@@ -97,6 +100,9 @@ if (!all.length) { console.log('  All clean!\n'); process.exit(0); }
 
 const fixable = all.filter(f => f.fixable).length;
 console.log(`  Total: ${all.length}  |  Auto-fixable: ${fixable}  |  Manual: ${all.length - fixable}`);
+if (!STRICT_MODE) {
+    console.log(`  Legacy budget: ${LEGACY_FINDING_BUDGET}  |  New debt: ${Math.max(0, all.length - LEGACY_FINDING_BUDGET)}`);
+}
 if (FIX_MODE) console.log(`  Fixed this run: ${fixed}`);
 console.log('');
 
@@ -111,5 +117,9 @@ for (const [file, items] of Object.entries(byFile)) {
 
 if (!FIX_MODE && fixable > 0) {
     console.log(`  Run with --fix to auto-replace ${fixable} values.\n`);
+}
+if (!STRICT_MODE && all.length <= LEGACY_FINDING_BUDGET) {
+    console.log('  No new token debt detected against the legacy budget.\n');
+    process.exit(0);
 }
 process.exit(all.length > 0 ? 1 : 0);

@@ -147,6 +147,55 @@ describe('session completion use cases', () => {
         expect(submitChallengeResultMock).not.toHaveBeenCalled();
     });
 
+    test('records free and adaptive sessions with unified training metadata', () => {
+        const environment = createPlanEnvironment({
+            activeSessionContext: null,
+            trainingPlan: null,
+            skillProfile: {
+                primaryFocus: 'accuracy'
+            },
+            currentDraft: {
+                sourceTextMeta: {
+                    source: 'builtin',
+                    label: 'Adaptive accuracy drill',
+                    generatedBy: 'adaptive',
+                    adaptiveFocus: 'accuracy',
+                    adaptiveSourceSessionId: 'session-0'
+                }
+            }
+        });
+        const session = recordSessionCompletion(environment, {
+            result: {
+                wpm: 64,
+                rawWpm: 68,
+                accuracy: 96,
+                consistency: 91,
+                correctChars: 100,
+                incorrectChars: 2,
+                extraChars: 0,
+                missedChars: 0,
+                durationSeconds: 45,
+                errors: 2,
+                topErrorChars: ['a'],
+                topErrorWords: []
+            },
+            timeline: {
+                samples: []
+            }
+        });
+
+        expect(session.trainingMeta).toMatchObject({
+            type: 'free',
+            surface: 'practice',
+            intent: 'adaptive-drill',
+            focus: 'accuracy',
+            sourceSessionId: 'session-0',
+            title: 'Adaptive accuracy drill'
+        });
+        expect(environment.setActiveSessionContext).toHaveBeenCalledWith(null);
+        expect(appendSessionMock).toHaveBeenCalledWith(session);
+    });
+
     test('does not submit a challenge result without a resolved challenge id', () => {
         const environment = createPlanEnvironment({
             activeSessionContext: {
