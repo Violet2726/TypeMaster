@@ -10,8 +10,10 @@ export default defineConfig({
         environment: 'node',
         setupFiles: ['src/test/setup.ts'],
         include: [
-            'src/features/**/*.test.jsx',
+            'src/application/__tests__/**/*.test.{ts,tsx,js,jsx}',
+            'src/features/**/*.test.{ts,tsx,js,jsx}',
             'src/hooks/__tests__/**/*.test.tsx',
+            'src/i18n/__tests__/**/*.test.{ts,js}',
             'src/services/__tests__/**/*.test.js',
             'src/store/__tests__/**/*.test.js',
             'src/training/__tests__/**/*.test.js',
