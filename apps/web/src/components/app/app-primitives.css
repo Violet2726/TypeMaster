@@ -1,0 +1,337 @@
+.app-button.tm-button {
+    border-radius: var(--tm-radius-control);
+}
+
+.app-sheet {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(1.25rem, 3vw, 2.2rem);
+    border-radius: var(--tm-radius-panel);
+    border: 1px solid var(--panel-stroke);
+    background:
+        radial-gradient(circle at top right, var(--main-soft), transparent 38%),
+        linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
+    box-shadow: var(--shadow-soft);
+}
+
+.app-sheet--image {
+    background:
+        linear-gradient(90deg, var(--glass-strong) 0%, var(--glass-mid) 45%, var(--glass-soft) 100%),
+        var(--app-sheet-image) center / cover no-repeat,
+        linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
+}
+
+body[data-theme='serika-light'] .app-sheet--image {
+    background:
+        linear-gradient(90deg, var(--glass-strong) 0%, var(--glass-mid) 48%, var(--glass-soft) 100%),
+        var(--app-sheet-image) center / cover no-repeat,
+        linear-gradient(180deg, var(--tm-white-alpha-980), var(--bg-elevated));
+}
+
+.app-sheet__content {
+    display: grid;
+    position: relative;
+    z-index: 1;
+    gap: 0.72rem;
+    max-width: 34rem;
+}
+
+.app-sheet__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.48rem;
+    width: fit-content;
+    min-height: 2rem;
+    padding: 0.38rem 0.72rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--panel-stroke);
+    background: var(--bg-soft);
+    color: var(--text-strong);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.app-sheet__status svg {
+    color: var(--main-color);
+}
+
+.app-sheet h1 {
+    margin: 0;
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: clamp(1.85rem, 3.6vw, 2.6rem);
+    line-height: 1.04;
+    letter-spacing: 0;
+}
+
+.app-sheet .hero-body {
+    max-width: 28rem;
+}
+
+.app-sheet__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 0.1rem;
+}
+
+.app-sheet__actions .tm-button {
+    min-height: 2.8rem;
+    padding-inline: 1.1rem;
+    font-size: 0.94rem;
+}
+
+.app-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.78rem;
+    width: 100%;
+    min-width: 0;
+    padding: 1rem;
+    border-radius: var(--tm-radius-panel);
+    border: 1px solid var(--panel-stroke);
+    background: linear-gradient(180deg, var(--surface-2), var(--bg-soft));
+    color: inherit;
+    text-align: left;
+    transition:
+        border-color var(--transition-fast),
+        background var(--transition-fast),
+        transform var(--transition-fast);
+}
+
+article.app-card {
+    align-items: stretch;
+}
+
+button.app-card:hover {
+    transform: translateY(-1px);
+    border-color: var(--tm-white-alpha-180);
+    background: linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
+}
+
+.app-card:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.app-card--primary {
+    background:
+        radial-gradient(circle at top left, var(--main-soft), transparent 46%),
+        linear-gradient(180deg, var(--surface-2), var(--bg-soft));
+}
+
+.app-card--success {
+    background:
+        radial-gradient(circle at top left, var(--success-soft), transparent 46%),
+        linear-gradient(180deg, var(--surface-2), var(--bg-soft));
+}
+
+.app-card--warning {
+    background:
+        radial-gradient(circle at top left, var(--warning-soft), transparent 46%),
+        linear-gradient(180deg, var(--surface-2), var(--bg-soft));
+}
+
+.app-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.72rem;
+}
+
+.app-feature-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: clamp(0.85rem, 2vw, 1.2rem);
+    width: 100%;
+    min-width: 0;
+    padding: clamp(1rem, 2.4vw, 1.35rem);
+    border-radius: var(--tm-radius-panel);
+    border: 1px solid var(--panel-stroke);
+    background:
+        radial-gradient(circle at top left, var(--main-soft), transparent 42%),
+        linear-gradient(180deg, var(--surface-2), var(--bg-soft));
+    box-shadow: var(--shadow-soft);
+}
+
+.app-feature-card__icon {
+    display: inline-grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: var(--main-soft);
+    color: var(--main-color);
+}
+
+.app-feature-card__body {
+    display: grid;
+    gap: 0.18rem;
+    min-width: 0;
+}
+
+.app-feature-card__kicker {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 0.76rem;
+    font-weight: 750;
+}
+
+.app-feature-card h1 {
+    margin: 0;
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: clamp(1.35rem, 2.6vw, 1.9rem);
+    line-height: 1.12;
+    letter-spacing: 0;
+}
+
+.app-feature-card .hero-body {
+    max-width: 42rem;
+    color: var(--text-color);
+    font-size: 0.92rem;
+    line-height: 1.45;
+}
+
+.app-feature-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.55rem;
+}
+
+.app-card__icon {
+    display: inline-grid;
+    place-items: center;
+    width: 2.05rem;
+    height: 2.05rem;
+    border-radius: 50%;
+    background: var(--surface-3);
+    color: var(--text-strong);
+}
+
+.app-card__text {
+    display: grid;
+    gap: 0.08rem;
+    min-width: 0;
+}
+
+.app-card__kicker {
+    margin: 0;
+    color: var(--text-dim);
+    font-family: var(--font-ui);
+    font-size: 0.74rem;
+    font-weight: 650;
+}
+
+.app-card__text strong {
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: 0.98rem;
+    line-height: 1.2;
+}
+
+.app-card__text span {
+    color: var(--text-color);
+    font-size: 0.84rem;
+    line-height: 1.4;
+}
+
+.app-card__action {
+    grid-column: 1 / -1;
+    justify-self: start;
+    margin-top: 0.2rem;
+}
+
+.app-progress-strip {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.72rem;
+}
+
+.app-metric-card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.15rem 0.5rem;
+    min-height: 72px;
+    padding: 0.75rem;
+    border: 1px solid var(--tm-border);
+    border-radius: var(--tm-radius-panel);
+    background: var(--tm-surface-soft);
+    align-items: center;
+}
+
+.app-metric-card span {
+    color: var(--text-dim);
+    font-size: 0.78rem;
+    font-weight: 650;
+}
+
+.app-metric-card strong {
+    grid-column: 1 / -1;
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: 1.55rem;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.app-section-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.6rem;
+}
+
+.app-section-header h2 {
+    margin: 0.14rem 0 0;
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: clamp(1.15rem, 1.6vw, 1.35rem);
+    line-height: 1.18;
+    letter-spacing: 0;
+}
+
+.app-section-header__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+@media (max-width: 720px) {
+    .app-sheet__content,
+    .app-sheet .hero-body {
+        max-width: 100%;
+    }
+
+    .app-sheet__actions .tm-button,
+    .app-card__action,
+    .app-card__action .tm-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .app-progress-strip {
+        grid-template-columns: 1fr;
+    }
+
+    .app-card-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .app-feature-card {
+        grid-template-columns: auto minmax(0, 1fr);
+        align-items: start;
+    }
+
+    .app-feature-card__actions {
+        grid-column: 1 / -1;
+        justify-content: stretch;
+    }
+
+    .app-feature-card__actions .tm-button {
+        flex: 1 1 100%;
+    }
+}

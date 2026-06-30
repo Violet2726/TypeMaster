@@ -22,7 +22,6 @@
 .mini-series__row,
 .banner,
 .sticky-action-bar,
-.home-action-card__strategy,
 .adaptive-drill-chip,
 .result-prescription,
 .result-prescription__item,
@@ -79,7 +78,6 @@
 .status-card strong,
 .ai-custom-panel strong,
 .mini-series__row strong,
-.home-action-card__summary strong,
 .result-prescription__item strong,
 .targeted-progress__hero strong,
 .keyboard-hotspots__primary strong {
@@ -97,8 +95,6 @@
 }
 
 .panel-head h2,
-.home-action-section__head h2,
-.home-action-card h2,
 .adaptive-drill-panel h2,
 .practice-toolbar h2,
 .result-copy h2,
@@ -115,7 +111,6 @@
 }
 
 /* --- Badges & chips --- */
-.home-action-chip,
 .panel-badge {
     display: inline-flex;
     align-items: center;
@@ -176,8 +171,6 @@
 /* --- Responsive --- */
 @media (max-width: 720px) {
     .panel-head h2,
-    .home-action-section__head h2,
-    .home-action-card h2,
     .adaptive-drill-panel h2,
     .practice-toolbar h2,
     .result-copy h2,

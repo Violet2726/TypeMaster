@@ -1,7 +1,14 @@
 'use client';
 
 import { Sparkles } from 'lucide-react';
+import { AppCard } from '../../../components/app/AppPrimitives';
 import './dialogs.css';
+
+function toneForRarity(rarity: string) {
+    if (rarity === 'rare') return 'primary';
+    if (rarity === 'epic' || rarity === 'legendary') return 'warning';
+    return 'default';
+}
 
 export default function UpgradeOverlay({ choices, copy, onChoose }: { choices: any[], copy: any, onChoose: (upgradeId: string) => void }) {
     if (!choices?.length) return null;
@@ -18,18 +25,17 @@ export default function UpgradeOverlay({ choices, copy, onChoose }: { choices: a
                     </div>
                     <div className="typerift-upgrade-grid">
                         {choices.map((choice, index) => (
-                            <button
+                            <AppCard
                                 key={choice.id}
-                                type="button"
-                                className={`typerift-card typerift-card--${choice.rarity}`}
+                                className={`typerift-upgrade-card typerift-upgrade-card--${choice.rarity}`}
+                                icon={Sparkles}
+                                kicker={`${choice.category} / ${choice.rarity} / Lv.${choice.stack || 1}`}
+                                title={choice.nameZh || choice.name}
+                                body={choice.summary}
+                                tone={toneForRarity(choice.rarity)}
                                 onClick={() => onChoose(choice.id)}
                                 autoFocus={index === 0}
-                            >
-                                <Sparkles aria-hidden="true" size={20} strokeWidth={2.2} />
-                                <strong>{choice.nameZh || choice.name}</strong>
-                                <small>{choice.category} · {choice.rarity} · Lv.{choice.stack || 1}</small>
-                                <span>{choice.summary}</span>
-                            </button>
+                            />
                         ))}
                     </div>
                 </div>
@@ -37,3 +43,4 @@ export default function UpgradeOverlay({ choices, copy, onChoose }: { choices: a
         </div>
     );
 }
+

@@ -1,6 +1,7 @@
 'use client';
 
 import { CalendarClock, Compass, GraduationCap, Trophy } from 'lucide-react';
+import { AppCard, MetricCard } from '../../../components/app/AppPrimitives';
 import './dialogs.css';
 
 export default function ModeSelectOverlay({
@@ -15,10 +16,36 @@ export default function ModeSelectOverlay({
     onStart: (mode: 'expedition' | 'daily-anomaly' | 'first-descent') => void,
 }) {
     const gameCopy = copy.game;
+    const modes = [
+        {
+            id: 'expedition',
+            icon: Compass,
+            title: gameCopy.modes.expedition.title,
+            meta: gameCopy.modes.expedition.meta,
+            body: gameCopy.modes.expedition.body,
+            tone: 'primary'
+        },
+        {
+            id: 'daily-anomaly',
+            icon: CalendarClock,
+            title: gameCopy.modes.daily.title,
+            meta: gameCopy.modes.daily.meta,
+            body: gameCopy.modes.daily.body,
+            tone: 'default'
+        },
+        {
+            id: 'first-descent',
+            icon: GraduationCap,
+            title: gameCopy.modes.first.title,
+            meta: gameCopy.modes.first.meta,
+            body: gameCopy.modes.first.body,
+            tone: 'default'
+        }
+    ] as const;
 
     return (
         <div className="typerift-overlay" role="dialog" aria-modal="true" aria-label={gameCopy.modeAria}>
-            <section className="typerift-panel typerift-panel--wide">
+            <section className="typerift-panel typerift-panel--wide typerift-panel--mode">
                 <div className="typerift-panel__inner">
                     <div className="typerift-heading">
                         <span>{gameCopy.modeKicker}</span>
@@ -26,33 +53,34 @@ export default function ModeSelectOverlay({
                         <p>{gameCopy.modeBody}</p>
                     </div>
                     <div className="typerift-mode-grid">
-                        <button className="typerift-card" type="button" onClick={() => onStart('expedition')} autoFocus>
-                            <Compass aria-hidden="true" size={22} strokeWidth={2.2} />
-                            <strong>{gameCopy.modes.expedition.title}</strong>
-                            <small>{gameCopy.modes.expedition.meta}</small>
-                            <span>{gameCopy.modes.expedition.body}</span>
-                        </button>
-                        <button className="typerift-card" type="button" onClick={() => onStart('daily-anomaly')}>
-                            <CalendarClock aria-hidden="true" size={22} strokeWidth={2.2} />
-                            <strong>{gameCopy.modes.daily.title}</strong>
-                            <small>{gameCopy.modes.daily.meta}</small>
-                            <span>{gameCopy.modes.daily.body}</span>
-                        </button>
-                        <button className="typerift-card" type="button" onClick={() => onStart('first-descent')}>
-                            <GraduationCap aria-hidden="true" size={22} strokeWidth={2.2} />
-                            <strong>{gameCopy.modes.first.title}</strong>
-                            <small>{gameCopy.modes.first.meta}</small>
-                            <span>{gameCopy.modes.first.body}</span>
-                        </button>
+                        {modes.map((mode, index) => (
+                            <AppCard
+                                key={mode.id}
+                                className="typerift-mode-card"
+                            icon={mode.icon}
+                            kicker={mode.meta}
+                            title={mode.title}
+                            body={mode.body}
+                                tone={mode.tone}
+                            onClick={() => onStart(mode.id)}
+                            autoFocus={index === 0}
+                        />
+                        ))}
                     </div>
-                    <div className="typerift-actions">
-                        <span className="typerift-action" aria-label={gameCopy.bestScoreAria}>
-                            <Trophy aria-hidden="true" size={17} strokeWidth={2.2} />
-                            {gameCopy.best} {Math.round(bestScore || 0).toLocaleString()}
-                        </span>
-                        <span className="typerift-action" aria-label={gameCopy.codexProgressAria}>
-                            {gameCopy.codex} {codexProgress?.discovered || 0}/{codexProgress?.total || 33}
-                        </span>
+                    <div className="typerift-mode-metrics">
+                        <MetricCard
+                            icon={Trophy}
+                            label={gameCopy.best}
+                            value={Math.round(bestScore || 0).toLocaleString()}
+                            tone="warning"
+                            ariaLabel={gameCopy.bestScoreAria}
+                        />
+                        <MetricCard
+                            label={gameCopy.codex}
+                            value={`${codexProgress?.discovered || 0}/${codexProgress?.total || 33}`}
+                            tone="primary"
+                            ariaLabel={gameCopy.codexProgressAria}
+                        />
                     </div>
                 </div>
             </section>

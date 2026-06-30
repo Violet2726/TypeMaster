@@ -35,6 +35,16 @@ const TOKEN_MAP = {
     'rgba(255, 255, 255, 0.10)': 'var(--panel-stroke)',
     'rgba(255, 255, 255, 0.12)': 'var(--panel-stroke)',
     'rgba(255, 255, 255, 0.13)': 'var(--panel-stroke)',
+    'rgba(255, 255, 255, 0.16)': 'var(--tm-white-alpha-180)',
+    'rgba(255, 255, 255, 0.24)': 'var(--tm-white-alpha-240)',
+    'rgba(255, 255, 255, 0.28)': 'var(--tm-white-alpha-240)',
+    'rgba(255, 255, 255, 0.48)': 'var(--tm-white-alpha-480)',
+    'rgba(255, 255, 255, 0.52)': 'var(--tm-white-alpha-550)',
+    'rgba(255, 255, 255, 0.54)': 'var(--tm-white-alpha-550)',
+    'rgba(255, 255, 255, 0.58)': 'var(--tm-white-alpha-580)',
+    'rgba(255, 255, 255, 0.60)': 'var(--tm-white-alpha-620)',
+    'rgba(255, 255, 255, 0.66)': 'var(--tm-white-alpha-640)',
+    'rgba(255, 255, 255, 0.82)': 'var(--tm-white-alpha-820)',
 };
 
 const EXCLUDE = ['node_modules', '.git', 'dist', '.next'];
@@ -50,6 +60,14 @@ function findCssFiles(dir) {
     return results;
 }
 
+function normalizeRgba(value) {
+    return value
+        .replace(/\s+/g, '')
+        .replace(/^rgba\((\d+),(\d+),(\d+),([^)]+)\)$/i, 'rgba($1, $2, $3, $4)')
+        .replace(/, 0\.1\)$/, ', 0.10)')
+        .replace(/, 0\.6\)$/, ', 0.60)');
+}
+
 function auditFile(filePath, fix) {
     let content = fs.readFileSync(filePath, 'utf-8');
     const lines = content.split('\n');
@@ -59,7 +77,7 @@ function auditFile(filePath, fix) {
         const matches = lines[i].match(/rgba\(255,\s*255,\s*255,\s*0\.\d+\)/g);
         if (!matches) continue;
         for (const match of matches) {
-            const token = TOKEN_MAP[match];
+            const token = TOKEN_MAP[normalizeRgba(match)];
             if (fix && token) {
                 const escaped = match.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                 content = content.replace(new RegExp(escaped, 'g'), token);

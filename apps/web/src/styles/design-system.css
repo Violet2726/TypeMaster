@@ -338,7 +338,7 @@ body[data-theme='serika-light'] {
 
 .tm-game-topbar__brand,
 .tm-game-topbar__action {
-    border: 1px solid rgba(255, 255, 255, 0.13);
+    border: 1px solid var(--panel-stroke);
     border-radius: var(--tm-radius-panel);
     background: rgba(12, 15, 22, 0.72);
     color: #ffffff;
@@ -356,7 +356,7 @@ body[data-theme='serika-light'] {
 
 .tm-game-topbar__brand span,
 .tm-game-topbar__brand small {
-    color: rgba(255, 255, 255, 0.58);
+    color: var(--tm-white-alpha-580);
     font-size: 0.72rem;
     line-height: 1.2;
     font-weight: 700;

@@ -7,10 +7,10 @@
 .typerift-codex-entry {
     min-height: 70px;
     padding: 12px;
-    border: 1px solid rgba(255,255,255,0.09);
+    border: 1px solid var(--panel-stroke);
     border-radius: 8px;
-    background: rgba(255,255,255,0.05);
-    color: rgba(255,255,255,0.6);
+    background: var(--bg-soft);
+    color: var(--tm-white-alpha-620);
 }
 
 .typerift-codex-entry.is-open {
@@ -26,7 +26,7 @@
 
 .typerift-codex-entry small {
     margin-top: 5px;
-    color: rgba(255,255,255,0.54);
+    color: var(--tm-white-alpha-550);
     font-size: 11px;
 }
 

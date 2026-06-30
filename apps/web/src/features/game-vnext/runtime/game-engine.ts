@@ -5,8 +5,9 @@ import {
     dispatchGameCommand,
     updateGameState
 } from '@typemaster/domain';
+import type { GameMode, GameResult, GameSnapshot } from '../../../types/game';
+export type { GameMode } from '../../../types/game';
 
-export type GameMode = 'expedition' | 'daily-anomaly' | 'first-descent';
 export type GameCommand = 'start' | 'pause' | 'resume' | 'retry' | 'quit' | 'extract' | 'type-char' | 'choose-upgrade';
 
 export interface GameEngineOptions {
@@ -18,17 +19,17 @@ export interface GameEngineOptions {
 }
 
 export interface GameEngineUpdate {
-    snapshot: any;
+    snapshot: GameSnapshot;
     events: any[];
 }
 
 export interface GameEngine {
     readonly state: any;
-    readonly snapshot: any;
+    readonly snapshot: GameSnapshot;
     tick(deltaTime: number): GameEngineUpdate;
     dispatch(command: GameCommand, payload?: Record<string, unknown>): GameEngineUpdate;
     handleKey(event: KeyboardEvent): GameEngineUpdate;
-    getResult(): any;
+    getResult(): GameResult;
     destroy(): void;
 }
 
@@ -144,4 +145,3 @@ export function createGameEngine(options: GameEngineOptions = {}): GameEngine {
         destroy() {}
     };
 }
-

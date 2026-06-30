@@ -15,7 +15,7 @@
     width: min(100%, 560px);
     max-height: min(780px, calc(100vh - 48px));
     overflow: auto;
-    border: 1px solid rgba(255,255,255,0.13);
+    border: 1px solid var(--panel-stroke);
     border-radius: 8px;
     background: rgba(15, 18, 26, 0.9);
     box-shadow: 0 26px 76px rgba(0,0,0,0.48);
@@ -23,6 +23,12 @@
 
 .typerift-panel--wide {
     width: min(100%, 820px);
+}
+
+.typerift-panel--mode {
+    width: min(100%, 860px);
+    background:
+        linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
 }
 
 .typerift-panel__inner {
@@ -39,7 +45,7 @@
 
 .typerift-heading span,
 .typerift-kicker {
-    color: rgba(255,255,255,0.52);
+    color: var(--tm-white-alpha-550);
     font-size: 12px;
     font-weight: 800;
 }
@@ -56,7 +62,7 @@
 .typerift-heading p {
     max-width: 35rem;
     margin: 0 auto;
-    color: rgba(255,255,255,0.66);
+    color: var(--tm-white-alpha-640);
     font-size: 13px;
     line-height: 1.48;
 }
@@ -68,44 +74,68 @@
     gap: 10px;
 }
 
-.typerift-card {
-    display: flex;
+.typerift-mode-card.app-card {
+    min-height: 150px;
+    align-content: start;
+}
+
+.typerift-mode-card .app-card__icon {
+    border-radius: var(--tm-radius-control);
+    background: var(--main-soft);
+    color: var(--main-color);
+}
+
+.typerift-mode-card .app-card__kicker {
+    color: var(--tm-white-alpha-580);
+}
+
+.typerift-mode-card .app-card__text strong {
+    color: var(--color-white);
+    font-size: 1.08rem;
+}
+
+.typerift-mode-card .app-card__text span {
+    color: var(--tm-white-alpha-640);
+}
+
+.typerift-mode-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.typerift-mode-metrics .app-metric-card {
+    min-height: 46px;
+    background: var(--surface-2);
+}
+
+.typerift-mode-metrics .app-metric-card strong {
+    font-size: 1.05rem;
+}
+
+.typerift-upgrade-card.app-card {
     min-height: 176px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 9px;
-    padding: 16px;
-    border: 1px solid rgba(255,255,255,0.13);
-    border-radius: 8px;
-    background: rgba(255,255,255,0.055);
-    color: #ffffff;
-    text-align: left;
-    font: inherit;
-    cursor: pointer;
+    align-content: start;
 }
 
-.typerift-card:hover,
-.typerift-card:focus-visible {
-    border-color: rgba(100,210,255,0.5);
-    background: rgba(100,210,255,0.12);
-    outline: none;
+.typerift-upgrade-card .app-card__icon {
+    border-radius: var(--tm-radius-control);
 }
 
-.typerift-card strong {
-    font-size: 18px;
-    line-height: 1.15;
+.typerift-upgrade-card .app-card__text strong {
+    color: var(--color-white);
+    font-size: 1.08rem;
 }
 
-.typerift-card small,
-.typerift-card span:last-child {
-    color: rgba(255,255,255,0.58);
-    font-size: 12px;
-    line-height: 1.35;
+.typerift-upgrade-card .app-card__text span,
+.typerift-upgrade-card .app-card__kicker {
+    color: var(--tm-white-alpha-580);
 }
 
-.typerift-card--rare { border-color: rgba(191,140,255,0.34); }
-.typerift-card--epic,
-.typerift-card--legendary { border-color: rgba(255,214,10,0.38); }
+.typerift-upgrade-card--rare { border-color: rgba(100,210,255,0.5); }
+.typerift-upgrade-card--epic,
+.typerift-upgrade-card--legendary { border-color: rgba(255,214,10,0.38); }
 
 .typerift-stats {
     display: grid;
@@ -116,9 +146,9 @@
 .typerift-stats div,
 .typerift-insight,
 .typerift-build {
-    border: 1px solid rgba(255,255,255,0.09);
+    border: 1px solid var(--panel-stroke);
     border-radius: 8px;
-    background: rgba(255,255,255,0.05);
+    background: var(--bg-soft);
 }
 
 .typerift-stats div {
@@ -130,7 +160,7 @@
 .typerift-insight span,
 .typerift-build > span {
     display: block;
-    color: rgba(255,255,255,0.48);
+    color: var(--tm-white-alpha-480);
     font-size: 11px;
     font-weight: 750;
 }
@@ -182,10 +212,10 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    border: 1px solid rgba(255,255,255,0.13);
+    border: 1px solid var(--panel-stroke);
     border-radius: 8px;
-    background: rgba(255,255,255,0.07);
-    color: rgba(255,255,255,0.82);
+    background: var(--surface-2);
+    color: var(--tm-white-alpha-820);
     font: inherit;
     font-size: 14px;
     font-weight: 760;
@@ -194,8 +224,8 @@
 
 .typerift-action:hover,
 .typerift-action:focus-visible {
-    border-color: rgba(255,255,255,0.24);
-    background: rgba(255,255,255,0.12);
+    border-color: var(--tm-white-alpha-240);
+    background: var(--panel-stroke);
     outline: none;
 }
 
@@ -234,7 +264,8 @@
 
     .typerift-mode-grid,
     .typerift-upgrade-grid,
-    .typerift-stats {
+    .typerift-stats,
+    .typerift-mode-metrics {
         grid-template-columns: 1fr;
     }
 
@@ -242,4 +273,3 @@
         flex-direction: column;
     }
 }
-

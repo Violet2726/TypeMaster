@@ -1,11 +1,16 @@
 'use client';
 
-import type { ReactNode } from 'react';
-import { BarChart3, DoorOpen, Flame, Gauge, Keyboard, ShieldCheck, Swords, Target, Trophy } from 'lucide-react';
-import { Button, MetricStrip } from '@typemaster/ui';
+import { BarChart3, DoorOpen, Flame, Gauge, Keyboard, ShieldCheck, Swords, Target } from 'lucide-react';
 import { formatDateTime } from '../i18n';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { useHomePageStore } from '../store/app-state-selectors';
+import {
+    NextActionCard,
+    ProgressStrip,
+    RecentRunCard,
+    TodayHero,
+    type ProgressItem
+} from '../features/home/components/HomeDashboardSections';
 import './home-page.css';
 
 function getGameSessions(sessions: any[]) {
@@ -33,37 +38,6 @@ function fillTemplate(template: string, values: Record<string, string | number>)
     ), template);
 }
 
-function HomeQuickCard({ icon: Icon, kicker, label, description, tone = 'default', onClick }: {
-    icon: any;
-    kicker: string;
-    label: string;
-    description: string;
-    tone?: string;
-    onClick: () => void;
-}) {
-    return (
-        <button type="button" className={`home-quick-card home-quick-card--${tone}`} onClick={onClick}>
-            <span className="home-quick-card__icon" aria-hidden="true">
-                <Icon size={18} strokeWidth={2.2} />
-            </span>
-            <span className="home-quick-card__text">
-                <p className="home-quick-card__kicker">{kicker}</p>
-                <strong>{label}</strong>
-                <span>{description}</span>
-            </span>
-        </button>
-    );
-}
-
-function HomeRecentChip({ icon: Icon, children, accent = false }: { icon: any; children: ReactNode; accent?: boolean }) {
-    return (
-        <span className={`home-recent-chip${accent ? ' home-recent-chip--accent' : ''}`}>
-            <Icon aria-hidden="true" size={13} strokeWidth={2.2} />
-            {children}
-        </span>
-    );
-}
-
 export function HomePage() {
     const navigate = useAppNavigate();
     const { copy, language, sessions, sessionStreak, skillProfile, weeklyGoal } = useHomePageStore();
@@ -74,57 +48,46 @@ export function HomePage() {
     const bestDepth = gameSessions.reduce((best, session) => Math.max(best, Number(session.gameMeta?.depth || session.trainingMeta?.depth || 0)), 0);
     const extractCount = gameSessions.filter((session) => ['extract', 'victory'].includes(session.gameMeta?.endReason || session.trainingMeta?.endReason)).length;
     const extractRate = gameSessions.length ? Math.round((extractCount / gameSessions.length) * 100) : 0;
-    const metricItems = [
+    const metricItems: ProgressItem[] = [
         {
             id: 'streak',
             icon: Flame,
             label: homeCopy.trainingStreak,
             value: sessionStreak ? `${sessionStreak}` : homeCopy.ready,
-            tone: 'streak'
+            tone: 'warning'
         },
         {
             id: 'depth',
             icon: Gauge,
             label: homeCopy.bestDepth,
             value: bestDepth || '--',
-            tone: 'speed'
+            tone: 'primary'
         },
         {
             id: 'extract',
             icon: DoorOpen,
             label: homeCopy.extractionRate,
             value: gameSessions.length ? `${extractRate}%` : '--',
-            tone: 'accuracy'
+            tone: 'success'
         }
     ];
 
     return (
         <div className="page-stack page-stack--home home-status-page-stack home-status-page-stack--dashboard">
-            <section className="home-starter-hero" aria-label={homeCopy.commandTitle}>
-                <div className="home-starter-hero__copy">
-                    <span className="home-starter-hero__status">
-                        <Swords aria-hidden="true" size={15} strokeWidth={2.2} />
-                        {homeCopy.commandKicker}
-                    </span>
-                    <h1>{homeCopy.commandTitle}</h1>
-                    <p className="hero-body">
-                        {homeCopy.commandBody}
-                    </p>
-                    <div className="home-starter-hero__actions">
-                        <Button variant="primary" icon={Swords} aria-label={homeCopy.startTypeRift} onClick={() => navigate('/raid')}>
-                            {homeCopy.startTypeRift}
-                        </Button>
-                        <Button icon={Trophy} onClick={() => navigate('/missions')}>
-                            {homeCopy.viewMissions}
-                        </Button>
-                    </div>
-                </div>
-            </section>
+            <TodayHero
+                kicker={homeCopy.commandKicker}
+                title={homeCopy.commandTitle}
+                body={homeCopy.commandBody}
+                startLabel={homeCopy.startTypeRift}
+                viewMissionsLabel={homeCopy.viewMissions}
+                onStart={() => navigate('/raid')}
+                onOpenMissions={() => navigate('/missions')}
+            />
 
-            <MetricStrip className="home-starter-metrics" ariaLabel={homeCopy.progressAria} items={metricItems} />
+            <ProgressStrip ariaLabel={homeCopy.progressAria} items={metricItems} />
 
-            <section className="home-quick-cards" aria-label={homeCopy.loopActionsAria}>
-                <HomeQuickCard
+            <section className="app-card-grid" aria-label={homeCopy.loopActionsAria}>
+                <NextActionCard
                     icon={Swords}
                     kicker={homeCopy.primaryLane}
                     label={homeCopy.typeRiftLaneTitle}
@@ -132,21 +95,21 @@ export function HomePage() {
                     tone="primary"
                     onClick={() => navigate('/raid')}
                 />
-                <HomeQuickCard
+                <NextActionCard
                     icon={Keyboard}
                     kicker={copy.nav.practice}
                     label={fillTemplate(homeCopy.focusLane, { value: weakFocus || homeCopy.noWeakFocus })}
                     description={homeCopy.focusLaneBody}
                     onClick={() => navigate('/practice')}
                 />
-                <HomeQuickCard
+                <NextActionCard
                     icon={Target}
                     kicker={copy.nav.missions}
                     label={homeCopy.missionLane}
                     description={fillTemplate(homeCopy.missionLaneBody, { completed: weeklyGoal.completed, target: weeklyGoal.target })}
                     onClick={() => navigate('/missions')}
                 />
-                <HomeQuickCard
+                <NextActionCard
                     icon={BarChart3}
                     kicker={copy.nav.insights}
                     label={homeCopy.insightLane}
@@ -155,48 +118,19 @@ export function HomePage() {
                 />
             </section>
 
-            {latestGame ? (
-                <section className="home-recent">
-                    <div className="home-recent__head">
-                        <p className="panel-kicker">{homeCopy.latestTypeRift}</p>
-                        <h2>{homeCopy.lastRunSignal}</h2>
-                    </div>
-                    <div className="home-recent-list">
-                        <div className="home-recent-item">
-                            <span className="home-recent-item__icon" aria-hidden="true">
-                                <Swords size={16} strokeWidth={2.2} />
-                            </span>
-                            <div className="home-recent-item__body">
-                                <strong>{latestGame.trainingMeta?.title || homeCopy.defaultRunTitle}</strong>
-                                <p>{formatDateTime(latestGame.completedAt || latestGame.result?.completedAt, language)}</p>
-                            </div>
-                            <div className="home-recent-item__metrics">
-                                <HomeRecentChip icon={Gauge}>{homeCopy.depthLabel} {latestGame.gameMeta?.depth || latestGame.trainingMeta?.depth || 1}</HomeRecentChip>
-                                <HomeRecentChip icon={ShieldCheck} accent>{latestGame.result?.accuracy || 0}%</HomeRecentChip>
-                                <HomeRecentChip icon={DoorOpen}>{formatDuration(latestGame.durationSeconds || latestGame.result?.durationSeconds || 0)}</HomeRecentChip>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            ) : (
-                <section className="home-recent">
-                    <div className="home-recent__head">
-                        <p className="panel-kicker">{homeCopy.firstRunKicker}</p>
-                        <h2>{homeCopy.firstRunTitle}</h2>
-                    </div>
-                    <div className="home-recent-list">
-                        <div className="home-recent-item">
-                            <span className="home-recent-item__icon" aria-hidden="true">
-                                <Swords size={16} strokeWidth={2.2} />
-                            </span>
-                            <div className="home-recent-item__body">
-                                <strong>{homeCopy.firstRunBody}</strong>
-                                <p>{homeCopy.typeRiftLaneBody}</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            )}
+            <RecentRunCard
+                accuracy={latestGame?.result?.accuracy || 0}
+                date={latestGame ? formatDateTime(latestGame.completedAt || latestGame.result?.completedAt, language) : ''}
+                depth={latestGame?.gameMeta?.depth || latestGame?.trainingMeta?.depth || 1}
+                depthLabel={homeCopy.depthLabel}
+                duration={formatDuration(latestGame?.durationSeconds || latestGame?.result?.durationSeconds || 0)}
+                emptyBody={homeCopy.firstRunBody}
+                emptyDescription={homeCopy.typeRiftLaneBody}
+                isEmpty={!latestGame}
+                kicker={latestGame ? homeCopy.latestTypeRift : homeCopy.firstRunKicker}
+                runTitle={latestGame?.trainingMeta?.title || homeCopy.defaultRunTitle}
+                title={latestGame ? homeCopy.lastRunSignal : homeCopy.firstRunTitle}
+            />
         </div>
     );
 }

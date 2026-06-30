@@ -3,7 +3,7 @@
 import { ArrowRight, BarChart3, Flag, Keyboard, ShieldCheck, Swords, Target, Trophy } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { buildInsights } from '@typemaster/domain';
-import { Button } from '@typemaster/ui';
+import { AppButton, AppCard, AppSheet, MetricCard, SectionHeader } from '../components/app/AppPrimitives';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { useAppActions } from '../store/use-app-action-set';
 import { useAchievementSnapshot, useHistorySnapshot, usePlanSnapshot, useShellSnapshot } from '../store/app-state-derived';
@@ -30,19 +30,18 @@ function MissionCard({ body, cta, icon: Icon, meta, onClick, title, tone = 'defa
     tone?: string
 }) {
     return (
-        <article className={`home-quick-card home-quick-card--${tone}`}>
-            <span className="home-quick-card__icon" aria-hidden="true">
-                <Icon size={19} strokeWidth={2.2} />
-            </span>
-            <span className="home-quick-card__text">
-                <p className="home-quick-card__kicker">{meta}</p>
-                <strong>{title}</strong>
-                <span>{body}</span>
-            </span>
-            <Button variant="primary" icon={ArrowRight} iconPosition="end" onClick={onClick}>
-                {cta}
-            </Button>
-        </article>
+        <AppCard
+            icon={Icon}
+            kicker={meta}
+            title={title}
+            body={body}
+            tone={tone === 'primary' ? 'primary' : 'default'}
+            action={(
+                <AppButton variant="primary" icon={ArrowRight} iconPosition="end" onClick={onClick}>
+                    {cta}
+                </AppButton>
+            )}
+        />
     );
 }
 
@@ -85,40 +84,27 @@ export function MissionsPage() {
 
     return (
         <div className="page-stack page-stack--home">
-            <section className="home-starter-hero" aria-label={missionCopy.title}>
-                <div className="home-starter-hero__copy">
-                    <span className="home-starter-hero__status">
-                        <Flag aria-hidden="true" size={15} strokeWidth={2.2} />
-                        {missionCopy.kicker}
-                    </span>
-                    <h1>{missionCopy.title}</h1>
-                    <p className="hero-body">
-                        {missionCopy.body}
-                    </p>
-                    <div className="home-starter-hero__actions">
-                        <Button variant="primary" icon={Swords} onClick={startGame}>
-                            {missionCopy.backToGame}
-                        </Button>
-                    </div>
-                </div>
+            <AppSheet
+                aria-label={missionCopy.title}
+                body={missionCopy.body}
+                icon={Flag}
+                kicker={missionCopy.kicker}
+                title={missionCopy.title}
+                variant="hero"
+                actions={(
+                    <AppButton variant="primary" icon={Swords} onClick={startGame}>
+                        {missionCopy.backToGame}
+                    </AppButton>
+                )}
+            />
+
+            <section className="app-progress-strip" aria-label={missionCopy.progressLabel}>
+                <MetricCard icon={Trophy} label={missionCopy.unlocked} value={unlocked} tone="warning" />
+                <MetricCard icon={ShieldCheck} label={missionCopy.weeklyMissions} value={`${weeklyGoal.completed}/${weeklyGoal.target}`} tone="success" />
+                <MetricCard icon={BarChart3} label={missionCopy.recentWpm} value={insights.recent7.avgWpm || copy.common.emptyValue} tone="primary" />
             </section>
 
-            <section className="home-starter-metrics tm-metric-strip" aria-label={missionCopy.progressLabel}>
-                <div className="tm-metric">
-                    <span><Trophy aria-hidden="true" size={16} /> {missionCopy.unlocked}</span>
-                    <strong>{unlocked}</strong>
-                </div>
-                <div className="tm-metric">
-                    <span><ShieldCheck aria-hidden="true" size={16} /> {missionCopy.weeklyMissions}</span>
-                    <strong>{weeklyGoal.completed}/{weeklyGoal.target}</strong>
-                </div>
-                <div className="tm-metric">
-                    <span><BarChart3 aria-hidden="true" size={16} /> {missionCopy.recentWpm}</span>
-                    <strong>{insights.recent7.avgWpm || copy.common.emptyValue}</strong>
-                </div>
-            </section>
-
-            <section className="home-quick-cards" aria-label={missionCopy.missionList}>
+            <section className="app-card-grid" aria-label={missionCopy.missionList}>
                 <MissionCard
                     icon={Target}
                     meta={missionCopy.baselineMeta}
@@ -148,10 +134,7 @@ export function MissionsPage() {
 
             {activeTrainingStep ? (
                 <section className="home-recent">
-                    <div className="home-recent__head">
-                        <p className="panel-kicker">{missionCopy.activeMission}</p>
-                        <h2>{activeTrainingStep.title}</h2>
-                    </div>
+                    <SectionHeader kicker={missionCopy.activeMission} title={activeTrainingStep.title} />
                     <div className="home-recent-list">
                         <div className="home-recent-item">
                             <span className="home-recent-item__icon" aria-hidden="true">
@@ -161,9 +144,9 @@ export function MissionsPage() {
                                 <strong>{activeTrainingStep.summary}</strong>
                                 <p>{fillTemplate(missionCopy.planProgress, { value: trainingPlanProgress?.percent || 0 })}</p>
                             </div>
-                            <Button onClick={continuePlan}>
+                            <AppButton onClick={continuePlan}>
                                 {missionCopy.continue}
-                            </Button>
+                            </AppButton>
                         </div>
                     </div>
                 </section>

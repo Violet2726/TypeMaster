@@ -12,6 +12,21 @@
     --main-soft: rgba(10, 132, 255, 0.16);
     --main-color-strong: #ffffff;
     --main-gradient: linear-gradient(135deg, var(--main-color), #64d2ff);
+    --main-hover: #2997ff;
+
+    --color-white: #ffffff;
+    --color-black: #000000;
+    --color-ink: #1d1d1f;
+    --color-canvas-dark: #06080d;
+    --color-canvas-strong: #05070c;
+    --color-canvas-mid: #11131b;
+    --color-canvas-deep: #08070b;
+    --color-sky: #64d2ff;
+    --color-success-bright: #7ee198;
+    --color-ios-green: #34c759;
+    --color-ios-red: #ff453a;
+    --color-ios-yellow: #ffd60a;
+    --color-ios-orange: #ff9f0a;
 
     --success-color: #32d74b;
     --success-soft: rgba(50, 215, 75, 0.14);
@@ -43,6 +58,13 @@
     --panel-stroke: var(--tm-white-alpha-100);
     --shadow-soft: 0 2px 12px rgba(0, 0, 0, 0.08);
     --shadow-focus: 0 0 0 4px rgba(10, 132, 255, 0.24);
+    --shadow-accent: 0 10px 24px rgba(10, 132, 255, 0.22);
+    --shadow-sheet: 0 18px 52px rgba(0, 0, 0, 0.28);
+    --overlay-scrim: rgba(0, 0, 0, 0.44);
+    --glass-dark: rgba(12, 15, 22, 0.72);
+    --glass-strong: rgba(5, 7, 12, 0.9);
+    --glass-mid: rgba(5, 7, 12, 0.72);
+    --glass-soft: rgba(5, 7, 12, 0.2);
     --radius-sm: 12px;
     --radius-md: 16px;
     --radius-lg: 22px;
@@ -79,6 +101,7 @@ body[data-theme='serika-light'] {
     --main-color: #0071e3;
     --main-soft: rgba(0, 113, 227, 0.12);
     --main-gradient: linear-gradient(135deg, #0071e3, #64d2ff);
+    --main-hover: #2997ff;
 
     --success-color: #248a3d;
     --success-soft: rgba(36, 138, 61, 0.11);
@@ -110,6 +133,13 @@ body[data-theme='serika-light'] {
     --panel-stroke: rgba(0, 0, 0, 0.08);
     --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.06);
     --shadow-focus: 0 0 0 4px rgba(0, 113, 227, 0.18);
+    --shadow-accent: 0 8px 20px rgba(0, 113, 227, 0.16);
+    --shadow-sheet: 0 16px 42px rgba(0, 0, 0, 0.08);
+    --overlay-scrim: rgba(245, 245, 247, 0.56);
+    --glass-dark: var(--tm-white-alpha-940);
+    --glass-strong: var(--tm-white-alpha-940);
+    --glass-mid: var(--tm-white-alpha-840);
+    --glass-soft: var(--tm-white-alpha-350);
 }
 
 body[data-font='sm'] {

@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { STORAGE_KEYS } from '@typemaster/contracts';
 
 const seedPreferences = {
-    language: 'zh-CN',
+    language: 'en-US',
     theme: 'serika-dark',
     fontScale: 'md',
     focusMode: false,
@@ -110,7 +110,14 @@ test('starts TypeRift with a non-empty battle canvas and DOM HUD', async ({ page
     await page.getByRole('button', { name: 'Expedition' }).click();
 
     await expect(page.getByText('Target')).toBeVisible();
-    await expect(page.getByRole('img', { name: 'TypeRift Echo Siege battlefield with enemies carrying typed words' })).toBeVisible();
+    await expect(page.getByRole('img', { name: 'TypeRift battlefield with enemies carrying typed words' })).toBeVisible();
+
+    await page.evaluate(() => window.advanceTime?.(700));
+    const active = JSON.parse(await page.evaluate(() => window.render_game_to_text?.() || '{}'));
+    expect(active.enemies.length).toBeGreaterThan(0);
+    await page.keyboard.type(active.enemies[0].word[0]);
+    const afterInput = JSON.parse(await page.evaluate(() => window.render_game_to_text?.() || '{}'));
+    expect(afterInput.enemies.some((enemy) => enemy.typed.length > 0)).toBeTruthy();
 
     const pixels = await page.locator('canvas').evaluate((canvas) => {
         const ctx = canvas.getContext('2d');
