@@ -2,13 +2,13 @@ import { BarChart3, Flag, Home, Keyboard, Swords } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 export type ShellRouteId = 'today' | 'raid' | 'practice' | 'missions' | 'insights' | 'result';
-export type ShellLayoutMode = 'standard' | 'focus' | 'fullscreen';
+export type ShellLayoutMode = 'standard' | 'focus' | 'immersiveGame';
 
 export type ShellRoute = {
     id: ShellRouteId,
     href: string,
     icon: LucideIcon,
-    labelKey?: 'home' | 'practice' | 'insights',
+    labelKey?: 'home' | 'raid' | 'practice' | 'missions' | 'insights',
     fallbackLabel: string,
     showInNav: boolean,
     layout: ShellLayoutMode
@@ -28,15 +28,17 @@ export const SHELL_ROUTES: ShellRoute[] = [
         id: 'raid',
         href: '/raid',
         icon: Swords,
+        labelKey: 'raid',
         fallbackLabel: 'TypeRift',
         showInNav: true,
-        layout: 'fullscreen'
+        layout: 'immersiveGame'
     },
     {
         id: 'practice',
         href: '/practice',
         icon: Keyboard,
-        fallbackLabel: 'Focus Lab',
+        labelKey: 'practice',
+        fallbackLabel: 'Practice',
         showInNav: true,
         layout: 'focus'
     },
@@ -44,6 +46,7 @@ export const SHELL_ROUTES: ShellRoute[] = [
         id: 'missions',
         href: '/missions',
         icon: Flag,
+        labelKey: 'missions',
         fallbackLabel: 'Missions',
         showInNav: true,
         layout: 'standard'

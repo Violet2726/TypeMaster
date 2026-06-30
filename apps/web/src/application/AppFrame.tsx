@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, type ReactNode } from 'react';
+import { useEffect, useMemo, type ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import { getInlineSeparator } from '../i18n';
 import { getRouteForPath } from './route-registry';
@@ -44,16 +44,23 @@ export function AppFrame({ children }: AppFrameProps) {
     const isPracticeRoute = pathname === '/practice';
     const isFocusedLayout = settings.focusMode && isPracticeRoute;
     const route = getRouteForPath(pathname || '/');
-    const isFullscreenLayout = route.layout === 'fullscreen';
+    const isImmersiveGameLayout = route.layout === 'immersiveGame';
     const footerText = useMemo(() => (
         isFocusedLayout
             ? copy.shell.footerFocus
             : `${copy.common.appName}${getInlineSeparator(settings.language)}${copy.shell.footerDefault}`
     ), [copy, isFocusedLayout, settings.language]);
 
-    if (isFullscreenLayout) {
+    useEffect(() => {
+        const handleOpenSettings = () => openSettings();
+        window.addEventListener('typemaster:open-settings', handleOpenSettings);
+
+        return () => window.removeEventListener('typemaster:open-settings', handleOpenSettings);
+    }, [openSettings]);
+
+    if (isImmersiveGameLayout) {
         return (
-            <div className={`app-shell app-shell--${route.id} app-shell--fullscreen ${settingsOpen ? 'is-settings-open' : ''}`}>
+            <div className={`app-shell app-shell--${route.id} app-shell--immersive-game ${settingsOpen ? 'is-settings-open' : ''}`}>
                 {children}
                 <SettingsDrawer
                     isOpen={settingsOpen}
