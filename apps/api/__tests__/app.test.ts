@@ -127,7 +127,7 @@ describe('app', () => {
 
         expect(exportResponse.status).toBe(200);
         expect(exportBody.bundle).toMatchObject({
-            version: 6,
+            version: 7,
             sessions: [expect.objectContaining({ id: 'session-export' })],
             coachAdviceRecords: [expect.objectContaining({
                 sessionId: 'session-export',
