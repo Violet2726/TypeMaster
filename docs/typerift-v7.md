@@ -93,7 +93,6 @@ Required directories:
 - `enemies/`: 12 WebP enemy sprites.
 - `bosses/`: 5 WebP boss sprites.
 - `relics/`: 24 WebP relic/glyph/weapon icons.
-- `atlases/`: source atlases retained for audit and regeneration.
 
 Visual direction:
 

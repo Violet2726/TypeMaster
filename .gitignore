@@ -1,49 +1,45 @@
-# Core config
-config.js
-!packages/domain/src/config.js
-
-# Frontend build
+# Dependencies
 node_modules
+
+# Build outputs
 dist
 .next
 .vite
 .turbo
 *.tsbuildinfo
-*.tmp-dev.out.log
-*.tmp-dev.err.log
-*.tmp-vite-out.log
-*.tmp-vite-err.log
-*.vite-out.log
-*.vite-err.log
+
+# Config (contains API keys)
+config.js
+!packages/domain/src/config.js
+
+# Logs
+*.log
 pnpm-debug.log*
 
-# Coverage reports
+# Coverage & test results
 coverage
 test-results
 playwright-report
+
+# IDE & tool artifacts
+.history
+.codex-screens/
+*.bak
+tmp/
+.tmp-*.png
+.tmp-*.js
+
+# Deployment
+.vercel
+.env*.local
+
+# Project data (except domain package)
 data
 !packages/domain/src/data/
 !packages/domain/src/data/words.js
-apps/web/.codex-screens/
 
+# Docs (keep markdown, ignore generated)
 docs/*
 !docs/*.md
 !docs/ai-iteration/
 !docs/auto-iteration/
-.history
-
-
-!src/engine/config.js
-.vercel
-.env*.local
-
-
-# Codex dev artifacts
-.codex-screens/
-tmp/
-.tmp-*.png
-.tmp-*.js
-*.bak
-tools/
-*.out.log
-*.err.log
