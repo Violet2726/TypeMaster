@@ -7,6 +7,7 @@
 }
 
 .home-starter-hero {
+    position: relative;
     overflow: hidden;
     padding: clamp(1.25rem, 3vw, 2.2rem);
     border-radius: var(--radius-lg);
@@ -19,15 +20,23 @@
 
 .home-starter-hero {
     border-radius: var(--tm-radius-panel);
-    background: linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
+    background:
+        linear-gradient(90deg, rgba(5, 7, 12, 0.9) 0%, rgba(5, 7, 12, 0.72) 45%, rgba(5, 7, 12, 0.2) 100%),
+        url('/game/typerift/backgrounds/neon-archive.webp') center / cover no-repeat,
+        linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
 }
 
 body[data-theme='serika-light'] .home-starter-hero {
-    background: linear-gradient(180deg, var(--tm-white-alpha-980), rgba(247, 249, 252, 0.88));
+    background:
+        linear-gradient(90deg, var(--tm-white-alpha-940) 0%, var(--tm-white-alpha-840) 48%, var(--tm-white-alpha-350) 100%),
+        url('/game/typerift/backgrounds/neon-archive.webp') center / cover no-repeat,
+        linear-gradient(180deg, var(--tm-white-alpha-980), rgba(247, 249, 252, 0.88));
 }
 
 .home-starter-hero__copy {
     display: grid;
+    position: relative;
+    z-index: 1;
     gap: 0.72rem;
     max-width: 34rem;
 }
@@ -66,10 +75,13 @@ body[data-theme='serika-light'] .home-starter-hero {
 }
 
 .home-starter-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
     margin-top: 0.1rem;
 }
 
-.home-starter-hero__actions .action-btn {
+.home-starter-hero__actions .tm-button {
     min-height: 2.8rem;
     padding-inline: 1.1rem;
     font-size: 0.94rem;
@@ -133,7 +145,7 @@ article.home-quick-card {
     align-items: stretch;
 }
 
-article.home-quick-card .action-btn {
+article.home-quick-card .tm-button {
     grid-column: 1 / -1;
     justify-self: start;
     margin-top: 0.2rem;
@@ -327,6 +339,12 @@ body[data-theme='serika-light'] .home-quick-card--primary {
 
     .home-quick-cards {
         grid-template-columns: 1fr;
+    }
+
+    .home-starter-hero__actions .tm-button,
+    article.home-quick-card .tm-button {
+        width: 100%;
+        justify-content: center;
     }
 
     .home-recent-item {

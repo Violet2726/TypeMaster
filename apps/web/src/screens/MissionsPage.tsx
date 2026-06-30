@@ -3,6 +3,7 @@
 import { ArrowRight, BarChart3, Flag, Keyboard, ShieldCheck, Swords, Target, Trophy } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { buildInsights } from '@typemaster/domain';
+import { Button } from '@typemaster/ui';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { useAppActions } from '../store/use-app-action-set';
 import { useAchievementSnapshot, useHistorySnapshot, usePlanSnapshot, useShellSnapshot } from '../store/app-state-derived';
@@ -10,7 +11,13 @@ import { useAchievementSnapshot, useHistorySnapshot, usePlanSnapshot, useShellSn
 function getWeakFocus(skillProfile: any) {
     return skillProfile?.topErrorChars?.slice(0, 3).join(' / ')
         || skillProfile?.weakZones?.[0]?.label
-        || 'rhythm';
+        || '';
+}
+
+function fillTemplate(template: string, values: Record<string, string | number>) {
+    return Object.entries(values).reduce((text, [key, value]) => (
+        text.replaceAll(`{${key}}`, String(value))
+    ), template);
 }
 
 function MissionCard({ body, cta, icon: Icon, meta, onClick, title, tone = 'default' }: {
@@ -32,10 +39,9 @@ function MissionCard({ body, cta, icon: Icon, meta, onClick, title, tone = 'defa
                 <strong>{title}</strong>
                 <span>{body}</span>
             </span>
-            <button type="button" className="action-btn primary" onClick={onClick}>
+            <Button variant="primary" icon={ArrowRight} iconPosition="end" onClick={onClick}>
                 {cta}
-                <ArrowRight aria-hidden="true" size={16} strokeWidth={2.2} />
-            </button>
+            </Button>
         </article>
     );
 }
@@ -43,13 +49,14 @@ function MissionCard({ body, cta, icon: Icon, meta, onClick, title, tone = 'defa
 export function MissionsPage() {
     const navigate = useAppNavigate();
     const { copy } = useShellSnapshot();
+    const missionCopy = copy.missions;
     const { sessions } = useHistorySnapshot();
     const { achievements, weeklyGoal } = useAchievementSnapshot();
     const { activeTrainingStep, dailyChallenge, skillProfile, trainingPlanProgress } = usePlanSnapshot();
     const { configActions, planActions, sessionActions } = useAppActions();
     const [isLaunchingDaily, setIsLaunchingDaily] = useState(false);
     const insights = useMemo(() => buildInsights(sessions), [sessions]);
-    const weakFocus = getWeakFocus(skillProfile);
+    const weakFocus = getWeakFocus(skillProfile) || copy.home.noWeakFocus;
     const unlocked = achievements.filter((item) => item.unlocked).length;
 
     const startGame = () => navigate('/raid');
@@ -78,64 +85,63 @@ export function MissionsPage() {
 
     return (
         <div className="page-stack page-stack--home">
-            <section className="home-starter-hero" aria-label="TypeRift missions">
+            <section className="home-starter-hero" aria-label={missionCopy.title}>
                 <div className="home-starter-hero__copy">
                     <span className="home-starter-hero__status">
                         <Flag aria-hidden="true" size={15} strokeWidth={2.2} />
-                        Missions
+                        {missionCopy.kicker}
                     </span>
-                    <h1>Mission Center</h1>
+                    <h1>{missionCopy.title}</h1>
                     <p className="hero-body">
-                        Calibrate speed, repair weak zones, and finish daily drills before returning to TypeRift builds.
+                        {missionCopy.body}
                     </p>
                     <div className="home-starter-hero__actions">
-                        <button type="button" className="action-btn primary" onClick={startGame}>
-                            <Swords aria-hidden="true" size={17} strokeWidth={2.25} />
-                            Back to TypeRift
-                        </button>
+                        <Button variant="primary" icon={Swords} onClick={startGame}>
+                            {missionCopy.backToGame}
+                        </Button>
                     </div>
                 </div>
             </section>
 
-            <section className="home-starter-metrics tm-metric-strip" aria-label="Mission progress">
+            <section className="home-starter-metrics tm-metric-strip" aria-label={missionCopy.progressLabel}>
                 <div className="tm-metric">
-                    <span><Trophy aria-hidden="true" size={16} /> Unlocked</span>
+                    <span><Trophy aria-hidden="true" size={16} /> {missionCopy.unlocked}</span>
                     <strong>{unlocked}</strong>
                 </div>
                 <div className="tm-metric">
-                    <span><ShieldCheck aria-hidden="true" size={16} /> Weekly missions</span>
+                    <span><ShieldCheck aria-hidden="true" size={16} /> {missionCopy.weeklyMissions}</span>
                     <strong>{weeklyGoal.completed}/{weeklyGoal.target}</strong>
                 </div>
                 <div className="tm-metric">
-                    <span><BarChart3 aria-hidden="true" size={16} /> Recent WPM</span>
+                    <span><BarChart3 aria-hidden="true" size={16} /> {missionCopy.recentWpm}</span>
                     <strong>{insights.recent7.avgWpm || copy.common.emptyValue}</strong>
                 </div>
             </section>
 
-            <section className="home-quick-cards" aria-label="Mission list">
+            <section className="home-quick-cards" aria-label={missionCopy.missionList}>
                 <MissionCard
                     icon={Target}
-                    meta="Baseline"
-                    title="30 second calibration"
-                    body="Set today's reference line for speed and accuracy before a game run."
-                    cta="Start calibration"
+                    meta={missionCopy.baselineMeta}
+                    title={missionCopy.baselineTitle}
+                    body={missionCopy.baselineBody}
+                    cta={missionCopy.baselineCta}
                     tone="primary"
                     onClick={startBaseline}
                 />
                 <MissionCard
                     icon={Keyboard}
-                    meta="Focus Lab"
-                    title={`Weak-zone repair: ${weakFocus}`}
-                    body="Turn TypeRift mistakes into a compact precision drill."
-                    cta="Enter practice"
+                    meta={missionCopy.focusMeta}
+                    title={fillTemplate(missionCopy.focusTitle, { value: weakFocus })}
+                    body={missionCopy.focusBody}
+                    cta={missionCopy.focusCta}
                     onClick={startFocus}
                 />
                 <MissionCard
                     icon={Trophy}
-                    meta="Daily"
-                    title={dailyChallenge?.title || 'Daily mission'}
-                    body={dailyChallenge?.summary || 'Complete the shared text and compare stability with today.'}
-                    cta={isLaunchingDaily ? 'Launching' : 'Start mission'}
+                    meta={missionCopy.dailyMeta}
+                    title={dailyChallenge?.title || missionCopy.dailyTitle}
+                    body={dailyChallenge?.summary || missionCopy.dailyBody}
+                    cta={isLaunchingDaily ? missionCopy.launching : missionCopy.dailyCta}
                     onClick={startDaily}
                 />
             </section>
@@ -143,7 +149,7 @@ export function MissionsPage() {
             {activeTrainingStep ? (
                 <section className="home-recent">
                     <div className="home-recent__head">
-                        <p className="panel-kicker">Active mission</p>
+                        <p className="panel-kicker">{missionCopy.activeMission}</p>
                         <h2>{activeTrainingStep.title}</h2>
                     </div>
                     <div className="home-recent-list">
@@ -153,11 +159,11 @@ export function MissionsPage() {
                             </span>
                             <div className="home-recent-item__body">
                                 <strong>{activeTrainingStep.summary}</strong>
-                                <p>Plan progress {trainingPlanProgress?.percent || 0}%</p>
+                                <p>{fillTemplate(missionCopy.planProgress, { value: trainingPlanProgress?.percent || 0 })}</p>
                             </div>
-                            <button type="button" className="action-btn" onClick={continuePlan}>
-                                Continue
-                            </button>
+                            <Button onClick={continuePlan}>
+                                {missionCopy.continue}
+                            </Button>
                         </div>
                     </div>
                 </section>

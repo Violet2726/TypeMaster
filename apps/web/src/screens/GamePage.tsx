@@ -1,12 +1,15 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent as ReactKeyboardEvent } from 'react';
+import { HelpCircle, Home, Pause, Play, Settings } from 'lucide-react';
+import { GameTopBar } from '@typemaster/ui';
 import '../features/game-vnext/components/game-shell.css';
 import { useGameStore } from '../features/game/state/game-store';
 import { createGameEngine, type GameEngine, type GameMode } from '../features/game-vnext/runtime/game-engine';
 import { loadGameAssets } from '../features/game-vnext/runtime/asset-loader';
 import { TypeRiftRenderer } from '../features/game-vnext/runtime/canvas-renderer';
 import { useAppNavigate } from '../application/use-app-navigate';
+import { getCopy } from '../i18n';
 import ModeSelectOverlay from '../features/game-vnext/components/ModeSelectOverlay';
 import HudOverlay from '../features/game-vnext/components/HudOverlay';
 import UpgradeOverlay from '../features/game-vnext/components/UpgradeOverlay';
@@ -42,6 +45,8 @@ export default function GamePage() {
     const [snapshot, setSnapshot] = useState<any>(null);
     const [bestScore, setBestScore] = useState(0);
     const [showCodex, setShowCodex] = useState(false);
+    const [showHelp, setShowHelp] = useState(false);
+    const copy = useMemo(() => getCopy(language || 'zh-CN'), [language]);
 
     const commitUpdate = useCallback((update: any, immediate = false) => {
         const renderer = rendererRef.current;
@@ -107,6 +112,16 @@ export default function GamePage() {
         if (action === 'codex') setShowCodex(true);
         if (action === 'menu') navigate('/');
     }, [dispatchAction, focusChars, navigate]);
+
+    const handleTopPauseAction = useCallback(() => {
+        const phase = snapshotRef.current?.phase;
+        if (phase === 'playing') dispatchAction('pause');
+        if (phase === 'paused') dispatchAction('resume');
+    }, [dispatchAction]);
+
+    const handleOpenSettings = useCallback(() => {
+        window.dispatchEvent(new CustomEvent('typemaster:open-settings'));
+    }, []);
 
     useEffect(() => {
         bestScoreRef.current = gameBestScore;
@@ -288,25 +303,73 @@ export default function GamePage() {
                 || (snapshot.overlay.result?.score || 0) > bestScore
         }
         : null;
+    const isPlaying = snapshot?.phase === 'playing';
+    const isPaused = snapshot?.phase === 'paused';
+    const isUpgrade = Boolean(snapshot?.upgradeChoices?.length);
+    const topSubtitle = snapshot?.phase === 'idle'
+        ? copy.game.topIdle
+        : isPaused
+            ? copy.game.topPaused
+            : isUpgrade
+                ? copy.game.topUpgrade
+                : resultOverlay
+                    ? copy.game.topResult
+                    : copy.game.topPlaying;
 
     return (
         <div
             ref={containerRef}
             className="typerift-container"
             role="application"
-            aria-label="TypeRift roguelite typing survival game"
+            aria-label={copy.game.aria}
             onPointerDown={() => inputRef.current?.focus({ preventScroll: true })}
         >
+            <GameTopBar
+                eyebrow={copy.game.topEyebrow}
+                title={copy.game.topTitle}
+                subtitle={topSubtitle}
+                primary={{
+                    id: 'exit',
+                    label: copy.game.exit,
+                    ariaLabel: copy.game.exit,
+                    icon: Home,
+                    onClick: () => navigate('/')
+                }}
+                actions={[
+                    {
+                        id: 'pause',
+                        label: isPaused ? copy.game.resume : copy.game.pause,
+                        ariaLabel: isPaused ? copy.game.resume : copy.game.pause,
+                        icon: isPaused ? Play : Pause,
+                        disabled: !isPlaying && !isPaused,
+                        onClick: handleTopPauseAction
+                    },
+                    {
+                        id: 'settings',
+                        label: copy.game.settings,
+                        ariaLabel: copy.game.settings,
+                        icon: Settings,
+                        onClick: handleOpenSettings
+                    },
+                    {
+                        id: 'help',
+                        label: copy.game.help,
+                        ariaLabel: copy.game.help,
+                        icon: HelpCircle,
+                        onClick: () => setShowHelp(true)
+                    }
+                ]}
+            />
             <canvas
                 ref={canvasRef}
                 className="typerift-canvas"
                 role="img"
-                aria-label="TypeRift Echo Siege battlefield with enemies carrying typed words"
+                aria-label={copy.game.canvasAria}
             />
             <input
                 ref={inputRef}
                 className="typerift-keyboard-input"
-                aria-label="TypeRift input"
+                aria-label={copy.game.inputAria}
                 autoCapitalize="none"
                 autoComplete="off"
                 autoCorrect="off"
@@ -318,25 +381,44 @@ export default function GamePage() {
             {snapshot?.phase === 'idle' && (
                 <ModeSelectOverlay
                     bestScore={bestScore}
+                    copy={copy}
                     codexProgress={gameCodex || snapshot.codexProgress}
                     onStart={handleStart}
                 />
             )}
-            {snapshot?.phase === 'playing' && <HudOverlay data={snapshot.hud} />}
+            {snapshot?.phase === 'playing' && <HudOverlay data={snapshot.hud} copy={copy} />}
             {snapshot?.phase === 'playing' && snapshot.upgradeChoices?.length ? (
-                <UpgradeOverlay choices={snapshot.upgradeChoices} onChoose={(upgradeId) => dispatchAction('choose-upgrade', { upgradeId })} />
+                <UpgradeOverlay choices={snapshot.upgradeChoices} copy={copy} onChoose={(upgradeId) => dispatchAction('choose-upgrade', { upgradeId })} />
             ) : null}
             {snapshot?.phase === 'paused' && (
-                <PauseOverlay stats={snapshot.hud} onAction={handlePauseAction} />
+                <PauseOverlay stats={snapshot.hud} copy={copy} onAction={handlePauseAction} />
             )}
             {resultOverlay && (
-                <RunResultOverlay data={resultOverlay} onAction={handleResultAction} />
+                <RunResultOverlay data={resultOverlay} copy={copy} onAction={handleResultAction} />
             )}
             <div className="typerift-sr-only" role="status" aria-live="polite" aria-atomic="true">
                 {snapshot?.liveMessage || ''}
             </div>
             {showCodex && (
-                <CodexOverlay codex={gameCodex || snapshot?.codexProgress} onClose={() => setShowCodex(false)} />
+                <CodexOverlay codex={gameCodex || snapshot?.codexProgress} copy={copy} onClose={() => setShowCodex(false)} />
+            )}
+            {showHelp && (
+                <div className="typerift-overlay" role="dialog" aria-modal="true" aria-label={copy.game.helpTitle}>
+                    <section className="typerift-panel">
+                        <div className="typerift-panel__inner">
+                            <div className="typerift-heading">
+                                <span>{copy.game.help}</span>
+                                <h2>{copy.game.helpTitle}</h2>
+                                <p>{copy.game.helpBody}</p>
+                            </div>
+                            <div className="typerift-actions">
+                                <button className="typerift-action typerift-action--primary" type="button" onClick={() => setShowHelp(false)} autoFocus>
+                                    {copy.game.helpDismiss}
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+                </div>
             )}
         </div>
     );

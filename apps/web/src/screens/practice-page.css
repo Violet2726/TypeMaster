@@ -45,7 +45,7 @@
     font-family: var(--font-display);
     font-size: clamp(1.8rem, 3.4vw, 2.55rem);
     line-height: 1.04;
-    letter-spacing: -0.028em;
+    letter-spacing: 0;
     max-width: 20ch;
 }
 
@@ -69,6 +69,18 @@
 .practice-brief-panel,
 .adaptive-drill-panel {
     border-radius: 24px;
+}
+
+.practice-workbench {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+    gap: 0.95rem;
+    align-items: start;
+}
+
+.practice-workbench__primary,
+.practice-workbench__rail {
+    min-width: 0;
 }
 
 .practice-workbench__rail .practice-toolbar {
@@ -184,6 +196,7 @@ body[data-theme='serika-light'] .practice-page--refined .practice-toolbar__suppo
 }
 
 @media (max-width: 1100px) {
+    .practice-workbench,
     .practice-support-grid--split,
     .practice-page--refined.practice-page--compose .practice-workbench {
         grid-template-columns: 1fr;
@@ -202,7 +215,7 @@ body[data-theme='serika-light'] .practice-page--refined .practice-toolbar__suppo
     .practice-workbench__rail .practice-toolbar,
     .practice-brief-panel,
     .adaptive-drill-panel {
-        border-radius: 20px;
+        border-radius: var(--tm-radius-panel);
     }
 
     .practice-hero {
@@ -221,6 +234,27 @@ body[data-theme='serika-light'] .practice-page--refined .practice-toolbar__suppo
 
     .practice-page--refined .practice-workbench__primary .typing-stage .words-container {
         height: calc(var(--typing-size) * var(--typing-line-height) * 3.35);
+    }
+
+    .practice-workbench__rail {
+        order: 2;
+    }
+
+    .practice-page .sticky-action-bar {
+        position: static;
+        bottom: auto;
+        margin-top: 0.2rem;
+        padding: 0.82rem;
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .practice-page .sticky-action-bar > div {
+        display: grid;
+        gap: 0.1rem;
+    }
+
+    .practice-page .sticky-action-bar .action-btn {
+        width: 100%;
     }
 }
 

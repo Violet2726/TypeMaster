@@ -1,5 +1,5 @@
 /** @vitest-environment jsdom */
-import { act, fireEvent, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import GamePage from '../GamePage';
 import { renderWithProvider } from '../../test/render-with-provider';
 
@@ -55,7 +55,7 @@ describe('GamePage', () => {
         renderWithProvider(<GamePage />, { route: '/raid' });
 
         await waitFor(() => expect(typeof window.render_game_to_text).toBe('function'));
-        fireEvent.click(await screen.findByRole('button', { name: /Expedition/ }));
+        fireEvent.click(await screen.findByRole('button', { name: /远征/ }));
 
         await waitFor(() => {
             const snapshot = JSON.parse(window.render_game_to_text());
@@ -71,8 +71,9 @@ describe('GamePage', () => {
 
         fireEvent.keyDown(window, { key: 'Escape' });
 
-        expect(await screen.findByRole('dialog', { name: 'TypeRift paused' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Resume' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Extract' })).toBeDisabled();
+        const pauseDialog = await screen.findByRole('dialog', { name: 'TypeRift 已暂停' });
+        expect(pauseDialog).toBeInTheDocument();
+        expect(within(pauseDialog).getByRole('button', { name: '继续' })).toBeInTheDocument();
+        expect(within(pauseDialog).getByRole('button', { name: '撤离' })).toBeDisabled();
     });
 });

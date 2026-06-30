@@ -20,7 +20,7 @@ describe('HomePage', () => {
         resetMockNavigation();
     });
 
-    test('shows the TypeRift Command Center as the first-run home', async () => {
+    test('shows the TypeRift command center as the first-run home', async () => {
         renderWithProvider(<HomePage />, {
             storageState: {
                 'typemaster:v7:settings': {
@@ -30,9 +30,9 @@ describe('HomePage', () => {
             }
         });
 
-        expect(await screen.findByRole('heading', { name: 'TypeRift Command Center' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Start TypeRift' })).toBeInTheDocument();
-        expect(screen.getByText('No legacy migration. v7 starts with your first TypeRift descent.')).toBeInTheDocument();
+        expect(await screen.findByRole('heading', { name: 'TypeRift 指挥台' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: '开始 TypeRift' })).toBeInTheDocument();
+        expect(screen.getByText('不迁移旧游戏记录。TypeRift 会从第一次下潜开始建立全新的图鉴和成绩。')).toBeInTheDocument();
         expect(screen.queryByRole('button', { name: /Start assessment/i })).not.toBeInTheDocument();
     });
 
@@ -46,7 +46,7 @@ describe('HomePage', () => {
             }
         });
 
-        fireEvent.click(await screen.findByRole('button', { name: 'Start TypeRift' }));
+        fireEvent.click(await screen.findByRole('button', { name: '开始 TypeRift' }));
 
         await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith('/raid'));
     });
@@ -94,8 +94,8 @@ describe('HomePage', () => {
             }
         });
 
-        expect(await screen.findByRole('heading', { name: 'Last run signal' })).toBeInTheDocument();
-        expect(screen.getByText('Depth 4')).toBeInTheDocument();
+        expect(await screen.findByRole('heading', { name: '上一局信号' })).toBeInTheDocument();
+        expect(screen.getByText('层数 4')).toBeInTheDocument();
         expect(screen.getByText('97%')).toBeInTheDocument();
     });
 });

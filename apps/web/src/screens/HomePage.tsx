@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { BarChart3, DoorOpen, Flame, Gauge, Keyboard, ShieldCheck, Swords, Target, Trophy } from 'lucide-react';
-import { MetricStrip } from '@typemaster/ui';
+import { Button, MetricStrip } from '@typemaster/ui';
 import { formatDateTime } from '../i18n';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { useHomePageStore } from '../store/app-state-selectors';
@@ -18,13 +18,19 @@ function getWeakFocus(skillProfile: any, sessions: any[]) {
     if (Array.isArray(chars) && chars.length) return chars.slice(0, 3).join(' / ');
     return skillProfile?.topErrorChars?.slice(0, 3).join(' / ')
         || skillProfile?.weakZones?.[0]?.label
-        || 'rhythm';
+        || '';
 }
 
 function formatDuration(seconds = 0) {
     const minutes = Math.floor(seconds / 60);
     const rest = Math.floor(seconds % 60);
     return `${minutes}:${String(rest).padStart(2, '0')}`;
+}
+
+function fillTemplate(template: string, values: Record<string, string | number>) {
+    return Object.entries(values).reduce((text, [key, value]) => (
+        text.replaceAll(`{${key}}`, String(value))
+    ), template);
 }
 
 function HomeQuickCard({ icon: Icon, kicker, label, description, tone = 'default', onClick }: {
@@ -60,7 +66,8 @@ function HomeRecentChip({ icon: Icon, children, accent = false }: { icon: any; c
 
 export function HomePage() {
     const navigate = useAppNavigate();
-    const { language, sessions, sessionStreak, skillProfile, weeklyGoal } = useHomePageStore();
+    const { copy, language, sessions, sessionStreak, skillProfile, weeklyGoal } = useHomePageStore();
+    const homeCopy = copy.home;
     const gameSessions = getGameSessions(sessions);
     const latestGame = gameSessions[0] || null;
     const weakFocus = getWeakFocus(skillProfile, sessions);
@@ -71,21 +78,21 @@ export function HomePage() {
         {
             id: 'streak',
             icon: Flame,
-            label: 'Training streak',
-            value: sessionStreak ? `${sessionStreak} days` : 'Ready',
+            label: homeCopy.trainingStreak,
+            value: sessionStreak ? `${sessionStreak}` : homeCopy.ready,
             tone: 'streak'
         },
         {
             id: 'depth',
             icon: Gauge,
-            label: 'Best depth',
+            label: homeCopy.bestDepth,
             value: bestDepth || '--',
             tone: 'speed'
         },
         {
             id: 'extract',
             icon: DoorOpen,
-            label: 'Extraction rate',
+            label: homeCopy.extractionRate,
             value: gameSessions.length ? `${extractRate}%` : '--',
             tone: 'accuracy'
         }
@@ -93,59 +100,57 @@ export function HomePage() {
 
     return (
         <div className="page-stack page-stack--home home-status-page-stack home-status-page-stack--dashboard">
-            <section className="home-starter-hero" aria-label="TypeRift Command Center">
+            <section className="home-starter-hero" aria-label={homeCopy.commandTitle}>
                 <div className="home-starter-hero__copy">
                     <span className="home-starter-hero__status">
                         <Swords aria-hidden="true" size={15} strokeWidth={2.2} />
-                        Echo Siege
+                        {homeCopy.commandKicker}
                     </span>
-                    <h1>TypeRift Command Center</h1>
+                    <h1>{homeCopy.commandTitle}</h1>
                     <p className="hero-body">
-                        Launch v7 runs, build weapon-relic-glyph synergies, and turn typing pressure into survival data without carrying legacy game history forward.
+                        {homeCopy.commandBody}
                     </p>
                     <div className="home-starter-hero__actions">
-                        <button type="button" className="action-btn primary" aria-label="Start TypeRift" onClick={() => navigate('/raid')}>
-                            <Swords aria-hidden="true" size={17} strokeWidth={2.25} />
-                            Start TypeRift
-                        </button>
-                        <button type="button" className="action-btn" onClick={() => navigate('/missions')}>
-                            <Trophy aria-hidden="true" size={17} strokeWidth={2.25} />
-                            View missions
-                        </button>
+                        <Button variant="primary" icon={Swords} aria-label={homeCopy.startTypeRift} onClick={() => navigate('/raid')}>
+                            {homeCopy.startTypeRift}
+                        </Button>
+                        <Button icon={Trophy} onClick={() => navigate('/missions')}>
+                            {homeCopy.viewMissions}
+                        </Button>
                     </div>
                 </div>
             </section>
 
-            <MetricStrip className="home-starter-metrics" ariaLabel="TypeRift progress" items={metricItems} />
+            <MetricStrip className="home-starter-metrics" ariaLabel={homeCopy.progressAria} items={metricItems} />
 
-            <section className="home-quick-cards" aria-label="TypeRift loop actions">
+            <section className="home-quick-cards" aria-label={homeCopy.loopActionsAria}>
                 <HomeQuickCard
                     icon={Swords}
-                    kicker="Primary"
-                    label="TypeRift"
-                    description="Type enemy tags, evolve weapons, and choose whether to extract after bosses or dive deeper."
+                    kicker={homeCopy.primaryLane}
+                    label={homeCopy.typeRiftLaneTitle}
+                    description={homeCopy.typeRiftLaneBody}
                     tone="primary"
                     onClick={() => navigate('/raid')}
                 />
                 <HomeQuickCard
                     icon={Keyboard}
-                    kicker="Focus Lab"
-                    label={`Repair weak zone: ${weakFocus}`}
-                    description="Convert exposed TypeRift weak characters into a short precision drill."
+                    kicker={copy.nav.practice}
+                    label={fillTemplate(homeCopy.focusLane, { value: weakFocus || homeCopy.noWeakFocus })}
+                    description={homeCopy.focusLaneBody}
                     onClick={() => navigate('/practice')}
                 />
                 <HomeQuickCard
                     icon={Target}
-                    kicker="Missions"
-                    label="Today loop"
-                    description={`Weekly progress ${weeklyGoal.completed}/${weeklyGoal.target}; return to TypeRift after the drill.`}
+                    kicker={copy.nav.missions}
+                    label={homeCopy.missionLane}
+                    description={fillTemplate(homeCopy.missionLaneBody, { completed: weeklyGoal.completed, target: weeklyGoal.target })}
                     onClick={() => navigate('/missions')}
                 />
                 <HomeQuickCard
                     icon={BarChart3}
-                    kicker="Insights"
-                    label="Review signal"
-                    description="Read speed, accuracy, weak characters, survival duration, and extraction consistency."
+                    kicker={copy.nav.insights}
+                    label={homeCopy.insightLane}
+                    description={homeCopy.insightLaneBody}
                     onClick={() => navigate('/insights')}
                 />
             </section>
@@ -153,8 +158,8 @@ export function HomePage() {
             {latestGame ? (
                 <section className="home-recent">
                     <div className="home-recent__head">
-                        <p className="panel-kicker">Latest TypeRift</p>
-                        <h2>Last run signal</h2>
+                        <p className="panel-kicker">{homeCopy.latestTypeRift}</p>
+                        <h2>{homeCopy.lastRunSignal}</h2>
                     </div>
                     <div className="home-recent-list">
                         <div className="home-recent-item">
@@ -162,11 +167,11 @@ export function HomePage() {
                                 <Swords size={16} strokeWidth={2.2} />
                             </span>
                             <div className="home-recent-item__body">
-                                <strong>{latestGame.trainingMeta?.title || 'TypeRift: Echo Siege'}</strong>
+                                <strong>{latestGame.trainingMeta?.title || homeCopy.defaultRunTitle}</strong>
                                 <p>{formatDateTime(latestGame.completedAt || latestGame.result?.completedAt, language)}</p>
                             </div>
                             <div className="home-recent-item__metrics">
-                                <HomeRecentChip icon={Gauge}>Depth {latestGame.gameMeta?.depth || latestGame.trainingMeta?.depth || 1}</HomeRecentChip>
+                                <HomeRecentChip icon={Gauge}>{homeCopy.depthLabel} {latestGame.gameMeta?.depth || latestGame.trainingMeta?.depth || 1}</HomeRecentChip>
                                 <HomeRecentChip icon={ShieldCheck} accent>{latestGame.result?.accuracy || 0}%</HomeRecentChip>
                                 <HomeRecentChip icon={DoorOpen}>{formatDuration(latestGame.durationSeconds || latestGame.result?.durationSeconds || 0)}</HomeRecentChip>
                             </div>
@@ -176,8 +181,8 @@ export function HomePage() {
             ) : (
                 <section className="home-recent">
                     <div className="home-recent__head">
-                        <p className="panel-kicker">First run</p>
-                        <h2>Create the first v7 game sample</h2>
+                        <p className="panel-kicker">{homeCopy.firstRunKicker}</p>
+                        <h2>{homeCopy.firstRunTitle}</h2>
                     </div>
                     <div className="home-recent-list">
                         <div className="home-recent-item">
@@ -185,8 +190,8 @@ export function HomePage() {
                                 <Swords size={16} strokeWidth={2.2} />
                             </span>
                             <div className="home-recent-item__body">
-                                <strong>No legacy migration. v7 starts with your first TypeRift descent.</strong>
-                                <p>Old game artifacts are cleaned on startup and do not feed recommendations, achievements, or codex progress.</p>
+                                <strong>{homeCopy.firstRunBody}</strong>
+                                <p>{homeCopy.typeRiftLaneBody}</p>
                             </div>
                         </div>
                     </div>
