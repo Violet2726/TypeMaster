@@ -105,7 +105,7 @@ export const DAILY_ANOMALIES = [
 
 export const GAME_COPY = {
     'zh-CN': {
-        title: 'TypeRift: Echo Siege',
+        title: 'TypeRift：回声围城',
         startExpedition: '开始远征',
         startDaily: '每日异象',
         startFirst: '首次下潜',
@@ -119,7 +119,12 @@ export const GAME_COPY = {
         miss: '没有匹配目标',
         error: '期望 {expected}',
         linePressure: '边界线承压',
-        codexUnlock: '图鉴更新'
+        codexUnlock: '图鉴更新',
+        shieldBroken: '护盾击破',
+        hit: '命中',
+        upgradeOnline: '{name} 已上线',
+        recommendationWeak: '下一局优先处理 {chars}',
+        recommendationStable: '保持节奏，尝试更高热度构筑。'
     },
     'en-US': {
         title: 'TypeRift: Echo Siege',
@@ -136,7 +141,12 @@ export const GAME_COPY = {
         miss: 'No matching target',
         error: 'Expected {expected}',
         linePressure: 'Boundary under pressure',
-        codexUnlock: 'Codex updated'
+        codexUnlock: 'Codex updated',
+        shieldBroken: 'Shield broken',
+        hit: 'Hit',
+        upgradeOnline: '{name} online',
+        recommendationWeak: 'Prioritize {chars} next run',
+        recommendationStable: 'Keep the rhythm and try a higher-heat build.'
     }
 };
 
@@ -155,4 +165,3 @@ export function sanitizeWordPool(wordPool) {
         .filter((word) => /^[a-z0-9?!+\-]+$/.test(word) && word.length > 1);
     return clean.length ? clean : ['go', 'cat', 'home', 'focus', 'trace', 'vector', 'steady'];
 }
-

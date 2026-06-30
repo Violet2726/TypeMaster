@@ -1,4 +1,4 @@
-import { UPGRADES } from './content.js';
+import { UPGRADES, getGameCopy } from './content.js';
 import { pick, seededRandom } from './rng.js';
 
 const RARITY_WEIGHT = {
@@ -80,6 +80,7 @@ export function generateUpgradeChoices(state, count = 3) {
 export function chooseUpgrade(state, upgradeId) {
     if (state.phase !== 'playing' || !state.upgradeChoices?.length) return { state, events: [] };
     const choice = state.upgradeChoices.find((upgrade) => upgrade.id === upgradeId) || state.upgradeChoices[0];
+    const copy = getGameCopy(state.language);
     const nextUpgrades = [...state.upgrades, choice];
     const effects = getUpgradeEffects(nextUpgrades);
     const maxLives = 5 + Math.floor(effects.maxLives || 0);
@@ -104,9 +105,8 @@ export function chooseUpgrade(state, upgradeId) {
             enemies: blastEnemies,
             score: state.score + blasted * 20,
             counters: { ...state.counters, upgrades: state.counters.upgrades + 1, kills: state.counters.kills + blasted },
-            liveMessage: `${choice.nameZh || choice.name} online`
+            liveMessage: copy.upgradeOnline.replace('{name}', choice.nameZh || choice.name)
         },
         events: [{ type: 'upgrade_chosen', upgrade: choice }, ...(blasted ? [{ type: 'upgrade_blast', count: blasted }] : [])]
     };
 }
-

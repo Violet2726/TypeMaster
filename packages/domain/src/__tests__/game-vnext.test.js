@@ -89,6 +89,34 @@ describe('TypeRift game domain', () => {
         expect(result.events[0].type).toBe('upgrade_chosen');
     });
 
+    it('handles pause, resume, locked extraction, successful extraction, and quit commands', () => {
+        const state = start('commands', { language: 'zh-CN' });
+
+        const paused = dispatchGameCommand(state, 'pause');
+        expect(paused.state.phase).toBe(GAME_PHASES.paused);
+        expect(paused.state.liveMessage).toBe('TypeRift 已暂停');
+        expect(paused.events[0].type).toBe('game_paused');
+
+        const resumed = dispatchGameCommand(paused.state, 'resume');
+        expect(resumed.state.phase).toBe(GAME_PHASES.playing);
+        expect(resumed.state.liveMessage).toBe('TypeRift：回声围城');
+
+        const locked = dispatchGameCommand(resumed.state, 'extract');
+        expect(locked.state.phase).toBe(GAME_PHASES.playing);
+        expect(locked.state.liveMessage).toBe('当前区域尚未开放撤离');
+        expect(locked.events[0].type).toBe('extract_locked');
+
+        const ready = { ...resumed.state, areaIndex: 1, enemies: [] };
+        const extracted = dispatchGameCommand(ready, 'extract');
+        expect(extracted.state.phase).toBe(GAME_PHASES.gameover);
+        expect(extracted.state.endReason).toBe('extract');
+        expect(extracted.events[0].type).toBe('game_ended');
+
+        const quit = dispatchGameCommand(resumed.state, 'quit');
+        expect(quit.state.phase).toBe(GAME_PHASES.idle);
+        expect(quit.events[0].type).toBe('game_quit');
+    });
+
     it('spawns a boss at a new area boundary', () => {
         const state = { ...start('boss'), elapsed: 193, areaIndex: 0, area: { id: 'neon-archive' }, spawnTimer: 999 };
         const result = updateGameState(state, 0.1);

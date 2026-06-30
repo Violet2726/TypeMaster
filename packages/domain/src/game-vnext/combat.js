@@ -93,13 +93,15 @@ function defeatEnemy(state, enemy) {
 }
 
 function completeTargetSegment(state, target) {
+    const copy = getGameCopy(state.language);
+
     if (target.shield > 0) {
         return {
             state: {
                 ...state,
                 enemies: state.enemies.map((enemy) => enemy.id === target.id ? { ...enemy, typed: '', shield: enemy.shield - 1 } : enemy),
                 feedback: { kind: 'shield', enemyId: target.id, at: state.elapsed },
-                liveMessage: 'Shield broken'
+                liveMessage: copy.shieldBroken
             },
             events: [{ type: 'enemy_shield_broken', enemyId: target.id }]
         };
@@ -149,7 +151,7 @@ export function processGameInput(state, rawChar) {
         enemies: state.enemies.map((enemy) => enemy.id === target.id ? { ...enemy, typed } : enemy),
         currentTargetId: target.id,
         counters: nextCounters,
-        liveMessage: target.word.slice(typed.length) || 'Hit'
+        liveMessage: target.word.slice(typed.length) || copy.hit
     };
     const nextTarget = { ...target, typed };
 
@@ -160,4 +162,3 @@ export function processGameInput(state, rawChar) {
 
     return { state: nextState, events: [{ type: 'char_correct', enemyId: target.id, char }] };
 }
-

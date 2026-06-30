@@ -28,6 +28,7 @@ export function finishRun(state, endReason, extractReason = null) {
 }
 
 export function buildGameResult(state) {
+    const copy = getGameCopy(state.language);
     const durationSeconds = Math.max(0, Math.round(state.endedAt ?? state.elapsed ?? 0));
     const typed = state.counters?.typed || 0;
     const correct = state.counters?.correct || 0;
@@ -69,8 +70,8 @@ export function buildGameResult(state) {
         heat: Math.round(clamp(state.heat || 0, 0, 100)),
         codexProgress: buildGameCodexProgress(state),
         recommendation: weakestChars.length
-            ? `下一局优先处理 ${weakestChars.slice(0, 3).join(' / ')}`
-            : '保持节奏，尝试更高热度构筑。'
+            ? copy.recommendationWeak.replace('{chars}', weakestChars.slice(0, 3).join(' / '))
+            : copy.recommendationStable
     };
 }
 
@@ -114,4 +115,3 @@ export function buildGameCodexFromSessions(sessions = []) {
         upgrades: [...upgrades.values()]
     };
 }
-
