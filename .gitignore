@@ -27,6 +27,7 @@ data
 apps/web/.codex-screens/
 
 docs/*
+!docs/*.md
 !docs/ai-iteration/
 !docs/auto-iteration/
 .history
