@@ -48,6 +48,14 @@
     border: 0;
 }
 
+.app-shell--immersive-game .settings-overlay {
+    z-index: 10020;
+}
+
+.app-shell--immersive-game .settings-drawer {
+    z-index: 10021;
+}
+
 @media (prefers-reduced-motion: reduce) {
     .typerift-container *,
     .typerift-container *::before,
@@ -56,4 +64,3 @@
         transition-duration: 1ms !important;
     }
 }
-

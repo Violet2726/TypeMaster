@@ -4,34 +4,35 @@ import { X } from 'lucide-react';
 import './dialogs.css';
 import './codex.css';
 
-export default function CodexOverlay({ codex, onClose }: { codex: any, onClose: () => void }) {
+export default function CodexOverlay({ codex, copy, onClose }: { codex: any, copy: any, onClose: () => void }) {
     const enemies = codex?.enemies || [];
     const bosses = codex?.bosses || [];
     const upgrades = codex?.upgrades || [];
+    const codexCopy = copy.game.codexDialog;
 
     return (
-        <div className="typerift-overlay" role="dialog" aria-modal="true" aria-label="TypeRift codex">
+        <div className="typerift-overlay" role="dialog" aria-modal="true" aria-label={codexCopy.aria}>
             <section className="typerift-panel typerift-panel--wide">
                 <div className="typerift-panel__inner">
                     <div className="typerift-heading">
-                        <span>Codex {codex?.discovered || 0}/{codex?.total || 33}</span>
-                        <h2>Echo Siege 图鉴</h2>
+                        <span>{copy.game.codex} {codex?.discovered || 0}/{codex?.total || 33}</span>
+                        <h2>{codexCopy.title}</h2>
                     </div>
-                    <button className="typerift-action" type="button" onClick={onClose} aria-label="Close TypeRift codex">
+                    <button className="typerift-action" type="button" onClick={onClose} aria-label={codexCopy.close}>
                         <X aria-hidden="true" size={18} strokeWidth={2.2} />
-                        关闭
+                        {codexCopy.close}
                     </button>
                     <div className="typerift-codex-grid">
                         {[...enemies, ...bosses, ...upgrades].map((entry: any) => (
                             <div key={entry.id} className="typerift-codex-entry is-open">
                                 <strong>{entry.nameZh || entry.name || entry.id}</strong>
-                                <small>{entry.category || (entry.defeated ? 'boss defeated' : 'enemy discovered')}</small>
+                                <small>{entry.category || (entry.defeated ? codexCopy.bossDefeated : codexCopy.enemyDiscovered)}</small>
                             </div>
                         ))}
                         {!enemies.length && !bosses.length && !upgrades.length ? (
                             <div className="typerift-codex-entry">
-                                <strong>Awaiting first descent</strong>
-                                <small>v7 starts with a clean game codex.</small>
+                                <strong>{codexCopy.emptyTitle}</strong>
+                                <small>{codexCopy.emptyBody}</small>
                             </div>
                         ) : null}
                     </div>
@@ -40,4 +41,3 @@ export default function CodexOverlay({ codex, onClose }: { codex: any, onClose: 
         </div>
     );
 }
-

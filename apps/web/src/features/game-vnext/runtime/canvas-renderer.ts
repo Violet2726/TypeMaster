@@ -214,7 +214,7 @@ export class TypeRiftRenderer {
         ctx.save();
         ctx.fillStyle = 'rgba(255,255,255,0.54)';
         ctx.font = '12px Inter, system-ui, sans-serif';
-        ctx.fillText(`TypeRift asset fallback active · ${snapshot?.area?.name || ''}`, 18, this.camera.height - 22);
+        ctx.fillText(`TypeRift 资源备用渲染 / ${snapshot?.area?.nameZh || snapshot?.area?.name || ''}`, 18, this.camera.height - 22);
         ctx.restore();
     }
 }

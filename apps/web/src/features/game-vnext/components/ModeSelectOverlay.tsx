@@ -6,48 +6,52 @@ import './dialogs.css';
 export default function ModeSelectOverlay({
     bestScore,
     codexProgress,
+    copy,
     onStart
 }: {
     bestScore: number,
     codexProgress?: { discovered?: number, total?: number } | null,
+    copy: any,
     onStart: (mode: 'expedition' | 'daily-anomaly' | 'first-descent') => void,
 }) {
+    const gameCopy = copy.game;
+
     return (
-        <div className="typerift-overlay" role="dialog" aria-modal="true" aria-label="TypeRift mode select">
+        <div className="typerift-overlay" role="dialog" aria-modal="true" aria-label={gameCopy.modeAria}>
             <section className="typerift-panel typerift-panel--wide">
                 <div className="typerift-panel__inner">
                     <div className="typerift-heading">
-                        <span>Roguelite Typing Survival</span>
-                        <h1>TypeRift: Echo Siege</h1>
-                        <p>输入敌人词条、升级武器与符文，在五个发光区域里守住边界线。v7 会从零建立新的游戏图鉴和成绩。</p>
+                        <span>{gameCopy.modeKicker}</span>
+                        <h1>{gameCopy.modeTitle}</h1>
+                        <p>{gameCopy.modeBody}</p>
                     </div>
                     <div className="typerift-mode-grid">
                         <button className="typerift-card" type="button" onClick={() => onStart('expedition')} autoFocus>
                             <Compass aria-hidden="true" size={22} strokeWidth={2.2} />
-                            <strong>Expedition</strong>
-                            <small>12-18 min</small>
-                            <span>完整远征，区域 Boss、构筑升级和撤离抉择全部开放。</span>
+                            <strong>{gameCopy.modes.expedition.title}</strong>
+                            <small>{gameCopy.modes.expedition.meta}</small>
+                            <span>{gameCopy.modes.expedition.body}</span>
                         </button>
                         <button className="typerift-card" type="button" onClick={() => onStart('daily-anomaly')}>
                             <CalendarClock aria-hidden="true" size={22} strokeWidth={2.2} />
-                            <strong>Daily Anomaly</strong>
-                            <small>Fixed seed</small>
-                            <span>每日固定异象，适合比较构筑路线和稳定性。</span>
+                            <strong>{gameCopy.modes.daily.title}</strong>
+                            <small>{gameCopy.modes.daily.meta}</small>
+                            <span>{gameCopy.modes.daily.body}</span>
                         </button>
                         <button className="typerift-card" type="button" onClick={() => onStart('first-descent')}>
                             <GraduationCap aria-hidden="true" size={22} strokeWidth={2.2} />
-                            <strong>First Descent</strong>
-                            <small>6 min</small>
-                            <span>短流程引导局，快速解锁第一份 TypeRift 样本。</span>
+                            <strong>{gameCopy.modes.first.title}</strong>
+                            <small>{gameCopy.modes.first.meta}</small>
+                            <span>{gameCopy.modes.first.body}</span>
                         </button>
                     </div>
                     <div className="typerift-actions">
-                        <span className="typerift-action" aria-label="TypeRift best score">
+                        <span className="typerift-action" aria-label={gameCopy.bestScoreAria}>
                             <Trophy aria-hidden="true" size={17} strokeWidth={2.2} />
-                            Best {Math.round(bestScore || 0).toLocaleString()}
+                            {gameCopy.best} {Math.round(bestScore || 0).toLocaleString()}
                         </span>
-                        <span className="typerift-action" aria-label="TypeRift codex progress">
-                            Codex {codexProgress?.discovered || 0}/{codexProgress?.total || 33}
+                        <span className="typerift-action" aria-label={gameCopy.codexProgressAria}>
+                            {gameCopy.codex} {codexProgress?.discovered || 0}/{codexProgress?.total || 33}
                         </span>
                     </div>
                 </div>
@@ -55,4 +59,3 @@ export default function ModeSelectOverlay({
         </div>
     );
 }
-

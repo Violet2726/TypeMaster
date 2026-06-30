@@ -3,17 +3,18 @@
 import { Sparkles } from 'lucide-react';
 import './dialogs.css';
 
-export default function UpgradeOverlay({ choices, onChoose }: { choices: any[], onChoose: (upgradeId: string) => void }) {
+export default function UpgradeOverlay({ choices, copy, onChoose }: { choices: any[], copy: any, onChoose: (upgradeId: string) => void }) {
     if (!choices?.length) return null;
+    const upgradeCopy = copy.game.upgrade;
 
     return (
-        <div className="typerift-overlay" role="dialog" aria-modal="true" aria-label="Choose TypeRift upgrade">
+        <div className="typerift-overlay" role="dialog" aria-modal="true" aria-label={upgradeCopy.aria}>
             <section className="typerift-panel typerift-panel--wide">
                 <div className="typerift-panel__inner">
                     <div className="typerift-heading">
-                        <span>Construct Online</span>
-                        <h2>选择一次构筑升级</h2>
-                        <p>按 1 / 2 / 3 或点击卡牌。Weapon 改变清怪方式，Relic 改变风险收益，Glyph 绑定弱字符训练。</p>
+                        <span>{upgradeCopy.kicker}</span>
+                        <h2>{upgradeCopy.title}</h2>
+                        <p>{upgradeCopy.body}</p>
                     </div>
                     <div className="typerift-upgrade-grid">
                         {choices.map((choice, index) => (
@@ -36,4 +37,3 @@ export default function UpgradeOverlay({ choices, onChoose }: { choices: any[], 
         </div>
     );
 }
-

@@ -1,11 +1,11 @@
 .typerift-hud {
     position: absolute;
-    top: max(14px, env(safe-area-inset-top));
+    top: max(72px, calc(env(safe-area-inset-top) + 72px));
     left: 16px;
     right: 16px;
     z-index: 30;
     display: grid;
-    grid-template-columns: minmax(260px, 1fr) minmax(180px, 260px) minmax(300px, 1fr);
+    grid-template-columns: minmax(250px, 0.9fr) minmax(210px, 0.72fr) minmax(340px, 1.1fr);
     gap: 10px;
     pointer-events: none;
 }
@@ -126,7 +126,7 @@
 
 @media (max-width: 760px) {
     .typerift-hud {
-        top: max(10px, env(safe-area-inset-top));
+        top: max(58px, calc(env(safe-area-inset-top) + 58px));
         left: 10px;
         right: 10px;
         grid-template-columns: 1fr;
@@ -155,4 +155,3 @@
         order: 3;
     }
 }
-
