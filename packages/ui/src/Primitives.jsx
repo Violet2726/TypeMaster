@@ -7,7 +7,7 @@ function cx(...parts) {
 export function Button({
     children,
     className = '',
-    icon: Icon,
+    icon: Icon = null,
     iconPosition = 'start',
     variant = 'secondary',
     size = 'md',
@@ -28,7 +28,7 @@ export function Button({
 
 export function IconButton({
     className = '',
-    icon: Icon,
+    icon: Icon = null,
     label,
     variant = 'ghost',
     size = 'md',
@@ -78,6 +78,28 @@ export function MetricStrip({ items = [], ariaLabel = undefined, className = '' 
     );
 }
 
+export function StatCard({
+    icon: Icon,
+    label,
+    value,
+    detail,
+    tone = 'default',
+    className = ''
+}) {
+    return (
+        <div className={cx('tm-stat-card', `tm-stat-card--${tone}`, className)}>
+            {Icon ? (
+                <span className="tm-stat-card__icon" aria-hidden="true">
+                    <Icon size={17} strokeWidth={2.25} />
+                </span>
+            ) : null}
+            <span className="tm-stat-card__label">{label}</span>
+            <strong>{value}</strong>
+            {detail ? <p>{detail}</p> : null}
+        </div>
+    );
+}
+
 export function Inspector({
     eyebrow,
     title,
@@ -101,6 +123,48 @@ export function Inspector({
             </div>
             {actions ? <div className="tm-inspector__actions">{actions}</div> : null}
         </aside>
+    );
+}
+
+export function GameTopBar({
+    eyebrow,
+    title,
+    subtitle,
+    primary,
+    actions = [],
+    className = ''
+}) {
+    const actionItems = [primary, ...actions].filter(Boolean);
+
+    return (
+        <div className={cx('tm-game-topbar', className)}>
+            <div className="tm-game-topbar__brand">
+                {eyebrow ? <span>{eyebrow}</span> : null}
+                <strong>{title}</strong>
+                {subtitle ? <small>{subtitle}</small> : null}
+            </div>
+            {actionItems.length ? (
+                <div className="tm-game-topbar__actions">
+                    {actionItems.map((action) => {
+                        const Icon = action.icon;
+                        return (
+                            <button
+                                key={action.id || action.label}
+                                type="button"
+                                className={cx('tm-game-topbar__action', action.primary ? 'is-primary' : '', action.className)}
+                                aria-label={action.ariaLabel || action.label}
+                                title={action.ariaLabel || action.label}
+                                disabled={action.disabled}
+                                onClick={action.onClick}
+                            >
+                                {Icon ? <Icon aria-hidden="true" size={17} strokeWidth={2.25} /> : null}
+                                <span>{action.label}</span>
+                            </button>
+                        );
+                    })}
+                </div>
+            ) : null}
+        </div>
     );
 }
 
