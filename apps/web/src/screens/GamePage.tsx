@@ -1,17 +1,18 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent as ReactKeyboardEvent } from 'react';
-import '../../src/styles/game-page.css';
+import '../features/game-vnext/components/game-shell.css';
 import { useGameStore } from '../features/game/state/game-store';
-import { createGameEngine, type GameEngine, type RaidMode } from '../engine/game-engine';
-import { MonsterRaidRenderer } from '../engine/raid-renderer';
+import { createGameEngine, type GameEngine, type GameMode } from '../features/game-vnext/runtime/game-engine';
+import { loadGameAssets } from '../features/game-vnext/runtime/asset-loader';
+import { TypeRiftRenderer } from '../features/game-vnext/runtime/canvas-renderer';
 import { useAppNavigate } from '../application/use-app-navigate';
-import IdleScreenOverlay from '../components/idle/IdleScreenOverlay';
-import PauseMenuOverlay from '../components/overlay/PauseMenuOverlay';
-import GameplayHud from '../components/overlay/GameplayHud';
-import GameOverOverlay from '../components/overlay/GameOverOverlay';
-import RelicChoiceOverlay from '../components/overlay/RelicChoiceOverlay';
-import CodexOverlay from '../components/overlay/CodexOverlay';
+import ModeSelectOverlay from '../features/game-vnext/components/ModeSelectOverlay';
+import HudOverlay from '../features/game-vnext/components/HudOverlay';
+import UpgradeOverlay from '../features/game-vnext/components/UpgradeOverlay';
+import PauseOverlay from '../features/game-vnext/components/PauseOverlay';
+import RunResultOverlay from '../features/game-vnext/components/RunResultOverlay';
+import CodexOverlay from '../features/game-vnext/components/CodexOverlay';
 
 function getFocusChars(keyboardHotspots: any) {
     const chars = keyboardHotspots?.primaryZone?.chars;
@@ -28,7 +29,7 @@ export default function GamePage() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const engineRef = useRef<GameEngine | null>(null);
-    const rendererRef = useRef<MonsterRaidRenderer | null>(null);
+    const rendererRef = useRef<TypeRiftRenderer | null>(null);
     const frameRef = useRef<number>(0);
     const lastFrameTimeRef = useRef(0);
     const lastUiCommitRef = useRef(0);
@@ -36,7 +37,7 @@ export default function GamePage() {
     const savedResultKeyRef = useRef('');
     const bestScoreRef = useRef(0);
     const bestResultKeyRef = useRef('');
-    const { keyboardHotspots, language, raidBestScore, riftCodex, recordCompletedRaidSession } = useGameStore();
+    const { keyboardHotspots, language, gameBestScore, gameCodex, recordCompletedGameSession } = useGameStore();
     const focusChars = useMemo(() => getFocusChars(keyboardHotspots), [keyboardHotspots]);
     const [snapshot, setSnapshot] = useState<any>(null);
     const [bestScore, setBestScore] = useState(0);
@@ -47,9 +48,7 @@ export default function GamePage() {
         const previous = snapshotRef.current;
         const next = update.snapshot;
 
-        if (renderer) {
-            renderer.handleEvents(update.events || [], next);
-        }
+        if (renderer) renderer.handleEvents(update.events || [], next);
 
         snapshotRef.current = next;
         const now = performance.now();
@@ -70,25 +69,21 @@ export default function GamePage() {
         const key = `${nextSnapshot.phase}:${result.score}:${result.durationSeconds}:${result.maxCombo}`;
         if (savedResultKeyRef.current === key) return;
         savedResultKeyRef.current = key;
-        if (result.score > bestScoreRef.current) {
-            bestResultKeyRef.current = key;
-        }
+        if (result.score > bestScoreRef.current) bestResultKeyRef.current = key;
 
-        recordCompletedRaidSession(result);
+        recordCompletedGameSession(result);
         setBestScore((current) => {
             const next = Math.max(current, result.score);
             bestScoreRef.current = next;
             return next;
         });
-    }, [recordCompletedRaidSession]);
+    }, [recordCompletedGameSession]);
 
     const dispatchAction = useCallback((command: string, payload: Record<string, unknown> = {}) => {
         const engine = engineRef.current;
         if (!engine) return;
 
-        if (command === 'start' || command === 'retry') {
-            savedResultKeyRef.current = '';
-        }
+        if (command === 'start' || command === 'retry') savedResultKeyRef.current = '';
 
         const update = engine.dispatch(command as any, payload);
         commitUpdate(update, true);
@@ -96,20 +91,8 @@ export default function GamePage() {
         inputRef.current?.focus({ preventScroll: true });
     }, [commitUpdate, maybeSaveResult]);
 
-    const handleIdleAction = useCallback((action: string) => {
-        if (action === 'codex') {
-            setShowCodex(true);
-            return;
-        }
-        const raidMode: RaidMode = action === 'daily-mutation'
-            ? 'daily-mutation'
-            : action === 'first-breach'
-                ? 'first-breach'
-                : 'endless-rift';
-        dispatchAction('start', {
-            raidMode,
-            focusChars
-        });
+    const handleStart = useCallback((gameMode: GameMode) => {
+        dispatchAction('start', { gameMode, focusChars });
     }, [dispatchAction, focusChars]);
 
     const handlePauseAction = useCallback((action: string) => {
@@ -125,14 +108,10 @@ export default function GamePage() {
         if (action === 'menu') navigate('/');
     }, [dispatchAction, focusChars, navigate]);
 
-    const handleRelicChoice = useCallback((relicId: string) => {
-        dispatchAction('choose-relic', { relicId });
-    }, [dispatchAction]);
-
     useEffect(() => {
-        bestScoreRef.current = raidBestScore;
-        setBestScore(raidBestScore);
-    }, [raidBestScore]);
+        bestScoreRef.current = gameBestScore;
+        setBestScore(gameBestScore);
+    }, [gameBestScore]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -143,13 +122,17 @@ export default function GamePage() {
             language: language || 'zh-CN',
             focusChars
         });
-        const renderer = new MonsterRaidRenderer();
+        const renderer = new TypeRiftRenderer();
         const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
         renderer.setReducedMotion(reducedMotion.matches);
 
         engineRef.current = engine;
         rendererRef.current = renderer;
         commitUpdate({ snapshot: engine.snapshot, events: [] }, true);
+
+        loadGameAssets().then((assets) => {
+            renderer.setAssets(assets);
+        });
 
         function resize() {
             const rect = container!.getBoundingClientRect();
@@ -163,11 +146,7 @@ export default function GamePage() {
             canvas!.style.height = `${height}px`;
 
             const ctx = canvas!.getContext('2d');
-            if (ctx) {
-                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-            }
-
-            engine.resize(width, height);
+            if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             renderer.resize(width, height, dpr);
         }
 
@@ -213,7 +192,7 @@ export default function GamePage() {
             engineRef.current = null;
             rendererRef.current = null;
         };
-    }, [commitUpdate, language, maybeSaveResult]);
+    }, [commitUpdate, focusChars, language, maybeSaveResult]);
 
     useEffect(() => {
         function handleKey(event: KeyboardEvent) {
@@ -235,6 +214,7 @@ export default function GamePage() {
             if (!current) return '{}';
             return JSON.stringify({
                 phase: current.phase,
+                mode: current.mode,
                 hud: current.hud,
                 enemies: current.arena.enemies.map((enemy: any) => ({
                     id: enemy.id,
@@ -255,7 +235,7 @@ export default function GamePage() {
 
             const steps = Math.max(1, Math.round(ms / 16));
             let update = { snapshot: engine.snapshot, events: [] as any[] };
-            for (let i = 0; i < steps; i += 1) {
+            for (let index = 0; index < steps; index += 1) {
                 update = engine.tick(1 / 60);
             }
             commitUpdate(update, true);
@@ -275,8 +255,8 @@ export default function GamePage() {
         if (!char) return;
         event.preventDefault();
         const engine = engineRef.current;
-        if (engine?.state?.relicChoices?.length && /^[123]$/.test(char)) {
-            dispatchAction('choose-relic', { relicId: engine.state.relicChoices[Number(char) - 1]?.id });
+        if (engine?.state?.upgradeChoices?.length && /^[123]$/.test(char)) {
+            dispatchAction('choose-upgrade', { upgradeId: engine.state.upgradeChoices[Number(char) - 1]?.id });
             if (inputRef.current) inputRef.current.value = '';
             return;
         }
@@ -287,7 +267,7 @@ export default function GamePage() {
     const handleInputKeyDown = useCallback((event: ReactKeyboardEvent<HTMLInputElement>) => {
         const engine = engineRef.current;
         if (!engine) return;
-        if (engine.state?.relicChoices?.length && /^[123]$/.test(event.key)) {
+        if (engine.state?.upgradeChoices?.length && /^[123]$/.test(event.key)) {
             event.preventDefault();
             const update = engine.handleKey(event.nativeEvent);
             commitUpdate(update, update.events.length > 0);
@@ -312,21 +292,21 @@ export default function GamePage() {
     return (
         <div
             ref={containerRef}
-            className="game-container"
+            className="typerift-container"
             role="application"
-            aria-label="Arcade Rift 打字街机游戏"
+            aria-label="TypeRift roguelite typing survival game"
             onPointerDown={() => inputRef.current?.focus({ preventScroll: true })}
         >
             <canvas
                 ref={canvasRef}
-                className="game-canvas"
+                className="typerift-canvas"
                 role="img"
-                aria-label="Arcade Rift 发光裂隙战场，输入怪物身上的词以清除目标"
+                aria-label="TypeRift Echo Siege battlefield with enemies carrying typed words"
             />
             <input
                 ref={inputRef}
-                className="game-keyboard-input"
-                aria-label="Arcade Rift input"
+                className="typerift-keyboard-input"
+                aria-label="TypeRift input"
                 autoCapitalize="none"
                 autoComplete="off"
                 autoCorrect="off"
@@ -336,29 +316,27 @@ export default function GamePage() {
                 onKeyDown={handleInputKeyDown}
             />
             {snapshot?.phase === 'idle' && (
-                <IdleScreenOverlay
-                    focusChars={focusChars}
+                <ModeSelectOverlay
                     bestScore={bestScore}
-                    mutation={snapshot.mutation}
-                    codexProgress={riftCodex || snapshot.codexProgress}
-                    onAction={handleIdleAction}
+                    codexProgress={gameCodex || snapshot.codexProgress}
+                    onStart={handleStart}
                 />
             )}
-            {snapshot?.phase === 'playing' && <GameplayHud data={snapshot.hud} activeRelics={snapshot.activeRelics || []} />}
-            {snapshot?.phase === 'playing' && snapshot.relicChoices?.length ? (
-                <RelicChoiceOverlay choices={snapshot.relicChoices} onChoose={handleRelicChoice} />
+            {snapshot?.phase === 'playing' && <HudOverlay data={snapshot.hud} />}
+            {snapshot?.phase === 'playing' && snapshot.upgradeChoices?.length ? (
+                <UpgradeOverlay choices={snapshot.upgradeChoices} onChoose={(upgradeId) => dispatchAction('choose-upgrade', { upgradeId })} />
             ) : null}
             {snapshot?.phase === 'paused' && (
-                <PauseMenuOverlay stats={snapshot.hud} onAction={handlePauseAction} />
+                <PauseOverlay stats={snapshot.hud} onAction={handlePauseAction} />
             )}
             {resultOverlay && (
-                <GameOverOverlay data={resultOverlay} onAction={handleResultAction} />
+                <RunResultOverlay data={resultOverlay} onAction={handleResultAction} />
             )}
-            <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+            <div className="typerift-sr-only" role="status" aria-live="polite" aria-atomic="true">
                 {snapshot?.liveMessage || ''}
             </div>
             {showCodex && (
-                <CodexOverlay codex={riftCodex || snapshot?.codexProgress || snapshot?.codexUnlocks} onClose={() => setShowCodex(false)} />
+                <CodexOverlay codex={gameCodex || snapshot?.codexProgress} onClose={() => setShowCodex(false)} />
             )}
         </div>
     );

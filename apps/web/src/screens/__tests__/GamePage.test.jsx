@@ -8,6 +8,7 @@ function createCanvasContext() {
         setTransform: vi.fn(),
         createLinearGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
         createRadialGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
+        drawImage: vi.fn(),
         fillRect: vi.fn(),
         stroke: vi.fn(),
         fill: vi.fn(),
@@ -32,6 +33,7 @@ describe('GamePage', () => {
         vi.spyOn(window, 'requestAnimationFrame').mockImplementation(() => 0);
         vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {});
         vi.spyOn(window.HTMLCanvasElement.prototype, 'getContext').mockReturnValue(createCanvasContext());
+        window.fetch = vi.fn(() => Promise.resolve({ ok: false, json: () => Promise.resolve({}) }));
         window.ResizeObserver = class {
             observe() {}
             disconnect() {}
@@ -49,11 +51,11 @@ describe('GamePage', () => {
         delete window.advanceTime;
     });
 
-    test('starts Arcade Rift and opens the DOM pause layer', async () => {
+    test('starts TypeRift and opens the DOM pause layer', async () => {
         renderWithProvider(<GamePage />, { route: '/raid' });
 
         await waitFor(() => expect(typeof window.render_game_to_text).toBe('function'));
-        fireEvent.click(await screen.findByRole('button', { name: '开始无尽裂隙' }));
+        fireEvent.click(await screen.findByRole('button', { name: /Expedition/ }));
 
         await waitFor(() => {
             const snapshot = JSON.parse(window.render_game_to_text());
@@ -65,12 +67,12 @@ describe('GamePage', () => {
         });
         const active = JSON.parse(window.render_game_to_text());
         expect(active.enemies.length).toBeGreaterThan(0);
-        expect(active.hud.threatLevel).toBe(1);
+        expect(active.hud.depth).toBe(1);
 
         fireEvent.keyDown(window, { key: 'Escape' });
 
-        expect(await screen.findByRole('dialog', { name: 'Arcade Rift 已暂停' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: '继续' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: '撤离结算' })).toBeDisabled();
+        expect(await screen.findByRole('dialog', { name: 'TypeRift paused' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Resume' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Extract' })).toBeDisabled();
     });
 });

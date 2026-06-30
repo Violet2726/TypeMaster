@@ -247,7 +247,7 @@ function resolveSessionSurface(session) {
     if (explicit) return explicit;
 
     const type = session?.trainingMeta?.type;
-    if (type === 'raid') return 'raid';
+    if (type === 'game') return 'game';
     if (type === 'challenge') return 'challenge';
     if (type === 'plan') return 'plan';
     if (type === 'diagnostic') return 'diagnostic';
@@ -265,7 +265,7 @@ function countSessionSurfaces(sessions) {
         diagnostic: 0,
         plan: 0,
         challenge: 0,
-        raid: 0
+        game: 0
     });
 }
 
@@ -508,17 +508,17 @@ export function buildSkillProfile(sessions, languageOrOptions = 'zh-CN') {
         avgConsistency: average(safeSessions.map((session) => session?.result?.consistency || 0)),
         avgDuration: average(safeSessions.map((session) => session?.result?.durationSeconds || 0)),
         surfaces: countSessionSurfaces(safeSessions),
-        raidBestScore: Math.max(0, ...safeSessions
-            .filter((session) => resolveSessionSurface(session) === 'raid')
+        gameBestScore: Math.max(0, ...safeSessions
+            .filter((session) => resolveSessionSurface(session) === 'game')
             .map((session) => session?.trainingMeta?.score || session?.result?.score || 0)),
-        raidMaxCombo: Math.max(0, ...safeSessions
-            .filter((session) => resolveSessionSurface(session) === 'raid')
+        gameMaxCombo: Math.max(0, ...safeSessions
+            .filter((session) => resolveSessionSurface(session) === 'game')
             .map((session) => session?.trainingMeta?.maxCombo || 0)),
-        raidHighestThreatLevel: Math.max(0, ...safeSessions
-            .filter((session) => resolveSessionSurface(session) === 'raid')
-            .map((session) => session?.trainingMeta?.riftLayer || session?.trainingMeta?.threatLevel || session?.trainingMeta?.wave || 0)),
-        raidLongestDurationSeconds: Math.max(0, ...safeSessions
-            .filter((session) => resolveSessionSurface(session) === 'raid')
+        gameHighestDepth: Math.max(0, ...safeSessions
+            .filter((session) => resolveSessionSurface(session) === 'game')
+            .map((session) => session?.trainingMeta?.depth || session?.trainingMeta?.areaIndex || 0)),
+        gameLongestDurationSeconds: Math.max(0, ...safeSessions
+            .filter((session) => resolveSessionSurface(session) === 'game')
             .map((session) => session?.trainingMeta?.durationSeconds || session?.result?.durationSeconds || 0))
     };
 

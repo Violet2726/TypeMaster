@@ -29,7 +29,7 @@ describe('Header', () => {
     test('shows the vNext arcade navigation', () => {
         renderHeader();
 
-        expect(screen.getAllByRole('link', { name: 'Raid' }).length).toBeGreaterThanOrEqual(1);
+        expect(screen.getAllByRole('link', { name: 'TypeRift' }).length).toBeGreaterThanOrEqual(1);
         expect(screen.getAllByRole('link', { name: 'Focus Lab' }).length).toBeGreaterThanOrEqual(1);
         expect(screen.getAllByRole('link', { name: 'Missions' }).length).toBeGreaterThanOrEqual(1);
         expect(screen.queryByRole('link', { name: 'Plan' })).not.toBeInTheDocument();

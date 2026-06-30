@@ -1,7 +1,7 @@
 import { describe, expect, test, vi } from 'vitest';
 import {
     publishChallengeAttempt,
-    recordRaidSessionCompletion,
+    recordGameSessionCompletion,
     recordSessionCompletion,
     resolveSessionCompletionContext
 } from '../session-completion-use-cases';
@@ -235,27 +235,30 @@ describe('session completion use cases', () => {
         expect(submitChallengeResultMock).not.toHaveBeenCalled();
     });
 
-    test('records Arcade Rift results through the unified session writer', () => {
+    test('records TypeRift results through the unified session writer', () => {
         const environment = createPlanEnvironment({
             activeSessionContext: null,
             trainingPlan: null
         });
 
-        const session = recordRaidSessionCompletion(environment, {
-            mode: 'daily-mutation',
+        const session = recordGameSessionCompletion(environment, {
+            version: 'typerift-v1',
+            mode: 'daily-anomaly',
             score: 12400,
             wpm: 78,
             accuracy: 96,
             durationSeconds: 514,
-            riftLayer: 7,
-            threatLevel: 7,
+            depth: 4,
+            areaIndex: 3,
+            areaId: 'paper-moon',
+            areaName: 'Paper Moon',
+            areaNameZh: 'Paper Moon',
             maxCombo: 34,
             livesRemaining: 2,
-            monstersDefeated: 86,
+            enemiesDefeated: 86,
             eliteDefeated: 1,
-            relicBuild: [{ id: 'combo-core', nameZh: '连击核心', stack: 2 }],
-            guardianDefeated: ['lumen-maw'],
-            mutationId: 'swift-nest',
+            upgradeBuild: [{ id: 'pulse-lance', nameZh: 'Pulse Lance', stack: 2 }],
+            anomalyId: 'mirror-rain',
             codexProgress: { discovered: 6, total: 15 },
             enemiesLeaked: 3,
             totalCharsTyped: 420,
@@ -266,35 +269,36 @@ describe('session completion use cases', () => {
         });
 
         expect(session.sourceTextMeta).toMatchObject({
-            label: 'Arcade Rift',
-            generatedBy: 'raid'
+            label: 'TypeRift: Echo Siege',
+            generatedBy: 'game'
         });
         expect(session.trainingMeta).toMatchObject({
-            type: 'raid',
-            surface: 'raid',
-            intent: 'daily-mutation',
+            type: 'game',
+            surface: 'game',
+            intent: 'daily-anomaly',
             score: 12400,
-            riftLayer: 7,
-            threatLevel: 7,
+            depth: 4,
+            areaIndex: 3,
+            areaId: 'paper-moon',
             durationSeconds: 514,
-            monstersDefeated: 86,
+            enemiesDefeated: 86,
             eliteDefeated: 1,
             endReason: 'extract',
-            mutationId: 'swift-nest',
+            anomalyId: 'mirror-rain',
             focusChars: ['r', 't']
         });
         expect(session).toMatchObject({
-            kind: 'raid',
-            intent: 'daily-mutation',
+            kind: 'game',
+            intent: 'daily-anomaly',
             durationSeconds: 514,
             gameMeta: {
-                threatLevel: 7,
-                monstersDefeated: 86,
+                version: 'typerift-v1',
+                depth: 4,
+                enemiesDefeated: 86,
                 eliteDefeated: 1,
                 endReason: 'extract',
-                relicBuild: [{ id: 'combo-core', nameZh: '连击核心', stack: 2 }],
-                guardianDefeated: ['lumen-maw'],
-                mutationId: 'swift-nest',
+                upgradeBuild: [{ id: 'pulse-lance', nameZh: 'Pulse Lance', stack: 2 }],
+                anomalyId: 'mirror-rain',
                 codexProgress: { discovered: 6, total: 15 }
             }
         });

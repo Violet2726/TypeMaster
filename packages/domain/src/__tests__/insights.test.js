@@ -33,7 +33,7 @@ describe('insights.js', () => {
             expect(result).toHaveProperty('topErrorWords');
             expect(result).toHaveProperty('keyboardHotspots');
             expect(result).toHaveProperty('surfaceBreakdown');
-            expect(result).toHaveProperty('raidSummary');
+            expect(result).toHaveProperty('gameSummary');
             expect(result).toHaveProperty('daily7');
             expect(result).toHaveProperty('daily30');
         });
@@ -145,19 +145,19 @@ describe('insights.js', () => {
             });
         });
 
-        it('summarizes training surfaces and raid performance from unified sessions', () => {
+        it('summarizes training surfaces and game performance from unified sessions', () => {
             const sessions = [
                 createMockSession({
                     trainingMeta: {
-                        type: 'raid',
-                        surface: 'raid',
+                        type: 'game',
+                        surface: 'game',
                         score: 2400,
-                        threatLevel: 6,
+                        depth: 4,
                         durationSeconds: 420,
                         endReason: 'extract',
-                        monstersDefeated: 44,
+                        enemiesDefeated: 44,
+                        bossesDefeated: 2,
                         maxCombo: 24,
-                        perfectWaves: 2,
                         focusChars: ['a', 's']
                     },
                     result: { wpm: 58, accuracy: 94, topErrorChars: ['a'], topErrorWords: [], score: 2400 }
@@ -172,17 +172,17 @@ describe('insights.js', () => {
                 counts: {
                     practice: 1,
                     challenge: 1,
-                    raid: 1
+                    game: 1
                 }
             });
-            expect(result.raidSummary).toMatchObject({
+            expect(result.gameSummary).toMatchObject({
                 count: 1,
                 bestScore: 2400,
                 maxCombo: 24,
-                highestThreatLevel: 6,
+                highestDepth: 4,
                 longestDurationSeconds: 420,
                 extractionRate: 100,
-                perfectWaves: 2,
+                bossesDefeated: 2,
                 focusChars: ['a', 's']
             });
         });

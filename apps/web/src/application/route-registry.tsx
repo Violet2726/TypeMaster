@@ -28,7 +28,7 @@ export const SHELL_ROUTES: ShellRoute[] = [
         id: 'raid',
         href: '/raid',
         icon: Swords,
-        fallbackLabel: 'Raid',
+        fallbackLabel: 'TypeRift',
         showInNav: true,
         layout: 'fullscreen'
     },

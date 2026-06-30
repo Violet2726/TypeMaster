@@ -28,7 +28,7 @@ export const StoredDiagnosticJourneySchema = DiagnosticJourneySchema.nullable();
 export const StoredActiveSessionContextSchema = ActiveSessionContextSchema.nullable();
 
 export const TrainingDataBundleSchema = z.object({
-    version: z.literal(6).optional().default(6),
+    version: z.literal(7).optional().default(7),
     exportedAt: z.string().optional(),
     settings: StoredSettingsSchema.nullable().optional(),
     sessions: StoredSessionsSchema.optional().default([]),

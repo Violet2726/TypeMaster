@@ -61,11 +61,11 @@ describe('training.js', () => {
             {
                 config: { includeNumbers: false, includePunctuation: false },
                 trainingMeta: {
-                    type: 'raid',
-                    surface: 'raid',
+                    type: 'game',
+                    surface: 'game',
                     score: 3200,
                     maxCombo: 28,
-                    threatLevel: 6,
+                    depth: 4,
                     durationSeconds: 420
                 },
                 result: {
@@ -92,12 +92,12 @@ describe('training.js', () => {
         });
         expect(profile.metrics.surfaces).toMatchObject({
             practice: 2,
-            raid: 1
+            game: 1
         });
-        expect(profile.metrics.raidBestScore).toBe(3200);
-        expect(profile.metrics.raidMaxCombo).toBe(28);
-        expect(profile.metrics.raidHighestThreatLevel).toBe(6);
-        expect(profile.metrics.raidLongestDurationSeconds).toBe(420);
+        expect(profile.metrics.gameBestScore).toBe(3200);
+        expect(profile.metrics.gameMaxCombo).toBe(28);
+        expect(profile.metrics.gameHighestDepth).toBe(4);
+        expect(profile.metrics.gameLongestDurationSeconds).toBe(420);
     });
 
     it('creates a 7-day starter plan and advances through it', () => {

@@ -20,56 +20,56 @@ describe('HomePage', () => {
         resetMockNavigation();
     });
 
-    test('shows the Raid Command Center as the first-run home', async () => {
+    test('shows the TypeRift Command Center as the first-run home', async () => {
         renderWithProvider(<HomePage />, {
             storageState: {
-                'typemaster:v6:settings': {
+                'typemaster:v7:settings': {
                     language: 'zh-CN',
                     lastConfig: baseConfig
                 }
             }
         });
 
-        expect(await screen.findByRole('heading', { name: 'Arcade Rift 指挥台' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: '开始 Arcade Rift' })).toBeInTheDocument();
-        expect(screen.getByText('无历史迁移，vNext 会从第一局重新建立画像。')).toBeInTheDocument();
+        expect(await screen.findByRole('heading', { name: 'TypeRift Command Center' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Start TypeRift' })).toBeInTheDocument();
+        expect(screen.getByText('No legacy migration. v7 starts with your first TypeRift descent.')).toBeInTheDocument();
         expect(screen.queryByRole('button', { name: /Start assessment/i })).not.toBeInTheDocument();
     });
 
-    test('routes the primary action to the new Raid route', async () => {
+    test('routes the primary action to the retained game route', async () => {
         renderWithProvider(<HomePage />, {
             storageState: {
-                'typemaster:v6:settings': {
+                'typemaster:v7:settings': {
                     language: 'zh-CN',
                     lastConfig: baseConfig
                 }
             }
         });
 
-        fireEvent.click(await screen.findByRole('button', { name: '开始 Arcade Rift' }));
+        fireEvent.click(await screen.findByRole('button', { name: 'Start TypeRift' }));
 
         await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith('/raid'));
     });
 
-    test('renders the latest v6 Arcade Rift feedback when evidence exists', async () => {
+    test('renders the latest v7 TypeRift feedback when evidence exists', async () => {
         renderWithProvider(<HomePage />, {
             storageState: {
-                'typemaster:v6:settings': {
+                'typemaster:v7:settings': {
                     language: 'zh-CN',
                     lastConfig: baseConfig
                 },
-                'typemaster:v6:sessions': [
+                'typemaster:v7:sessions': [
                     {
-                        id: 'raid-1',
-                        kind: 'raid',
-                        intent: 'endless-rift',
+                        id: 'game-1',
+                        kind: 'game',
+                        intent: 'expedition',
                         completedAt: '2026-06-08T08:00:00.000Z',
                         durationSeconds: 420,
-                        source: 'raid',
+                        source: 'game',
                         focus: 'accuracy',
                         gameMeta: {
-                            riftLayer: 6,
-                            threatLevel: 6,
+                            version: 'typerift-v1',
+                            depth: 4,
                             endReason: 'extract',
                             weakestChars: ['t']
                         },
@@ -82,12 +82,11 @@ describe('HomePage', () => {
                             topErrorChars: ['t']
                         },
                         trainingMeta: {
-                            type: 'raid',
-                            surface: 'raid',
-                            intent: 'endless-rift',
-                            title: 'Arcade Rift',
-                            riftLayer: 6,
-                            threatLevel: 6,
+                            type: 'game',
+                            surface: 'game',
+                            intent: 'expedition',
+                            title: 'TypeRift: Echo Siege',
+                            depth: 4,
                             endReason: 'extract'
                         }
                     }
@@ -95,8 +94,8 @@ describe('HomePage', () => {
             }
         });
 
-        expect(await screen.findByRole('heading', { name: '上一局反馈' })).toBeInTheDocument();
-        expect(screen.getByText('威胁 6')).toBeInTheDocument();
+        expect(await screen.findByRole('heading', { name: 'Last run signal' })).toBeInTheDocument();
+        expect(screen.getByText('Depth 4')).toBeInTheDocument();
         expect(screen.getByText('97%')).toBeInTheDocument();
     });
 });

@@ -60,44 +60,44 @@ export function buildAchievements({
             unlockedAt: firstMatchDate(safeSessions, (session) => (session?.result?.wpm || 0) >= 100)
         },
         {
-            id: 'first-raid',
-            title: 'First Rift',
-            description: 'Finish your first Arcade Rift run.',
-            unlockedAt: firstMatchDate(safeSessions, (session) => session?.trainingMeta?.type === 'raid')
+            id: 'first-game',
+            title: 'First Descent',
+            description: 'Finish your first TypeRift run.',
+            unlockedAt: firstMatchDate(safeSessions, (session) => session?.trainingMeta?.type === 'game')
         },
         {
             id: 'combo-20',
             title: 'Combo Master',
-            description: 'Reach a 20-combo streak in Arcade Rift.',
-            unlockedAt: firstMatchDate(safeSessions, (session) => session?.trainingMeta?.type === 'raid' && (session?.trainingMeta?.maxCombo || 0) >= 20)
+            description: 'Reach a 20-combo streak in TypeRift.',
+            unlockedAt: firstMatchDate(safeSessions, (session) => session?.trainingMeta?.type === 'game' && (session?.trainingMeta?.maxCombo || 0) >= 20)
         },
         {
-            id: 'wave-10',
-            title: 'Rift Survivor',
-            description: 'Survive to Rift Layer 10 in Arcade Rift.',
+            id: 'depth-5',
+            title: 'Echo Survivor',
+            description: 'Reach depth 5 in TypeRift.',
             unlockedAt: firstMatchDate(safeSessions, (session) => (
-                session?.trainingMeta?.type === 'raid'
-                && (session?.trainingMeta?.riftLayer || session?.trainingMeta?.threatLevel || session?.trainingMeta?.wave || 0) >= 10
+                session?.trainingMeta?.type === 'game'
+                && (session?.trainingMeta?.depth || 0) >= 5
             ))
         },
         {
-            id: 'raid-perfect',
+            id: 'game-extract',
             title: 'Clean Extraction',
-            description: 'Extract from Arcade Rift with lives remaining.',
+            description: 'Extract from TypeRift with lives remaining.',
             unlockedAt: firstMatchDate(safeSessions, (session) => (
-                session?.trainingMeta?.type === 'raid'
+                session?.trainingMeta?.type === 'game'
                 && (
                     session?.trainingMeta?.endReason === 'extract'
-                    || (session?.trainingMeta?.perfectWaves || 0) > 0
+                    || session?.trainingMeta?.endReason === 'victory'
                 )
                 && (session?.trainingMeta?.livesRemaining ?? 1) > 0
             ))
         },
         {
-            id: 'raid-1000',
-            title: 'Rift Commander',
-            description: 'Score 1000+ points in a single Arcade Rift run.',
-            unlockedAt: firstMatchDate(safeSessions, (session) => session?.trainingMeta?.type === 'raid' && (session?.result?.score || 0) >= 1000)
+            id: 'game-1000',
+            title: 'Echo Commander',
+            description: 'Score 1000+ points in a single TypeRift run.',
+            unlockedAt: firstMatchDate(safeSessions, (session) => session?.trainingMeta?.type === 'game' && (session?.result?.score || 0) >= 1000)
         }
     ];
 

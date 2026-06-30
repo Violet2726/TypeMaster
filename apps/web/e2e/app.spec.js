@@ -67,19 +67,19 @@ async function finishRound(page) {
     await page.waitForURL(/\/result/, { timeout: 10000 });
 }
 
-test('shows the Arcade Rift Command Center and navigates only through vNext routes', async ({ page }) => {
+test('shows the TypeRift command center and keeps the v7 route loop', async ({ page }) => {
     await seedVNextState(page);
 
     await page.goto('/');
 
-    await expect(page.getByRole('heading', { name: 'Arcade Rift 指挥台' })).toBeVisible();
-    await expect(page.getByRole('button', { name: '开始 Arcade Rift' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'TypeRift Command Center' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Start TypeRift' })).toBeVisible();
 
-    await page.getByRole('button', { name: '查看任务' }).click();
+    await page.getByRole('button', { name: 'View missions' }).click();
     await expect(page).toHaveURL(/\/missions/);
-    await expect(page.getByRole('heading', { name: '任务中心' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Mission Center' })).toBeVisible();
 
-    await page.getByRole('button', { name: '回到 Arcade Rift' }).click();
+    await page.getByRole('button', { name: 'Back to TypeRift' }).click();
     await expect(page).toHaveURL(/\/raid/);
 });
 
@@ -102,13 +102,25 @@ test('completes a Focus Lab round and reaches the unified result page', async ({
     await expect(page.getByText('Next action', { exact: true })).toBeVisible();
 });
 
-test('starts Arcade Rift with a non-empty battle canvas and DOM HUD', async ({ page }) => {
+test('starts TypeRift with a non-empty battle canvas and DOM HUD', async ({ page }) => {
     await seedVNextState(page);
 
     await page.goto('/raid');
-    await expect(page.getByRole('application', { name: 'Arcade Rift 打字街机游戏' })).toBeVisible();
-    await page.getByRole('button', { name: '开始无尽裂隙' }).click();
+    await expect(page.getByRole('application', { name: 'TypeRift roguelite typing survival game' })).toBeVisible();
+    await page.getByRole('button', { name: 'Expedition' }).click();
 
-    await expect(page.getByText(/裂隙\s+1/)).toBeVisible();
-    await expect(page.getByRole('img', { name: 'Arcade Rift 发光裂隙战场，输入怪物身上的词以清除目标' })).toBeVisible();
+    await expect(page.getByText('Target')).toBeVisible();
+    await expect(page.getByRole('img', { name: 'TypeRift Echo Siege battlefield with enemies carrying typed words' })).toBeVisible();
+
+    const pixels = await page.locator('canvas').evaluate((canvas) => {
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return 0;
+        const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        let lit = 0;
+        for (let index = 0; index < data.length; index += 4) {
+            if (data[index] + data[index + 1] + data[index + 2] > 12) lit += 1;
+        }
+        return lit;
+    });
+    expect(pixels).toBeGreaterThan(500);
 });

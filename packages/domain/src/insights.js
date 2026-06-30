@@ -192,7 +192,7 @@ function resolveSessionSurface(session) {
     if (explicit) return explicit;
 
     const type = session?.trainingMeta?.type;
-    if (type === 'raid') return 'raid';
+    if (type === 'game') return 'game';
     if (type === 'challenge') return 'challenge';
     if (type === 'plan') return 'plan';
     if (type === 'diagnostic') return 'diagnostic';
@@ -206,7 +206,7 @@ function buildSurfaceBreakdown(sessions) {
         diagnostic: 0,
         plan: 0,
         challenge: 0,
-        raid: 0
+        game: 0
     };
 
     sessions.forEach((session) => {
@@ -224,36 +224,36 @@ function buildSurfaceBreakdown(sessions) {
     };
 }
 
-function buildRaidSummary(sessions) {
-    const raidSessions = sessions.filter((session) => resolveSessionSurface(session) === 'raid');
+function buildGameSummary(sessions) {
+    const gameSessions = sessions.filter((session) => resolveSessionSurface(session) === 'game');
 
-    if (!raidSessions.length) {
+    if (!gameSessions.length) {
         return {
             count: 0,
             bestScore: 0,
             maxCombo: 0,
-            highestThreatLevel: 0,
+            highestDepth: 0,
             longestDurationSeconds: 0,
             extractionRate: 0,
-            perfectWaves: 0,
+            bossesDefeated: 0,
             focusChars: []
         };
     }
 
     const focusChars = topCounts(buildCounter(
-        raidSessions.flatMap((session) => session?.trainingMeta?.focusChars || session?.result?.topErrorChars || [])
+        gameSessions.flatMap((session) => session?.trainingMeta?.focusChars || session?.result?.topErrorChars || [])
     ), 5).map((item) => item.label);
 
-    const extractCount = raidSessions.filter((session) => session?.trainingMeta?.endReason === 'extract').length;
+    const extractCount = gameSessions.filter((session) => session?.trainingMeta?.endReason === 'extract' || session?.trainingMeta?.endReason === 'victory').length;
 
     return {
-        count: raidSessions.length,
-        bestScore: Math.max(...raidSessions.map((session) => session?.trainingMeta?.score || session?.result?.score || 0)),
-        maxCombo: Math.max(...raidSessions.map((session) => session?.trainingMeta?.maxCombo || 0)),
-        highestThreatLevel: Math.max(...raidSessions.map((session) => session?.trainingMeta?.riftLayer || session?.trainingMeta?.threatLevel || session?.trainingMeta?.wave || 0)),
-        longestDurationSeconds: Math.max(...raidSessions.map((session) => session?.trainingMeta?.durationSeconds || session?.result?.durationSeconds || 0)),
-        extractionRate: Math.round((extractCount / raidSessions.length) * 100),
-        perfectWaves: raidSessions.reduce((sum, session) => sum + Number(session?.trainingMeta?.perfectWaves || 0), 0),
+        count: gameSessions.length,
+        bestScore: Math.max(...gameSessions.map((session) => session?.trainingMeta?.score || session?.result?.score || 0)),
+        maxCombo: Math.max(...gameSessions.map((session) => session?.trainingMeta?.maxCombo || 0)),
+        highestDepth: Math.max(...gameSessions.map((session) => session?.trainingMeta?.depth || session?.trainingMeta?.areaIndex || 0)),
+        longestDurationSeconds: Math.max(...gameSessions.map((session) => session?.trainingMeta?.durationSeconds || session?.result?.durationSeconds || 0)),
+        extractionRate: Math.round((extractCount / gameSessions.length) * 100),
+        bossesDefeated: gameSessions.reduce((sum, session) => sum + Number(session?.trainingMeta?.bossesDefeated || 0), 0),
         focusChars
     };
 }
@@ -322,7 +322,7 @@ export function buildInsights(sessions, options = {}) {
             keyboardLayout: options.keyboardLayout
         }),
         surfaceBreakdown: buildSurfaceBreakdown(recent30),
-        raidSummary: buildRaidSummary(recent30),
+        gameSummary: buildGameSummary(recent30),
         daily7: buildDailySeries(recent30, 7),
         daily30: buildDailySeries(recent30, 30)
     };

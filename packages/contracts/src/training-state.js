@@ -213,7 +213,7 @@ export const TrainingSurfaceSchema = z.enum([
     'practice',
     'missions',
     'insights',
-    'raid',
+    'game',
     'result'
 ]);
 
@@ -223,16 +223,16 @@ export const SessionIntentSchema = z.enum([
     'daily-mission',
     'focus-drill',
     'challenge-mission',
-    'endless-rift',
-    'daily-mutation',
-    'first-breach',
+    'expedition',
+    'daily-anomaly',
+    'first-descent',
     'adaptive-drill',
     'keyboard-zone-drill',
     'recovery-drill'
 ]);
 
 export const SessionTrainingMetaSchema = z.object({
-    type: z.enum(['free', 'practice', 'mission', 'raid']).optional(),
+    type: z.enum(['free', 'practice', 'mission', 'game']).optional(),
     surface: TrainingSurfaceSchema.optional(),
     intent: SessionIntentSchema.optional(),
     focus: z.string().nullable().optional(),
@@ -243,7 +243,7 @@ export const SessionTrainingMetaSchema = z.object({
 
 export const SessionRecordSchema = z.object({
     id: z.string(),
-    kind: z.enum(['raid', 'practice', 'mission']).optional(),
+    kind: z.enum(['game', 'practice', 'mission']).optional(),
     intent: SessionIntentSchema.optional(),
     startedAt: z.string().optional(),
     completedAt: z.string().optional(),

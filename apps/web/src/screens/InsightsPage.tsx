@@ -337,11 +337,11 @@ export function InsightsPage() {
             value: String(surfaceCounts.challenge || 0)
         },
         {
-            id: 'raid',
+            id: 'game',
             icon: Swords,
-            label: 'Raid',
-            value: insights.raidSummary?.count
-                ? `${insights.raidSummary.count} / ${insights.raidSummary.bestScore}`
+            label: 'TypeRift',
+            value: insights.gameSummary?.count
+                ? `${insights.gameSummary.count} / ${insights.gameSummary.bestScore}`
                 : '0'
         },
         {

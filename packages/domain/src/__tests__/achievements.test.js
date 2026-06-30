@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { buildAchievements } from '../achievements.js';
 
-function makeRaidSession(overrides = {}) {
+function makeGameSession(overrides = {}) {
     return {
-        id: 'raid-1',
-        trainingMeta: { type: 'raid', maxCombo: 10, threatLevel: 5, endReason: 'extract', livesRemaining: 2 },
+        id: 'game-1',
+        trainingMeta: { type: 'game', maxCombo: 10, depth: 3, endReason: 'extract', livesRemaining: 2 },
         result: { completedAt: '2026-06-20T12:00:00Z', score: 500, wpm: 60, accuracy: 95 },
         ...overrides
     };
@@ -40,51 +40,51 @@ describe('achievements.js', () => {
 });
 
 describe('Game achievements', () => {
-    it('first-raid unlocks when a raid session exists', () => {
-        const result = buildAchievements({ sessions: [makeRaidSession()] });
-        const raid = result.find((a) => a.id === 'first-raid');
-        expect(raid.unlocked).toBe(true);
+    it('first-game unlocks when a game session exists', () => {
+        const result = buildAchievements({ sessions: [makeGameSession()] });
+        const game = result.find((a) => a.id === 'first-game');
+        expect(game.unlocked).toBe(true);
     });
 
-    it('first-raid stays locked without raid sessions', () => {
+    it('first-game stays locked without game sessions', () => {
         const result = buildAchievements({ sessions: [{ id: 's1', trainingMeta: { type: 'free' } }] });
-        const raid = result.find((a) => a.id === 'first-raid');
-        expect(raid.unlocked).toBe(false);
+        const game = result.find((a) => a.id === 'first-game');
+        expect(game.unlocked).toBe(false);
     });
 
     it('combo-20 unlocks when maxCombo >= 20', () => {
-        const result = buildAchievements({ sessions: [makeRaidSession({ trainingMeta: { type: 'raid', maxCombo: 20, threatLevel: 5 } })] });
+        const result = buildAchievements({ sessions: [makeGameSession({ trainingMeta: { type: 'game', maxCombo: 20, depth: 3 } })] });
         const combo = result.find((a) => a.id === 'combo-20');
         expect(combo.unlocked).toBe(true);
     });
 
     it('combo-20 stays locked when maxCombo < 20', () => {
-        const result = buildAchievements({ sessions: [makeRaidSession({ trainingMeta: { type: 'raid', maxCombo: 10 } })] });
+        const result = buildAchievements({ sessions: [makeGameSession({ trainingMeta: { type: 'game', maxCombo: 10 } })] });
         const combo = result.find((a) => a.id === 'combo-20');
         expect(combo.unlocked).toBe(false);
     });
 
-    it('wave-10 unlocks when threatLevel >= 10', () => {
-        const result = buildAchievements({ sessions: [makeRaidSession({ trainingMeta: { type: 'raid', threatLevel: 10 } })] });
-        const wave = result.find((a) => a.id === 'wave-10');
-        expect(wave.unlocked).toBe(true);
+    it('depth-5 unlocks when depth >= 5', () => {
+        const result = buildAchievements({ sessions: [makeGameSession({ trainingMeta: { type: 'game', depth: 5 } })] });
+        const depth = result.find((a) => a.id === 'depth-5');
+        expect(depth.unlocked).toBe(true);
     });
 
-    it('raid-perfect unlocks when the player extracts cleanly', () => {
-        const result = buildAchievements({ sessions: [makeRaidSession({ trainingMeta: { type: 'raid', endReason: 'extract', livesRemaining: 2 } })] });
-        const perfect = result.find((a) => a.id === 'raid-perfect');
+    it('game-extract unlocks when the player extracts cleanly', () => {
+        const result = buildAchievements({ sessions: [makeGameSession({ trainingMeta: { type: 'game', endReason: 'extract', livesRemaining: 2 } })] });
+        const perfect = result.find((a) => a.id === 'game-extract');
         expect(perfect.unlocked).toBe(true);
     });
 
-    it('raid-1000 unlocks when score >= 1000', () => {
-        const result = buildAchievements({ sessions: [makeRaidSession({ result: { completedAt: '2026-06-20T12:00:00Z', score: 1000, wpm: 80, accuracy: 96 } })] });
-        const cmd = result.find((a) => a.id === 'raid-1000');
+    it('game-1000 unlocks when score >= 1000', () => {
+        const result = buildAchievements({ sessions: [makeGameSession({ result: { completedAt: '2026-06-20T12:00:00Z', score: 1000, wpm: 80, accuracy: 96 } })] });
+        const cmd = result.find((a) => a.id === 'game-1000');
         expect(cmd.unlocked).toBe(true);
     });
 
-    it('raid-1000 stays locked when score < 1000', () => {
-        const result = buildAchievements({ sessions: [makeRaidSession({ result: { completedAt: '2026-06-20T12:00:00Z', score: 500 } })] });
-        const cmd = result.find((a) => a.id === 'raid-1000');
+    it('game-1000 stays locked when score < 1000', () => {
+        const result = buildAchievements({ sessions: [makeGameSession({ result: { completedAt: '2026-06-20T12:00:00Z', score: 500 } })] });
+        const cmd = result.find((a) => a.id === 'game-1000');
         expect(cmd.unlocked).toBe(false);
     });
 });

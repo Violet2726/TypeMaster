@@ -3,7 +3,7 @@ import { usePlanSnapshot } from '../../../store/app-state-derived';
 import { useHistorySnapshot } from '../../../store/app-state-derived';
 import { useShellSnapshot } from '../../../store/app-state-derived';
 import { useAppActions } from '../../../store/use-app-action-set';
-import { buildKeyboardHotspots, buildInsights, buildRiftCodexFromSessions } from '@typemaster/domain';
+import { buildKeyboardHotspots, buildGameCodexFromSessions, buildInsights } from '@typemaster/domain';
 
 export function useGameStore() {
     const plan = usePlanSnapshot();
@@ -45,19 +45,19 @@ export function useGameStore() {
         if (!sessions || sessions.length === 0) return null;
         return buildInsights(sessions.slice(0, 30));
     }, [sessions]);
-    const raidBestScore = useMemo(() => Math.max(0, ...(sessions || [])
-        .filter((session: any) => session?.trainingMeta?.type === 'raid')
+    const gameBestScore = useMemo(() => Math.max(0, ...(sessions || [])
+        .filter((session: any) => session?.trainingMeta?.type === 'game' || session?.kind === 'game')
         .map((session: any) => Number(session?.trainingMeta?.score || session?.result?.score || 0))), [sessions]);
-    const riftCodex = useMemo(() => buildRiftCodexFromSessions((sessions || [])
-        .filter((session: any) => session?.trainingMeta?.type === 'raid' || session?.kind === 'raid')), [sessions]);
+    const gameCodex = useMemo(() => buildGameCodexFromSessions((sessions || [])
+        .filter((session: any) => session?.trainingMeta?.type === 'game' || session?.kind === 'game')), [sessions]);
 
     return {
         skillProfile,
         keyboardHotspots,
         insights,
         language,
-        riftCodex,
-        raidBestScore,
-        recordCompletedRaidSession: sessionActions.recordCompletedRaidSession
+        gameCodex,
+        gameBestScore,
+        recordCompletedGameSession: sessionActions.recordCompletedGameSession
     };
 }

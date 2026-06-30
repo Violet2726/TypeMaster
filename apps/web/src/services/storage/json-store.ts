@@ -22,8 +22,8 @@ const CLIENT_CACHE_KEYS = [
     STORAGE_KEYS.diagnosticJourney,
     STORAGE_KEYS.activeSessionContext
 ];
-const V6_INSTALL_PAYLOAD = {
-    version: 6,
+const V7_INSTALL_PAYLOAD = {
+    version: 7,
     installedAt: new Date().toISOString()
 };
 
@@ -92,7 +92,7 @@ function removeObsoleteLocalCacheKeys() {
     });
 }
 
-function markV6Install() {
+function markV7Install() {
     const storage = getBrowserLocalStorage();
     if (!storage) {
         return;
@@ -100,10 +100,10 @@ function markV6Install() {
 
     try {
         if (!storage.getItem(STORAGE_KEYS.install)) {
-            storage.setItem(STORAGE_KEYS.install, JSON.stringify(V6_INSTALL_PAYLOAD));
+            storage.setItem(STORAGE_KEYS.install, JSON.stringify(V7_INSTALL_PAYLOAD));
         }
     } catch (error) {
-        console.warn('Failed to mark TypeMaster v6 install', error);
+        console.warn('Failed to mark TypeMaster v7 install', error);
     }
 }
 
@@ -189,7 +189,7 @@ export function hydrateClientCache() {
 
     hydrationPromise = (async () => {
         removeObsoleteLocalCacheKeys();
-        markV6Install();
+        markV7Install();
 
         if (canUseIndexedDb()) {
             await deleteIndexedDbEntries(OBSOLETE_STORAGE_KEYS);

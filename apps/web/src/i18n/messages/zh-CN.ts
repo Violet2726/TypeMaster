@@ -91,7 +91,7 @@ export const zhCNMessages = {
         body: '先玩一局，再用短训练修复弱区。',
         primaryCta: '开始无尽突袭',
         secondaryCta: '查看任务',
-        statsTitle: 'Raid 快照',
+        statsTitle: 'TypeRift snapshot',
         avgWpm: '最近 7 次平均 WPM',
         bestAccuracy: '最近 7 次最佳准确率',
         latestMode: '最近模式',

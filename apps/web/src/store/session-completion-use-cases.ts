@@ -92,7 +92,7 @@ function resolveSessionTrainingMeta(environment, completionContext) {
         : 'practice';
 
     return {
-        type: type === 'free' ? 'practice' : (type === 'raid' ? 'raid' : 'mission'),
+        type: type === 'free' ? 'practice' : (type === 'game' ? 'game' : 'mission'),
         surface,
         intent: resolveSessionIntent(environment, completionContext),
         focus: resolveSessionFocus(environment, completionContext),
@@ -147,43 +147,50 @@ export function recordSession(environment, session) {
     return completeSession(environment, session);
 }
 
-export function createRaidSessionRecord(result) {
+export function createGameSessionRecord(result) {
     const focusChars = Array.isArray(result?.focusChars) ? result.focusChars : [];
     const weakestChars = Array.isArray(result?.weakestChars) ? result.weakestChars : focusChars;
     const durationSeconds = Number(result?.durationSeconds || 0);
     const completedAt = new Date().toISOString();
-    const intent = result?.mode === 'daily-mutation'
-        ? 'daily-mutation'
-        : result?.mode === 'first-breach'
-            ? 'first-breach'
-            : 'endless-rift';
-    const threatLevel = Number(result?.riftLayer || result?.threatLevel || 1);
-    const monstersDefeated = Number(result?.monstersDefeated || result?.enemiesDefeated || 0);
+    const intent = result?.mode === 'daily-anomaly'
+        ? 'daily-anomaly'
+        : result?.mode === 'first-descent'
+            ? 'first-descent'
+            : 'expedition';
+    const depth = Number(result?.depth || result?.areaIndex + 1 || 1);
+    const enemiesDefeated = Number(result?.enemiesDefeated || result?.monstersDefeated || 0);
     const eliteDefeated = Number(result?.eliteDefeated || 0);
+    const bossesDefeated = Number(result?.bossesDefeated || 0);
     const endReason = result?.endReason || null;
 
     return normalizeSessionRecord({
-        id: `raid-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
-        kind: 'raid',
+        id: `game-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+        kind: 'game',
         intent,
         startedAt: completedAt,
         completedAt,
         durationSeconds,
         focus: focusChars.length ? focusChars.join('') : 'speed',
-        source: 'raid',
+        source: 'game',
         gameMeta: {
+            version: result?.version || 'typerift-v1',
             score: Number(result?.score || 0),
-            threatLevel,
+            depth,
+            areaIndex: Number(result?.areaIndex || 0),
+            areaId: result?.areaId || null,
+            areaName: result?.areaName || null,
+            areaNameZh: result?.areaNameZh || null,
             durationSeconds,
             maxCombo: Number(result?.maxCombo || 0),
-            monstersDefeated,
+            enemiesDefeated,
             eliteDefeated,
+            bossesDefeated,
             endReason,
-            relicBuild: result?.relicBuild || [],
-            guardianDefeated: result?.guardianDefeated || [],
-            mutationId: result?.mutationId || null,
+            upgradeBuild: result?.upgradeBuild || [],
+            anomalyId: result?.anomalyId || null,
             codexProgress: result?.codexProgress || null,
             livesRemaining: Number(result?.livesRemaining || 0),
+            heat: Number(result?.heat || 0),
             focusChars,
             weakestChars
         },
@@ -217,36 +224,37 @@ export function createRaidSessionRecord(result) {
         },
         sourceTextMeta: {
             source: 'builtin',
-            label: 'Arcade Rift',
-            generatedBy: 'raid'
+            label: 'TypeRift: Echo Siege',
+            generatedBy: 'game'
         },
         coachAdviceId: null,
         trainingMeta: {
-            type: 'raid',
-            surface: 'raid',
+            type: 'game',
+            surface: 'game',
             intent,
             focus: focusChars.length ? focusChars.join('') : 'speed',
             sourceSessionId: null,
-            title: 'Arcade Rift',
+            title: 'TypeRift: Echo Siege',
             score: Number(result?.score || 0),
-            riftLayer: threatLevel,
-            threatLevel,
+            depth,
+            areaIndex: Number(result?.areaIndex || 0),
+            areaId: result?.areaId || null,
             durationSeconds,
             maxCombo: Number(result?.maxCombo || 0),
-            monstersDefeated,
+            enemiesDefeated,
             eliteDefeated,
+            bossesDefeated,
             endReason,
-            relicBuild: result?.relicBuild || [],
-            guardianDefeated: result?.guardianDefeated || [],
-            mutationId: result?.mutationId || null,
+            upgradeBuild: result?.upgradeBuild || [],
+            anomalyId: result?.anomalyId || null,
             livesRemaining: Number(result?.livesRemaining || 0),
             focusChars
         }
     });
 }
 
-export function recordRaidSessionCompletion(environment, result) {
-    const session = createRaidSessionRecord(result);
+export function recordGameSessionCompletion(environment, result) {
+    const session = createGameSessionRecord(result);
     completeSession(environment, session);
     environment.setActiveSessionContext(null);
     return session;

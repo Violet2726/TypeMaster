@@ -1,21 +1,31 @@
-const API_FALLBACK_CACHE_KEY = 'typemaster:v6:api-fallback-cache';
+const API_FALLBACK_CACHE_KEY = 'typemaster:v7:api-fallback-cache';
 const API_BASE = '/api';
 const REMOTE_API_FLAG = '1';
 const SESSION_LIMIT = 50;
 
 const STORAGE_KEYS = {
-    install: 'typemaster:v6:install',
-    settings: 'typemaster:v6:settings',
-    sessions: 'typemaster:v6:sessions',
-    coachAdvices: 'typemaster:v6:coach-advice-cache',
-    skillProfile: 'typemaster:v6:skill-profile-cache',
-    trainingPlan: 'typemaster:v6:missions-cache',
-    achievements: 'typemaster:v6:achievements-cache',
-    diagnosticJourney: 'typemaster:v6:baseline-mission-cache',
-    activeSessionContext: 'typemaster:v6:active-mission-context'
+    install: 'typemaster:v7:install',
+    settings: 'typemaster:v7:settings',
+    sessions: 'typemaster:v7:sessions',
+    coachAdvices: 'typemaster:v7:coach-advice-cache',
+    skillProfile: 'typemaster:v7:skill-profile-cache',
+    trainingPlan: 'typemaster:v7:missions-cache',
+    achievements: 'typemaster:v7:achievements-cache',
+    diagnosticJourney: 'typemaster:v7:baseline-mission-cache',
+    activeSessionContext: 'typemaster:v7:active-mission-context'
 };
 
 const OBSOLETE_STORAGE_KEYS = [
+    'typemaster:v6:install',
+    'typemaster:v6:settings',
+    'typemaster:v6:sessions',
+    'typemaster:v6:coach-advice-cache',
+    'typemaster:v6:skill-profile-cache',
+    'typemaster:v6:missions-cache',
+    'typemaster:v6:achievements-cache',
+    'typemaster:v6:baseline-mission-cache',
+    'typemaster:v6:active-mission-context',
+    'typemaster:v6:api-fallback-cache',
     'typemaster:v5:preferences',
     'typemaster:v5:sessions-cache',
     'typemaster:v5:coach-cache',

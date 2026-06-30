@@ -62,11 +62,11 @@ describe('contracts', () => {
     });
 
     test('exports stable storage and API constants', () => {
-        expect(API_FALLBACK_CACHE_KEY).toBe('typemaster:v6:api-fallback-cache');
+        expect(API_FALLBACK_CACHE_KEY).toBe('typemaster:v7:api-fallback-cache');
         expect(API_BASE).toBe('/api');
         expect(SESSION_LIMIT).toBe(50);
-        expect(STORAGE_KEYS.settings).toBe('typemaster:v6:settings');
-        expect(STORAGE_KEYS.sessions).toBe('typemaster:v6:sessions');
+        expect(STORAGE_KEYS.settings).toBe('typemaster:v7:settings');
+        expect(STORAGE_KEYS.sessions).toBe('typemaster:v7:sessions');
         expect(getTodayDateKey(new Date('2026-06-08T10:00:00.000Z'))).toBe('2026-06-08');
         expect(getDailyChallengeId('2026-06-08')).toBe('daily-2026-06-08');
     });

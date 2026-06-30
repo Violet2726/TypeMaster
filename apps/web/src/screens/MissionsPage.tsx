@@ -10,7 +10,7 @@ import { useAchievementSnapshot, useHistorySnapshot, usePlanSnapshot, useShellSn
 function getWeakFocus(skillProfile: any) {
     return skillProfile?.topErrorChars?.slice(0, 3).join(' / ')
         || skillProfile?.weakZones?.[0]?.label
-        || '节奏稳定';
+        || 'rhythm';
 }
 
 function MissionCard({ body, cta, icon: Icon, meta, onClick, title, tone = 'default' }: {
@@ -44,7 +44,7 @@ export function MissionsPage() {
     const navigate = useAppNavigate();
     const { copy } = useShellSnapshot();
     const { sessions } = useHistorySnapshot();
-    const { achievements, sessionStreak, weeklyGoal } = useAchievementSnapshot();
+    const { achievements, weeklyGoal } = useAchievementSnapshot();
     const { activeTrainingStep, dailyChallenge, skillProfile, trainingPlanProgress } = usePlanSnapshot();
     const { configActions, planActions, sessionActions } = useAppActions();
     const [isLaunchingDaily, setIsLaunchingDaily] = useState(false);
@@ -52,13 +52,10 @@ export function MissionsPage() {
     const weakFocus = getWeakFocus(skillProfile);
     const unlocked = achievements.filter((item) => item.unlocked).length;
 
-    const startRaid = () => navigate('/raid');
+    const startGame = () => navigate('/raid');
     const startFocus = () => {
-        if (skillProfile?.topErrorChars?.length) {
-            configActions.setKeyboardZoneDrillDraft(skillProfile.topErrorChars[0]);
-        } else {
-            sessionActions.resetPracticeToBuiltin();
-        }
+        if (skillProfile?.topErrorChars?.length) configActions.setKeyboardZoneDrillDraft(skillProfile.topErrorChars[0]);
+        else sessionActions.resetPracticeToBuiltin();
         navigate('/practice');
     };
     const startBaseline = () => {
@@ -81,20 +78,20 @@ export function MissionsPage() {
 
     return (
         <div className="page-stack page-stack--home">
-            <section className="home-starter-hero" aria-label="Arcade missions">
+            <section className="home-starter-hero" aria-label="TypeRift missions">
                 <div className="home-starter-hero__copy">
                     <span className="home-starter-hero__status">
                         <Flag aria-hidden="true" size={15} strokeWidth={2.2} />
-                        Arcade Missions
+                        Missions
                     </span>
-                    <h1>任务中心</h1>
+                    <h1>Mission Center</h1>
                     <p className="hero-body">
-                        用短任务提升下一局无尽突袭：校准基准、修复弱区、完成每日挑战，然后回到战场验证。
+                        Calibrate speed, repair weak zones, and finish daily drills before returning to TypeRift builds.
                     </p>
                     <div className="home-starter-hero__actions">
-                        <button type="button" className="action-btn primary" onClick={startRaid}>
+                        <button type="button" className="action-btn primary" onClick={startGame}>
                             <Swords aria-hidden="true" size={17} strokeWidth={2.25} />
-                            回到 Arcade Rift
+                            Back to TypeRift
                         </button>
                     </div>
                 </div>
@@ -102,15 +99,15 @@ export function MissionsPage() {
 
             <section className="home-starter-metrics tm-metric-strip" aria-label="Mission progress">
                 <div className="tm-metric">
-                    <span><Trophy aria-hidden="true" size={16} /> 已解锁</span>
+                    <span><Trophy aria-hidden="true" size={16} /> Unlocked</span>
                     <strong>{unlocked}</strong>
                 </div>
                 <div className="tm-metric">
-                    <span><ShieldCheck aria-hidden="true" size={16} /> 本周任务</span>
+                    <span><ShieldCheck aria-hidden="true" size={16} /> Weekly missions</span>
                     <strong>{weeklyGoal.completed}/{weeklyGoal.target}</strong>
                 </div>
                 <div className="tm-metric">
-                    <span><BarChart3 aria-hidden="true" size={16} /> 最近 WPM</span>
+                    <span><BarChart3 aria-hidden="true" size={16} /> Recent WPM</span>
                     <strong>{insights.recent7.avgWpm || copy.common.emptyValue}</strong>
                 </div>
             </section>
@@ -119,26 +116,26 @@ export function MissionsPage() {
                 <MissionCard
                     icon={Target}
                     meta="Baseline"
-                    title="30 秒基准校准"
-                    body="首次或状态不明时，用短样本建立今天的速度和准确率参考线。"
-                    cta="开始校准"
+                    title="30 second calibration"
+                    body="Set today's reference line for speed and accuracy before a game run."
+                    cta="Start calibration"
                     tone="primary"
                     onClick={startBaseline}
                 />
                 <MissionCard
                     icon={Keyboard}
                     meta="Focus Lab"
-                    title={`弱区修复：${weakFocus}`}
-                    body="把 Raid 暴露出的字符或节奏问题转成 2 分钟专注训练。"
-                    cta="进入训练"
+                    title={`Weak-zone repair: ${weakFocus}`}
+                    body="Turn TypeRift mistakes into a compact precision drill."
+                    cta="Enter practice"
                     onClick={startFocus}
                 />
                 <MissionCard
                     icon={Trophy}
                     meta="Daily"
-                    title={dailyChallenge?.title || '每日任务'}
-                    body={dailyChallenge?.summary || '完成统一文本，比较今天的稳定性和准确率。'}
-                    cta={isLaunchingDaily ? '启动中' : '开始任务'}
+                    title={dailyChallenge?.title || 'Daily mission'}
+                    body={dailyChallenge?.summary || 'Complete the shared text and compare stability with today.'}
+                    cta={isLaunchingDaily ? 'Launching' : 'Start mission'}
                     onClick={startDaily}
                 />
             </section>
@@ -156,10 +153,10 @@ export function MissionsPage() {
                             </span>
                             <div className="home-recent-item__body">
                                 <strong>{activeTrainingStep.summary}</strong>
-                                <p>计划进度 {trainingPlanProgress?.percent || 0}%</p>
+                                <p>Plan progress {trainingPlanProgress?.percent || 0}%</p>
                             </div>
                             <button type="button" className="action-btn" onClick={continuePlan}>
-                                继续
+                                Continue
                             </button>
                         </div>
                     </div>
