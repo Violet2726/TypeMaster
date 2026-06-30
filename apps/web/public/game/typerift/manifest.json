@@ -1,0 +1,57 @@
+{
+  "backgrounds": {
+    "neon-archive": "/game/typerift/backgrounds/neon-archive.webp",
+    "glass-mire": "/game/typerift/backgrounds/glass-mire.webp",
+    "signal-foundry": "/game/typerift/backgrounds/signal-foundry.webp",
+    "paper-moon": "/game/typerift/backgrounds/paper-moon.webp",
+    "black-terminal": "/game/typerift/backgrounds/black-terminal.webp"
+  },
+  "enemies": {
+    "spark": "/game/typerift/enemies/spark.webp",
+    "shard": "/game/typerift/enemies/shard.webp",
+    "mirror": "/game/typerift/enemies/mirror.webp",
+    "static": "/game/typerift/enemies/static.webp",
+    "husk": "/game/typerift/enemies/husk.webp",
+    "siren": "/game/typerift/enemies/siren.webp",
+    "prism": "/game/typerift/enemies/prism.webp",
+    "stitch": "/game/typerift/enemies/stitch.webp",
+    "cipher": "/game/typerift/enemies/cipher.webp",
+    "anchor": "/game/typerift/enemies/anchor.webp",
+    "chorus": "/game/typerift/enemies/chorus.webp",
+    "omen": "/game/typerift/enemies/omen.webp"
+  },
+  "bosses": {
+    "archive-seraph": "/game/typerift/bosses/archive-seraph.webp",
+    "mire-oracle": "/game/typerift/bosses/mire-oracle.webp",
+    "foundry-heart": "/game/typerift/bosses/foundry-heart.webp",
+    "paper-regent": "/game/typerift/bosses/paper-regent.webp",
+    "terminal-eclipse": "/game/typerift/bosses/terminal-eclipse.webp"
+  },
+  "relics": {
+    "pulse-lance": "/game/typerift/relics/pulse-lance.webp",
+    "echo-blade": "/game/typerift/relics/echo-blade.webp",
+    "glass-orbit": "/game/typerift/relics/glass-orbit.webp",
+    "terminal-ray": "/game/typerift/relics/terminal-ray.webp",
+    "calm-buffer": "/game/typerift/relics/calm-buffer.webp",
+    "clean-room": "/game/typerift/relics/clean-room.webp",
+    "aegis-line": "/game/typerift/relics/aegis-line.webp",
+    "risk-engine": "/game/typerift/relics/risk-engine.webp",
+    "exit-credit": "/game/typerift/relics/exit-credit.webp",
+    "last-signal": "/game/typerift/relics/last-signal.webp",
+    "weak-key-glyph": "/game/typerift/relics/weak-key-glyph.webp",
+    "number-glyph": "/game/typerift/relics/number-glyph.webp",
+    "punctuation-glyph": "/game/typerift/relics/punctuation-glyph.webp",
+    "mirror-glyph": "/game/typerift/relics/mirror-glyph.webp",
+    "boss-glyph": "/game/typerift/relics/boss-glyph.webp",
+    "black-terminal-key": "/game/typerift/relics/black-terminal-key.webp",
+    "split-control": "/game/typerift/relics/split-control.webp",
+    "heat-sink": "/game/typerift/relics/heat-sink.webp",
+    "prism-core": "/game/typerift/relics/prism-core.webp",
+    "paper-aegis": "/game/typerift/relics/paper-aegis.webp",
+    "signal-spike": "/game/typerift/relics/signal-spike.webp",
+    "eclipse-mark": "/game/typerift/relics/eclipse-mark.webp",
+    "steady-metronome": "/game/typerift/relics/steady-metronome.webp",
+    "archive-map": "/game/typerift/relics/archive-map.webp"
+  },
+  "ui": {}
+}
