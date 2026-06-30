@@ -250,7 +250,7 @@ function buildRaidSummary(sessions) {
         count: raidSessions.length,
         bestScore: Math.max(...raidSessions.map((session) => session?.trainingMeta?.score || session?.result?.score || 0)),
         maxCombo: Math.max(...raidSessions.map((session) => session?.trainingMeta?.maxCombo || 0)),
-        highestThreatLevel: Math.max(...raidSessions.map((session) => session?.trainingMeta?.threatLevel || session?.trainingMeta?.wave || 0)),
+        highestThreatLevel: Math.max(...raidSessions.map((session) => session?.trainingMeta?.riftLayer || session?.trainingMeta?.threatLevel || session?.trainingMeta?.wave || 0)),
         longestDurationSeconds: Math.max(...raidSessions.map((session) => session?.trainingMeta?.durationSeconds || session?.result?.durationSeconds || 0)),
         extractionRate: Math.round((extractCount / raidSessions.length) * 100),
         perfectWaves: raidSessions.reduce((sum, session) => sum + Number(session?.trainingMeta?.perfectWaves || 0), 0),

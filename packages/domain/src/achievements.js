@@ -61,29 +61,29 @@ export function buildAchievements({
         },
         {
             id: 'first-raid',
-            title: 'First Raid',
-            description: 'Finish your first Endless Raid run.',
+            title: 'First Rift',
+            description: 'Finish your first Arcade Rift run.',
             unlockedAt: firstMatchDate(safeSessions, (session) => session?.trainingMeta?.type === 'raid')
         },
         {
             id: 'combo-20',
             title: 'Combo Master',
-            description: 'Reach a 20-combo streak in Typing Raid.',
+            description: 'Reach a 20-combo streak in Arcade Rift.',
             unlockedAt: firstMatchDate(safeSessions, (session) => session?.trainingMeta?.type === 'raid' && (session?.trainingMeta?.maxCombo || 0) >= 20)
         },
         {
             id: 'wave-10',
-            title: 'Threat Survivor',
-            description: 'Survive to Threat Level 10 in Endless Raid.',
+            title: 'Rift Survivor',
+            description: 'Survive to Rift Layer 10 in Arcade Rift.',
             unlockedAt: firstMatchDate(safeSessions, (session) => (
                 session?.trainingMeta?.type === 'raid'
-                && (session?.trainingMeta?.threatLevel || session?.trainingMeta?.wave || 0) >= 10
+                && (session?.trainingMeta?.riftLayer || session?.trainingMeta?.threatLevel || session?.trainingMeta?.wave || 0) >= 10
             ))
         },
         {
             id: 'raid-perfect',
             title: 'Clean Extraction',
-            description: 'Extract from Endless Raid with lives remaining.',
+            description: 'Extract from Arcade Rift with lives remaining.',
             unlockedAt: firstMatchDate(safeSessions, (session) => (
                 session?.trainingMeta?.type === 'raid'
                 && (
@@ -95,8 +95,8 @@ export function buildAchievements({
         },
         {
             id: 'raid-1000',
-            title: 'Raid Commander',
-            description: 'Score 1000+ points in a single Typing Raid game.',
+            title: 'Rift Commander',
+            description: 'Score 1000+ points in a single Arcade Rift run.',
             unlockedAt: firstMatchDate(safeSessions, (session) => session?.trainingMeta?.type === 'raid' && (session?.result?.score || 0) >= 1000)
         }
     ];

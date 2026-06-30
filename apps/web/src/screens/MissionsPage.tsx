@@ -94,7 +94,7 @@ export function MissionsPage() {
                     <div className="home-starter-hero__actions">
                         <button type="button" className="action-btn primary" onClick={startRaid}>
                             <Swords aria-hidden="true" size={17} strokeWidth={2.25} />
-                            回到无尽突袭
+                            回到 Arcade Rift
                         </button>
                     </div>
                 </div>

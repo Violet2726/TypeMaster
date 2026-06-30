@@ -1,4 +1,4 @@
-type MonsterType = 'nib' | 'mossback' | 'blink' | 'echo' | 'glyph' | 'bloom' | 'guardian';
+type MonsterType = 'nib' | 'mossback' | 'blink' | 'echo' | 'glyph' | 'bloom' | 'splitter' | 'scribe' | 'mimic' | 'anchor' | 'choir' | 'guardian';
 
 type RaidEnemyView = {
     id: string;
@@ -32,6 +32,11 @@ const MONSTER_COLORS: Record<MonsterType, string> = {
     echo: '#ffd60a',
     glyph: '#ff9f0a',
     bloom: '#7ee198',
+    splitter: '#5ac8fa',
+    scribe: '#ffb86b',
+    mimic: '#a6f0ff',
+    anchor: '#8e8e93',
+    choir: '#f6d365',
     guardian: '#ff453a'
 };
 
@@ -42,6 +47,11 @@ const MONSTER_RADIUS: Record<MonsterType, number> = {
     echo: 23,
     glyph: 22,
     bloom: 24,
+    splitter: 20,
+    scribe: 24,
+    mimic: 22,
+    anchor: 31,
+    choir: 23,
     guardian: 42
 };
 
@@ -312,6 +322,16 @@ export class MonsterRaidRenderer {
             this.pathGlyph(ctx, radius);
         } else if (enemy.type === 'bloom') {
             this.pathBloom(ctx, radius);
+        } else if (enemy.type === 'splitter') {
+            this.pathSplitter(ctx, radius);
+        } else if (enemy.type === 'scribe') {
+            this.pathScribe(ctx, radius);
+        } else if (enemy.type === 'mimic') {
+            this.pathMimic(ctx, radius);
+        } else if (enemy.type === 'anchor') {
+            this.pathAnchor(ctx, radius);
+        } else if (enemy.type === 'choir') {
+            this.pathChoir(ctx, radius);
         } else {
             this.pathGuardian(ctx, radius);
         }
@@ -459,6 +479,58 @@ export class MonsterRaidRenderer {
         }
         ctx.moveTo(radius * 0.6, 0);
         ctx.arc(0, 0, radius * 0.62, 0, Math.PI * 2);
+    }
+
+    private pathSplitter(ctx: CanvasRenderingContext2D, radius: number) {
+        ctx.beginPath();
+        ctx.moveTo(0, -radius * 1.15);
+        ctx.lineTo(radius * 0.95, -radius * 0.3);
+        ctx.lineTo(radius * 0.42, radius * 0.12);
+        ctx.lineTo(radius * 0.82, radius * 0.96);
+        ctx.lineTo(0, radius * 0.55);
+        ctx.lineTo(-radius * 0.82, radius * 0.96);
+        ctx.lineTo(-radius * 0.42, radius * 0.12);
+        ctx.lineTo(-radius * 0.95, -radius * 0.3);
+        ctx.closePath();
+    }
+
+    private pathScribe(ctx: CanvasRenderingContext2D, radius: number) {
+        ctx.beginPath();
+        ctx.roundRect(-radius * 0.78, -radius * 1.08, radius * 1.56, radius * 2.16, radius * 0.28);
+        ctx.moveTo(-radius * 0.48, -radius * 0.64);
+        ctx.lineTo(radius * 0.48, -radius * 0.64);
+        ctx.moveTo(-radius * 0.48, 0);
+        ctx.lineTo(radius * 0.34, 0);
+        ctx.moveTo(-radius * 0.48, radius * 0.52);
+        ctx.lineTo(radius * 0.48, radius * 0.52);
+    }
+
+    private pathMimic(ctx: CanvasRenderingContext2D, radius: number) {
+        ctx.beginPath();
+        ctx.arc(0, 0, radius, 0, Math.PI * 2);
+        ctx.moveTo(-radius * 0.74, -radius * 0.55);
+        ctx.quadraticCurveTo(0, -radius * 1.42, radius * 0.74, -radius * 0.55);
+        ctx.moveTo(-radius * 0.74, radius * 0.55);
+        ctx.quadraticCurveTo(0, radius * 1.42, radius * 0.74, radius * 0.55);
+    }
+
+    private pathAnchor(ctx: CanvasRenderingContext2D, radius: number) {
+        ctx.beginPath();
+        ctx.arc(0, -radius * 0.14, radius * 0.78, 0, Math.PI * 2);
+        ctx.moveTo(0, radius * 0.36);
+        ctx.lineTo(0, radius * 1.18);
+        ctx.moveTo(-radius * 0.78, radius * 0.62);
+        ctx.quadraticCurveTo(-radius * 0.58, radius * 1.18, 0, radius * 1.18);
+        ctx.moveTo(radius * 0.78, radius * 0.62);
+        ctx.quadraticCurveTo(radius * 0.58, radius * 1.18, 0, radius * 1.18);
+    }
+
+    private pathChoir(ctx: CanvasRenderingContext2D, radius: number) {
+        ctx.beginPath();
+        ctx.arc(-radius * 0.45, 0, radius * 0.62, 0, Math.PI * 2);
+        ctx.arc(radius * 0.45, 0, radius * 0.62, 0, Math.PI * 2);
+        ctx.moveTo(-radius * 0.05, -radius * 0.92);
+        ctx.arc(0, -radius * 0.42, radius * 0.58, 0, Math.PI * 2);
     }
 
     private pathGuardian(ctx: CanvasRenderingContext2D, radius: number) {

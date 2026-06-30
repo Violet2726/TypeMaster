@@ -30,8 +30,8 @@ describe('HomePage', () => {
             }
         });
 
-        expect(await screen.findByRole('heading', { name: '无尽突袭指挥台' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: '开始无尽突袭' })).toBeInTheDocument();
+        expect(await screen.findByRole('heading', { name: 'Arcade Rift 指挥台' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: '开始 Arcade Rift' })).toBeInTheDocument();
         expect(screen.getByText('无历史迁移，vNext 会从第一局重新建立画像。')).toBeInTheDocument();
         expect(screen.queryByRole('button', { name: /Start assessment/i })).not.toBeInTheDocument();
     });
@@ -46,12 +46,12 @@ describe('HomePage', () => {
             }
         });
 
-        fireEvent.click(await screen.findByRole('button', { name: '开始无尽突袭' }));
+        fireEvent.click(await screen.findByRole('button', { name: '开始 Arcade Rift' }));
 
         await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith('/raid'));
     });
 
-    test('renders the latest v6 Raid feedback when evidence exists', async () => {
+    test('renders the latest v6 Arcade Rift feedback when evidence exists', async () => {
         renderWithProvider(<HomePage />, {
             storageState: {
                 'typemaster:v6:settings': {
@@ -62,12 +62,13 @@ describe('HomePage', () => {
                     {
                         id: 'raid-1',
                         kind: 'raid',
-                        intent: 'endless-raid',
+                        intent: 'endless-rift',
                         completedAt: '2026-06-08T08:00:00.000Z',
                         durationSeconds: 420,
                         source: 'raid',
                         focus: 'accuracy',
                         gameMeta: {
+                            riftLayer: 6,
                             threatLevel: 6,
                             endReason: 'extract',
                             weakestChars: ['t']
@@ -83,8 +84,9 @@ describe('HomePage', () => {
                         trainingMeta: {
                             type: 'raid',
                             surface: 'raid',
-                            intent: 'endless-raid',
-                            title: 'Endless Raid',
+                            intent: 'endless-rift',
+                            title: 'Arcade Rift',
+                            riftLayer: 6,
                             threatLevel: 6,
                             endReason: 'extract'
                         }

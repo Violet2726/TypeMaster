@@ -516,7 +516,7 @@ export function buildSkillProfile(sessions, languageOrOptions = 'zh-CN') {
             .map((session) => session?.trainingMeta?.maxCombo || 0)),
         raidHighestThreatLevel: Math.max(0, ...safeSessions
             .filter((session) => resolveSessionSurface(session) === 'raid')
-            .map((session) => session?.trainingMeta?.threatLevel || session?.trainingMeta?.wave || 0)),
+            .map((session) => session?.trainingMeta?.riftLayer || session?.trainingMeta?.threatLevel || session?.trainingMeta?.wave || 0)),
         raidLongestDurationSeconds: Math.max(0, ...safeSessions
             .filter((session) => resolveSessionSurface(session) === 'raid')
             .map((session) => session?.trainingMeta?.durationSeconds || session?.result?.durationSeconds || 0))

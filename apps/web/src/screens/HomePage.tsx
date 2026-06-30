@@ -99,19 +99,19 @@ export function HomePage() {
                         <Swords aria-hidden="true" size={15} strokeWidth={2.2} />
                         Arcade Coach
                     </span>
-                    <h1>无尽突袭指挥台</h1>
+                    <h1>Arcade Rift 指挥台</h1>
                     <p className="hero-body">
-                        先进入无尽突袭，用真实压力暴露弱区；结算后再用 Focus Lab 和 Missions 修复下一局表现。
+                        先进入发光裂隙，用纯街机压力打出构筑；结算后再回看图鉴、弱区和下一局路线。
                     </p>
                     <div className="home-starter-hero__actions">
                         <button
                             type="button"
                             className="action-btn primary"
-                            aria-label="开始无尽突袭"
+                            aria-label="开始 Arcade Rift"
                             onClick={() => navigate('/raid')}
                         >
                             <Swords aria-hidden="true" size={17} strokeWidth={2.25} />
-                            开始无尽突袭
+                            开始 Arcade Rift
                         </button>
                         <button type="button" className="action-btn" onClick={() => navigate('/missions')}>
                             <Trophy aria-hidden="true" size={17} strokeWidth={2.25} />
@@ -131,7 +131,7 @@ export function HomePage() {
                 <HomeQuickCard
                     icon={Swords}
                     kicker="Primary"
-                    label="Endless Raid"
+                    label="Arcade Rift"
                     description="输入怪物词，守住裂隙，在营门选择撤离或继续挑战。"
                     tone="primary"
                     onClick={() => navigate('/raid')}
@@ -172,7 +172,7 @@ export function HomePage() {
                                 <Swords size={16} strokeWidth={2.2} />
                             </span>
                             <div className="home-recent-item__body">
-                                <strong>{latestRaid.trainingMeta?.title || 'Endless Raid'}</strong>
+                                <strong>{latestRaid.trainingMeta?.title || 'Arcade Rift'}</strong>
                                 <p>{formatDateTime(latestRaid.completedAt || latestRaid.result?.completedAt, language)}</p>
                             </div>
                             <div className="home-recent-item__metrics">

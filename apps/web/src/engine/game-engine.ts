@@ -7,8 +7,8 @@ import {
 } from '@typemaster/domain';
 
 export type RaidPhase = 'idle' | 'playing' | 'paused' | 'gameover';
-export type RaidMode = 'endless' | 'daily-focus';
-export type RaidCommand = 'start' | 'pause' | 'resume' | 'retry' | 'quit' | 'extract' | 'type-char';
+export type RaidMode = 'endless-rift' | 'daily-mutation' | 'first-breach';
+export type RaidCommand = 'start' | 'pause' | 'resume' | 'retry' | 'quit' | 'extract' | 'type-char' | 'choose-relic';
 
 export interface RaidEngineOptions {
     language?: string;
@@ -48,8 +48,8 @@ export function createGameEngine(options: RaidEngineOptions = {}): GameEngine {
     let height = 600;
     let engineOptions: RaidEngineOptions = {
         language: 'zh-CN',
-        raidMode: 'endless',
-        seed: `raid-${todaySeed()}`,
+        raidMode: 'endless-rift',
+        seed: `rift-${todaySeed()}`,
         focusChars: [],
         ...options
     };
@@ -66,11 +66,13 @@ export function createGameEngine(options: RaidEngineOptions = {}): GameEngine {
             engineOptions = {
                 ...engineOptions,
                 ...payload,
-                raidMode: (payload.raidMode as RaidMode) || engineOptions.raidMode || 'endless',
+                raidMode: (payload.raidMode as RaidMode) || engineOptions.raidMode || 'endless-rift',
                 seed: (payload.seed as string) || (
-                    payload.raidMode === 'daily-focus'
+                    payload.raidMode === 'daily-mutation'
                         ? `daily-${todaySeed()}`
-                        : `endless-${Date.now().toString(36)}`
+                        : payload.raidMode === 'first-breach'
+                            ? `first-breach-${todaySeed()}`
+                            : `rift-${Date.now().toString(36)}`
                 )
             };
         }
@@ -105,7 +107,13 @@ export function createGameEngine(options: RaidEngineOptions = {}): GameEngine {
 
         if (key === 'Enter' && state.phase === 'idle') {
             event.preventDefault();
-            return dispatch('start', { raidMode: 'endless' });
+            return dispatch('start', { raidMode: 'endless-rift' });
+        }
+
+        if (/^[123]$/.test(key) && state.phase === 'playing' && state.relicChoices?.length) {
+            event.preventDefault();
+            const index = Number(key) - 1;
+            return dispatch('choose-relic', { relicId: state.relicChoices[index]?.id });
         }
 
         if ((key === 'r' || key === 'R') && state.phase === 'gameover') {

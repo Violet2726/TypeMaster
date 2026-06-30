@@ -5,6 +5,7 @@ import './overlays.css';
 
 interface PauseStats {
   score: number;
+  riftLayer?: number;
   threatLevel: number;
   combo: number;
   lives: number;
@@ -12,6 +13,7 @@ interface PauseStats {
   wpm: number;
   elapsedSeconds: number;
   extractAvailable: boolean;
+  nextExtractRiftLayer?: number;
   nextExtractThreatLevel?: number;
 }
 
@@ -27,27 +29,30 @@ function formatDuration(seconds = 0) {
 }
 
 export default function PauseMenuOverlay({ stats, onAction }: PauseMenuOverlayProps) {
+  const layer = stats.riftLayer || stats.threatLevel || 1;
+  const nextGate = stats.nextExtractRiftLayer || stats.nextExtractThreatLevel || 3;
+
   return (
-    <div className="raid-overlay" role="dialog" aria-modal="true" aria-label="无尽突袭已暂停">
+    <div className="raid-overlay" role="dialog" aria-modal="true" aria-label="Arcade Rift 已暂停">
       <section className="raid-panel raid-panel--pause">
         <div className="raid-panel__heading">
-          <span>{stats.extractAvailable ? '营门已开启' : '已暂停'}</span>
-          <h2>无尽突袭</h2>
+          <span>{stats.extractAvailable ? '撤离门已开启' : '已暂停'}</span>
+          <h2>Arcade Rift</h2>
           <p>
             {stats.extractAvailable
-              ? '现在撤离会保存本局成绩，也可以继续挑战更高威胁。'
-              : `下一个营门在威胁 ${stats.nextExtractThreatLevel || 3} 开启。`}
+              ? '现在撤离会保存本局构筑和分数；继续挑战会进入更高裂隙层。'
+              : `下一道撤离门会在裂隙 ${nextGate} 开启。`}
           </p>
         </div>
 
-        <div className="raid-pause-summary" aria-label="当前突袭数据">
+        <div className="raid-pause-summary" aria-label="当前 Arcade Rift 数据">
           <div>
-            <span>得分</span>
+            <span>分数</span>
             <strong>{Math.round(stats.score).toLocaleString()}</strong>
           </div>
           <div>
-            <span>威胁</span>
-            <strong>{stats.threatLevel}</strong>
+            <span>裂隙</span>
+            <strong>{layer}</strong>
           </div>
           <div>
             <span>连击</span>
@@ -79,7 +84,7 @@ export default function PauseMenuOverlay({ stats, onAction }: PauseMenuOverlayPr
             disabled={!stats.extractAvailable}
           >
             <DoorOpen aria-hidden="true" size={18} strokeWidth={2.2} />
-            撤离并结算
+            撤离结算
           </button>
           <button className="raid-action" type="button" onClick={() => onAction('retry')}>
             <RotateCcw aria-hidden="true" size={18} strokeWidth={2.2} />

@@ -117,6 +117,11 @@
     white-space: nowrap;
 }
 
+.raid-hud__target mark {
+    color: #64d2ff;
+    background: transparent;
+}
+
 .raid-hud__lives {
     display: inline-flex;
     align-items: center;
@@ -149,6 +154,10 @@
     -webkit-backdrop-filter: blur(18px) saturate(130%);
 }
 
+.raid-overlay--soft {
+    background: rgba(5, 7, 12, 0.36);
+}
+
 .raid-panel {
     width: min(100%, 430px);
     max-height: min(760px, calc(100vh - 48px));
@@ -168,12 +177,31 @@
     padding: 24px;
 }
 
+.raid-panel--relic {
+    width: min(100%, 760px);
+    padding: 24px;
+}
+
+.raid-panel--codex {
+    width: min(100%, 780px);
+    padding: 24px;
+}
+
 .raid-panel__heading {
     display: flex;
     flex-direction: column;
     gap: 4px;
     margin-bottom: 20px;
     text-align: center;
+}
+
+.raid-panel__heading--row {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    text-align: left;
 }
 
 .raid-panel__heading span,
@@ -318,6 +346,175 @@
     margin-top: 20px;
 }
 
+.raid-relic-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.raid-relic-card {
+    position: relative;
+    display: flex;
+    min-height: 190px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 16px;
+    border: 1px solid var(--tm-white-alpha-120);
+    border-radius: 8px;
+    background: var(--bg-soft);
+    color: #ffffff;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+}
+
+.raid-relic-card:hover,
+.raid-relic-card:focus-visible {
+    border-color: rgba(100, 210, 255, 0.5);
+    background: rgba(100, 210, 255, 0.11);
+    outline: none;
+}
+
+.raid-relic-card--rare {
+    border-color: rgba(191, 140, 255, 0.32);
+}
+
+.raid-relic-card--epic,
+.raid-relic-card--legendary {
+    border-color: rgba(255, 214, 10, 0.36);
+}
+
+.raid-relic-card__index {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: var(--tm-white-alpha-420);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.raid-relic-card strong {
+    font-size: 18px;
+    line-height: 1.15;
+}
+
+.raid-relic-card small,
+.raid-relic-card span:last-child {
+    color: var(--tm-white-alpha-560);
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.raid-result-section {
+    margin-top: 10px;
+    padding: 14px;
+    border: 1px solid var(--tm-white-alpha-090);
+    border-radius: 8px;
+    background: var(--tm-white-alpha-045);
+}
+
+.raid-result-section > span,
+.raid-result-section small {
+    display: block;
+    color: var(--tm-white-alpha-460);
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.raid-result-section--inline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.raid-relic-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 8px;
+}
+
+.raid-relic-pills b {
+    display: inline-flex;
+    min-height: 28px;
+    align-items: center;
+    padding: 0 9px;
+    border-radius: 8px;
+    background: rgba(100, 210, 255, 0.12);
+    color: #ffffff;
+    font-size: 12px;
+}
+
+.raid-icon-action {
+    display: inline-flex;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--tm-white-alpha-120);
+    border-radius: 8px;
+    background: var(--tm-white-alpha-060);
+    color: var(--tm-white-alpha-760);
+    cursor: pointer;
+}
+
+.raid-icon-action:hover,
+.raid-icon-action:focus-visible {
+    border-color: var(--tm-white-alpha-240);
+    background: var(--tm-white-alpha-100);
+    outline: none;
+}
+
+.raid-codex-section + .raid-codex-section {
+    margin-top: 18px;
+}
+
+.raid-codex-section h3 {
+    margin: 0 0 8px;
+    color: #ffffff;
+    font-size: 15px;
+}
+
+.raid-codex-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.raid-codex-entry {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px 8px;
+    min-height: 72px;
+    padding: 12px;
+    border: 1px solid var(--tm-white-alpha-080);
+    border-radius: 8px;
+    background: var(--bg-soft);
+    color: var(--tm-white-alpha-520);
+}
+
+.raid-codex-entry.is-open {
+    border-color: var(--tm-white-alpha-140);
+    color: #ffffff;
+    background: rgba(100, 210, 255, 0.07);
+}
+
+.raid-codex-entry span {
+    grid-row: 1 / span 2;
+}
+
+.raid-codex-entry strong {
+    font-size: 13px;
+}
+
+.raid-codex-entry small {
+    color: var(--tm-white-alpha-520);
+    font-size: 11px;
+    line-height: 1.35;
+}
+
 .raid-action {
     display: inline-flex;
     flex: 1;
@@ -423,7 +620,9 @@
     }
 
     .raid-result-grid,
-    .raid-pause-summary {
+    .raid-pause-summary,
+    .raid-relic-grid,
+    .raid-codex-list {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
@@ -450,5 +649,10 @@
 
     .raid-actions {
         flex-direction: column;
+    }
+
+    .raid-relic-grid,
+    .raid-codex-list {
+        grid-template-columns: 1fr;
     }
 }

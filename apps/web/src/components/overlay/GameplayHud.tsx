@@ -1,10 +1,11 @@
 'use client';
 
-import { Activity, DoorOpen, Heart, ShieldAlert, Target, Timer, Zap } from 'lucide-react';
+import { Activity, DoorOpen, Heart, ShieldAlert, Sparkles, Target, Timer, Zap } from 'lucide-react';
 import './overlays.css';
 
 interface HudData {
   score: number;
+  riftLayer?: number;
   threatLevel: number;
   combo: number;
   streakTier: number;
@@ -13,14 +14,19 @@ interface HudData {
   accuracy: number;
   wpm: number;
   targetWord: string;
+  targetTyped?: string;
   progress: number;
   elapsedSeconds: number;
   extractAvailable: boolean;
+  nextExtractRiftLayer?: number;
   nextExtractThreatLevel?: number;
+  relicCount?: number;
+  mutation?: { nameZh?: string; name?: string } | null;
 }
 
 interface GameplayHudProps {
   data: HudData;
+  activeRelics?: Array<{ id: string; nameZh?: string; name?: string; stack?: number }>;
 }
 
 function formatDuration(seconds = 0) {
@@ -29,12 +35,14 @@ function formatDuration(seconds = 0) {
   return `${minutes}:${String(rest).padStart(2, '0')}`;
 }
 
-export default function GameplayHud({ data }: GameplayHudProps) {
+export default function GameplayHud({ data, activeRelics = [] }: GameplayHudProps) {
   const progress = `${Math.round((data.progress || 0) * 100)}%`;
-  const extractText = data.extractAvailable ? '可撤离' : `营门 ${data.nextExtractThreatLevel || 3}`;
+  const riftLayer = data.riftLayer || data.threatLevel || 1;
+  const extractText = data.extractAvailable ? '可撤离' : `撤离门 ${data.nextExtractRiftLayer || data.nextExtractThreatLevel || 3}`;
+  const topRelic = activeRelics[activeRelics.length - 1];
 
   return (
-    <header className="raid-hud" aria-label="Raid 状态">
+    <header className="raid-hud" aria-label="Arcade Rift 状态">
       <div className="raid-hud__cluster raid-hud__cluster--primary">
         <div className="raid-hud__metric raid-hud__metric--score">
           <Activity aria-hidden="true" size={16} strokeWidth={2.2} />
@@ -42,7 +50,7 @@ export default function GameplayHud({ data }: GameplayHudProps) {
         </div>
         <div className="raid-hud__metric">
           <ShieldAlert aria-hidden="true" size={16} strokeWidth={2.2} />
-          <span>威胁 {data.threatLevel}</span>
+          <span>裂隙 {riftLayer}</span>
         </div>
         <div className="raid-hud__progress" aria-hidden="true">
           <span style={{ width: progress }} />
@@ -51,7 +59,10 @@ export default function GameplayHud({ data }: GameplayHudProps) {
 
       <div className="raid-hud__target" aria-label={`当前目标 ${data.targetWord || '无'}`}>
         <span>目标</span>
-        <strong>{data.targetWord || '...'}</strong>
+        <strong>
+          {data.targetTyped ? <mark>{data.targetTyped}</mark> : null}
+          {data.targetWord ? data.targetWord.slice((data.targetTyped || '').length) : '...'}
+        </strong>
       </div>
 
       <div className="raid-hud__cluster raid-hud__cluster--secondary">
@@ -72,6 +83,10 @@ export default function GameplayHud({ data }: GameplayHudProps) {
           <Target aria-hidden="true" size={16} strokeWidth={2.2} />
           <span>{data.wpm}</span>
           <small>WPM</small>
+        </div>
+        <div className="raid-hud__metric">
+          <Sparkles aria-hidden="true" size={16} strokeWidth={2.2} />
+          <span>{topRelic ? (topRelic.nameZh || topRelic.name) : `${data.relicCount || 0} relic`}</span>
         </div>
         <div className="raid-hud__metric">
           <span>{data.accuracy}%</span>

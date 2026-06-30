@@ -1,18 +1,17 @@
 /**
- * Typing Raid Endless Monsters pure gameplay model.
+ * Arcade Rift pure gameplay model.
  *
- * The domain layer owns deterministic monster generation, input matching,
- * threat-level difficulty, extraction, scoring, result building, and
- * presentation snapshots. It has no DOM, Canvas, audio, storage, or React
- * dependency.
+ * The domain owns deterministic monster generation, rift-layer pacing,
+ * relic choices, Guardian variants, codex progress, scoring, extraction,
+ * and snapshots. It has no DOM, Canvas, audio, storage, or React dependency.
  */
 
 import { commonWords } from './data/words.js';
 
-export const RAID_THREAT_INTERVAL_SECONDS = 60;
+export const RAID_THREAT_INTERVAL_SECONDS = 90;
 export const RAID_EXTRACT_INTERVAL = 3;
 export const RAID_GUARDIAN_INTERVAL = 5;
-export const RAID_MODES = ['endless', 'daily-focus'];
+export const RAID_MODES = ['endless-rift', 'daily-mutation', 'first-breach'];
 
 export const RAID_PHASES = {
     idle: 'idle',
@@ -21,26 +20,58 @@ export const RAID_PHASES = {
     gameover: 'gameover'
 };
 
+export const GUARDIAN_VARIANTS = {
+    lumenMaw: {
+        id: 'lumen-maw',
+        label: 'Lumen Maw',
+        labelZh: '流明巨口',
+        color: '#ff6b7a',
+        role: 'burst',
+        segments: ['flare', 'lumen', 'radiant'],
+        summary: '短促爆发，召唤快速小怪。'
+    },
+    inkCrown: {
+        id: 'ink-crown',
+        label: 'Ink Crown',
+        labelZh: '墨冠',
+        color: '#bf8cff',
+        role: 'confusion',
+        segments: ['trace', 'mirror', 'rewrite'],
+        summary: '制造相似词和干扰符号。'
+    },
+    glassWarden: {
+        id: 'glass-warden',
+        label: 'Glass Warden',
+        labelZh: '玻璃守卫',
+        color: '#64d2ff',
+        role: 'shield',
+        segments: ['guard', 'prism', 'shatter'],
+        summary: '护盾厚重，击破阶段奖励更高。'
+    }
+};
+
 export const MONSTER_TYPES = {
     nib: {
         id: 'nib',
         label: 'Nib',
         labelZh: '啃啃',
-        speedFactor: 1.36,
+        speedFactor: 1.38,
         scoreMultiplier: 1.05,
         color: '#64d2ff',
         wordRange: [2, 5],
-        role: 'swift'
+        role: 'swift',
+        codexHint: '短词高速推进，优先清理。'
     },
     mossback: {
         id: 'mossback',
         label: 'Mossback',
         labelZh: '苔背',
         speedFactor: 0.68,
-        scoreMultiplier: 1.7,
+        scoreMultiplier: 1.65,
         color: '#34c759',
         wordRange: [4, 8],
-        role: 'armored'
+        role: 'armored',
+        codexHint: '双段护壳，考验稳定输入。'
     },
     blink: {
         id: 'blink',
@@ -50,7 +81,8 @@ export const MONSTER_TYPES = {
         scoreMultiplier: 1.25,
         color: '#bf8cff',
         wordRange: [3, 6],
-        role: 'switch'
+        role: 'switch',
+        codexHint: '未输入前会换轨，锁定后保持位置。'
     },
     echo: {
         id: 'echo',
@@ -60,7 +92,8 @@ export const MONSTER_TYPES = {
         scoreMultiplier: 1.35,
         color: '#ffd60a',
         wordRange: [4, 7],
-        role: 'confuser'
+        role: 'confuser',
+        codexHint: '携带易混词根，容易诱发误击。'
     },
     glyph: {
         id: 'glyph',
@@ -70,126 +103,190 @@ export const MONSTER_TYPES = {
         scoreMultiplier: 1.5,
         color: '#ff9f0a',
         wordRange: [2, 8],
-        role: 'focus'
+        role: 'symbol',
+        codexHint: '数字、标点和弱字符特训。'
     },
     bloom: {
         id: 'bloom',
         label: 'Bloom',
-        labelZh: '芽芽',
+        labelZh: '芽团',
         speedFactor: 0.58,
         scoreMultiplier: 1.8,
         color: '#7ee198',
         wordRange: [4, 7],
-        role: 'support'
+        role: 'support',
+        codexHint: '给附近怪物护盾，尽早击杀。'
+    },
+    splitter: {
+        id: 'splitter',
+        label: 'Splitter',
+        labelZh: '裂片',
+        speedFactor: 1.02,
+        scoreMultiplier: 1.42,
+        color: '#5ac8fa',
+        wordRange: [4, 7],
+        role: 'swarm',
+        codexHint: '击杀后分裂成字符碎片。'
+    },
+    scribe: {
+        id: 'scribe',
+        label: 'Scribe',
+        labelZh: '刻写者',
+        speedFactor: 0.82,
+        scoreMultiplier: 1.58,
+        color: '#ffb86b',
+        wordRange: [5, 9],
+        role: 'disrupt',
+        codexHint: '会把干扰字符写进目标。'
+    },
+    mimic: {
+        id: 'mimic',
+        label: 'Mimic',
+        labelZh: '拟形',
+        speedFactor: 0.96,
+        scoreMultiplier: 1.5,
+        color: '#a6f0ff',
+        wordRange: [3, 8],
+        role: 'memory',
+        codexHint: '复制上一只被击败怪物的词。'
+    },
+    anchor: {
+        id: 'anchor',
+        label: 'Anchor',
+        labelZh: '锚兽',
+        speedFactor: 0.52,
+        scoreMultiplier: 2.05,
+        color: '#8e8e93',
+        wordRange: [6, 10],
+        role: 'gate',
+        codexHint: '拖慢撤离门进度，血厚但分高。'
+    },
+    choir: {
+        id: 'choir',
+        label: 'Choir',
+        labelZh: '合唱群',
+        speedFactor: 0.9,
+        scoreMultiplier: 1.75,
+        color: '#f6d365',
+        wordRange: [4, 7],
+        role: 'sync',
+        codexHint: '同屏越多，整体推进越快。'
     },
     guardian: {
         id: 'guardian',
         label: 'Guardian Variant',
         labelZh: '守门变体',
-        speedFactor: 0.34,
-        scoreMultiplier: 4.4,
+        speedFactor: 0.32,
+        scoreMultiplier: 5.2,
         color: '#ff453a',
         wordRange: [5, 11],
-        role: 'elite'
+        role: 'elite',
+        codexHint: '三阶段精英，击破后提供高额奖励。'
     }
 };
 
 export const ENEMY_TYPES = MONSTER_TYPES;
 
+export const RAID_RELICS = [
+    { id: 'combo-core', name: 'Combo Core', nameZh: '连击核心', rarity: 'common', summary: '连击分数 +12%。', effect: { comboScore: 0.12 } },
+    { id: 'rift-spark', name: 'Rift Spark', nameZh: '裂隙火花', rarity: 'common', summary: '击杀分数 +10%。', effect: { scoreMultiplier: 0.1 } },
+    { id: 'stasis-thread', name: 'Stasis Thread', nameZh: '迟滞丝线', rarity: 'common', summary: '怪物速度 -7%。', effect: { slow: 0.07 } },
+    { id: 'glyph-lens', name: 'Glyph Lens', nameZh: '符文透镜', rarity: 'common', summary: '符文怪分数 +35%。', effect: { glyphBonus: 0.35 } },
+    { id: 'aegis-key', name: 'Aegis Key', nameZh: '护盾键', rarity: 'common', summary: '最大生命 +1。', effect: { maxLives: 1 } },
+    { id: 'clean-hit', name: 'Clean Hit', nameZh: '干净命中', rarity: 'common', summary: '准确率高于 96% 时分数 +14%。', effect: { accuracyScore: 0.14 } },
+    { id: 'split-control', name: 'Split Control', nameZh: '裂片约束', rarity: 'common', summary: '裂片怪分裂数量 -1。', effect: { splitControl: 1 } },
+    { id: 'door-credit', name: 'Door Credit', nameZh: '营门筹码', rarity: 'common', summary: '撤离分数 +20%。', effect: { extractScore: 0.2 } },
+    { id: 'starburst', name: 'Starburst', nameZh: '星爆', rarity: 'rare', summary: '击杀时溅射附近怪物。', effect: { blast: 1 } },
+    { id: 'piercing-note', name: 'Piercing Note', nameZh: '穿透音符', rarity: 'rare', summary: '每 6 次击杀额外清除一只低血怪。', effect: { pierceEvery: 6 } },
+    { id: 'guardian-mark', name: 'Guardian Mark', nameZh: '守门印记', rarity: 'rare', summary: 'Guardian 阶段分数 +30%。', effect: { guardianScore: 0.3 } },
+    { id: 'bloom-cutter', name: 'Bloom Cutter', nameZh: '芽团切刃', rarity: 'rare', summary: 'Bloom 护盾吸收后仍造成 40% 分数。', effect: { shieldScore: 0.4 } },
+    { id: 'error-buffer', name: 'Error Buffer', nameZh: '误击缓冲', rarity: 'rare', summary: '每层可抵消一次错误断连。', effect: { errorBuffer: 1 } },
+    { id: 'anchor-breaker', name: 'Anchor Breaker', nameZh: '断锚器', rarity: 'rare', summary: '锚兽生命 -1，最低为 1。', effect: { anchorBreak: 1 } },
+    { id: 'mimic-seal', name: 'Mimic Seal', nameZh: '拟形封印', rarity: 'rare', summary: 'Mimic 不再复制长词。', effect: { mimicCap: 5 } },
+    { id: 'choir-mute', name: 'Choir Mute', nameZh: '静默合唱', rarity: 'rare', summary: '合唱群同步加速减半。', effect: { choirMute: 1 } },
+    { id: 'lumen-heart', name: 'Lumen Heart', nameZh: '流明心脏', rarity: 'epic', summary: '每次选择 relic 回复 1 生命。', effect: { healOnRelic: 1 } },
+    { id: 'perfect-gate', name: 'Perfect Gate', nameZh: '完美营门', rarity: 'epic', summary: '无漏怪撤离时分数 +50%。', effect: { perfectExtract: 0.5 } },
+    { id: 'rift-engine', name: 'Rift Engine', nameZh: '裂隙引擎', rarity: 'epic', summary: '威胁越高，击杀分数越高。', effect: { threatScore: 0.025 } },
+    { id: 'glass-edge', name: 'Glass Edge', nameZh: '玻璃刃', rarity: 'epic', summary: 'Guardian 受击阶段额外掉落 relic。', effect: { guardianRelic: 1 } },
+    { id: 'calm-meter', name: 'Calm Meter', nameZh: '静稳仪', rarity: 'epic', summary: '低生命时生成压力降低。', effect: { panicRelief: 0.18 } },
+    { id: 'symbol-halo', name: 'Symbol Halo', nameZh: '符号光环', rarity: 'epic', summary: '数字与标点输入正确时连击 +1。', effect: { symbolCombo: 1 } },
+    { id: 'rift-crown', name: 'Rift Crown', nameZh: '裂隙王冠', rarity: 'legendary', summary: '所有分数 +20%，怪物速度 +6%。', effect: { scoreMultiplier: 0.2, haste: 0.06 } },
+    { id: 'last-stand', name: 'Last Stand', nameZh: '终线守势', rarity: 'legendary', summary: '首次生命归零时保留 1 点生命并清屏。', effect: { lastStand: 1 } }
+];
+
+export const RUN_MUTATIONS = [
+    { id: 'swift-nest', name: 'Swift Nest', nameZh: '迅巢', summary: 'Nib 与 Blink 更常见，击杀分数略高。', weights: { nib: 3, blink: 3 }, scoreMultiplier: 1.08 },
+    { id: 'glyph-storm', name: 'Glyph Storm', nameZh: '符文风暴', summary: 'Glyph 提前出现，数字与标点更多。', weights: { glyph: 5 }, glyphEarly: true },
+    { id: 'bloom-garden', name: 'Bloom Garden', nameZh: '芽团花园', summary: 'Bloom 更常见，护盾怪分数更高。', weights: { bloom: 4 }, shieldScore: 0.22 },
+    { id: 'mirror-choir', name: 'Mirror Choir', nameZh: '镜像合唱', summary: 'Echo、Mimic、Choir 更常见。', weights: { echo: 3, mimic: 3, choir: 2 } },
+    { id: 'heavy-rift', name: 'Heavy Rift', nameZh: '重压裂隙', summary: 'Mossback 与 Anchor 更常见，但撤离奖励更高。', weights: { mossback: 3, anchor: 3 }, extractScore: 0.25 },
+    { id: 'guardian-hour', name: 'Guardian Hour', nameZh: '守门时刻', summary: 'Guardian 分数更高，层级压力更快上升。', weights: {}, guardianScore: 0.4, pressureBonus: 0.08 }
+];
+
 const GAME_COPY = {
     'zh-CN': {
-        title: '无尽突袭',
-        subtitle: '在字符裂隙中清除怪物潮，稳定撤离或挑战更高威胁',
-        start: '开始无尽突袭',
-        dailyFocus: '每日聚焦',
-        pause: '暂停',
-        paused: '已暂停',
-        resume: '继续',
-        retry: '再来一局',
-        quit: '返回菜单',
-        extract: '撤离并结算',
-        extractReady: '营门已开启，可以撤离',
-        extractLocked: '下一个营门尚未开启',
-        gameOver: '突袭结束',
-        defeated: '生命耗尽',
-        extracted: '稳定撤离',
-        score: '得分',
-        threat: '威胁',
-        combo: '连击',
-        wpm: '速度',
-        accuracy: '准确率',
-        lives: '生命',
-        target: '目标',
-        insight: '训练洞察',
-        nextStep: '下一步建议',
-        focusChars: '重点字符',
-        threatUp: '威胁等级 {level}',
-        guardianIncoming: '守门变体进入裂隙',
-        miss: '未找到匹配目标',
+        title: 'Arcade Rift',
+        subtitle: '输入怪物词，收集 relic，在发光裂隙里撑到更高层。',
+        ready: '选择模式开始 Arcade Rift',
+        start: '开始无尽裂隙',
+        daily: '每日异变',
+        firstBreach: '首次破口',
+        paused: '裂隙已暂停',
+        extracted: '成功撤离',
+        defeated: '防线失守',
+        relicReady: '选择一个 relic',
+        threatUp: '裂隙层 {level}',
+        guardianIncoming: 'Guardian 进入裂隙',
+        extractReady: '撤离门开启',
+        extractLocked: '下一道撤离门尚未开启',
         error: '期望 {expected}',
-        shield: '护盾已破',
-        ready: '按 Enter 开始，输入怪物身上的词',
-        linePressure: '防线承压'
+        miss: '没有匹配目标',
+        shield: '护盾破裂',
+        codexUnlock: '图鉴更新',
+        linePressure: '安全线承压'
     },
     'en-US': {
-        title: 'Endless Raid',
-        subtitle: 'Clear monster waves in the character rift, extract safely, or push higher',
-        start: 'Start Endless Raid',
-        dailyFocus: 'Daily Focus',
-        pause: 'Pause',
-        paused: 'Paused',
-        resume: 'Resume',
-        retry: 'Play Again',
-        quit: 'Back to Menu',
-        extract: 'Extract and Save',
-        extractReady: 'Camp gate is open',
-        extractLocked: 'Next camp gate is not open yet',
-        gameOver: 'Raid Ended',
-        defeated: 'Lives depleted',
-        extracted: 'Stable extraction',
-        score: 'Score',
-        threat: 'Threat',
-        combo: 'Combo',
-        wpm: 'Speed',
-        accuracy: 'Accuracy',
-        lives: 'Lives',
-        target: 'Target',
-        insight: 'Training insight',
-        nextStep: 'Next step',
-        focusChars: 'Focus chars',
-        threatUp: 'Threat Level {level}',
-        guardianIncoming: 'Guardian variant entering the rift',
-        miss: 'No matching target',
+        title: 'Arcade Rift',
+        subtitle: 'Type monster words, collect relics, and survive deeper rift layers.',
+        ready: 'Choose a mode to start Arcade Rift',
+        start: 'Start Endless Rift',
+        daily: 'Daily Mutation',
+        firstBreach: 'First Breach',
+        paused: 'Rift paused',
+        extracted: 'Extraction complete',
+        defeated: 'Line breached',
+        relicReady: 'Choose a relic',
+        threatUp: 'Rift Layer {level}',
+        guardianIncoming: 'Guardian entering the rift',
+        extractReady: 'Extraction gate open',
+        extractLocked: 'Next extraction gate is still sealed',
         error: 'Expected {expected}',
+        miss: 'No matching target',
         shield: 'Shield broken',
-        ready: 'Press Enter to start, then type monster words',
-        linePressure: 'Line under pressure'
+        codexUnlock: 'Codex updated',
+        linePressure: 'Safe line under pressure'
     }
 };
 
-const GLYPH_WORDS = ['a1', 's2', 'd3', 'j7', 'k8', 'l9', 'api', 'ui', 'v2', 'x9', 'q4', 'z0'];
 const ECHO_PAIRS = [
     ['form', 'from'],
     ['trail', 'trial'],
     ['quiet', 'quite'],
     ['there', 'three'],
     ['angle', 'angel'],
-    ['react', 'trace']
+    ['react', 'trace'],
+    ['ratio', 'radio']
 ];
-const GUARDIAN_SEGMENTS = [
-    ['steady', 'vector', 'resolve'],
-    ['focus', 'rhythm', 'finish'],
-    ['signal', 'guardian', 'victory'],
-    ['calm', 'target', 'release']
-];
-const LANES = [0.12, 0.25, 0.38, 0.50, 0.62, 0.75, 0.88];
+const GLYPH_WORDS = ['a1', 's2', 'd3', 'j7', 'k8', 'l9', 'ui?', 'api!', 'v2', 'x9', 'q4', 'z0', 'run+', 'aim-'];
+const SCRIBE_SUFFIX = ['x', 'z', '7', '?', '!'];
+const LANES = [0.11, 0.24, 0.37, 0.50, 0.63, 0.76, 0.89];
 const SAFE_LINE_Y = 1.04;
 
 function hashSeed(seed) {
-    const text = String(seed || 'typing-raid');
+    const text = String(seed || 'arcade-rift');
     let hash = 2166136261;
-    for (let i = 0; i < text.length; i += 1) {
-        hash ^= text.charCodeAt(i);
+    for (let index = 0; index < text.length; index += 1) {
+        hash ^= text.charCodeAt(index);
         hash = Math.imul(hash, 16777619);
     }
     return hash >>> 0;
@@ -213,15 +310,44 @@ function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
 }
 
+function pick(rng, items) {
+    return items[Math.floor(rng() * items.length) % items.length];
+}
+
+function weightedPick(rng, weights) {
+    const entries = Object.entries(weights).filter(([, weight]) => weight > 0);
+    const total = entries.reduce((sum, [, weight]) => sum + weight, 0);
+    let roll = rng() * total;
+    for (const [id, weight] of entries) {
+        roll -= weight;
+        if (roll <= 0) return id;
+    }
+    return entries[0]?.[0] || 'nib';
+}
+
 function normalizeMode(mode) {
-    return RAID_MODES.includes(mode) ? mode : 'endless';
+    return RAID_MODES.includes(mode) ? mode : 'endless-rift';
 }
 
 function sanitizeWordPool(wordPool) {
-    const pool = Array.isArray(wordPool) && wordPool.length > 0 ? wordPool : commonWords;
-    return pool
+    const pool = Array.isArray(wordPool) && wordPool.length ? wordPool : commonWords;
+    const clean = pool
         .map((word) => String(word || '').trim().toLowerCase())
-        .filter((word) => /^[a-z0-9]+$/.test(word) && word.length > 1);
+        .filter((word) => /^[a-z0-9?!+\-]+$/.test(word) && word.length > 1);
+    return clean.length ? clean : ['go', 'cat', 'home', 'focus', 'trace', 'vector', 'steady'];
+}
+
+function todayKey() {
+    return new Date().toISOString().slice(0, 10);
+}
+
+export function getDailyMutation(dateKey = todayKey()) {
+    const rng = seededRandom(`daily-mutation-${dateKey}`);
+    return RUN_MUTATIONS[Math.floor(rng() * RUN_MUTATIONS.length) % RUN_MUTATIONS.length];
+}
+
+export function getGameCopy(language = 'zh-CN') {
+    return GAME_COPY[language] || GAME_COPY['en-US'];
 }
 
 function createEmptyCounters() {
@@ -232,7 +358,323 @@ function createEmptyCounters() {
         kills: 0,
         leaked: 0,
         eliteKills: 0,
-        shieldBreaks: 0
+        guardianPhases: 0,
+        shieldBreaks: 0,
+        relicChoices: 0
+    };
+}
+
+function getRiftLayer(elapsed) {
+    return Math.max(1, 1 + Math.floor(Math.max(0, elapsed) / RAID_THREAT_INTERVAL_SECONDS));
+}
+
+function getLayerProgress(elapsed) {
+    return (Math.max(0, elapsed) % RAID_THREAT_INTERVAL_SECONDS) / RAID_THREAT_INTERVAL_SECONDS;
+}
+
+function isExtractAvailable(layer) {
+    return layer > 1 && layer % RAID_EXTRACT_INTERVAL === 0;
+}
+
+function nextExtractLayer(layer) {
+    return layer + (RAID_EXTRACT_INTERVAL - (layer % RAID_EXTRACT_INTERVAL || RAID_EXTRACT_INTERVAL));
+}
+
+function getRelicStacks(relics) {
+    const stacks = {};
+    (relics || []).forEach((relic) => {
+        stacks[relic.id] = (stacks[relic.id] || 0) + 1;
+    });
+    return stacks;
+}
+
+export function getRelicEffects(relics = []) {
+    const effects = {};
+    relics.forEach((relic) => {
+        const definition = RAID_RELICS.find((item) => item.id === relic.id) || relic;
+        Object.entries(definition.effect || {}).forEach(([key, value]) => {
+            effects[key] = (effects[key] || 0) + Number(value || 0);
+        });
+    });
+    return effects;
+}
+
+function serializeRelics(relics = []) {
+    const stacks = getRelicStacks(relics);
+    return Object.entries(stacks).map(([id, stack]) => {
+        const definition = RAID_RELICS.find((item) => item.id === id);
+        return {
+            id,
+            stack,
+            name: definition?.name || id,
+            nameZh: definition?.nameZh || definition?.name || id,
+            rarity: definition?.rarity || 'common',
+            summary: definition?.summary || ''
+        };
+    });
+}
+
+export function calculateRaidPressure(state) {
+    const counters = state.counters || createEmptyCounters();
+    const typed = Math.max(1, counters.typed || 0);
+    const accuracy = (counters.correct || 0) / typed;
+    const lifeRatio = (state.lives || 0) / Math.max(1, state.maxLives || 5);
+    const comboScore = clamp((state.combo || 0) / 45, 0, 1);
+    const timeScore = clamp((state.elapsed || 0) / 900, 0, 1);
+    const mutationBonus = state.mutation?.pressureBonus || 0;
+    const relicRelief = getRelicEffects(state.relics).panicRelief || 0;
+    return clamp(0.18 + accuracy * 0.34 + lifeRatio * 0.15 + comboScore * 0.18 + timeScore * 0.12 + mutationBonus - (lifeRatio < 0.35 ? relicRelief : 0), 0.12, 0.98);
+}
+
+export function buildDifficultyProfile(riftLayer, pressureScore = 0.45, mutation = null, relics = []) {
+    const layer = Math.max(1, riftLayer);
+    const pressure = clamp(pressureScore, 0, 1);
+    const effects = getRelicEffects(relics);
+    const speedMultiplier = clamp(1 + (effects.haste || 0) - (effects.slow || 0), 0.62, 1.24);
+    return {
+        riftLayer: layer,
+        threatLevel: layer,
+        pressureScore: pressure,
+        baseSpeed: (0.025 + layer * 0.0025 + pressure * 0.006) * speedMultiplier,
+        spawnInterval: clamp(1.36 - layer * 0.04 - pressure * 0.18, 0.46, 1.32),
+        activeCap: clamp(4 + Math.floor(layer / 2), 4, 13),
+        wordBonus: layer >= 10 ? 3 : layer >= 6 ? 2 : layer >= 3 ? 1 : 0,
+        mutationId: mutation?.id || null
+    };
+}
+
+function buildMonsterWeights(stateLike) {
+    const layer = stateLike.riftLayer || stateLike.threatLevel || 1;
+    const mutation = stateLike.mutation || null;
+    const weights = {
+        nib: 4,
+        mossback: layer >= 1 ? 2 : 0,
+        blink: layer >= 2 ? 2 : 0,
+        bloom: layer >= 2 ? 1 : 0,
+        echo: layer >= 3 ? 2 : 0,
+        splitter: layer >= 3 ? 2 : 0,
+        glyph: layer >= 4 || mutation?.glyphEarly ? 2 : 0,
+        anchor: layer >= 4 ? 1 : 0,
+        scribe: layer >= 5 ? 2 : 0,
+        mimic: layer >= 5 ? 1 : 0,
+        choir: layer >= 6 ? 1 : 0
+    };
+    Object.entries(mutation?.weights || {}).forEach(([key, value]) => {
+        weights[key] = (weights[key] || 0) + Number(value || 0);
+    });
+    return weights;
+}
+
+function chooseGuardianVariant(seed, riftLayer) {
+    const variants = Object.values(GUARDIAN_VARIANTS);
+    const rng = seededRandom(seed, `guardian-${riftLayer}`);
+    return variants[Math.floor(rng() * variants.length) % variants.length];
+}
+
+function chooseNextMonsterType(stateLike) {
+    const layer = stateLike.riftLayer || stateLike.threatLevel || 1;
+    const spawnedGuardians = new Set(stateLike.spawnedGuardianLayers || stateLike.spawnedGuardianLevels || []);
+    if (layer >= RAID_GUARDIAN_INTERVAL && layer % RAID_GUARDIAN_INTERVAL === 0 && !spawnedGuardians.has(layer)) {
+        return 'guardian';
+    }
+    const rng = seededRandom(stateLike.seed, `type-${layer}-${stateLike.spawnIndex || 0}`);
+    return weightedPick(rng, buildMonsterWeights(stateLike));
+}
+
+function wordInRange(word, range, bonus = 0) {
+    const max = range[1] + bonus;
+    return word.length >= range[0] && word.length <= max;
+}
+
+function choosePoolWord({ rng, pool, range, bonus = 0 }) {
+    const candidates = pool.filter((word) => wordInRange(word, range, bonus));
+    return pick(rng, candidates.length ? candidates : pool);
+}
+
+function chooseMonsterWord(options) {
+    const { type, seed, spawnIndex, riftLayer, focusChars, wordPool, difficultyProfile, lastDefeatedWord, mutation } = options;
+    const definition = MONSTER_TYPES[type] || MONSTER_TYPES.nib;
+    const rng = seededRandom(seed, `word-${type}-${riftLayer}-${spawnIndex}`);
+    const bonus = difficultyProfile?.wordBonus || 0;
+
+    if (type === 'echo') {
+        const pair = pick(rng, ECHO_PAIRS);
+        return pick(rng, pair);
+    }
+
+    if (type === 'glyph') {
+        const focus = Array.isArray(focusChars) && focusChars.length ? focusChars : ['a', 's', 'd', 'j', 'k', 'l'];
+        const glyph = pick(rng, GLYPH_WORDS);
+        return rng() > 0.45 ? glyph : `${pick(rng, focus)}${Math.floor(rng() * 10)}`;
+    }
+
+    if (type === 'scribe') {
+        const base = choosePoolWord({ rng, pool: wordPool, range: definition.wordRange, bonus });
+        return `${base}${pick(rng, SCRIBE_SUFFIX)}`;
+    }
+
+    if (type === 'mimic' && lastDefeatedWord) {
+        const effects = getRelicEffects(options.relics || []);
+        const cap = effects.mimicCap || Infinity;
+        return String(lastDefeatedWord).slice(0, cap);
+    }
+
+    if (type === 'guardian') {
+        const variant = options.guardianVariant || chooseGuardianVariant(seed, riftLayer);
+        return variant.segments[0];
+    }
+
+    if (type === 'choir' && mutation?.id === 'mirror-choir') {
+        return pick(rng, ['tone', 'sync', 'chorus', 'pulse']);
+    }
+
+    return choosePoolWord({ rng, pool: wordPool, range: definition.wordRange, bonus });
+}
+
+export function generateRaidMonster(options = {}) {
+    const seed = options.seed || 'arcade-rift';
+    const riftLayer = Math.max(1, options.riftLayer || options.threatLevel || 1);
+    const spawnIndex = options.spawnIndex || 0;
+    const wordPool = sanitizeWordPool(options.wordPool);
+    const type = options.type || chooseNextMonsterType({ ...options, riftLayer });
+    const definition = MONSTER_TYPES[type] || MONSTER_TYPES.nib;
+    const difficultyProfile = options.difficultyProfile || buildDifficultyProfile(riftLayer, options.pressureScore || 0.45, options.mutation, options.relics);
+    const rng = seededRandom(seed, `monster-${riftLayer}-${spawnIndex}-${type}`);
+    const guardianVariant = type === 'guardian' ? chooseGuardianVariant(seed, riftLayer) : null;
+    const word = chooseMonsterWord({
+        type,
+        seed,
+        spawnIndex,
+        riftLayer,
+        focusChars: options.focusChars || [],
+        wordPool,
+        difficultyProfile,
+        lastDefeatedWord: options.lastDefeatedWord,
+        mutation: options.mutation,
+        relics: options.relics,
+        guardianVariant
+    });
+    const effects = getRelicEffects(options.relics || []);
+    const baseHp = type === 'guardian'
+        ? 3
+        : type === 'mossback'
+            ? 2
+            : type === 'anchor'
+                ? Math.max(1, 2 - (effects.anchorBreak || 0))
+                : 1;
+
+    return {
+        id: `monster-${riftLayer}-${spawnIndex}-${type}`,
+        type,
+        archetype: type,
+        label: definition.label,
+        labelZh: definition.labelZh,
+        word,
+        typed: '',
+        xRatio: pick(rng, LANES) + (rng() - 0.5) * 0.025,
+        y: -0.1 - rng() * 0.08,
+        speed: difficultyProfile.baseSpeed * definition.speedFactor,
+        hp: baseHp,
+        maxHp: baseHp,
+        alive: true,
+        leaked: false,
+        elite: type === 'guardian',
+        shielded: false,
+        shieldBroken: false,
+        splitOnDeath: type === 'splitter',
+        blinkTimer: type === 'blink' ? 1.2 + rng() * 1.4 : 0,
+        scribeTimer: type === 'scribe' ? 3.2 : 0,
+        guardianVariant,
+        phaseIndex: 0,
+        spawnedAtLayer: riftLayer,
+        spawnedAtThreat: riftLayer
+    };
+}
+
+export function generateRelicChoices(state, count = 3) {
+    const owned = getRelicStacks(state.relics);
+    const rng = seededRandom(state.seed, `relic-${state.counters?.relicChoices || 0}-${state.riftLayer || 1}-${state.counters?.kills || 0}`);
+    const rarityRoll = rng();
+    const rarityPool = RAID_RELICS.filter((relic) => {
+        if ((owned[relic.id] || 0) >= 3) return false;
+        if (relic.rarity === 'legendary') return rarityRoll > 0.92;
+        if (relic.rarity === 'epic') return rarityRoll > 0.68;
+        if (relic.rarity === 'rare') return rarityRoll > 0.28;
+        return true;
+    });
+    const pool = rarityPool.length >= count ? rarityPool : RAID_RELICS.filter((relic) => (owned[relic.id] || 0) < 3);
+    const choices = [];
+    const used = new Set();
+    while (choices.length < count && used.size < pool.length) {
+        const relic = pick(rng, pool);
+        if (used.has(relic.id)) continue;
+        used.add(relic.id);
+        choices.push({
+            id: relic.id,
+            name: relic.name,
+            nameZh: relic.nameZh,
+            rarity: relic.rarity,
+            summary: relic.summary,
+            stack: (owned[relic.id] || 0) + 1
+        });
+    }
+    return choices;
+}
+
+export function createRaidState(options = {}) {
+    const raidMode = normalizeMode(options.raidMode);
+    const language = options.language || 'zh-CN';
+    const mutation = raidMode === 'daily-mutation'
+        ? (options.mutation || getDailyMutation(options.dateKey))
+        : null;
+    const riftLayer = getRiftLayer(options.elapsed || 0);
+    const pressureScore = 0.42 + (mutation?.pressureBonus || 0);
+    const relics = Array.isArray(options.relics) ? options.relics : [];
+    const effects = getRelicEffects(relics);
+    const maxLives = raidMode === 'first-breach' ? 6 : 5 + (effects.maxLives || 0);
+
+    return {
+        phase: RAID_PHASES.idle,
+        mode: RAID_PHASES.idle,
+        raidMode,
+        language,
+        seed: options.seed || (raidMode === 'daily-mutation' ? `daily-${todayKey()}` : `rift-${todayKey()}`),
+        wordPool: sanitizeWordPool(options.wordPool),
+        focusChars: Array.isArray(options.focusChars) ? options.focusChars.slice(0, 6) : [],
+        mutation,
+        elapsed: options.elapsed || 0,
+        endedAt: null,
+        riftLayer,
+        threatLevel: riftLayer,
+        highestRiftLayer: riftLayer,
+        highestThreatLevel: riftLayer,
+        pressureScore,
+        difficultyProfile: buildDifficultyProfile(riftLayer, pressureScore, mutation, relics),
+        enemies: [],
+        spawnTimer: 0.55,
+        spawnIndex: 0,
+        spawnedGuardianLayers: [],
+        spawnedGuardianLevels: [],
+        lives: maxLives,
+        maxLives,
+        score: 0,
+        combo: 0,
+        maxCombo: 0,
+        streakTier: 0,
+        counters: createEmptyCounters(),
+        errorCounts: {},
+        relics,
+        relicChoices: null,
+        nextRelicKill: 8,
+        currentTargetId: null,
+        lastDefeatedWord: '',
+        lastStandUsed: false,
+        guardianDefeated: [],
+        codexSeen: {},
+        liveMessage: getGameCopy(language).ready,
+        feedback: null,
+        endReason: null,
+        extractReason: null
     };
 }
 
@@ -240,722 +682,522 @@ function withModeAlias(state) {
     return { ...state, mode: state.phase };
 }
 
-function getThreatLevel(elapsed) {
-    return Math.max(1, 1 + Math.floor(Math.max(0, elapsed) / RAID_THREAT_INTERVAL_SECONDS));
-}
-
-function getThreatProgress(elapsed) {
-    return (Math.max(0, elapsed) % RAID_THREAT_INTERVAL_SECONDS) / RAID_THREAT_INTERVAL_SECONDS;
-}
-
-function isExtractAvailable(threatLevel) {
-    return threatLevel > 1 && threatLevel % RAID_EXTRACT_INTERVAL === 0;
-}
-
-function nextExtractThreatLevel(threatLevel) {
-    return threatLevel + (RAID_EXTRACT_INTERVAL - (threatLevel % RAID_EXTRACT_INTERVAL || RAID_EXTRACT_INTERVAL));
-}
-
-export function getGameCopy(language = 'zh-CN') {
-    return GAME_COPY[language] || GAME_COPY['en-US'];
-}
-
-export function getEnemyTypeConfig(type) {
-    return MONSTER_TYPES[type] || MONSTER_TYPES.nib;
-}
-
-export function getAllEnemyTypes() {
-    return Object.keys(MONSTER_TYPES);
-}
-
-export function calculateRaidPressure(state) {
-    const typed = state.counters?.typed || 0;
-    const correct = state.counters?.correct || 0;
-    const elapsedMinutes = Math.max((state.elapsed || 1) / 60, 1 / 60);
-    const accuracy = typed > 0 ? correct / typed : 1;
-    const wpm = (correct / 5) / elapsedMinutes;
-    const speedScore = clamp(wpm / 85, 0, 1);
-    const lifeScore = clamp((state.lives || 0) / (state.maxLives || 5), 0, 1);
-    const comboScore = clamp((state.combo || 0) / 32, 0, 1);
-    const recoveryScore = clamp(1 - ((state.counters?.errors || 0) / Math.max(typed, 1)), 0, 1);
-
-    return clamp(
-        accuracy * 0.34 + speedScore * 0.24 + lifeScore * 0.18 + comboScore * 0.14 + recoveryScore * 0.1,
-        0.15,
-        0.98
-    );
-}
-
-export function buildDifficultyProfile(threatLevel, pressureScore = 0.45) {
-    const threat = Math.max(1, threatLevel);
-    const ramp = Math.min(1, (threat - 1) / 10);
-    const pressure = clamp(pressureScore, 0.15, 0.98);
-    const baseSpeed = 0.026 + threat * 0.0026 + pressure * 0.006;
-    const spawnInterval = clamp(1.42 - threat * 0.045 - pressure * 0.22, 0.54, 1.36);
-    const activeCap = clamp(4 + Math.floor(threat / 2), 4, 11);
-
-    return {
-        threatLevel: threat,
-        pressureScore: pressure,
-        baseSpeed,
-        spawnInterval,
-        activeCap,
-        wordBonus: threat >= 8 ? 2 : threat >= 4 ? 1 : 0,
-        mix: {
-            nib: 3 + Math.floor(ramp * 2),
-            mossback: threat >= 2 ? 2 : 1,
-            blink: threat >= 3 ? 2 : 0,
-            echo: threat >= 4 ? 2 : 0,
-            glyph: threat >= 5 ? 2 : 0,
-            bloom: threat >= 3 ? 1 : 0
-        }
-    };
-}
-
-function pickWord(rng, pool, range, usedWords = new Set()) {
-    const [minLength, maxLength] = range;
-    const candidates = pool.filter((word) => (
-        !usedWords.has(word) && word.length >= minLength && word.length <= maxLength
-    ));
-    const safe = candidates.length > 0 ? candidates : pool;
-    const word = safe[Math.floor(rng() * safe.length)] || 'type';
-    usedWords.add(word);
-    return word;
-}
-
-function pickFocusedWord(rng, pool, focusChars, range, usedWords = new Set()) {
-    const focus = new Set((focusChars || []).map((char) => String(char).toLowerCase()).filter(Boolean));
-    if (focus.size === 0) return pickWord(rng, pool, range, usedWords);
-    const candidates = pool.filter((word) => (
-        !usedWords.has(word)
-        && word.length >= range[0]
-        && word.length <= range[1]
-        && word.split('').some((char) => focus.has(char))
-    ));
-    if (candidates.length === 0) return pickWord(rng, pool, range, usedWords);
-    const word = candidates[Math.floor(rng() * candidates.length)];
-    usedWords.add(word);
-    return word;
-}
-
-function pickGlyphWord(rng, focusChars) {
-    const focus = (focusChars || []).map((char) => String(char).toLowerCase()).filter(Boolean);
-    if (focus.length > 0) {
-        return `${focus[Math.floor(rng() * focus.length)]}${Math.ceil(rng() * 9)}`;
-    }
-    const pool = focus.length > 0
-        ? [...focus.map((char) => `${char}${Math.ceil(rng() * 9)}`), ...GLYPH_WORDS]
-        : GLYPH_WORDS;
-    return pool[Math.floor(rng() * pool.length)] || 'a1';
-}
-
-function pickEchoSegments(rng) {
-    const pair = ECHO_PAIRS[Math.floor(rng() * ECHO_PAIRS.length)] || ECHO_PAIRS[0];
-    return rng() > 0.5 ? pair : [...pair].reverse();
-}
-
-function pickGuardianSegments(rng, focusChars) {
-    const template = GUARDIAN_SEGMENTS[Math.floor(rng() * GUARDIAN_SEGMENTS.length)] || GUARDIAN_SEGMENTS[0];
-    const focus = (focusChars || []).map((char) => String(char).toLowerCase()).filter(Boolean);
-    if (focus.length === 0) return template;
-    return template.map((segment, index) => index === 1 ? `${segment}${focus[Math.floor(rng() * focus.length)]}` : segment);
-}
-
-function weightedMonsterType(rng, mix) {
-    const entries = Object.entries(mix).filter(([, weight]) => weight > 0);
-    const total = entries.reduce((sum, [, weight]) => sum + weight, 0);
-    let cursor = rng() * total;
-    for (const [type, weight] of entries) {
-        cursor -= weight;
-        if (cursor <= 0) return type;
-    }
-    return entries[0]?.[0] || 'nib';
-}
-
-export function chooseNextMonsterType(state, rng = seededRandom(state.seed, `type-${state.spawnIndex}`)) {
-    const threatLevel = state.threatLevel || 1;
-    const spawnedGuardians = new Set(state.spawnedGuardianLevels || []);
-    if (
-        threatLevel >= RAID_GUARDIAN_INTERVAL
-        && threatLevel % RAID_GUARDIAN_INTERVAL === 0
-        && !spawnedGuardians.has(threatLevel)
-    ) {
-        return 'guardian';
-    }
-
-    const profile = state.difficultyProfile || buildDifficultyProfile(threatLevel, state.pressureScore);
-    const mix = { ...profile.mix };
-    if (state.raidMode === 'daily-focus') {
-        mix.glyph = (mix.glyph || 0) + 3;
-    }
-    return weightedMonsterType(rng, mix);
-}
-
-export function generateRaidMonster(options = {}) {
-    const seed = options.seed || 'typing-raid';
-    const threatLevel = Math.max(1, options.threatLevel || 1);
-    const spawnIndex = Math.max(0, options.spawnIndex || 0);
-    const type = options.type || 'nib';
-    const profile = options.difficultyProfile || buildDifficultyProfile(threatLevel, options.pressureScore);
-    const wordPool = sanitizeWordPool(options.wordPool);
-    const focusChars = options.focusChars || [];
-    const rng = seededRandom(seed, `monster-${threatLevel}-${spawnIndex}-${type}`);
-    const config = MONSTER_TYPES[type] || MONSTER_TYPES.nib;
-    const usedWords = new Set();
-    const laneIndex = Math.floor(rng() * LANES.length);
-    const lane = LANES[laneIndex];
-    const jitter = (rng() - 0.5) * 0.035;
-    let segments = null;
-    let word;
-
-    if (type === 'guardian') {
-        segments = pickGuardianSegments(rng, focusChars);
-        word = segments[0];
-    } else if (type === 'mossback') {
-        const first = pickFocusedWord(rng, wordPool, focusChars, [config.wordRange[0], config.wordRange[1] + profile.wordBonus], usedWords);
-        const second = pickWord(rng, wordPool, [3, 7 + profile.wordBonus], usedWords);
-        segments = [first, second];
-        word = segments[0];
-    } else if (type === 'echo') {
-        segments = pickEchoSegments(rng);
-        word = segments[0];
-    } else if (type === 'glyph') {
-        word = pickGlyphWord(rng, focusChars);
-    } else if (type === 'bloom') {
-        word = pickWord(rng, wordPool, [4, 7 + profile.wordBonus], usedWords);
-    } else {
-        word = pickWord(rng, wordPool, [config.wordRange[0], config.wordRange[1] + profile.wordBonus], usedWords);
-    }
-
-    const maxHp = Array.isArray(segments) ? segments.length : 1;
-
-    return {
-        id: `monster-${threatLevel}-${spawnIndex}-${type}`,
-        type,
-        word,
-        segments,
-        segmentIndex: 0,
-        xRatio: clamp(lane + jitter, 0.08, 0.92),
-        laneIndex,
-        y: 0.18 + rng() * 0.035,
-        age: 0,
-        speed: profile.baseSpeed * config.speedFactor * (0.9 + rng() * 0.18),
-        hp: maxHp,
-        maxHp,
-        scoreMultiplier: config.scoreMultiplier,
-        typed: '',
-        alive: true,
-        leaked: false,
-        shieldBroken: false,
-        elite: type === 'guardian',
-        spawnedAtThreat: threatLevel
-    };
-}
-
-export function createRaidState(options = {}) {
-    const language = options.language || 'zh-CN';
-    const raidMode = normalizeMode(options.raidMode);
-    const pressureScore = clamp(options.pressureScore ?? 0.45, 0.15, 0.98);
-    const threatLevel = getThreatLevel(options.elapsed || 0);
-
-    return withModeAlias({
-        phase: RAID_PHASES.idle,
-        raidMode,
-        language,
-        seed: options.seed || `raid-${new Date().toISOString().slice(0, 10)}`,
-        score: 0,
-        combo: 0,
-        maxCombo: 0,
-        lives: 5,
-        maxLives: 5,
-        threatLevel,
-        highestThreatLevel: threatLevel,
-        pressureScore,
-        difficultyProfile: buildDifficultyProfile(threatLevel, pressureScore),
-        spawnTimer: 0,
-        spawnIndex: 0,
-        enemies: [],
-        elapsed: options.elapsed || 0,
-        startedAt: options.now ?? 0,
-        endedAt: null,
-        endReason: null,
-        extractReason: null,
-        currentTargetId: null,
-        counters: createEmptyCounters(),
-        errorCounts: {},
-        focusChars: Array.isArray(options.focusChars) ? options.focusChars.slice(0, 8) : [],
-        wordPool: sanitizeWordPool(options.wordPool),
-        recentKeyTimes: [],
-        bestStreakWindow: 0,
-        spawnedGuardianLevels: [],
-        lastFeedback: null,
-        liveMessage: getGameCopy(language).ready,
-        lastEventId: 0
-    });
-}
-
 function nextEvent(state, event) {
-    const id = (state.lastEventId || 0) + 1;
     return {
-        state: { ...state, lastEventId: id },
-        event: { id, ...event }
+        state: withModeAlias({
+            ...state,
+            feedback: {
+                kind: event.type,
+                enemyId: event.enemyId,
+                at: Math.round((state.elapsed || 0) * 1000)
+            }
+        }),
+        event
     };
 }
 
-function updateErrorCount(errorCounts, label) {
-    if (!label) return errorCounts;
-    const key = String(label).toLowerCase();
-    return { ...errorCounts, [key]: (errorCounts[key] || 0) + 1 };
-}
-
-function getAccuracy(state) {
-    const typed = state.counters.typed || 0;
-    if (typed === 0) return 100;
-    return Math.round((state.counters.correct / typed) * 100);
-}
-
-function getWpm(state) {
-    const minutes = Math.max((state.elapsed || 0) / 60, 1 / 60);
-    return Math.round((state.counters.correct / 5) / minutes);
-}
-
-function getActiveEnemy(state) {
-    if (!state.currentTargetId) return null;
-    return state.enemies.find((enemy) => enemy.alive && enemy.id === state.currentTargetId) || null;
-}
-
-function getPriorityEnemy(state) {
-    return state.enemies
-        .filter((enemy) => enemy.alive)
-        .sort((a, b) => b.y - a.y || a.spawnedAtThreat - b.spawnedAtThreat || a.id.localeCompare(b.id))[0] || null;
-}
-
-function getMatchingEnemy(state, char) {
-    return state.enemies
-        .filter((enemy) => enemy.alive && enemy.word[0]?.toLowerCase() === char)
-        .sort((a, b) => b.y - a.y || a.id.localeCompare(b.id))[0] || null;
-}
-
-function getEnemyExpectedChar(enemy) {
-    if (!enemy) return '';
-    return enemy.word[(enemy.typed || '').length] || '';
-}
-
-function isEnemyShielded(state, enemy) {
-    if (!enemy || enemy.type === 'bloom' || enemy.type === 'guardian' || enemy.shieldBroken) return false;
-    return state.enemies.some((item) => (
-        item.alive
-        && item.type === 'bloom'
-        && item.id !== enemy.id
-        && Math.abs(item.xRatio - enemy.xRatio) <= 0.19
-        && Math.abs(item.y - enemy.y) <= 0.22
-    ));
-}
-
-function scoreForMonster(enemy, combo) {
-    const text = (enemy.segments || [enemy.word]).join('');
-    const wordValue = text.length * 12;
-    const comboMultiplier = 1 + Math.floor(combo / 8) * 0.16;
-    return Math.round(wordValue * (enemy.scoreMultiplier || 1) * comboMultiplier);
-}
-
-function buildMonsterMix(enemies) {
-    return enemies
-        .filter((enemy) => enemy.alive)
-        .reduce((mix, enemy) => ({ ...mix, [enemy.type]: (mix[enemy.type] || 0) + 1 }), {});
-}
-
-function updateThreatBoundary(state) {
-    const threatLevel = getThreatLevel(state.elapsed);
-    if (threatLevel === state.threatLevel) return { state, event: null };
-    const pressureScore = calculateRaidPressure(state);
-    const copy = getGameCopy(state.language);
-    const nextState = withModeAlias({
-        ...state,
-        threatLevel,
-        highestThreatLevel: Math.max(state.highestThreatLevel || 1, threatLevel),
-        pressureScore,
-        difficultyProfile: buildDifficultyProfile(threatLevel, pressureScore),
-        spawnTimer: Math.min(state.spawnTimer, 0.4),
-        liveMessage: threatLevel % RAID_GUARDIAN_INTERVAL === 0
-            ? copy.guardianIncoming
-            : copy.threatUp.replace('{level}', String(threatLevel))
-    });
-    const result = nextEvent(nextState, { type: 'threat_level_up', threatLevel });
-    return { state: result.state, event: result.event };
-}
-
-function spawnMonster(state) {
-    const rng = seededRandom(state.seed, `spawn-${state.threatLevel}-${state.spawnIndex}`);
-    const type = chooseNextMonsterType(state, rng);
-    const monster = generateRaidMonster({
-        seed: state.seed,
-        threatLevel: state.threatLevel,
-        spawnIndex: state.spawnIndex,
-        type,
-        pressureScore: state.pressureScore,
-        difficultyProfile: state.difficultyProfile,
-        wordPool: state.wordPool,
-        focusChars: state.focusChars
-    });
-    const guardianLevels = type === 'guardian'
-        ? [...(state.spawnedGuardianLevels || []), state.threatLevel]
-        : state.spawnedGuardianLevels;
-    const nextState = withModeAlias({
-        ...state,
-        enemies: [...state.enemies, monster],
-        spawnIndex: state.spawnIndex + 1,
-        spawnedGuardianLevels: guardianLevels
-    });
-    const result = nextEvent(nextState, {
-        type: 'monster_spawned',
-        enemyId: monster.id,
-        enemyType: monster.type,
-        xRatio: monster.xRatio,
-        y: monster.y
-    });
-    return { state: result.state, event: result.event };
-}
-
-function maybeMoveBlink(enemy, dt) {
-    if (enemy.type !== 'blink' || enemy.typed) {
-        return { enemy: { ...enemy, age: (enemy.age || 0) + dt }, moved: false };
-    }
-
-    const previousAge = enemy.age || 0;
-    const nextAge = previousAge + dt;
-    const previousStep = Math.floor(previousAge / 2.4);
-    const nextStep = Math.floor(nextAge / 2.4);
-    if (nextStep === previousStep) {
-        return { enemy: { ...enemy, age: nextAge }, moved: false };
-    }
-
-    const direction = nextStep % 2 === 0 ? -1 : 1;
-    const laneIndex = clamp((enemy.laneIndex || 3) + direction, 0, LANES.length - 1);
-    return {
-        enemy: {
-            ...enemy,
-            age: nextAge,
-            laneIndex,
-            xRatio: LANES[laneIndex]
-        },
-        moved: true
-    };
-}
-
-function updateEnemies(state, dt) {
-    const events = [];
-    let leakedCount = 0;
-    const leakedExpectedChars = [];
-    const movedEnemies = state.enemies.map((enemy) => {
-        if (!enemy.alive) return enemy;
-        const blink = maybeMoveBlink(enemy, dt);
-        let nextEnemy = blink.enemy;
-        if (blink.moved) {
-            events.push({ type: 'monster_blinked', enemyId: enemy.id, xRatio: nextEnemy.xRatio, y: nextEnemy.y });
-        }
-        const y = nextEnemy.y + nextEnemy.speed * dt;
-        if (y > SAFE_LINE_Y) {
-            leakedCount += nextEnemy.type === 'guardian' ? 2 : nextEnemy.type === 'bloom' ? 0 : 1;
-            leakedExpectedChars.push(getEnemyExpectedChar(nextEnemy) || nextEnemy.word[0]);
-            return { ...nextEnemy, y, alive: false, leaked: true };
-        }
-        return { ...nextEnemy, y };
-    });
-
-    return { movedEnemies, leakedCount, leakedExpectedChars, movementEvents: events };
-}
-
-function completeMonsterSegment(state, enemy, char) {
-    const nextTyped = `${enemy.typed || ''}${char}`;
-    const counters = {
-        ...state.counters,
-        typed: state.counters.typed + 1,
-        correct: state.counters.correct + 1
-    };
-
-    if (nextTyped !== enemy.word) {
-        return nextEvent(withModeAlias({
-            ...state,
-            counters,
-            enemies: state.enemies.map((item) => (
-                item.id === enemy.id ? { ...item, typed: nextTyped } : item
-            )),
-            lastFeedback: { kind: 'correct', enemyId: enemy.id, char, at: state.elapsed },
-            liveMessage: enemy.word
-        }), { type: 'char_correct', enemyId: enemy.id });
-    }
-
-    const hasNextSegment = Array.isArray(enemy.segments) && enemy.segmentIndex + 1 < enemy.segments.length;
-    if (hasNextSegment) {
-        const nextSegmentIndex = enemy.segmentIndex + 1;
-        const nextWord = enemy.segments[nextSegmentIndex];
-        const nextHp = Math.max(1, enemy.maxHp - nextSegmentIndex);
-        return nextEvent(withModeAlias({
-            ...state,
-            counters,
-            enemies: state.enemies.map((item) => (
-                item.id === enemy.id
-                    ? { ...item, hp: nextHp, segmentIndex: nextSegmentIndex, word: nextWord, typed: '' }
-                    : item
-            )),
-            lastFeedback: { kind: 'segment', enemyId: enemy.id, char, at: state.elapsed },
-            liveMessage: nextWord
-        }), { type: enemy.type === 'guardian' ? 'guardian_phase' : 'monster_segment', enemyId: enemy.id });
-    }
-
-    if (isEnemyShielded(state, enemy)) {
-        return nextEvent(withModeAlias({
-            ...state,
-            counters: {
-                ...counters,
-                shieldBreaks: counters.shieldBreaks + 1
-            },
-            enemies: state.enemies.map((item) => (
-                item.id === enemy.id ? { ...item, typed: '', shieldBroken: true } : item
-            )),
-            lastFeedback: { kind: 'shield', enemyId: enemy.id, char, at: state.elapsed },
-            liveMessage: getGameCopy(state.language).shield
-        }), { type: 'monster_shield_broken', enemyId: enemy.id });
-    }
-
-    const score = scoreForMonster(enemy, state.combo);
-    const nextCombo = state.combo + (enemy.type === 'bloom' ? 2 : 1);
-    const nextState = withModeAlias({
-        ...state,
-        score: state.score + score,
-        combo: nextCombo,
-        maxCombo: Math.max(state.maxCombo, nextCombo),
-        bestStreakWindow: Math.max(state.bestStreakWindow || 0, nextCombo),
-        currentTargetId: null,
-        counters: {
-            ...counters,
-            kills: counters.kills + 1,
-            eliteKills: counters.eliteKills + (enemy.elite ? 1 : 0)
-        },
-        enemies: state.enemies.map((item) => (
-            item.id === enemy.id ? { ...item, typed: nextTyped, alive: false, hp: 0 } : item
-        )),
-        lastFeedback: { kind: 'kill', enemyId: enemy.id, char, at: state.elapsed },
-        liveMessage: `+${score}`
-    });
-
-    return nextEvent(nextState, {
-        type: 'monster_defeated',
-        enemyId: enemy.id,
-        enemyType: enemy.type,
-        score,
-        xRatio: enemy.xRatio,
-        y: enemy.y,
-        elite: enemy.elite
-    });
-}
-
-export function processRaidInput(state, inputChar) {
-    if (state.phase !== RAID_PHASES.playing) {
-        return { state, events: [] };
-    }
-
-    const char = String(inputChar || '').slice(0, 1).toLowerCase();
-    if (!char) return { state, events: [] };
-
-    const activeEnemy = getActiveEnemy(state);
-    const target = activeEnemy || getMatchingEnemy(state, char);
-    const copy = getGameCopy(state.language);
-
-    if (!target) {
-        const nextState = withModeAlias({
-            ...state,
-            combo: Math.max(0, state.combo - 1),
-            counters: {
-                ...state.counters,
-                typed: state.counters.typed + 1,
-                errors: state.counters.errors + 1
-            },
-            errorCounts: updateErrorCount(state.errorCounts, char),
-            lastFeedback: { kind: 'miss', char, at: state.elapsed },
-            liveMessage: copy.miss
-        });
-        const result = nextEvent(nextState, { type: 'char_miss', char });
-        return { state: result.state, events: [result.event] };
-    }
-
-    const expected = getEnemyExpectedChar(target).toLowerCase();
-    const targetState = activeEnemy ? state : { ...state, currentTargetId: target.id };
-
-    if (char !== expected) {
-        const nextState = withModeAlias({
-            ...targetState,
-            combo: Math.max(0, state.combo - 2),
-            counters: {
-                ...state.counters,
-                typed: state.counters.typed + 1,
-                errors: state.counters.errors + 1
-            },
-            errorCounts: updateErrorCount(state.errorCounts, expected || char),
-            lastFeedback: { kind: 'error', enemyId: target.id, char, expected, at: state.elapsed },
-            liveMessage: copy.error.replace('{expected}', expected || '?')
-        });
-        const result = nextEvent(nextState, { type: 'char_error', enemyId: target.id, char, expected });
-        return { state: result.state, events: [result.event] };
-    }
-
-    const result = completeMonsterSegment(targetState, target, char);
-    return { state: result.state, events: [result.event] };
-}
-
-export function startEndlessRaid(state, payload = {}) {
+function startArcadeRift(state, payload = {}) {
+    const raidMode = normalizeMode(payload.raidMode || state.raidMode);
     const fresh = createRaidState({
         ...state,
         ...payload,
-        raidMode: normalizeMode(payload.raidMode || state.raidMode),
-        language: payload.language || state.language || 'zh-CN',
-        seed: payload.seed || state.seed,
-        focusChars: payload.focusChars || state.focusChars,
-        wordPool: payload.wordPool || state.wordPool,
-        now: 0
+        raidMode,
+        seed: payload.seed || (
+            raidMode === 'daily-mutation'
+                ? `daily-${todayKey()}`
+                : raidMode === 'first-breach'
+                    ? `first-breach-${todayKey()}`
+                    : `rift-${Date.now().toString(36)}`
+        ),
+        elapsed: 0,
+        relics: []
     });
     return withModeAlias({
         ...fresh,
         phase: RAID_PHASES.playing,
-        spawnTimer: 0,
-        liveMessage: getGameCopy(fresh.language).ready
+        mode: RAID_PHASES.playing,
+        liveMessage: raidMode === 'daily-mutation'
+            ? `${fresh.mutation?.nameZh || '每日异变'}：${fresh.mutation?.summary || ''}`
+            : getGameCopy(fresh.language).start
     });
 }
 
-export function updateRaidState(state, deltaTime) {
-    if (state.phase !== RAID_PHASES.playing) {
-        return { state, events: [] };
+function updateRiftLayerBoundary(state) {
+    const riftLayer = getRiftLayer(state.elapsed);
+    if (riftLayer === state.riftLayer) return { state, event: null };
+
+    const pressureScore = calculateRaidPressure({ ...state, riftLayer });
+    const copy = getGameCopy(state.language);
+    const nextState = withModeAlias({
+        ...state,
+        riftLayer,
+        threatLevel: riftLayer,
+        highestRiftLayer: Math.max(state.highestRiftLayer || 1, riftLayer),
+        highestThreatLevel: Math.max(state.highestThreatLevel || 1, riftLayer),
+        pressureScore,
+        difficultyProfile: buildDifficultyProfile(riftLayer, pressureScore, state.mutation, state.relics),
+        liveMessage: riftLayer % RAID_GUARDIAN_INTERVAL === 0
+            ? copy.guardianIncoming
+            : copy.threatUp.replace('{level}', String(riftLayer))
+    });
+    return nextEvent(nextState, { type: 'rift_layer_up', riftLayer, threatLevel: riftLayer });
+}
+
+function spawnMonster(state) {
+    const type = chooseNextMonsterType(state);
+    const monster = generateRaidMonster({
+        seed: state.seed,
+        type,
+        riftLayer: state.riftLayer,
+        threatLevel: state.riftLayer,
+        spawnIndex: state.spawnIndex,
+        wordPool: state.wordPool,
+        focusChars: state.focusChars,
+        pressureScore: state.pressureScore,
+        difficultyProfile: state.difficultyProfile,
+        mutation: state.mutation,
+        relics: state.relics,
+        lastDefeatedWord: state.lastDefeatedWord
+    });
+    const spawnedGuardianLayers = type === 'guardian'
+        ? [...(state.spawnedGuardianLayers || []), state.riftLayer]
+        : state.spawnedGuardianLayers;
+
+    return nextEvent({
+        ...state,
+        enemies: [...state.enemies, monster],
+        spawnIndex: state.spawnIndex + 1,
+        spawnedGuardianLayers,
+        spawnedGuardianLevels: spawnedGuardianLayers,
+        codexSeen: { ...state.codexSeen, [type]: true },
+        liveMessage: type === 'guardian' ? getGameCopy(state.language).guardianIncoming : state.liveMessage
+    }, {
+        type: 'monster_spawned',
+        enemyId: monster.id,
+        enemyType: monster.type,
+        guardianVariant: monster.guardianVariant?.id || null,
+        xRatio: monster.xRatio,
+        y: monster.y
+    });
+}
+
+function shouldBloomShield(state, target) {
+    if (!target || target.type === 'bloom' || target.shieldBroken) return false;
+    return state.enemies.some((enemy) => (
+        enemy.alive
+        && enemy.type === 'bloom'
+        && Math.abs(enemy.xRatio - target.xRatio) < 0.13
+        && Math.abs(enemy.y - target.y) < 0.16
+    ));
+}
+
+function scoreEnemy(state, enemy, partial = 1) {
+    const definition = MONSTER_TYPES[enemy.type] || MONSTER_TYPES.nib;
+    const effects = getRelicEffects(state.relics);
+    const typed = Math.max(1, state.counters.typed || 1);
+    const accuracy = (state.counters.correct || 0) / typed;
+    const comboMultiplier = 1 + Math.min(2.5, (state.combo || 0) * 0.025) + (effects.comboScore || 0);
+    const scoreMultiplier = 1
+        + (effects.scoreMultiplier || 0)
+        + (effects.threatScore || 0) * (state.riftLayer || 1)
+        + (accuracy >= 0.96 ? (effects.accuracyScore || 0) : 0)
+        + (enemy.type === 'glyph' ? (effects.glyphBonus || 0) : 0)
+        + (enemy.type === 'guardian' ? ((effects.guardianScore || 0) + (state.mutation?.guardianScore || 0)) : 0)
+        + (state.mutation?.scoreMultiplier ? state.mutation.scoreMultiplier - 1 : 0);
+    return Math.round((40 + enemy.word.length * 14 + (state.riftLayer || 1) * 9) * definition.scoreMultiplier * comboMultiplier * scoreMultiplier * partial);
+}
+
+function maybeOpenRelicChoice(state, force = false) {
+    if (state.relicChoices?.length) return state;
+    if (!force && (state.counters.kills || 0) < state.nextRelicKill) return state;
+    return withModeAlias({
+        ...state,
+        relicChoices: generateRelicChoices(state),
+        liveMessage: getGameCopy(state.language).relicReady
+    });
+}
+
+function pierceIfNeeded(state, events) {
+    const effects = getRelicEffects(state.relics);
+    if (!effects.pierceEvery) return { state, events };
+    if ((state.counters.kills || 0) % effects.pierceEvery !== 0) return { state, events };
+    const victim = state.enemies.find((enemy) => enemy.alive && !enemy.elite && enemy.hp <= 1);
+    if (!victim) return { state, events };
+    const score = scoreEnemy(state, victim, 0.55);
+    const nextState = withModeAlias({
+        ...state,
+        enemies: state.enemies.map((enemy) => enemy.id === victim.id ? { ...enemy, alive: false, typed: enemy.word } : enemy),
+        score: state.score + score,
+        counters: { ...state.counters, kills: state.counters.kills + 1 }
+    });
+    return {
+        state: nextState,
+        events: [...events, { type: 'monster_defeated', enemyId: victim.id, enemyType: victim.type, score, pierce: true }]
+    };
+}
+
+function spawnSplitterFragments(state, enemy) {
+    const effects = getRelicEffects(state.relics);
+    const chars = Array.from(new Set(enemy.word.replace(/[^a-z0-9?!+\-]/g, '').slice(0, Math.max(1, 3 - (effects.splitControl || 0))).split('')));
+    return chars.map((char, index) => ({
+        ...generateRaidMonster({
+            seed: state.seed,
+            type: 'nib',
+            riftLayer: state.riftLayer,
+            spawnIndex: state.spawnIndex + index + 1,
+            wordPool: [char]
+        }),
+        id: `${enemy.id}-frag-${index}`,
+        word: char,
+        xRatio: clamp(enemy.xRatio + (index - 1) * 0.045, 0.08, 0.92),
+        y: Math.max(0.02, enemy.y - 0.05),
+        speed: enemy.speed * 1.18,
+        type: 'nib',
+        label: 'Shard',
+        labelZh: '碎片'
+    }));
+}
+
+function defeatEnemy(state, enemy) {
+    let score = scoreEnemy(state, enemy);
+    const effects = getRelicEffects(state.relics);
+    const nextCombo = state.combo + 1 + (/[0-9?!+\-]/.test(enemy.word) ? (effects.symbolCombo || 0) : 0);
+    let nextEnemies = state.enemies.map((item) => item.id === enemy.id ? { ...item, alive: false, typed: item.word } : item);
+    const events = [{ type: 'monster_defeated', enemyId: enemy.id, enemyType: enemy.type, elite: enemy.elite, score }];
+
+    if (enemy.splitOnDeath) {
+        const fragments = spawnSplitterFragments(state, enemy);
+        nextEnemies = [...nextEnemies, ...fragments];
+        events.push({ type: 'monster_split', enemyId: enemy.id, count: fragments.length });
     }
 
-    const dt = clamp(Number(deltaTime) || 0, 0, 0.08);
+    if (effects.blast) {
+        nextEnemies = nextEnemies.map((item) => {
+            if (!item.alive || item.elite || item.id === enemy.id) return item;
+            if (Math.abs(item.xRatio - enemy.xRatio) > 0.09 + effects.blast * 0.02) return item;
+            score += scoreEnemy(state, item, 0.35);
+            events.push({ type: 'monster_defeated', enemyId: item.id, enemyType: item.type, blast: true });
+            return { ...item, alive: false, typed: item.word };
+        });
+    }
+
+    const guardianDefeated = enemy.type === 'guardian' && enemy.guardianVariant
+        ? [...state.guardianDefeated, enemy.guardianVariant.id]
+        : state.guardianDefeated;
+    const counters = {
+        ...state.counters,
+        kills: state.counters.kills + 1,
+        eliteKills: state.counters.eliteKills + (enemy.elite ? 1 : 0)
+    };
+    const nextState = maybeOpenRelicChoice(withModeAlias({
+        ...state,
+        enemies: nextEnemies,
+        score: state.score + score,
+        combo: nextCombo,
+        maxCombo: Math.max(state.maxCombo || 0, nextCombo),
+        streakTier: Math.floor(nextCombo / 25),
+        counters,
+        currentTargetId: null,
+        lastDefeatedWord: enemy.word,
+        guardianDefeated,
+        codexSeen: {
+            ...state.codexSeen,
+            [enemy.type]: true,
+            ...(enemy.guardianVariant ? { [enemy.guardianVariant.id]: true } : {})
+        },
+        liveMessage: enemy.elite ? 'Guardian defeated' : `${enemy.labelZh || enemy.label} cleared`
+    }), Boolean(enemy.elite && effects.guardianRelic));
+    return pierceIfNeeded(nextState, events);
+}
+
+function completeEnemySegment(state, enemy) {
+    if (shouldBloomShield(state, enemy)) {
+        const effects = getRelicEffects(state.relics);
+        const score = Math.round(scoreEnemy(state, enemy) * (effects.shieldScore || state.mutation?.shieldScore || 0));
+        return {
+            state: withModeAlias({
+                ...state,
+                enemies: state.enemies.map((item) => item.id === enemy.id ? { ...item, typed: '', shieldBroken: true, shielded: false } : item),
+                score: state.score + score,
+                counters: { ...state.counters, shieldBreaks: state.counters.shieldBreaks + 1 },
+                liveMessage: getGameCopy(state.language).shield
+            }),
+            events: [{ type: 'monster_shield_broken', enemyId: enemy.id, enemyType: enemy.type }]
+        };
+    }
+
+    if (enemy.hp > 1) {
+        const nextHp = enemy.hp - 1;
+        const nextPhase = (enemy.phaseIndex || 0) + 1;
+        const nextWord = enemy.type === 'guardian' && enemy.guardianVariant
+            ? enemy.guardianVariant.segments[Math.min(nextPhase, enemy.guardianVariant.segments.length - 1)]
+            : enemy.word;
+        return {
+            state: withModeAlias({
+                ...state,
+                enemies: state.enemies.map((item) => item.id === enemy.id
+                    ? { ...item, hp: nextHp, typed: '', word: nextWord, phaseIndex: nextPhase }
+                    : item),
+                score: state.score + scoreEnemy(state, enemy, 0.32),
+                counters: { ...state.counters, guardianPhases: state.counters.guardianPhases + (enemy.elite ? 1 : 0) },
+                currentTargetId: enemy.id,
+                liveMessage: enemy.elite ? `Guardian phase ${nextPhase + 1}` : 'Armor cracked'
+            }),
+            events: [{ type: enemy.elite ? 'guardian_phase' : 'monster_segment', enemyId: enemy.id, enemyType: enemy.type, hp: nextHp }]
+        };
+    }
+
+    return defeatEnemy(state, enemy);
+}
+
+function findTargetForChar(state, char) {
+    const current = state.enemies.find((enemy) => enemy.alive && enemy.id === state.currentTargetId);
+    if (current) return current;
+    return state.enemies.find((enemy) => enemy.alive && enemy.word[enemy.typed.length]?.toLowerCase() === char) || null;
+}
+
+export function processRaidInput(state, inputChar) {
+    if (state.phase !== RAID_PHASES.playing || state.relicChoices?.length) return { state, events: [] };
+    const char = String(inputChar || '').slice(-1).toLowerCase();
+    if (!char) return { state, events: [] };
+
+    const target = findTargetForChar(state, char);
+    const copy = getGameCopy(state.language);
+    const counters = { ...state.counters, typed: state.counters.typed + 1 };
+
+    if (!target) {
+        const errorCounts = { ...state.errorCounts, [char]: (state.errorCounts[char] || 0) + 1 };
+        const effects = getRelicEffects(state.relics);
+        const bufferLayer = `buffer-${state.riftLayer}`;
+        const canBuffer = effects.errorBuffer && !state[bufferLayer];
+        return nextEvent({
+            ...state,
+            counters: { ...counters, errors: counters.errors + 1 },
+            errorCounts,
+            combo: canBuffer ? state.combo : 0,
+            [bufferLayer]: true,
+            liveMessage: copy.miss
+        }, { type: 'char_error', char });
+    }
+
+    const expected = target.word[target.typed.length]?.toLowerCase();
+    if (char !== expected) {
+        const errorCounts = { ...state.errorCounts, [expected || char]: (state.errorCounts[expected || char] || 0) + 1 };
+        const effects = getRelicEffects(state.relics);
+        const bufferLayer = `buffer-${state.riftLayer}`;
+        const canBuffer = effects.errorBuffer && !state[bufferLayer];
+        return nextEvent({
+            ...state,
+            counters: { ...counters, errors: counters.errors + 1 },
+            errorCounts,
+            combo: canBuffer ? state.combo : 0,
+            currentTargetId: target.id,
+            [bufferLayer]: true,
+            liveMessage: copy.error.replace('{expected}', expected || '')
+        }, { type: 'char_error', enemyId: target.id, expected, char });
+    }
+
+    const nextTyped = `${target.typed}${char}`;
     let nextState = withModeAlias({
         ...state,
-        elapsed: state.elapsed + dt,
-        lastFeedback: state.lastFeedback && state.elapsed - state.lastFeedback.at > 0.6
-            ? null
-            : state.lastFeedback
+        enemies: state.enemies.map((enemy) => enemy.id === target.id ? { ...enemy, typed: nextTyped } : enemy),
+        counters: { ...counters, correct: counters.correct + 1 },
+        currentTargetId: target.id,
+        liveMessage: target.word.slice(nextTyped.length) || 'Hit'
     });
-    const events = [];
+    const events = [{ type: 'char_correct', enemyId: target.id, char }];
 
-    const threatUpdate = updateThreatBoundary(nextState);
-    nextState = threatUpdate.state;
-    if (threatUpdate.event) events.push(threatUpdate.event);
-
-    const { movedEnemies, leakedCount, leakedExpectedChars, movementEvents } = updateEnemies(nextState, dt);
-    nextState = withModeAlias({ ...nextState, enemies: movedEnemies });
-    movementEvents.forEach((event) => {
-        const result = nextEvent(nextState, event);
-        nextState = result.state;
-        events.push(result.event);
-    });
-
-    if (leakedCount > 0) {
-        const lives = Math.max(0, nextState.lives - leakedCount);
-        let errorCounts = nextState.errorCounts;
-        leakedExpectedChars.forEach((char) => {
-            errorCounts = updateErrorCount(errorCounts, char);
-        });
-        nextState = withModeAlias({
-            ...nextState,
-            lives,
-            combo: 0,
-            currentTargetId: movedEnemies.some((enemy) => enemy.alive && enemy.id === nextState.currentTargetId)
-                ? nextState.currentTargetId
-                : null,
-            counters: {
-                ...nextState.counters,
-                leaked: nextState.counters.leaked + leakedCount
-            },
-            errorCounts,
-            lastFeedback: { kind: 'leak', at: nextState.elapsed },
-            liveMessage: lives > 0 ? getGameCopy(nextState.language).linePressure : getGameCopy(nextState.language).defeated
-        });
-        const leaked = nextEvent(nextState, { type: 'monster_leaked', count: leakedCount });
-        nextState = leaked.state;
-        events.push(leaked.event);
+    if (nextTyped.length >= target.word.length) {
+        const completed = { ...target, typed: nextTyped };
+        const result = completeEnemySegment(nextState, completed);
+        return { state: result.state, events: [...events, ...result.events] };
     }
-
-    if (nextState.lives <= 0) {
-        nextState = withModeAlias({
-            ...nextState,
-            phase: RAID_PHASES.gameover,
-            endedAt: nextState.elapsed,
-            endReason: 'defeat',
-            extractReason: null,
-            liveMessage: getGameCopy(nextState.language).defeated
-        });
-        const gameover = nextEvent(nextState, { type: 'raid_ended', endReason: 'defeat' });
-        return { state: gameover.state, events: [...events, gameover.event] };
-    }
-
-    const aliveCount = nextState.enemies.filter((enemy) => enemy.alive).length;
-    let spawnTimer = nextState.spawnTimer - dt;
-    while (spawnTimer <= 0 && aliveCount + events.filter((event) => event.type === 'monster_spawned').length < nextState.difficultyProfile.activeCap) {
-        const spawned = spawnMonster({ ...nextState, spawnTimer });
-        nextState = spawned.state;
-        events.push(spawned.event);
-        spawnTimer += nextState.difficultyProfile.spawnInterval;
-    }
-
-    nextState = withModeAlias({ ...nextState, spawnTimer });
 
     return { state: nextState, events };
 }
 
+function moveEnemies(state, deltaTime) {
+    const choirCount = state.enemies.filter((enemy) => enemy.alive && enemy.type === 'choir').length;
+    const effects = getRelicEffects(state.relics);
+    const choirBoost = choirCount > 1 ? 1 + choirCount * (effects.choirMute ? 0.025 : 0.05) : 1;
+
+    return state.enemies.map((enemy) => {
+        if (!enemy.alive) return enemy;
+        let next = {
+            ...enemy,
+            y: enemy.y + enemy.speed * deltaTime * choirBoost
+        };
+
+        if (enemy.type === 'blink' && !enemy.typed) {
+            const timer = (enemy.blinkTimer || 0) - deltaTime;
+            if (timer <= 0) {
+                const rng = seededRandom(state.seed, `blink-${enemy.id}-${Math.round(state.elapsed * 10)}`);
+                next = {
+                    ...next,
+                    xRatio: pick(rng, LANES),
+                    blinkTimer: 1.1 + rng() * 1.6
+                };
+            } else {
+                next.blinkTimer = timer;
+            }
+        }
+
+        return next;
+    });
+}
+
+function finishRun(state, endReason, extractReason = null) {
+    const effects = getRelicEffects(state.relics);
+    const perfect = endReason === 'extract' && (state.counters.leaked || 0) === 0;
+    const extractBonus = endReason === 'extract'
+        ? Math.round(state.score * ((effects.extractScore || 0) + (state.mutation?.extractScore || 0) + (perfect ? (effects.perfectExtract || 0) : 0)))
+        : 0;
+    return withModeAlias({
+        ...state,
+        phase: RAID_PHASES.gameover,
+        mode: RAID_PHASES.gameover,
+        endedAt: state.elapsed,
+        endReason,
+        extractReason,
+        score: state.score + extractBonus,
+        liveMessage: endReason === 'extract' ? getGameCopy(state.language).extracted : getGameCopy(state.language).defeated
+    });
+}
+
+export function updateRaidState(state, deltaTime) {
+    if (state.phase !== RAID_PHASES.playing) return { state, events: [] };
+    if (state.relicChoices?.length) return { state, events: [] };
+
+    let nextState = withModeAlias({
+        ...state,
+        elapsed: state.elapsed + Math.max(0, deltaTime),
+        enemies: moveEnemies(state, deltaTime)
+    });
+    const events = [];
+
+    if (nextState.raidMode === 'first-breach' && nextState.elapsed >= 180) {
+        const finished = finishRun(nextState, 'extract', 'first-breach-complete');
+        return { state: finished, events: [{ type: 'raid_ended', endReason: 'extract' }] };
+    }
+
+    const layerUpdate = updateRiftLayerBoundary(nextState);
+    nextState = layerUpdate.state;
+    if (layerUpdate.event) events.push(layerUpdate.event);
+
+    const leaking = nextState.enemies.filter((enemy) => enemy.alive && !enemy.leaked && enemy.y >= SAFE_LINE_Y);
+    if (leaking.length) {
+        let lives = nextState.lives - leaking.length;
+        const effects = getRelicEffects(nextState.relics);
+        let lastStandTriggered = false;
+        if (lives <= 0 && effects.lastStand && !nextState.lastStandUsed) {
+            lives = 1;
+            lastStandTriggered = true;
+        }
+        const errorCounts = { ...nextState.errorCounts };
+        leaking.forEach((enemy) => {
+            const missed = enemy.word[enemy.typed.length] || enemy.word[0];
+            errorCounts[missed] = (errorCounts[missed] || 0) + 1;
+        });
+        nextState = withModeAlias({
+            ...nextState,
+            lives,
+            enemies: lastStandTriggered
+                ? nextState.enemies.map((enemy) => enemy.alive ? { ...enemy, alive: false, leaked: true } : enemy)
+                : nextState.enemies.map((enemy) => leaking.some((item) => item.id === enemy.id) ? { ...enemy, leaked: true, alive: false } : enemy),
+            combo: 0,
+            counters: { ...nextState.counters, leaked: nextState.counters.leaked + leaking.length },
+            errorCounts,
+            lastStandUsed: nextState.lastStandUsed || lastStandTriggered,
+            liveMessage: lives > 0 ? getGameCopy(nextState.language).linePressure : getGameCopy(nextState.language).defeated
+        });
+        events.push({ type: 'monster_leaked', count: leaking.length });
+
+        if (lives <= 0) {
+            const finished = finishRun(nextState, 'defeat');
+            return { state: finished, events: [...events, { type: 'raid_ended', endReason: 'defeat' }] };
+        }
+    }
+
+    nextState = withModeAlias({
+        ...nextState,
+        pressureScore: calculateRaidPressure(nextState),
+        difficultyProfile: buildDifficultyProfile(nextState.riftLayer, calculateRaidPressure(nextState), nextState.mutation, nextState.relics)
+    });
+
+    let spawnTimer = nextState.spawnTimer - deltaTime;
+    let aliveCount = nextState.enemies.filter((enemy) => enemy.alive).length;
+    while (spawnTimer <= 0 && aliveCount < nextState.difficultyProfile.activeCap) {
+        const spawned = spawnMonster({ ...nextState, spawnTimer });
+        nextState = spawned.state;
+        events.push(spawned.event);
+        aliveCount += 1;
+        spawnTimer += nextState.difficultyProfile.spawnInterval * (0.86 + seededRandom(nextState.seed, `interval-${nextState.spawnIndex}`)() * 0.24);
+    }
+
+    return {
+        state: withModeAlias({ ...nextState, spawnTimer }),
+        events
+    };
+}
+
+export function chooseRaidRelic(state, relicId) {
+    if (state.phase !== RAID_PHASES.playing || !state.relicChoices?.length) return { state, events: [] };
+    const choice = state.relicChoices.find((relic) => relic.id === relicId) || state.relicChoices[0];
+    const definition = RAID_RELICS.find((relic) => relic.id === choice.id);
+    const nextRelics = [...state.relics, definition || choice];
+    const effects = getRelicEffects(nextRelics);
+    const healedLives = Math.min((state.maxLives || 5) + (effects.maxLives || 0), state.lives + (effects.healOnRelic || 0));
+    const maxLives = Math.max(state.maxLives || 5, 5 + (effects.maxLives || 0));
+    const nextState = withModeAlias({
+        ...state,
+        relics: nextRelics,
+        relicChoices: null,
+        maxLives,
+        lives: Math.min(maxLives, healedLives),
+        counters: { ...state.counters, relicChoices: state.counters.relicChoices + 1 },
+        nextRelicKill: state.nextRelicKill + 8 + Math.floor((state.riftLayer || 1) / 3),
+        difficultyProfile: buildDifficultyProfile(state.riftLayer, state.pressureScore, state.mutation, nextRelics),
+        liveMessage: `${choice.nameZh || choice.name} acquired`
+    });
+    return { state: nextState, events: [{ type: 'relic_chosen', relicId: choice.id, relic: choice }] };
+}
+
 export function dispatchRaidCommand(state, command, payload = {}) {
-    const type = typeof command === 'string' ? command : command?.type;
-    const commandPayload = typeof command === 'string' ? payload : (command || {});
+    const type = String(command || '');
+    const commandPayload = payload || {};
     const copy = getGameCopy(state.language || commandPayload.language);
 
     if (type === 'start' || type === 'retry') {
-        const nextState = startEndlessRaid(state, commandPayload);
-        return { state: nextState, events: [{ type: type === 'retry' ? 'raid_retried' : 'raid_started' }] };
+        const nextState = startArcadeRift(state, commandPayload);
+        return { state: nextState, events: [{ type: type === 'retry' ? 'raid_retried' : 'raid_started', raidMode: nextState.raidMode }] };
     }
 
     if (type === 'pause' && state.phase === RAID_PHASES.playing) {
-        return {
-            state: withModeAlias({ ...state, phase: RAID_PHASES.paused, liveMessage: copy.paused }),
-            events: [{ type: 'raid_paused' }]
-        };
+        return { state: withModeAlias({ ...state, phase: RAID_PHASES.paused, liveMessage: copy.paused }), events: [{ type: 'raid_paused' }] };
     }
 
     if (type === 'resume' && state.phase === RAID_PHASES.paused) {
-        return {
-            state: withModeAlias({ ...state, phase: RAID_PHASES.playing, liveMessage: copy.ready }),
-            events: [{ type: 'raid_resumed' }]
-        };
+        return { state: withModeAlias({ ...state, phase: RAID_PHASES.playing, liveMessage: copy.start }), events: [{ type: 'raid_resumed' }] };
     }
 
     if (type === 'extract' && state.phase === RAID_PHASES.playing) {
-        if (!isExtractAvailable(state.threatLevel || 1)) {
+        if (!isExtractAvailable(state.riftLayer || 1)) {
             return {
                 state: withModeAlias({ ...state, liveMessage: copy.extractLocked }),
-                events: [{ type: 'extract_locked', nextThreatLevel: nextExtractThreatLevel(state.threatLevel || 1) }]
+                events: [{ type: 'extract_locked', nextRiftLayer: nextExtractLayer(state.riftLayer || 1), nextThreatLevel: nextExtractLayer(state.riftLayer || 1) }]
             };
         }
-
-        const nextState = withModeAlias({
-            ...state,
-            phase: RAID_PHASES.gameover,
-            endedAt: state.elapsed,
-            endReason: 'extract',
-            extractReason: 'camp-gate',
-            liveMessage: copy.extracted
-        });
-        const result = nextEvent(nextState, { type: 'raid_ended', endReason: 'extract' });
-        return { state: result.state, events: [result.event] };
+        const nextState = finishRun(state, 'extract', 'rift-gate');
+        return { state: nextState, events: [{ type: 'raid_ended', endReason: 'extract' }] };
     }
 
     if (type === 'quit') {
         return {
             state: createRaidState({
-                ...state,
-                phase: RAID_PHASES.idle,
                 language: state.language,
-                seed: state.seed,
-                focusChars: state.focusChars,
-                wordPool: state.wordPool
+                raidMode: state.raidMode,
+                wordPool: state.wordPool,
+                focusChars: state.focusChars
             }),
             events: [{ type: 'raid_quit' }]
         };
@@ -965,287 +1207,227 @@ export function dispatchRaidCommand(state, command, payload = {}) {
         return processRaidInput(state, commandPayload.char);
     }
 
+    if (type === 'choose-relic') {
+        return chooseRaidRelic(state, commandPayload.relicId || commandPayload.index);
+    }
+
     return { state, events: [] };
 }
 
-function buildRecommendation(state, result) {
-    if (result.accuracy < 92) {
-        return '下一局先放慢首字母选择，优先守住准确率。';
-    }
-    if (result.wpm < 35) {
-        return '保持目标提前量，尝试在怪物进入中线前锁定。';
-    }
-    if (result.endReason === 'extract') {
-        return '撤离节奏稳定，下次可以多挑战一个威胁等级。';
-    }
-    if ((state.maxCombo || 0) >= 24) {
-        return '连击稳定，适合进入每日聚焦清理弱字符。';
-    }
-    return '保持节奏，下一局在营门开启时评估是否撤离。';
+function weakestCharsFrom(state) {
+    return Object.entries(state.errorCounts || {})
+        .sort((a, b) => b[1] - a[1])
+        .map(([label]) => label)
+        .slice(0, 5);
+}
+
+function buildCodexProgress(state) {
+    const seen = state.codexSeen || {};
+    const monsters = Object.values(MONSTER_TYPES).map((monster) => ({
+        id: monster.id,
+        name: monster.label,
+        nameZh: monster.labelZh,
+        role: monster.role,
+        color: monster.color,
+        hint: monster.codexHint,
+        discovered: Boolean(seen[monster.id]),
+        defeated: (state.counters?.kills || 0) > 0 && Boolean(seen[monster.id])
+    }));
+    const guardians = Object.values(GUARDIAN_VARIANTS).map((guardian) => ({
+        id: guardian.id,
+        name: guardian.label,
+        nameZh: guardian.labelZh,
+        role: guardian.role,
+        color: guardian.color,
+        summary: guardian.summary,
+        discovered: Boolean(seen[guardian.id]),
+        defeated: (state.guardianDefeated || []).includes(guardian.id)
+    }));
+    const discovered = [...monsters, ...guardians].filter((entry) => entry.discovered).length;
+    return {
+        discovered,
+        total: monsters.length + guardians.length,
+        monsters,
+        guardians
+    };
+}
+
+export function buildRiftCodexFromSessions(sessions = []) {
+    const base = buildCodexProgress({ codexSeen: {}, guardianDefeated: [], counters: createEmptyCounters() });
+    const monsterMap = new Map(base.monsters.map((entry) => [entry.id, { ...entry }]));
+    const guardianMap = new Map(base.guardians.map((entry) => [entry.id, { ...entry }]));
+
+    (Array.isArray(sessions) ? sessions : []).forEach((session) => {
+        const codex = session?.gameMeta?.codexProgress || session?.trainingMeta?.codexProgress;
+        (codex?.monsters || []).forEach((entry) => {
+            const current = monsterMap.get(entry.id);
+            if (current) {
+                monsterMap.set(entry.id, {
+                    ...current,
+                    discovered: current.discovered || Boolean(entry.discovered),
+                    defeated: current.defeated || Boolean(entry.defeated)
+                });
+            }
+        });
+        (codex?.guardians || []).forEach((entry) => {
+            const current = guardianMap.get(entry.id);
+            if (current) {
+                guardianMap.set(entry.id, {
+                    ...current,
+                    discovered: current.discovered || Boolean(entry.discovered),
+                    defeated: current.defeated || Boolean(entry.defeated)
+                });
+            }
+        });
+        (session?.gameMeta?.guardianDefeated || session?.trainingMeta?.guardianDefeated || []).forEach((id) => {
+            const current = guardianMap.get(id);
+            if (current) guardianMap.set(id, { ...current, discovered: true, defeated: true });
+        });
+    });
+
+    const monsters = [...monsterMap.values()];
+    const guardians = [...guardianMap.values()];
+    const discovered = [...monsters, ...guardians].filter((entry) => entry.discovered).length;
+    return {
+        discovered,
+        total: monsters.length + guardians.length,
+        monsters,
+        guardians
+    };
 }
 
 export function buildRaidResult(state) {
-    const durationSeconds = Math.max(1, Math.round(state.endedAt || state.elapsed || 0));
-    const errorEntries = Object.entries(state.errorCounts || {})
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5);
-    const weakestChars = errorEntries.map(([label]) => label);
-    const accuracy = getAccuracy(state);
-    const wpm = getWpm(state);
-    const threatLevel = Math.max(state.highestThreatLevel || state.threatLevel || 1, getThreatLevel(state.elapsed || 0));
-    const result = {
-        score: state.score,
-        mode: state.raidMode || 'endless',
-        wpm,
-        accuracy,
-        maxCombo: state.maxCombo,
-        threatLevel,
-        durationSeconds,
-        monstersDefeated: state.counters.kills,
-        eliteDefeated: state.counters.eliteKills || 0,
-        enemiesDefeated: state.counters.kills,
-        enemiesLeaked: state.counters.leaked,
-        focusChars: weakestChars,
-        weakestChars,
-        totalCharsTyped: state.counters.typed,
-        totalCharsCorrect: state.counters.correct,
-        livesRemaining: state.lives,
-        endReason: state.endReason || (state.phase === RAID_PHASES.gameover ? 'defeat' : null),
-        extractReason: state.extractReason || null,
-        bestStreakWindow: state.bestStreakWindow || state.maxCombo || 0
-    };
+    const durationSeconds = Math.max(0, Math.round(state.endedAt ?? state.elapsed ?? 0));
+    const typed = state.counters?.typed || 0;
+    const correct = state.counters?.correct || 0;
+    const accuracy = typed ? Math.round((correct / typed) * 100) : 100;
+    const wpm = durationSeconds > 0 ? Math.round((correct / 5) / (durationSeconds / 60)) : 0;
+    const riftLayer = Math.max(state.highestRiftLayer || state.riftLayer || 1, getRiftLayer(state.elapsed || 0));
+    const weakestChars = weakestCharsFrom(state);
+    const codexProgress = buildCodexProgress(state);
 
     return {
-        ...result,
-        recommendation: buildRecommendation(state, result)
+        mode: state.raidMode || 'endless-rift',
+        score: Math.round(state.score || 0),
+        wpm,
+        accuracy,
+        maxCombo: state.maxCombo || 0,
+        riftLayer,
+        threatLevel: riftLayer,
+        durationSeconds,
+        monstersDefeated: state.counters?.kills || 0,
+        eliteDefeated: state.counters?.eliteKills || 0,
+        guardianDefeated: state.guardianDefeated || [],
+        enemiesLeaked: state.counters?.leaked || 0,
+        totalCharsTyped: typed,
+        totalCharsCorrect: correct,
+        focusChars: state.focusChars || [],
+        weakestChars,
+        bestStreakWindow: state.maxCombo || 0,
+        endReason: state.endReason || (state.phase === RAID_PHASES.gameover ? 'defeat' : null),
+        extractReason: state.extractReason || null,
+        relicBuild: serializeRelics(state.relics),
+        activeRelics: serializeRelics(state.relics),
+        mutationId: state.mutation?.id || null,
+        mutation: state.mutation || null,
+        codexProgress,
+        recommendation: weakestChars.length
+            ? `下局优先处理 ${weakestChars.slice(0, 3).join(' / ')}`
+            : '继续推进更高裂隙层'
     };
+}
+
+function buildMonsterMix(enemies) {
+    return enemies.reduce((mix, enemy) => {
+        mix[enemy.type] = (mix[enemy.type] || 0) + 1;
+        return mix;
+    }, {});
 }
 
 export function buildRaidSnapshot(state) {
     const result = buildRaidResult(state);
-    const activeEnemy = getActiveEnemy(state);
-    const priorityEnemy = activeEnemy || getPriorityEnemy(state);
-    const extractAvailable = isExtractAvailable(state.threatLevel || 1);
-    const activeEnemies = state.enemies.filter((enemy) => enemy.alive);
+    const activeEnemies = (state.enemies || []).filter((enemy) => enemy.alive && !enemy.leaked);
+    const currentTarget = activeEnemies.find((enemy) => enemy.id === state.currentTargetId)
+        || activeEnemies.find((enemy) => enemy.typed)
+        || activeEnemies[0]
+        || null;
+    const extractAvailable = isExtractAvailable(state.riftLayer || 1);
+    const codexProgress = buildCodexProgress(state);
 
     return {
         phase: state.phase,
+        mode: state.mode || state.phase,
+        raidMode: state.raidMode,
         hud: {
-            score: state.score,
-            threatLevel: state.threatLevel || 1,
-            wave: state.threatLevel || 1,
-            waveLabel: `威胁 ${state.threatLevel || 1}`,
-            combo: state.combo,
-            maxCombo: state.maxCombo,
-            streakTier: Math.floor((state.combo || 0) / 10),
-            lives: state.lives,
-            maxLives: state.maxLives,
+            score: Math.round(state.score || 0),
+            riftLayer: state.riftLayer || 1,
+            threatLevel: state.riftLayer || 1,
+            wave: state.riftLayer || 1,
+            waveLabel: `裂隙 ${state.riftLayer || 1}`,
+            combo: state.combo || 0,
+            maxCombo: state.maxCombo || 0,
+            streakTier: state.streakTier || 0,
+            lives: state.lives || 0,
+            maxLives: state.maxLives || 5,
             accuracy: result.accuracy,
             wpm: result.wpm,
-            targetWord: priorityEnemy?.word || '',
-            pressureScore: state.pressureScore,
-            progress: getThreatProgress(state.elapsed || 0),
+            targetWord: currentTarget?.word || '',
+            targetTyped: currentTarget?.typed || '',
+            progress: getLayerProgress(state.elapsed || 0),
             elapsedSeconds: Math.round(state.elapsed || 0),
+            pressureScore: state.pressureScore || 0,
             extractAvailable,
-            nextExtractThreatLevel: nextExtractThreatLevel(state.threatLevel || 1),
-            monsterMix: buildMonsterMix(activeEnemies)
+            extractReady: extractAvailable,
+            nextExtractThreatLevel: nextExtractLayer(state.riftLayer || 1),
+            nextExtractRiftLayer: nextExtractLayer(state.riftLayer || 1),
+            monsterMix: buildMonsterMix(activeEnemies),
+            relicCount: state.relics?.length || 0,
+            mutation: state.mutation
         },
         arena: {
+            safeLineY: SAFE_LINE_Y,
+            feedback: state.feedback,
             enemies: activeEnemies.map((enemy) => ({
                 id: enemy.id,
                 type: enemy.type,
+                archetype: enemy.archetype || enemy.type,
+                label: enemy.label,
+                labelZh: enemy.labelZh,
                 word: enemy.word,
-                typed: enemy.typed || '',
+                typed: enemy.typed,
                 xRatio: enemy.xRatio,
                 y: enemy.y,
                 hp: enemy.hp,
                 maxHp: enemy.maxHp,
-                isTarget: enemy.id === priorityEnemy?.id,
-                shielded: isEnemyShielded(state, enemy),
-                elite: Boolean(enemy.elite)
-            })),
-            feedback: state.lastFeedback
+                isTarget: enemy.id === currentTarget?.id,
+                shielded: shouldBloomShield(state, enemy),
+                elite: enemy.elite,
+                guardianVariant: enemy.guardianVariant
+            }))
         },
-        overlay: state.phase === RAID_PHASES.idle
-            ? { type: 'idle' }
-            : state.phase === RAID_PHASES.paused
-                ? { type: 'paused' }
-                : state.phase === RAID_PHASES.gameover
-                    ? { type: 'result', result, isVictory: result.endReason === 'extract' }
+        relicChoices: state.relicChoices || [],
+        activeRelics: serializeRelics(state.relics),
+        mutation: state.mutation,
+        codexUnlocks: codexProgress,
+        codexProgress,
+        dangerCurve: {
+            layer: state.riftLayer || 1,
+            pressure: state.pressureScore || 0,
+            progress: getLayerProgress(state.elapsed || 0),
+            activeEnemies: activeEnemies.length,
+            activeCap: state.difficultyProfile?.activeCap || 4
+        },
+        overlay: state.phase === RAID_PHASES.gameover
+            ? {
+                type: 'result',
+                result,
+                isVictory: result.endReason === 'extract'
+            }
+            : state.phase === RAID_PHASES.idle
+                ? { type: 'idle' }
+                : state.relicChoices?.length
+                    ? { type: 'relic-choice', choices: state.relicChoices }
                     : null,
-        liveMessage: state.liveMessage
+        liveMessage: state.liveMessage || ''
     };
-}
-
-// ---------------------------------------------------------------------------
-// Compatibility exports for older modules/tests that still import game.js.
-// New game code should use the endless Raid functions above.
-// ---------------------------------------------------------------------------
-
-export function generateRaidWave(threatLevel, options = {}) {
-    const profile = buildDifficultyProfile(threatLevel, options.pressureScore ?? options.performanceScore ?? 0.45);
-    const count = Math.max(3, Math.min(10, Math.round(profile.activeCap + threatLevel / 2)));
-    const state = {
-        ...createRaidState(options),
-        threatLevel,
-        difficultyProfile: profile,
-        pressureScore: profile.pressureScore,
-        spawnIndex: 0
-    };
-    const monsters = [];
-    let nextState = state;
-    for (let index = 0; index < count; index += 1) {
-        const type = chooseNextMonsterType({ ...nextState, spawnedGuardianLevels: [threatLevel] });
-        monsters.push(generateRaidMonster({
-            ...options,
-            type,
-            threatLevel,
-            spawnIndex: index,
-            pressureScore: profile.pressureScore,
-            difficultyProfile: profile
-        }));
-        nextState = { ...nextState, spawnIndex: index + 1 };
-    }
-    return monsters;
-}
-
-export function startRaidWave(state) {
-    return startEndlessRaid(state);
-}
-
-export function getDifficultyFactor(threatLevel) {
-    return clamp(threatLevel / 12, 0, 1);
-}
-
-export function getEnemyBaseSpeed(threatLevel, canvasHeight = 600) {
-    return buildDifficultyProfile(Math.max(1, threatLevel)).baseSpeed * canvasHeight;
-}
-
-export function getSpawnInterval(threatLevel) {
-    return Math.round(buildDifficultyProfile(Math.max(1, threatLevel)).spawnInterval * 1000);
-}
-
-export function getWaveTemplate(threatLevel) {
-    return buildDifficultyProfile(Math.max(1, threatLevel));
-}
-
-export function generateWaveEnemies(waveIndex, wordPool, options = {}) {
-    return generateRaidWave(waveIndex + 1, {
-        seed: options.seed || 'legacy',
-        wordPool,
-        focusChars: options.focusChars || [],
-        pressureScore: options.performanceScore ?? 0.45
-    }).map((enemy) => ({
-        ...enemy,
-        x: enemy.xRatio * (options.canvasWidth || 800),
-        y: enemy.y * (options.canvasHeight || 600),
-        speed: enemy.speed * (options.canvasHeight || 600)
-    }));
-}
-
-export function getDifficultyModifier(profile) {
-    const modifiers = {
-        foundation: 0.78,
-        builder: 0.9,
-        fluent: 1,
-        sprint: 1.12
-    };
-    return modifiers[profile?.level?.id] || 1;
-}
-
-export function biasWordPool(basePool, hotspots = []) {
-    if (!Array.isArray(hotspots) || hotspots.length === 0) return basePool;
-    const chars = new Set(hotspots.flatMap((item) => {
-        if (typeof item === 'string') return [item.toLowerCase()];
-        if (Array.isArray(item?.chars)) return item.chars.map((char) => String(char).toLowerCase());
-        if (item?.label) return [String(item.label).toLowerCase()];
-        return [];
-    }));
-    return basePool.flatMap((word) => (
-        String(word).split('').some((char) => chars.has(char.toLowerCase())) ? [word, word] : [word]
-    ));
-}
-
-export function calculateKillScore(enemy, comboCount) {
-    return scoreForMonster(enemy, comboCount);
-}
-
-export function getComboMultiplier(comboCount) {
-    return 1 + Math.floor(comboCount / 8) * 0.16;
-}
-
-export function createGameState(options = {}) {
-    return createRaidState(options);
-}
-
-export function transitionGameMode(state, action) {
-    if (action === 'start') return dispatchRaidCommand(state, 'start').state;
-    if (action === 'pause') return dispatchRaidCommand(state, 'pause').state;
-    if (action === 'resume') return dispatchRaidCommand(state, 'resume').state;
-    if (action === 'restart') return createRaidState();
-    if (action === 'gameover') return withModeAlias({ ...state, phase: RAID_PHASES.gameover, endReason: 'defeat' });
-    return state;
-}
-
-export function processInput(state, char) {
-    return processRaidInput(state, char);
-}
-
-export function updateGameState(state, deltaTime) {
-    return updateRaidState(state, deltaTime);
-}
-
-export function startWave(state) {
-    return startEndlessRaid(state);
-}
-
-export function processSpawns(state, deltaTime) {
-    return updateRaidState(state, deltaTime).state;
-}
-
-export function buildGameResult(state) {
-    return buildRaidResult(state);
-}
-
-export function calculatePerformanceScore(state) {
-    return calculateRaidPressure(state);
-}
-
-export function getAdaptiveModifier(performanceScore) {
-    return 0.82 + clamp(performanceScore, 0, 1) * 0.36;
-}
-
-export function isBreathingWave(threatLevel) {
-    return threatLevel > 1 && threatLevel % RAID_EXTRACT_INTERVAL === 0;
-}
-
-export function getAdaptiveSpawnInterval(threatLevel, performanceScore) {
-    return Math.round(getSpawnInterval(threatLevel) / getAdaptiveModifier(performanceScore));
-}
-
-export function getBossPhase(hp, maxHp) {
-    const ratio = maxHp > 0 ? hp / maxHp : 0;
-    if (ratio > 0.66) return 1;
-    if (ratio > 0.33) return 2;
-    return 3;
-}
-
-export function getBossPhaseSpeedMultiplier(phase) {
-    return phase === 3 ? 1.28 : phase === 2 ? 1.14 : 1;
-}
-
-export function getBossPhaseWordRange(phase) {
-    return phase === 3 ? [7, 11] : phase === 2 ? [6, 9] : [5, 8];
-}
-
-export function getBossPhaseColor(phase) {
-    if (phase === 3) return '#ff453a';
-    if (phase === 2) return '#ff9f0a';
-    return '#0a84ff';
-}
-
-export function checkBossPhaseTransition(enemy) {
-    if (enemy?.type !== 'guardian') return null;
-    const next = getBossPhase(enemy.hp, enemy.maxHp);
-    return next > (enemy._bossPhase || 1) ? next : null;
 }

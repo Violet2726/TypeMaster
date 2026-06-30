@@ -152,8 +152,12 @@ export function createRaidSessionRecord(result) {
     const weakestChars = Array.isArray(result?.weakestChars) ? result.weakestChars : focusChars;
     const durationSeconds = Number(result?.durationSeconds || 0);
     const completedAt = new Date().toISOString();
-    const intent = result?.mode === 'daily-focus' ? 'daily-focus-raid' : 'endless-raid';
-    const threatLevel = Number(result?.threatLevel || 1);
+    const intent = result?.mode === 'daily-mutation'
+        ? 'daily-mutation'
+        : result?.mode === 'first-breach'
+            ? 'first-breach'
+            : 'endless-rift';
+    const threatLevel = Number(result?.riftLayer || result?.threatLevel || 1);
     const monstersDefeated = Number(result?.monstersDefeated || result?.enemiesDefeated || 0);
     const eliteDefeated = Number(result?.eliteDefeated || 0);
     const endReason = result?.endReason || null;
@@ -175,6 +179,10 @@ export function createRaidSessionRecord(result) {
             monstersDefeated,
             eliteDefeated,
             endReason,
+            relicBuild: result?.relicBuild || [],
+            guardianDefeated: result?.guardianDefeated || [],
+            mutationId: result?.mutationId || null,
+            codexProgress: result?.codexProgress || null,
             livesRemaining: Number(result?.livesRemaining || 0),
             focusChars,
             weakestChars
@@ -209,7 +217,7 @@ export function createRaidSessionRecord(result) {
         },
         sourceTextMeta: {
             source: 'builtin',
-            label: 'Endless Raid',
+            label: 'Arcade Rift',
             generatedBy: 'raid'
         },
         coachAdviceId: null,
@@ -219,14 +227,18 @@ export function createRaidSessionRecord(result) {
             intent,
             focus: focusChars.length ? focusChars.join('') : 'speed',
             sourceSessionId: null,
-            title: 'Endless Raid',
+            title: 'Arcade Rift',
             score: Number(result?.score || 0),
+            riftLayer: threatLevel,
             threatLevel,
             durationSeconds,
             maxCombo: Number(result?.maxCombo || 0),
             monstersDefeated,
             eliteDefeated,
             endReason,
+            relicBuild: result?.relicBuild || [],
+            guardianDefeated: result?.guardianDefeated || [],
+            mutationId: result?.mutationId || null,
             livesRemaining: Number(result?.livesRemaining || 0),
             focusChars
         }

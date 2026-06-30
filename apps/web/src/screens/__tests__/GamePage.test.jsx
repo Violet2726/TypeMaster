@@ -14,6 +14,7 @@ function createCanvasContext() {
         beginPath: vi.fn(),
         moveTo: vi.fn(),
         lineTo: vi.fn(),
+        quadraticCurveTo: vi.fn(),
         closePath: vi.fn(),
         arc: vi.fn(),
         roundRect: vi.fn(),
@@ -48,11 +49,11 @@ describe('GamePage', () => {
         delete window.advanceTime;
     });
 
-    test('starts endless raid and opens the DOM pause layer', async () => {
+    test('starts Arcade Rift and opens the DOM pause layer', async () => {
         renderWithProvider(<GamePage />, { route: '/raid' });
 
         await waitFor(() => expect(typeof window.render_game_to_text).toBe('function'));
-        fireEvent.click(await screen.findByRole('button', { name: '开始无尽突袭' }));
+        fireEvent.click(await screen.findByRole('button', { name: '开始无尽裂隙' }));
 
         await waitFor(() => {
             const snapshot = JSON.parse(window.render_game_to_text());
@@ -68,8 +69,8 @@ describe('GamePage', () => {
 
         fireEvent.keyDown(window, { key: 'Escape' });
 
-        expect(await screen.findByRole('dialog', { name: '无尽突袭已暂停' })).toBeInTheDocument();
+        expect(await screen.findByRole('dialog', { name: 'Arcade Rift 已暂停' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: '继续' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: '撤离并结算' })).toBeDisabled();
+        expect(screen.getByRole('button', { name: '撤离结算' })).toBeDisabled();
     });
 });

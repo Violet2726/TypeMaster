@@ -223,8 +223,9 @@ export const SessionIntentSchema = z.enum([
     'daily-mission',
     'focus-drill',
     'challenge-mission',
-    'endless-raid',
-    'daily-focus-raid',
+    'endless-rift',
+    'daily-mutation',
+    'first-breach',
     'adaptive-drill',
     'keyboard-zone-drill',
     'recovery-drill'

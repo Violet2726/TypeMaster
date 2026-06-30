@@ -274,8 +274,9 @@ describe('training state contracts', () => {
     test('parses vNext training surface and session intent metadata', () => {
         expect(TrainingSurfaceSchema.parse('practice')).toBe('practice');
         expect(TrainingSurfaceSchema.parse('missions')).toBe('missions');
-        expect(SessionIntentSchema.parse('endless-raid')).toBe('endless-raid');
-        expect(SessionIntentSchema.parse('daily-focus-raid')).toBe('daily-focus-raid');
+        expect(SessionIntentSchema.parse('endless-rift')).toBe('endless-rift');
+        expect(SessionIntentSchema.parse('daily-mutation')).toBe('daily-mutation');
+        expect(SessionIntentSchema.parse('first-breach')).toBe('first-breach');
         expect(SessionIntentSchema.parse('baseline-mission')).toBe('baseline-mission');
 
         expect(SessionTrainingMetaSchema.parse({

@@ -10,6 +10,8 @@ import IdleScreenOverlay from '../components/idle/IdleScreenOverlay';
 import PauseMenuOverlay from '../components/overlay/PauseMenuOverlay';
 import GameplayHud from '../components/overlay/GameplayHud';
 import GameOverOverlay from '../components/overlay/GameOverOverlay';
+import RelicChoiceOverlay from '../components/overlay/RelicChoiceOverlay';
+import CodexOverlay from '../components/overlay/CodexOverlay';
 
 function getFocusChars(keyboardHotspots: any) {
     const chars = keyboardHotspots?.primaryZone?.chars;
@@ -34,10 +36,11 @@ export default function GamePage() {
     const savedResultKeyRef = useRef('');
     const bestScoreRef = useRef(0);
     const bestResultKeyRef = useRef('');
-    const { keyboardHotspots, language, raidBestScore, recordCompletedRaidSession } = useGameStore();
+    const { keyboardHotspots, language, raidBestScore, riftCodex, recordCompletedRaidSession } = useGameStore();
     const focusChars = useMemo(() => getFocusChars(keyboardHotspots), [keyboardHotspots]);
     const [snapshot, setSnapshot] = useState<any>(null);
     const [bestScore, setBestScore] = useState(0);
+    const [showCodex, setShowCodex] = useState(false);
 
     const commitUpdate = useCallback((update: any, immediate = false) => {
         const renderer = rendererRef.current;
@@ -94,7 +97,15 @@ export default function GamePage() {
     }, [commitUpdate, maybeSaveResult]);
 
     const handleIdleAction = useCallback((action: string) => {
-        const raidMode: RaidMode = action === 'daily-focus' ? 'daily-focus' : 'endless';
+        if (action === 'codex') {
+            setShowCodex(true);
+            return;
+        }
+        const raidMode: RaidMode = action === 'daily-mutation'
+            ? 'daily-mutation'
+            : action === 'first-breach'
+                ? 'first-breach'
+                : 'endless-rift';
         dispatchAction('start', {
             raidMode,
             focusChars
@@ -110,8 +121,13 @@ export default function GamePage() {
 
     const handleResultAction = useCallback((action: string) => {
         if (action === 'retry') dispatchAction('retry', { focusChars });
+        if (action === 'codex') setShowCodex(true);
         if (action === 'menu') navigate('/');
     }, [dispatchAction, focusChars, navigate]);
+
+    const handleRelicChoice = useCallback((relicId: string) => {
+        dispatchAction('choose-relic', { relicId });
+    }, [dispatchAction]);
 
     useEffect(() => {
         bestScoreRef.current = raidBestScore;
@@ -258,6 +274,12 @@ export default function GamePage() {
         const char = String(nativeEvent.data || '').slice(-1).toLowerCase();
         if (!char) return;
         event.preventDefault();
+        const engine = engineRef.current;
+        if (engine?.state?.relicChoices?.length && /^[123]$/.test(char)) {
+            dispatchAction('choose-relic', { relicId: engine.state.relicChoices[Number(char) - 1]?.id });
+            if (inputRef.current) inputRef.current.value = '';
+            return;
+        }
         dispatchAction('type-char', { char });
         if (inputRef.current) inputRef.current.value = '';
     }, [dispatchAction]);
@@ -265,6 +287,13 @@ export default function GamePage() {
     const handleInputKeyDown = useCallback((event: ReactKeyboardEvent<HTMLInputElement>) => {
         const engine = engineRef.current;
         if (!engine) return;
+        if (engine.state?.relicChoices?.length && /^[123]$/.test(event.key)) {
+            event.preventDefault();
+            const update = engine.handleKey(event.nativeEvent);
+            commitUpdate(update, update.events.length > 0);
+            maybeSaveResult(update.snapshot);
+            return;
+        }
         if (event.key.length === 1) return;
         const update = engine.handleKey(event.nativeEvent);
         commitUpdate(update, update.events.length > 0);
@@ -285,19 +314,19 @@ export default function GamePage() {
             ref={containerRef}
             className="game-container"
             role="application"
-            aria-label="Typing Raid 无尽突袭游戏"
+            aria-label="Arcade Rift 打字街机游戏"
             onPointerDown={() => inputRef.current?.focus({ preventScroll: true })}
         >
             <canvas
                 ref={canvasRef}
                 className="game-canvas"
                 role="img"
-                aria-label="无尽突袭战场，输入怪物身上的词以清除目标"
+                aria-label="Arcade Rift 发光裂隙战场，输入怪物身上的词以清除目标"
             />
             <input
                 ref={inputRef}
                 className="game-keyboard-input"
-                aria-label="Typing Raid input"
+                aria-label="Arcade Rift input"
                 autoCapitalize="none"
                 autoComplete="off"
                 autoCorrect="off"
@@ -310,10 +339,15 @@ export default function GamePage() {
                 <IdleScreenOverlay
                     focusChars={focusChars}
                     bestScore={bestScore}
+                    mutation={snapshot.mutation}
+                    codexProgress={riftCodex || snapshot.codexProgress}
                     onAction={handleIdleAction}
                 />
             )}
-            {snapshot?.phase === 'playing' && <GameplayHud data={snapshot.hud} />}
+            {snapshot?.phase === 'playing' && <GameplayHud data={snapshot.hud} activeRelics={snapshot.activeRelics || []} />}
+            {snapshot?.phase === 'playing' && snapshot.relicChoices?.length ? (
+                <RelicChoiceOverlay choices={snapshot.relicChoices} onChoose={handleRelicChoice} />
+            ) : null}
             {snapshot?.phase === 'paused' && (
                 <PauseMenuOverlay stats={snapshot.hud} onAction={handlePauseAction} />
             )}
@@ -323,6 +357,9 @@ export default function GamePage() {
             <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
                 {snapshot?.liveMessage || ''}
             </div>
+            {showCodex && (
+                <CodexOverlay codex={riftCodex || snapshot?.codexProgress || snapshot?.codexUnlocks} onClose={() => setShowCodex(false)} />
+            )}
         </div>
     );
 }

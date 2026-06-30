@@ -3,7 +3,7 @@ import { usePlanSnapshot } from '../../../store/app-state-derived';
 import { useHistorySnapshot } from '../../../store/app-state-derived';
 import { useShellSnapshot } from '../../../store/app-state-derived';
 import { useAppActions } from '../../../store/use-app-action-set';
-import { buildKeyboardHotspots, buildInsights } from '@typemaster/domain';
+import { buildKeyboardHotspots, buildInsights, buildRiftCodexFromSessions } from '@typemaster/domain';
 
 export function useGameStore() {
     const plan = usePlanSnapshot();
@@ -48,12 +48,15 @@ export function useGameStore() {
     const raidBestScore = useMemo(() => Math.max(0, ...(sessions || [])
         .filter((session: any) => session?.trainingMeta?.type === 'raid')
         .map((session: any) => Number(session?.trainingMeta?.score || session?.result?.score || 0))), [sessions]);
+    const riftCodex = useMemo(() => buildRiftCodexFromSessions((sessions || [])
+        .filter((session: any) => session?.trainingMeta?.type === 'raid' || session?.kind === 'raid')), [sessions]);
 
     return {
         skillProfile,
         keyboardHotspots,
         insights,
         language,
+        riftCodex,
         raidBestScore,
         recordCompletedRaidSession: sessionActions.recordCompletedRaidSession
     };

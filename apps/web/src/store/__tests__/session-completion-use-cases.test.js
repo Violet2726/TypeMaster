@@ -235,23 +235,28 @@ describe('session completion use cases', () => {
         expect(submitChallengeResultMock).not.toHaveBeenCalled();
     });
 
-    test('records Endless Raid results through the unified session writer', () => {
+    test('records Arcade Rift results through the unified session writer', () => {
         const environment = createPlanEnvironment({
             activeSessionContext: null,
             trainingPlan: null
         });
 
         const session = recordRaidSessionCompletion(environment, {
-            mode: 'endless',
+            mode: 'daily-mutation',
             score: 12400,
             wpm: 78,
             accuracy: 96,
             durationSeconds: 514,
+            riftLayer: 7,
             threatLevel: 7,
             maxCombo: 34,
             livesRemaining: 2,
             monstersDefeated: 86,
             eliteDefeated: 1,
+            relicBuild: [{ id: 'combo-core', nameZh: '连击核心', stack: 2 }],
+            guardianDefeated: ['lumen-maw'],
+            mutationId: 'swift-nest',
+            codexProgress: { discovered: 6, total: 15 },
             enemiesLeaked: 3,
             totalCharsTyped: 420,
             totalCharsCorrect: 404,
@@ -261,30 +266,36 @@ describe('session completion use cases', () => {
         });
 
         expect(session.sourceTextMeta).toMatchObject({
-            label: 'Endless Raid',
+            label: 'Arcade Rift',
             generatedBy: 'raid'
         });
         expect(session.trainingMeta).toMatchObject({
             type: 'raid',
             surface: 'raid',
-            intent: 'endless-raid',
+            intent: 'daily-mutation',
             score: 12400,
+            riftLayer: 7,
             threatLevel: 7,
             durationSeconds: 514,
             monstersDefeated: 86,
             eliteDefeated: 1,
             endReason: 'extract',
+            mutationId: 'swift-nest',
             focusChars: ['r', 't']
         });
         expect(session).toMatchObject({
             kind: 'raid',
-            intent: 'endless-raid',
+            intent: 'daily-mutation',
             durationSeconds: 514,
             gameMeta: {
                 threatLevel: 7,
                 monstersDefeated: 86,
                 eliteDefeated: 1,
-                endReason: 'extract'
+                endReason: 'extract',
+                relicBuild: [{ id: 'combo-core', nameZh: '连击核心', stack: 2 }],
+                guardianDefeated: ['lumen-maw'],
+                mutationId: 'swift-nest',
+                codexProgress: { discovered: 6, total: 15 }
             }
         });
         expect(session.result).toMatchObject({
