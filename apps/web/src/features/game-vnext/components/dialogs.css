@@ -1,0 +1,245 @@
+.typerift-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 80;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(5, 7, 12, 0.58);
+    backdrop-filter: blur(18px) saturate(130%);
+    -webkit-backdrop-filter: blur(18px) saturate(130%);
+}
+
+.typerift-panel {
+    width: min(100%, 560px);
+    max-height: min(780px, calc(100vh - 48px));
+    overflow: auto;
+    border: 1px solid rgba(255,255,255,0.13);
+    border-radius: 8px;
+    background: rgba(15, 18, 26, 0.9);
+    box-shadow: 0 26px 76px rgba(0,0,0,0.48);
+}
+
+.typerift-panel--wide {
+    width: min(100%, 820px);
+}
+
+.typerift-panel__inner {
+    padding: 24px;
+}
+
+.typerift-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.typerift-heading span,
+.typerift-kicker {
+    color: rgba(255,255,255,0.52);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.typerift-heading h1,
+.typerift-heading h2 {
+    margin: 0;
+    color: #ffffff;
+    font-size: 34px;
+    line-height: 1;
+    font-weight: 820;
+}
+
+.typerift-heading p {
+    max-width: 35rem;
+    margin: 0 auto;
+    color: rgba(255,255,255,0.66);
+    font-size: 13px;
+    line-height: 1.48;
+}
+
+.typerift-mode-grid,
+.typerift-upgrade-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.typerift-card {
+    display: flex;
+    min-height: 176px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 16px;
+    border: 1px solid rgba(255,255,255,0.13);
+    border-radius: 8px;
+    background: rgba(255,255,255,0.055);
+    color: #ffffff;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+}
+
+.typerift-card:hover,
+.typerift-card:focus-visible {
+    border-color: rgba(100,210,255,0.5);
+    background: rgba(100,210,255,0.12);
+    outline: none;
+}
+
+.typerift-card strong {
+    font-size: 18px;
+    line-height: 1.15;
+}
+
+.typerift-card small,
+.typerift-card span:last-child {
+    color: rgba(255,255,255,0.58);
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.typerift-card--rare { border-color: rgba(191,140,255,0.34); }
+.typerift-card--epic,
+.typerift-card--legendary { border-color: rgba(255,214,10,0.38); }
+
+.typerift-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.typerift-stats div,
+.typerift-insight,
+.typerift-build {
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+}
+
+.typerift-stats div {
+    min-height: 72px;
+    padding: 12px;
+}
+
+.typerift-stats span,
+.typerift-insight span,
+.typerift-build > span {
+    display: block;
+    color: rgba(255,255,255,0.48);
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.typerift-stats strong,
+.typerift-insight strong {
+    display: block;
+    margin-top: 6px;
+    color: #ffffff;
+    font-size: 20px;
+    line-height: 1.1;
+    font-weight: 800;
+}
+
+.typerift-build,
+.typerift-insight {
+    margin-top: 10px;
+    padding: 14px;
+}
+
+.typerift-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 8px;
+}
+
+.typerift-pills b {
+    display: inline-flex;
+    min-height: 28px;
+    align-items: center;
+    padding: 0 9px;
+    border-radius: 8px;
+    background: rgba(100,210,255,0.13);
+    color: #ffffff;
+    font-size: 12px;
+}
+
+.typerift-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.typerift-action {
+    display: inline-flex;
+    flex: 1;
+    min-height: 46px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid rgba(255,255,255,0.13);
+    border-radius: 8px;
+    background: rgba(255,255,255,0.07);
+    color: rgba(255,255,255,0.82);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 760;
+    cursor: pointer;
+}
+
+.typerift-action:hover,
+.typerift-action:focus-visible {
+    border-color: rgba(255,255,255,0.24);
+    background: rgba(255,255,255,0.12);
+    outline: none;
+}
+
+.typerift-action--primary {
+    border-color: rgba(10,132,255,0.45);
+    background: #0a84ff;
+    color: #ffffff;
+}
+
+.typerift-action--extract {
+    border-color: rgba(126,225,152,0.42);
+    color: #7ee198;
+    background: rgba(126,225,152,0.14);
+}
+
+.typerift-action:disabled {
+    cursor: not-allowed;
+    opacity: 0.46;
+}
+
+@media (max-width: 760px) {
+    .typerift-overlay {
+        align-items: flex-end;
+        padding: 14px;
+    }
+
+    .typerift-panel,
+    .typerift-panel--wide {
+        width: 100%;
+        max-height: min(720px, calc(100vh - 28px));
+    }
+
+    .typerift-panel__inner {
+        padding: 18px;
+    }
+
+    .typerift-mode-grid,
+    .typerift-upgrade-grid,
+    .typerift-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .typerift-actions {
+        flex-direction: column;
+    }
+}
+
