@@ -345,7 +345,8 @@ export function SettingsDrawer({
                             </div>
                         </div>
                     </section>
-                </div></div>\n            </aside>
+                </div></div>
+            </aside>
         </div>
     );
 }

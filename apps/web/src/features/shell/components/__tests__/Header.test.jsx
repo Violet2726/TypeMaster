@@ -30,7 +30,7 @@ describe('Header', () => {
         renderHeader();
 
         expect(screen.getAllByRole('link', { name: 'TypeRift' }).length).toBeGreaterThanOrEqual(1);
-        expect(screen.getAllByRole('link', { name: 'Focus Lab' }).length).toBeGreaterThanOrEqual(1);
+        expect(screen.getAllByRole('link', { name: 'Practice' }).length).toBeGreaterThanOrEqual(1);
         expect(screen.getAllByRole('link', { name: 'Missions' }).length).toBeGreaterThanOrEqual(1);
         expect(screen.queryByRole('link', { name: 'Plan' })).not.toBeInTheDocument();
         expect(screen.queryByRole('link', { name: 'Challenge' })).not.toBeInTheDocument();
