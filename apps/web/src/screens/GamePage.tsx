@@ -22,6 +22,10 @@ import { useGameResultPersistence } from '../features/game-vnext/hooks/use-game-
 import { useGameTestBridge } from '../features/game-vnext/hooks/use-game-test-bridge';
 import type { GameSnapshot } from '../types/game';
 
+type GamePageProps = {
+    onExit?: () => void;
+};
+
 function getFocusChars(keyboardHotspots: any) {
     const chars = keyboardHotspots?.primaryZone?.chars;
     if (!Array.isArray(chars)) return [];
@@ -31,7 +35,7 @@ function getFocusChars(keyboardHotspots: any) {
         .slice(0, 5);
 }
 
-export default function GamePage() {
+export default function GamePage({ onExit }: GamePageProps) {
     const navigate = useAppNavigate();
     const containerRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -93,18 +97,27 @@ export default function GamePage() {
         inputRef.current?.focus({ preventScroll: true });
     }, [startGame]);
 
+    const handleExit = useCallback(() => {
+        if (onExit) {
+            onExit();
+            return;
+        }
+
+        navigate('/');
+    }, [navigate, onExit]);
+
     const handlePauseAction = useCallback((action: string) => {
         if (action === 'resume') dispatchAndFocus('resume');
         if (action === 'retry') dispatchAndFocus('retry', { focusChars });
         if (action === 'extract') dispatchAndFocus('extract');
-        if (action === 'quit') navigate('/');
-    }, [dispatchAndFocus, focusChars, navigate]);
+        if (action === 'quit') handleExit();
+    }, [dispatchAndFocus, focusChars, handleExit]);
 
     const handleResultAction = useCallback((action: string) => {
         if (action === 'retry') dispatchAndFocus('retry', { focusChars });
         if (action === 'codex') setShowCodex(true);
-        if (action === 'menu') navigate('/');
-    }, [dispatchAndFocus, focusChars, navigate]);
+        if (action === 'menu') handleExit();
+    }, [dispatchAndFocus, focusChars, handleExit]);
 
     const handleTopPauseAction = useCallback(() => {
         const phase = snapshotRef.current?.phase;
@@ -160,6 +173,7 @@ export default function GamePage() {
                 : resultOverlay
                     ? copy.game.topResult
                     : copy.game.topPlaying;
+    const showGameTopBar = snapshot?.phase !== 'idle';
 
     return (
         <div
@@ -169,42 +183,44 @@ export default function GamePage() {
             aria-label={copy.game.aria}
             onPointerDown={() => inputRef.current?.focus({ preventScroll: true })}
         >
-            <GameTopBar
-                eyebrow={copy.game.topEyebrow}
-                title={copy.game.topTitle}
-                subtitle={topSubtitle}
-                primary={{
-                    id: 'exit',
-                    label: copy.game.exit,
-                    ariaLabel: copy.game.exit,
-                    icon: Home,
-                    onClick: () => navigate('/')
-                }}
-                actions={[
-                    {
-                        id: 'pause',
-                        label: isPaused ? copy.game.resume : copy.game.pause,
-                        ariaLabel: isPaused ? copy.game.resume : copy.game.pause,
-                        icon: isPaused ? Play : Pause,
-                        disabled: !isPlaying && !isPaused,
-                        onClick: handleTopPauseAction
-                    },
-                    {
-                        id: 'settings',
-                        label: copy.game.settings,
-                        ariaLabel: copy.game.settings,
-                        icon: Settings,
-                        onClick: handleOpenSettings
-                    },
-                    {
-                        id: 'help',
-                        label: copy.game.help,
-                        ariaLabel: copy.game.help,
-                        icon: HelpCircle,
-                        onClick: () => setShowHelp(true)
-                    }
-                ]}
-            />
+            {showGameTopBar ? (
+                <GameTopBar
+                    eyebrow={copy.game.topEyebrow}
+                    title={copy.game.topTitle}
+                    subtitle={topSubtitle}
+                    primary={{
+                        id: 'exit',
+                        label: copy.game.exit,
+                        ariaLabel: copy.game.exit,
+                        icon: Home,
+                        onClick: handleExit
+                    }}
+                    actions={[
+                        {
+                            id: 'pause',
+                            label: isPaused ? copy.game.resume : copy.game.pause,
+                            ariaLabel: isPaused ? copy.game.resume : copy.game.pause,
+                            icon: isPaused ? Play : Pause,
+                            disabled: !isPlaying && !isPaused,
+                            onClick: handleTopPauseAction
+                        },
+                        {
+                            id: 'settings',
+                            label: copy.game.settings,
+                            ariaLabel: copy.game.settings,
+                            icon: Settings,
+                            onClick: handleOpenSettings
+                        },
+                        {
+                            id: 'help',
+                            label: copy.game.help,
+                            ariaLabel: copy.game.help,
+                            icon: HelpCircle,
+                            onClick: () => setShowHelp(true)
+                        }
+                    ]}
+                />
+            ) : null}
             <canvas
                 ref={canvasRef}
                 className="typerift-canvas"
@@ -231,7 +247,13 @@ export default function GamePage() {
                     onStart={handleStart}
                 />
             )}
-            {snapshot?.phase === 'playing' && <HudOverlay data={snapshot.hud} copy={copy} />}
+            {snapshot?.phase === 'playing' && (
+                <HudOverlay
+                    data={snapshot.hud}
+                    copy={copy}
+                    onSurge={() => dispatchAndFocus('surge')}
+                />
+            )}
             {snapshot?.phase === 'playing' && snapshot.upgradeChoices?.length ? (
                 <UpgradeOverlay choices={snapshot.upgradeChoices} copy={copy} onChoose={(upgradeId) => dispatchAndFocus('choose-upgrade', { upgradeId })} />
             ) : null}

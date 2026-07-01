@@ -27,7 +27,7 @@ typemaster/
 
 ## 产品模块
 
-- `TypeRift: Echo Siege`：主游戏模块，路径暂保留 `/raid` 作为导航兼容入口，但 UI、测试、数据模型统一使用 TypeRift/game 命名。
+- `TypeRift: Echo Siege`：主游戏模块以内嵌卡片运行在指挥台中，UI、测试、数据模型统一使用 TypeRift/game 命名。
 - `Focus Lab`：短训练模块，用于修复 TypeRift 和日常练习暴露出的弱字符、节奏和准确率问题。
 - `Missions`：校准、日常任务和训练计划入口，服务于 TypeRift 前后的训练节奏。
 - `Insights`：复盘速度、准确率、弱字符、游戏深度、撤离稳定性和成就进展。
@@ -131,7 +131,7 @@ pnpm dev:api
 
 - Web: `http://localhost:5173`
 - API: `http://localhost:8080`
-- TypeRift: `http://localhost:5173/raid`
+- TypeRift: `http://localhost:5173/#typerift`
 
 开发态 Next.js rewrites 会把 Web 里的 `/api` 转发到 `http://localhost:8080`。
 
@@ -148,12 +148,12 @@ pnpm test:e2e
 
 - `packages/domain`：确定性 seed、生成、锁定、输入命中、错误惩罚、击杀、泄漏、Boss 阶段、升级与结算。
 - `apps/web`：模式选择、HUD、升级 overlay、结算写入 v7 game session。
-- Playwright：`/raid` 首屏、Canvas 非空、桌面/移动无明显遮挡、资产失败 fallback。
+- Playwright：指挥台 TypeRift 卡片、Canvas 非空、桌面/移动无明显遮挡、资产失败 fallback。
 
 ## 运行模型
 
 - 路由使用 Next.js App Router 浏览器路径，不使用 hash route。
-- `/raid` 是 TypeRift 的保留入口路径，不代表内部仍使用旧游戏模型。
+- `/raid` 不再作为 TypeRift 保留入口；TypeRift 从指挥台 `#typerift` 卡片打开。
 - React Query 管理 account、sessions、plans、skill profiles、daily challenges 等 API 快照。
 - Zustand 管理当前输入草稿、运行时控制、UI 偏好和进行中的训练流。
 - Store action hook 保持薄层适配；账号同步、草稿生成、训练启动、教练反馈和会话完成等产品流程放在 `*-use-cases.ts` 中。

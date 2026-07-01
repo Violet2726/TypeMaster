@@ -67,7 +67,7 @@ async function finishRound(page) {
     await page.waitForURL(/\/result/, { timeout: 10000 });
 }
 
-test('shows the TypeRift command center and keeps the v7 route loop', async ({ page }) => {
+test('shows the TypeRift command center and keeps TypeRift cardized', async ({ page }) => {
     await seedVNextState(page);
 
     await page.goto('/');
@@ -80,7 +80,8 @@ test('shows the TypeRift command center and keeps the v7 route loop', async ({ p
     await expect(page.getByRole('heading', { name: 'Mission Center' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Back to TypeRift' }).click();
-    await expect(page).toHaveURL(/\/raid/);
+    await expect(page).toHaveURL(/\/#typerift/);
+    await expect(page.getByRole('application', { name: 'TypeRift roguelite typing survival game' })).toBeVisible();
 });
 
 test('completes a Focus Lab round and reaches the unified result page', async ({ page, isMobile }) => {
@@ -105,7 +106,7 @@ test('completes a Focus Lab round and reaches the unified result page', async ({
 test('starts TypeRift with a non-empty battle canvas and DOM HUD', async ({ page }) => {
     await seedVNextState(page);
 
-    await page.goto('/raid');
+    await page.goto('/#typerift');
     await expect(page.getByRole('application', { name: 'TypeRift roguelite typing survival game' })).toBeVisible();
     await page.getByRole('button', { name: 'Expedition' }).click();
 

@@ -8,7 +8,7 @@ import {
 import type { GameMode, GameResult, GameSnapshot } from '../../../types/game';
 export type { GameMode } from '../../../types/game';
 
-export type GameCommand = 'start' | 'pause' | 'resume' | 'retry' | 'quit' | 'extract' | 'type-char' | 'choose-upgrade';
+export type GameCommand = 'start' | 'pause' | 'resume' | 'retry' | 'quit' | 'extract' | 'type-char' | 'choose-upgrade' | 'surge';
 
 export interface GameEngineOptions {
     language?: string;
@@ -113,6 +113,11 @@ export function createGameEngine(options: GameEngineOptions = {}): GameEngine {
             event.preventDefault();
             const index = Number(key) - 1;
             return dispatch('choose-upgrade', { upgradeId: state.upgradeChoices[index]?.id });
+        }
+
+        if ((key === ' ' || key === 'Spacebar') && state.phase === 'playing' && !state.upgradeChoices?.length) {
+            event.preventDefault();
+            return dispatch('surge');
         }
 
         if ((key === 'r' || key === 'R') && state.phase === 'gameover') {

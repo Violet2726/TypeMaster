@@ -13,6 +13,7 @@
 .typerift-hud__cluster,
 .typerift-hud__target,
 .typerift-hud__metric,
+.typerift-hud__surge,
 .typerift-hud__lives {
     min-height: 44px;
     border: 1px solid var(--panel-stroke);
@@ -35,6 +36,7 @@
 }
 
 .typerift-hud__metric,
+.typerift-hud__surge,
 .typerift-hud__lives {
     display: inline-flex;
     align-items: center;
@@ -46,6 +48,46 @@
     font-size: 13px;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
+}
+
+.typerift-hud__surge {
+    position: relative;
+    overflow: hidden;
+    border-color: rgba(10,132,255,0.34);
+    color: var(--tm-white-alpha-820);
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.typerift-hud__surge i {
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    bottom: 5px;
+    height: 3px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.14);
+}
+
+.typerift-hud__surge b {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #0a84ff, #64d2ff, #ffffff);
+}
+
+.typerift-hud__surge.is-ready {
+    border-color: rgba(10,132,255,0.72);
+    color: #ffffff;
+    background: rgba(10,132,255,0.28);
+    box-shadow: 0 0 0 1px rgba(100,210,255,0.18), 0 18px 48px rgba(10,132,255,0.22);
+}
+
+.typerift-hud__surge:hover,
+.typerift-hud__surge:focus-visible {
+    outline: none;
+    border-color: rgba(255,255,255,0.36);
 }
 
 .typerift-hud__metric--score {
@@ -146,6 +188,7 @@
     }
 
     .typerift-hud__metric,
+    .typerift-hud__surge,
     .typerift-hud__lives {
         width: 100%;
         min-width: 0;

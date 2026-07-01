@@ -1,6 +1,8 @@
 'use client';
 
-import { BarChart3, DoorOpen, Flame, Gauge, Keyboard, ShieldCheck, Swords, Target } from 'lucide-react';
+import dynamic from 'next/dynamic';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { BarChart3, DoorOpen, Flame, Gauge, Keyboard, Play, Swords, Target } from 'lucide-react';
 import { formatDateTime } from '../i18n';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { useHomePageStore } from '../store/app-state-selectors';
@@ -12,6 +14,10 @@ import {
     type ProgressItem
 } from '../features/home/components/HomeDashboardSections';
 import './home-page.css';
+
+const EmbeddedGamePage = dynamic(() => import('./GamePage'), {
+    ssr: false
+});
 
 function getGameSessions(sessions: any[]) {
     return sessions.filter((session) => session.kind === 'game' || session.trainingMeta?.type === 'game');
@@ -40,6 +46,8 @@ function fillTemplate(template: string, values: Record<string, string | number>)
 
 export function HomePage() {
     const navigate = useAppNavigate();
+    const typeRiftSectionRef = useRef<HTMLElement>(null);
+    const [isTypeRiftOpen, setIsTypeRiftOpen] = useState(false);
     const { copy, language, sessions, sessionStreak, skillProfile, weeklyGoal } = useHomePageStore();
     const homeCopy = copy.home;
     const gameSessions = getGameSessions(sessions);
@@ -71,6 +79,34 @@ export function HomePage() {
             tone: 'success'
         }
     ];
+    const openTypeRift = useCallback(() => {
+        setIsTypeRiftOpen(true);
+        window.history.replaceState(null, '', '#typerift');
+        requestAnimationFrame(() => {
+            typeRiftSectionRef.current?.scrollIntoView?.({ block: 'start', behavior: 'smooth' });
+        });
+    }, []);
+
+    const closeTypeRift = useCallback(() => {
+        setIsTypeRiftOpen(false);
+        if (window.location.hash === '#typerift') {
+            window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
+        }
+    }, []);
+
+    useEffect(() => {
+        const openFromHash = () => {
+            if (window.location.hash !== '#typerift') return;
+            setIsTypeRiftOpen(true);
+            requestAnimationFrame(() => {
+                typeRiftSectionRef.current?.scrollIntoView?.({ block: 'start' });
+            });
+        };
+
+        openFromHash();
+        window.addEventListener('hashchange', openFromHash);
+        return () => window.removeEventListener('hashchange', openFromHash);
+    }, []);
 
     return (
         <div className="page-stack page-stack--home home-status-page-stack home-status-page-stack--dashboard">
@@ -80,11 +116,28 @@ export function HomePage() {
                 body={homeCopy.commandBody}
                 startLabel={homeCopy.startTypeRift}
                 viewMissionsLabel={homeCopy.viewMissions}
-                onStart={() => navigate('/raid')}
+                onStart={openTypeRift}
                 onOpenMissions={() => navigate('/missions')}
             />
 
             <ProgressStrip ariaLabel={homeCopy.progressAria} items={metricItems} />
+
+            <section id="typerift" ref={typeRiftSectionRef} className="home-typerift" aria-label={homeCopy.typeRiftLaneTitle}>
+                {isTypeRiftOpen ? (
+                    <EmbeddedGamePage onExit={closeTypeRift} />
+                ) : (
+                    <button className="home-typerift-launch" type="button" onClick={openTypeRift}>
+                        <span className="home-typerift-launch__icon" aria-hidden="true">
+                            <Play size={18} strokeWidth={2.2} />
+                        </span>
+                        <span className="home-typerift-launch__body">
+                            <span>{homeCopy.primaryLane}</span>
+                            <strong>{homeCopy.typeRiftLaneTitle}</strong>
+                            <small>{homeCopy.typeRiftLaneBody}</small>
+                        </span>
+                    </button>
+                )}
+            </section>
 
             <section className="app-card-grid" aria-label={homeCopy.loopActionsAria}>
                 <NextActionCard
@@ -93,7 +146,7 @@ export function HomePage() {
                     label={homeCopy.typeRiftLaneTitle}
                     description={homeCopy.typeRiftLaneBody}
                     tone="primary"
-                    onClick={() => navigate('/raid')}
+                    onClick={openTypeRift}
                 />
                 <NextActionCard
                     icon={Keyboard}

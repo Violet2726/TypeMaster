@@ -162,3 +162,61 @@ export function processGameInput(state, rawChar) {
 
     return { state: nextState, events: [{ type: 'char_correct', enemyId: target.id, char }] };
 }
+
+export function activateSurge(state) {
+    if (state.phase !== GAME_PHASES.playing || state.upgradeChoices?.length) return { state, events: [] };
+
+    const copy = getGameCopy(state.language);
+    if ((state.energy || 0) < 100) {
+        return {
+            state: { ...state, liveMessage: copy.surgeCharging },
+            events: [{ type: 'surge_not_ready' }]
+        };
+    }
+
+    const enemies = activeEnemies(state);
+    const boss = enemies.find((enemy) => enemy.boss);
+    const clearTargets = enemies
+        .filter((enemy) => !enemy.boss)
+        .sort((a, b) => b.y - a.y)
+        .slice(0, 4);
+    let nextState = {
+        ...state,
+        energy: 0,
+        heat: clamp(state.heat - 18, 0, 100),
+        combo: state.combo + (clearTargets.length ? 2 : 0),
+        maxCombo: Math.max(state.maxCombo, state.combo + (clearTargets.length ? 2 : 0)),
+        liveMessage: copy.surgeOnline,
+        feedback: { kind: 'surge', at: state.elapsed }
+    };
+    let events = [{ type: 'surge_activated', count: clearTargets.length + (boss ? 1 : 0) }];
+
+    if (boss) {
+        if (boss.hp <= 2) {
+            const result = defeatEnemy(nextState, boss);
+            nextState = result.state;
+            events = [...events, ...result.events];
+        } else {
+            nextState = {
+                ...nextState,
+                enemies: nextState.enemies.map((enemy) => (
+                    enemy.id === boss.id
+                        ? { ...enemy, hp: enemy.hp - 2, phase: (enemy.phase || 1) + 1 }
+                        : enemy
+                )),
+                feedback: { kind: 'boss_phase', enemyId: boss.id, at: state.elapsed }
+            };
+            events.push({ type: 'boss_phase', enemyId: boss.id, hp: boss.hp - 2 });
+        }
+    }
+
+    clearTargets.forEach((target) => {
+        const current = nextState.enemies.find((enemy) => enemy.id === target.id && enemy.alive);
+        if (!current) return;
+        const result = defeatEnemy(nextState, current);
+        nextState = result.state;
+        events = [...events, ...result.events];
+    });
+
+    return { state: { ...nextState, energy: 0 }, events };
+}

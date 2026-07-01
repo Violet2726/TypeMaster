@@ -1,6 +1,6 @@
 import { GAME_PHASES, getGameCopy } from './content.js';
 import { startGameState, createGameState } from './state.js';
-import { processGameInput } from './combat.js';
+import { activateSurge, processGameInput } from './combat.js';
 import { chooseUpgrade } from './upgrades.js';
 import { finishRun, isExtractAvailable } from './scoring.js';
 
@@ -41,8 +41,8 @@ export function dispatchGameCommand(state, command, payload = {}) {
     }
 
     if (type === 'type-char') return processGameInput(state, payload.char);
+    if (type === 'surge') return activateSurge(state);
     if (type === 'choose-upgrade') return chooseUpgrade(state, payload.upgradeId || payload.index);
 
     return { state, events: [] };
 }
-

@@ -1,16 +1,17 @@
 .typerift-container {
-    position: fixed;
-    inset: 0;
-    width: 100vw;
-    height: 100vh;
+    position: relative;
+    width: 100%;
+    height: clamp(520px, 72vh, 760px);
     overflow: hidden;
+    border: 1px solid var(--panel-stroke);
+    border-radius: var(--tm-radius-panel);
     background: #06080d;
     color: #ffffff;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Inter, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     isolation: isolate;
     touch-action: manipulation;
-    z-index: 9999;
+    box-shadow: var(--shadow-soft);
 }
 
 .typerift-canvas {
@@ -48,12 +49,8 @@
     border: 0;
 }
 
-.app-shell--immersive-game .settings-overlay {
-    z-index: 10020;
-}
-
-.app-shell--immersive-game .settings-drawer {
-    z-index: 10021;
+.typerift-container {
+    scroll-margin-top: 5.5rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -62,5 +59,12 @@
     .typerift-container *::after {
         animation-duration: 1ms !important;
         transition-duration: 1ms !important;
+    }
+}
+
+@media (max-width: 720px) {
+    .typerift-container {
+        height: min(680px, calc(100vh - 9rem));
+        min-height: 520px;
     }
 }

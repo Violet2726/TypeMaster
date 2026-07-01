@@ -40,6 +40,7 @@ export function buildGameSnapshot(state) {
             maxLives: state.maxLives || 5,
             heat: Math.round(state.heat || 0),
             energy: Math.round(state.energy || 0),
+            surgeReady: (state.energy || 0) >= 100,
             level: state.level || 1,
             xp: state.xp || 0,
             nextUpgradeXp: state.nextUpgradeXp || 1,
@@ -91,4 +92,3 @@ export function buildGameSnapshot(state) {
         liveMessage: state.liveMessage || ''
     };
 }
-

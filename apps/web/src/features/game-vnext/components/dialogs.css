@@ -28,7 +28,7 @@
 .typerift-panel--mode {
     width: min(100%, 860px);
     background:
-        linear-gradient(180deg, var(--bg-elevated), var(--bg-panel));
+        linear-gradient(180deg, rgba(28,31,40,0.92), rgba(10,12,18,0.92));
 }
 
 .typerift-panel__inner {
@@ -74,28 +74,104 @@
     gap: 10px;
 }
 
-.typerift-mode-card.app-card {
-    min-height: 150px;
-    align-content: start;
+.typerift-mode-card,
+.typerift-upgrade-card {
+    position: relative;
+    display: grid;
+    min-width: 0;
+    border: 1px solid rgba(255,255,255,0.13);
+    border-radius: 8px;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    overflow: hidden;
+    transition:
+        border-color var(--transition-fast),
+        background var(--transition-fast),
+        transform var(--transition-fast);
 }
 
-.typerift-mode-card .app-card__icon {
-    border-radius: var(--tm-radius-control);
-    background: var(--main-soft);
-    color: var(--main-color);
+.typerift-mode-card {
+    grid-template-rows: auto 1fr auto;
+    min-height: 174px;
+    padding: 14px;
+    background:
+        radial-gradient(circle at 20% 0%, rgba(100,210,255,0.2), transparent 42%),
+        linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.035));
 }
 
-.typerift-mode-card .app-card__kicker {
+.typerift-mode-card--primary {
+    border-color: rgba(100,210,255,0.38);
+    background:
+        radial-gradient(circle at 24% 0%, rgba(100,210,255,0.28), transparent 42%),
+        linear-gradient(180deg, rgba(10,132,255,0.18), rgba(255,255,255,0.04));
+}
+
+.typerift-mode-card:hover,
+.typerift-mode-card:focus-visible,
+.typerift-upgrade-card:hover,
+.typerift-upgrade-card:focus-visible {
+    transform: translateY(-1px);
+    border-color: rgba(255,255,255,0.36);
+    outline: none;
+}
+
+.typerift-mode-card__icon {
+    display: inline-grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.1);
+    color: #64d2ff;
+}
+
+.typerift-mode-card__copy,
+.typerift-upgrade-card__copy {
+    display: grid;
+    min-width: 0;
+    gap: 6px;
+}
+
+.typerift-mode-card__copy {
+    margin-top: 18px;
+}
+
+.typerift-mode-card__copy small,
+.typerift-upgrade-card__copy small {
     color: var(--tm-white-alpha-580);
+    font-size: 11px;
+    font-weight: 760;
+    text-transform: uppercase;
 }
 
-.typerift-mode-card .app-card__text strong {
-    color: var(--color-white);
-    font-size: 1.08rem;
+.typerift-mode-card__copy strong,
+.typerift-upgrade-card__copy strong {
+    color: #ffffff;
+    font-size: 18px;
+    line-height: 1.08;
+    font-weight: 820;
 }
 
-.typerift-mode-card .app-card__text span {
-    color: var(--tm-white-alpha-640);
+.typerift-mode-card__copy span,
+.typerift-upgrade-card__copy span {
+    color: var(--tm-white-alpha-680);
+    font-size: 13px;
+    line-height: 1.42;
+}
+
+.typerift-mode-card__stats {
+    display: inline-flex;
+    width: fit-content;
+    min-height: 28px;
+    align-items: center;
+    margin-top: 18px;
+    padding: 0 9px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.78);
+    font-size: 12px;
+    font-weight: 750;
 }
 
 .typerift-mode-metrics {
@@ -114,28 +190,65 @@
     font-size: 1.05rem;
 }
 
-.typerift-upgrade-card.app-card {
-    min-height: 176px;
-    align-content: start;
+.typerift-upgrade-card {
+    grid-template-columns: 72px minmax(0, 1fr);
+    min-height: 188px;
+    gap: 14px;
+    padding: 14px;
+    background:
+        radial-gradient(circle at 0% 0%, rgba(255,255,255,0.14), transparent 46%),
+        linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.032));
 }
 
-.typerift-upgrade-card .app-card__icon {
-    border-radius: var(--tm-radius-control);
+.typerift-upgrade-card__number {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: inline-grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 820;
 }
 
-.typerift-upgrade-card .app-card__text strong {
-    color: var(--color-white);
-    font-size: 1.08rem;
+.typerift-upgrade-card__art {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: 72px;
+    height: 72px;
+    border: 1px solid rgba(255,255,255,0.13);
+    border-radius: 8px;
+    background: rgba(0,0,0,0.18);
+    overflow: hidden;
 }
 
-.typerift-upgrade-card .app-card__text span,
-.typerift-upgrade-card .app-card__kicker {
-    color: var(--tm-white-alpha-580);
+.typerift-upgrade-card__art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.typerift-upgrade-card__art svg {
+    position: absolute;
+    right: 7px;
+    bottom: 7px;
+    color: #ffffff;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
 }
 
 .typerift-upgrade-card--rare { border-color: rgba(100,210,255,0.5); }
 .typerift-upgrade-card--epic,
-.typerift-upgrade-card--legendary { border-color: rgba(255,214,10,0.38); }
+.typerift-upgrade-card--legendary {
+    border-color: rgba(255,214,10,0.38);
+    background:
+        radial-gradient(circle at 0% 0%, rgba(255,214,10,0.18), transparent 46%),
+        linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.032));
+}
 
 .typerift-stats {
     display: grid;
@@ -255,7 +368,7 @@
     .typerift-panel,
     .typerift-panel--wide {
         width: 100%;
-        max-height: min(720px, calc(100vh - 28px));
+        max-height: calc(100% - 28px);
     }
 
     .typerift-panel__inner {
@@ -267,6 +380,20 @@
     .typerift-stats,
     .typerift-mode-metrics {
         grid-template-columns: 1fr;
+    }
+
+    .typerift-mode-card {
+        min-height: 154px;
+    }
+
+    .typerift-upgrade-card {
+        grid-template-columns: 58px minmax(0, 1fr);
+        min-height: 144px;
+    }
+
+    .typerift-upgrade-card__art {
+        width: 58px;
+        height: 58px;
     }
 
     .typerift-actions {

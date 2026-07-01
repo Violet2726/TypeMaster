@@ -27,9 +27,10 @@ function resolveRouteLabel(route, copy: AppCopy) {
 }
 
 function getNavProps(pathname: string, href: string) {
+    const hrefPath = href.split('#')[0] || '/';
     const isActive = href === '/'
         ? pathname === '/'
-        : pathname === href;
+        : !href.includes('#') && pathname === hrefPath;
 
     return {
         className: `nav-link${isActive ? ' active' : ''}`,
@@ -86,9 +87,10 @@ export function Header({ settings, copy, onToggleTheme, onOpenSettings }: Header
             {!compact && (
                 <nav className="mobile-tab-bar" aria-label="Mobile navigation">
                     {navItems.map(({ href, label, icon: Icon }) => {
+                        const hrefPath = href.split('#')[0] || '/';
                         const isActive = href === '/'
                             ? pathname === '/'
-                            : pathname.startsWith(href);
+                            : !href.includes('#') && pathname.startsWith(hrefPath);
                         return (
                             <Link
                                 key={href}

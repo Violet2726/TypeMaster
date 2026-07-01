@@ -6,7 +6,7 @@ export const enUSMessages = {
         },
         nav: {
             home: 'Home',
-            raid: 'TypeRift',
+            typerift: 'TypeRift',
             practice: 'Practice',
             missions: 'Missions',
             insights: 'Insights',
@@ -194,7 +194,7 @@ export const enUSMessages = {
             settings: 'Settings',
             help: 'Help',
             helpTitle: 'Controls',
-            helpBody: 'Type enemy tags to attack. Press Esc to pause, 1/2/3 to choose upgrades, and use Exit to return to the command center.',
+            helpBody: 'Type enemy tags to attack. Press Space to release Echo Surge at full energy, Esc to pause, and 1/2/3 to choose upgrades.',
             helpDismiss: 'Got it',
             modeAria: 'TypeRift mode select',
             modeKicker: 'Roguelite typing survival',
@@ -208,17 +208,20 @@ export const enUSMessages = {
                 expedition: {
                     title: 'Expedition',
                     meta: '12-18 min',
-                    body: 'Full route with bosses, upgrades, extraction, and deeper risk.'
+                    body: 'Full route with bosses, upgrades, extraction, and deeper risk.',
+                    stats: '5 zones / full codex'
                 },
                 daily: {
                     title: 'Daily Anomaly',
                     meta: 'Fixed seed',
-                    body: 'A comparable daily route for build and stability checks.'
+                    body: 'A comparable daily route for build and stability checks.',
+                    stats: 'Shared pressure'
                 },
                 first: {
                     title: 'First Descent',
                     meta: '6 min',
-                    body: 'A short onboarding run that unlocks the first TypeRift sample.'
+                    body: 'A short onboarding run that unlocks the first TypeRift sample.',
+                    stats: 'Fast unlock'
                 }
             },
             hud: {
@@ -232,6 +235,9 @@ export const enUSMessages = {
                 level: 'Level',
                 lives: 'Lives',
                 upgrade: 'Upgrade',
+                surge: 'Surge',
+                surgeReady: 'Surge',
+                surgeHint: 'Press Space or tap to release Echo Surge when energy is full.',
                 extractReady: 'Extract ready',
                 noTarget: '...'
             },

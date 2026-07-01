@@ -1,6 +1,6 @@
 'use client';
 
-import { Activity, Crosshair, DoorOpen, Flame, Heart, Layers, Timer, Zap } from 'lucide-react';
+import { Activity, Crosshair, DoorOpen, Flame, Heart, Layers, RadioTower, Timer, Zap } from 'lucide-react';
 import './hud.css';
 
 function formatDuration(seconds = 0) {
@@ -9,10 +9,11 @@ function formatDuration(seconds = 0) {
     return `${minutes}:${String(rest).padStart(2, '0')}`;
 }
 
-export default function HudOverlay({ data, copy }: { data: any, copy: any }) {
+export default function HudOverlay({ data, copy, onSurge }: { data: any, copy: any, onSurge?: () => void }) {
     const hudCopy = copy.game.hud;
     const progress = `${Math.min(100, Math.round((data.progress || 0) * 100))}%`;
     const xpProgress = `${Math.min(100, Math.round(((data.xp || 0) / Math.max(1, data.nextUpgradeXp || 1)) * 100))}%`;
+    const energyProgress = `${Math.min(100, Math.round(data.energy || 0))}%`;
 
     return (
         <header className="typerift-hud" aria-label="TypeRift status">
@@ -56,6 +57,17 @@ export default function HudOverlay({ data, copy }: { data: any, copy: any }) {
                     <Flame aria-hidden="true" size={16} strokeWidth={2.2} />
                     <span>{data.heat}</span>
                 </div>
+                <button
+                    className={`typerift-hud__surge${data.surgeReady ? ' is-ready' : ''}`}
+                    type="button"
+                    onClick={onSurge}
+                    aria-label={hudCopy.surge}
+                    title={hudCopy.surgeHint}
+                >
+                    <RadioTower aria-hidden="true" size={16} strokeWidth={2.2} />
+                    <span>{data.surgeReady ? hudCopy.surgeReady : hudCopy.surge}</span>
+                    <i aria-hidden="true"><b style={{ width: energyProgress }} /></i>
+                </button>
                 <div className={`typerift-hud__metric${data.extractAvailable ? ' is-ready' : ''}`} aria-label={data.extractAvailable ? hudCopy.extractReady : hudCopy.level}>
                     <DoorOpen aria-hidden="true" size={16} strokeWidth={2.2} />
                     <span>{data.extractAvailable ? hudCopy.extractReady : `Lv ${data.level}`}</span>

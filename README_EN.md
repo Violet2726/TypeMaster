@@ -27,7 +27,7 @@ typemaster/
 
 ## Product Modules
 
-- `TypeRift: Echo Siege`: the main game module. The browser path remains `/raid` to avoid navigation churn, but UI copy, tests, and data models use TypeRift/game terminology.
+- `TypeRift: Echo Siege`: the main game module runs as a card inside the command center. UI copy, tests, and data models use TypeRift/game terminology.
 - `Focus Lab`: short drills that repair weak characters, rhythm issues, and accuracy problems surfaced by TypeRift or practice.
 - `Missions`: calibration, daily tasks, and plan entry points around the TypeRift loop.
 - `Insights`: review speed, accuracy, weak characters, game depth, extraction stability, and achievement progress.
@@ -131,7 +131,7 @@ Main URLs:
 
 - Web: `http://localhost:5173`
 - API: `http://localhost:8080`
-- TypeRift: `http://localhost:5173/raid`
+- TypeRift: `http://localhost:5173/#typerift`
 
 During development, Next.js rewrites `/api` from the web app to `http://localhost:8080`.
 
@@ -148,12 +148,12 @@ TypeRift-focused verification should cover:
 
 - `packages/domain`: deterministic seeds, spawning, targeting, hit input, error penalties, kills, leaks, boss phases, upgrades, snapshots, and results.
 - `apps/web`: mode select, HUD, upgrade overlay, result overlay, and v7 game session writing.
-- Playwright: `/raid` first view, non-empty canvas, desktop/mobile layout, asset-loaded pixels, and fallback clarity.
+- Playwright: command-center TypeRift card, non-empty canvas, desktop/mobile layout, asset-loaded pixels, and fallback clarity.
 
 ## Runtime Model
 
-- Routing uses Next.js App Router browser paths, not hash routes.
-- `/raid` is the retained TypeRift entry path; it does not imply the internal data model still uses the legacy game model.
+- Routing uses Next.js App Router browser paths; TypeRift is opened from the command-center `#typerift` card anchor.
+- `/raid` is no longer a retained TypeRift entry path.
 - React Query owns account, sessions, plans, skill profiles, daily challenges, and other API snapshots.
 - Zustand owns active drafts, runtime controls, UI preferences, and in-progress training flow.
 - Store action hooks stay thin. Product workflows such as account sync, draft generation, training launch, coach feedback, and session completion live in `*-use-cases.ts`.

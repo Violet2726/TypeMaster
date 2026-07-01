@@ -2,7 +2,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import HomePage from '../HomePage';
 import { renderWithProvider } from '../../test/render-with-provider';
-import { mockRouterPush, resetMockNavigation } from '../../test/next-navigation';
+import { resetMockNavigation } from '../../test/next-navigation';
 
 const baseConfig = {
     source: 'builtin',
@@ -15,9 +15,54 @@ const baseConfig = {
     difficulty: 'medium'
 };
 
+function createCanvasContext() {
+    return {
+        setTransform: vi.fn(),
+        createLinearGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
+        createRadialGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
+        drawImage: vi.fn(),
+        fillRect: vi.fn(),
+        stroke: vi.fn(),
+        fill: vi.fn(),
+        beginPath: vi.fn(),
+        moveTo: vi.fn(),
+        lineTo: vi.fn(),
+        quadraticCurveTo: vi.fn(),
+        closePath: vi.fn(),
+        arc: vi.fn(),
+        roundRect: vi.fn(),
+        save: vi.fn(),
+        restore: vi.fn(),
+        translate: vi.fn(),
+        scale: vi.fn(),
+        fillText: vi.fn(),
+        measureText: vi.fn((text) => ({ width: String(text).length * 8 }))
+    };
+}
+
 describe('HomePage', () => {
     beforeEach(() => {
         resetMockNavigation();
+        window.history.replaceState(null, '', '/');
+        vi.spyOn(window, 'requestAnimationFrame').mockImplementation(() => 0);
+        vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {});
+        vi.spyOn(window.HTMLCanvasElement.prototype, 'getContext').mockReturnValue(createCanvasContext());
+        window.fetch = vi.fn(() => Promise.resolve({ ok: false, json: () => Promise.resolve({}) }));
+        window.ResizeObserver = class {
+            observe() {}
+            disconnect() {}
+        };
+        window.matchMedia = vi.fn(() => ({
+            matches: false,
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn()
+        }));
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+        delete window.render_game_to_text;
+        delete window.advanceTime;
     });
 
     test('shows the TypeRift command center as the first-run home', async () => {
@@ -36,7 +81,7 @@ describe('HomePage', () => {
         expect(screen.queryByRole('button', { name: /Start assessment/i })).not.toBeInTheDocument();
     });
 
-    test('routes the primary action to the retained game route', async () => {
+    test('opens TypeRift as a cardized command-center experience', async () => {
         renderWithProvider(<HomePage />, {
             storageState: {
                 'typemaster:v7:settings': {
@@ -48,7 +93,7 @@ describe('HomePage', () => {
 
         fireEvent.click(await screen.findByRole('button', { name: '开始 TypeRift' }));
 
-        await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith('/raid'));
+        await waitFor(() => expect(screen.getByRole('application')).toBeInTheDocument());
     });
 
     test('renders the latest v7 TypeRift feedback when evidence exists', async () => {

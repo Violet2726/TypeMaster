@@ -1,7 +1,7 @@
 'use client';
 
 import { CalendarClock, Compass, GraduationCap, Trophy } from 'lucide-react';
-import { AppCard, MetricCard } from '../../../components/app/AppPrimitives';
+import { MetricCard } from '../../../components/app/AppPrimitives';
 import './dialogs.css';
 
 export default function ModeSelectOverlay({
@@ -23,6 +23,7 @@ export default function ModeSelectOverlay({
             title: gameCopy.modes.expedition.title,
             meta: gameCopy.modes.expedition.meta,
             body: gameCopy.modes.expedition.body,
+            stats: gameCopy.modes.expedition.stats,
             tone: 'primary'
         },
         {
@@ -31,6 +32,7 @@ export default function ModeSelectOverlay({
             title: gameCopy.modes.daily.title,
             meta: gameCopy.modes.daily.meta,
             body: gameCopy.modes.daily.body,
+            stats: gameCopy.modes.daily.stats,
             tone: 'default'
         },
         {
@@ -39,6 +41,7 @@ export default function ModeSelectOverlay({
             title: gameCopy.modes.first.title,
             meta: gameCopy.modes.first.meta,
             body: gameCopy.modes.first.body,
+            stats: gameCopy.modes.first.stats,
             tone: 'default'
         }
     ] as const;
@@ -54,17 +57,23 @@ export default function ModeSelectOverlay({
                     </div>
                     <div className="typerift-mode-grid">
                         {modes.map((mode, index) => (
-                            <AppCard
+                            <button
                                 key={mode.id}
-                                className="typerift-mode-card"
-                            icon={mode.icon}
-                            kicker={mode.meta}
-                            title={mode.title}
-                            body={mode.body}
-                                tone={mode.tone}
-                            onClick={() => onStart(mode.id)}
-                            autoFocus={index === 0}
-                        />
+                                className={`typerift-mode-card typerift-mode-card--${mode.tone}`}
+                                type="button"
+                                onClick={() => onStart(mode.id)}
+                                autoFocus={index === 0}
+                            >
+                                <span className="typerift-mode-card__icon">
+                                    <mode.icon aria-hidden="true" size={22} strokeWidth={2.1} />
+                                </span>
+                                <span className="typerift-mode-card__copy">
+                                    <small>{mode.meta}</small>
+                                    <strong>{mode.title}</strong>
+                                    <span>{mode.body}</span>
+                                </span>
+                                <span className="typerift-mode-card__stats">{mode.stats}</span>
+                            </button>
                         ))}
                     </div>
                     <div className="typerift-mode-metrics">

@@ -1,13 +1,10 @@
 'use client';
 
 import { Sparkles } from 'lucide-react';
-import { AppCard } from '../../../components/app/AppPrimitives';
 import './dialogs.css';
 
-function toneForRarity(rarity: string) {
-    if (rarity === 'rare') return 'primary';
-    if (rarity === 'epic' || rarity === 'legendary') return 'warning';
-    return 'default';
+function assetPath(id: string) {
+    return `/game/typerift/relics/${id}.webp`;
 }
 
 export default function UpgradeOverlay({ choices, copy, onChoose }: { choices: any[], copy: any, onChoose: (upgradeId: string) => void }) {
@@ -25,17 +22,24 @@ export default function UpgradeOverlay({ choices, copy, onChoose }: { choices: a
                     </div>
                     <div className="typerift-upgrade-grid">
                         {choices.map((choice, index) => (
-                            <AppCard
+                            <button
                                 key={choice.id}
                                 className={`typerift-upgrade-card typerift-upgrade-card--${choice.rarity}`}
-                                icon={Sparkles}
-                                kicker={`${choice.category} / ${choice.rarity} / Lv.${choice.stack || 1}`}
-                                title={choice.nameZh || choice.name}
-                                body={choice.summary}
-                                tone={toneForRarity(choice.rarity)}
+                                type="button"
                                 onClick={() => onChoose(choice.id)}
                                 autoFocus={index === 0}
-                            />
+                            >
+                                <span className="typerift-upgrade-card__number">{index + 1}</span>
+                                <span className="typerift-upgrade-card__art">
+                                    <img src={assetPath(choice.id)} alt="" aria-hidden="true" />
+                                    <Sparkles aria-hidden="true" size={16} strokeWidth={2.2} />
+                                </span>
+                                <span className="typerift-upgrade-card__copy">
+                                    <small>{choice.category} / {choice.rarity} / Lv.{choice.stack || 1}</small>
+                                    <strong>{choice.nameZh || choice.name}</strong>
+                                    <span>{choice.summary}</span>
+                                </span>
+                            </button>
                         ))}
                     </div>
                 </div>
@@ -43,4 +47,3 @@ export default function UpgradeOverlay({ choices, copy, onChoose }: { choices: a
         </div>
     );
 }
-

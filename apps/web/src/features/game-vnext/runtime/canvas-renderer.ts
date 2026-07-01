@@ -42,8 +42,9 @@ export class TypeRiftRenderer {
             const color = enemy?.color || event.enemy?.color || '#64d2ff';
             const x = ((enemy?.xRatio ?? event.enemy?.xRatio ?? 0.5) * this.camera.width);
             const y = mapArenaY(this.camera, enemy?.y ?? event.enemy?.y ?? 0.62);
-            if (['enemy_defeated', 'boss_defeated', 'enemy_shield_broken', 'char_error', 'upgrade_blast'].includes(event.type)) {
-                emitParticles(this.particles, x, y, event.type === 'char_error' ? '#ff453a' : color, event.type === 'boss_defeated' ? 42 : 22);
+            if (['enemy_defeated', 'boss_defeated', 'enemy_shield_broken', 'char_error', 'upgrade_blast', 'surge_activated'].includes(event.type)) {
+                const burstColor = event.type === 'char_error' ? '#ff453a' : event.type === 'surge_activated' ? '#0a84ff' : color;
+                emitParticles(this.particles, x, y, burstColor, event.type === 'boss_defeated' || event.type === 'surge_activated' ? 42 : 22);
             }
         });
     }

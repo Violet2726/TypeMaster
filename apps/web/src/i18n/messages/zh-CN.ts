@@ -11,7 +11,7 @@ export const zhCNMessages = {
     nav: {
         ...enUSMessages.nav,
         home: '指挥台',
-        raid: 'TypeRift',
+        typerift: 'TypeRift',
         practice: '训练',
         missions: '任务',
         insights: '洞察',
@@ -176,7 +176,7 @@ export const zhCNMessages = {
         settings: '设置',
         help: '帮助',
         helpTitle: '操作说明',
-        helpBody: '输入敌人词条即可攻击。按 Esc 暂停，按 1/2/3 选择升级，也可以随时点退出回到指挥台。',
+        helpBody: '输入敌人词条即可攻击。能量满后按空格释放回声超载，按 Esc 暂停，按 1/2/3 选择升级。',
         helpDismiss: '知道了',
         modeAria: 'TypeRift 模式选择',
         modeKicker: '构筑式打字生存',
@@ -190,17 +190,20 @@ export const zhCNMessages = {
             expedition: {
                 title: '远征',
                 meta: '12-18 分钟',
-                body: '完整路线，区域首领、构筑升级、撤离抉择和深层风险全部开放。'
+                body: '完整路线，区域首领、构筑升级、撤离抉择和深层风险全部开放。',
+                stats: '5 区域 / 完整图鉴'
             },
             daily: {
                 title: '每日异象',
                 meta: '固定种子',
-                body: '每天一条可比较路线，适合复盘构筑和输入稳定性。'
+                body: '每天一条可比较路线，适合复盘构筑和输入稳定性。',
+                stats: '共享压力'
             },
             first: {
                 title: '首次下潜',
                 meta: '6 分钟',
-                body: '短流程引导局，快速解锁第一份 TypeRift 样本。'
+                body: '短流程引导局，快速解锁第一份 TypeRift 样本。',
+                stats: '快速解锁'
             }
         },
         hud: {
@@ -214,6 +217,9 @@ export const zhCNMessages = {
             level: '等级',
             lives: '生命',
             upgrade: '升级',
+            surge: '超载',
+            surgeReady: '释放',
+            surgeHint: '能量满后按空格或点击释放回声超载。',
             extractReady: '可撤离',
             noTarget: '...'
         },

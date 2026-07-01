@@ -9,6 +9,7 @@ TypeRift is a Roguelite typing survival mode:
 - The player types enemy word tags to lock targets and release attacks.
 - Correct input builds score, combo, energy, experience, and upgrade momentum.
 - Mistakes add heat pressure and can weaken survival resources.
+- Full energy unlocks Echo Surge, a deliberate active skill that clears the most dangerous enemies, damages bosses, spends energy, and lowers heat.
 - Run results feed Focus Lab, Missions, Insights, Achievements, and Codex through v7 game sessions.
 
 The legacy game model is intentionally not compatible. No old game history is migrated into v7.
@@ -34,6 +35,8 @@ Each area has its own background, palette, enemy pressure, boss, and scoring con
 - `Weapon`: direct clearing tools such as pulse, blade, orbit, and ray patterns.
 - `Relic`: run modifiers for survivability, scoring, extraction, heat, and risk.
 - `Glyph`: training-linked modifiers that increase pressure or rewards around weak characters, numbers, punctuation, and boss behavior.
+
+Energy is a readable risk valve rather than a passive number: players can hold it for score rhythm or press Space / tap Surge when the line is close to breaking.
 
 Upgrade choice generation lives in `packages/domain/src/game-vnext/upgrades.js` and should remain deterministic under the run seed.
 
@@ -133,7 +136,7 @@ Do not write `raid` as a session kind, training type, storage source, or analyti
 
 ## Route Contract
 
-`/raid` remains the browser entry path for compatibility with existing navigation and external bookmarks. The route id may remain `raid`, but user-facing names, aria labels, tests, sessions, analytics, and documentation should call the module `TypeRift` or `game`.
+TypeRift runs as a card inside the command center at `/#typerift`. Do not retain `/raid` as a compatibility entry path, and do not add new route ids, user-facing names, aria labels, tests, sessions, analytics, or documentation that revive the old `raid` surface.
 
 ## Testing Expectations
 
@@ -157,7 +160,7 @@ Web tests should cover:
 
 E2E and visual checks should cover:
 
-- `/raid` first screen shows TypeRift mode select
+- the command-center TypeRift card shows mode select
 - a run produces a non-empty Canvas
 - backgrounds and enemies load from bitmap assets
 - fallback text appears when assets fail
@@ -169,4 +172,4 @@ E2E and visual checks should cover:
 - Do not reintroduce deleted engine files under `apps/web/src/engine/`.
 - Do not add new logic to deleted overlay components under `apps/web/src/components/overlay`.
 - Do not migrate legacy game history into v7.
-- Do not add new `raid*` data fields except for the retained route id/path compatibility layer.
+- Do not add new `raid*` data fields or route compatibility layers.

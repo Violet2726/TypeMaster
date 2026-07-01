@@ -58,7 +58,7 @@ export function MissionsPage() {
     const weakFocus = getWeakFocus(skillProfile) || copy.home.noWeakFocus;
     const unlocked = achievements.filter((item) => item.unlocked).length;
 
-    const startGame = () => navigate('/raid');
+    const startGame = () => navigate('/#typerift');
     const startFocus = () => {
         if (skillProfile?.topErrorChars?.length) configActions.setKeyboardZoneDrillDraft(skillProfile.topErrorChars[0]);
         else sessionActions.resetPracticeToBuiltin();

@@ -44,7 +44,6 @@ export function AppFrame({ children }: AppFrameProps) {
     const isPracticeRoute = pathname === '/practice';
     const isFocusedLayout = settings.focusMode && isPracticeRoute;
     const route = getRouteForPath(pathname || '/');
-    const isImmersiveGameLayout = route.layout === 'immersiveGame';
     const footerText = useMemo(() => (
         isFocusedLayout
             ? copy.shell.footerFocus
@@ -57,27 +56,6 @@ export function AppFrame({ children }: AppFrameProps) {
 
         return () => window.removeEventListener('typemaster:open-settings', handleOpenSettings);
     }, [openSettings]);
-
-    if (isImmersiveGameLayout) {
-        return (
-            <div className={`app-shell app-shell--${route.id} app-shell--immersive-game ${settingsOpen ? 'is-settings-open' : ''}`}>
-                {children}
-                <SettingsDrawer
-                    isOpen={settingsOpen}
-                    settings={settings}
-                    copy={copy}
-                    account={account}
-                    accountStatus={accountStatus}
-                    onClose={closeSettings}
-                    onChange={updateSettings}
-                    onSignIn={signInToAccount}
-                    onSignOut={signOutFromAccount}
-                    onExportData={exportTrainingData}
-                    onImportData={importTrainingData}
-                />
-            </div>
-        );
-    }
 
     return (
         <div className={`app-shell app-shell--${route.id} ${isFocusedLayout ? 'is-focus-layout' : ''} ${settingsOpen ? 'is-settings-open' : ''}`}>

@@ -122,6 +122,9 @@ export const GAME_COPY = {
         codexUnlock: '图鉴更新',
         shieldBroken: '护盾击破',
         hit: '命中',
+        surgeReady: '回声超载就绪',
+        surgeCharging: '能量尚未充满',
+        surgeOnline: '回声超载释放',
         upgradeOnline: '{name} 已上线',
         recommendationWeak: '下一局优先处理 {chars}',
         recommendationStable: '保持节奏，尝试更高热度构筑。'
@@ -144,6 +147,9 @@ export const GAME_COPY = {
         codexUnlock: 'Codex updated',
         shieldBroken: 'Shield broken',
         hit: 'Hit',
+        surgeReady: 'Echo Surge ready',
+        surgeCharging: 'Energy is still charging',
+        surgeOnline: 'Echo Surge released',
         upgradeOnline: '{name} online',
         recommendationWeak: 'Prioritize {chars} next run',
         recommendationStable: 'Keep the rhythm and try a higher-heat build.'

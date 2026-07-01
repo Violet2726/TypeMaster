@@ -4,10 +4,16 @@ import type { RenderContext, SnapshotView } from './types';
 export function drawBackground(ctx: CanvasRenderingContext2D, snapshot: SnapshotView, render: RenderContext) {
     const { width, height } = render.camera;
     const area = snapshot?.area;
-    const bg = snapshot?.phase !== 'idle' && area?.id ? getAssetImage(render.assets, 'backgrounds', area.id) : null;
+    const bg = area?.id ? getAssetImage(render.assets, 'backgrounds', area.id) : null;
     if (bg) {
         ctx.drawImage(bg, 0, 0, width, height);
-        ctx.fillStyle = 'rgba(5,7,12,0.28)';
+        ctx.fillStyle = snapshot?.phase === 'idle' ? 'rgba(5,7,12,0.42)' : 'rgba(5,7,12,0.28)';
+        ctx.fillRect(0, 0, width, height);
+        const vignette = ctx.createRadialGradient(width * 0.5, height * 0.46, 40, width * 0.5, height * 0.46, Math.max(width, height) * 0.72);
+        vignette.addColorStop(0, 'rgba(255,255,255,0.02)');
+        vignette.addColorStop(0.58, 'rgba(0,0,0,0)');
+        vignette.addColorStop(1, 'rgba(0,0,0,0.46)');
+        ctx.fillStyle = vignette;
         ctx.fillRect(0, 0, width, height);
         return;
     }

@@ -89,6 +89,24 @@ describe('TypeRift game domain', () => {
         expect(result.events[0].type).toBe('upgrade_chosen');
     });
 
+    it('releases Echo Surge at full energy to clear pressure', () => {
+        const base = start('surge');
+        const first = { ...generateEnemy({ ...base, spawnIndex: 0 }, 'spark'), id: 'a', word: 'go', y: 0.9, score: 20 };
+        const second = { ...generateEnemy({ ...base, spawnIndex: 1 }, 'shard'), id: 'b', word: 'cat', y: 0.82, score: 30 };
+        const waiting = dispatchGameCommand({ ...base, energy: 80, enemies: [first], spawnTimer: 999 }, 'surge');
+
+        expect(waiting.state.energy).toBe(80);
+        expect(waiting.events[0].type).toBe('surge_not_ready');
+
+        const result = dispatchGameCommand({ ...base, energy: 100, heat: 44, enemies: [first, second], spawnTimer: 999 }, 'surge');
+
+        expect(result.state.energy).toBe(0);
+        expect(result.state.heat).toBe(22);
+        expect(result.state.counters.kills).toBe(2);
+        expect(result.state.enemies.every((enemy) => !enemy.alive)).toBe(true);
+        expect(result.events.some((event) => event.type === 'surge_activated')).toBe(true);
+    });
+
     it('handles pause, resume, locked extraction, successful extraction, and quit commands', () => {
         const state = start('commands', { language: 'zh-CN' });
 

@@ -52,7 +52,7 @@ describe('GamePage', () => {
     });
 
     test('starts TypeRift and opens the DOM pause layer', async () => {
-        renderWithProvider(<GamePage />, { route: '/raid' });
+        renderWithProvider(<GamePage />, { route: '/' });
 
         await waitFor(() => expect(typeof window.render_game_to_text).toBe('function'));
         fireEvent.click(await screen.findByRole('button', { name: /远征/ }));
