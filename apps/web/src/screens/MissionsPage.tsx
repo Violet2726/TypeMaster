@@ -1,14 +1,15 @@
 'use client';
 
-import { ArrowRight, BarChart3, Flag, Keyboard, ShieldCheck, Swords, Target, Trophy } from 'lucide-react';
+import { ArrowRight, BarChart3, Flag, Keyboard, ShieldCheck, Swords, Target, Trophy, type LucideIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { buildInsights } from '@typemaster/domain';
 import { AppButton, AppCard, AppSheet, MetricCard, SectionHeader } from '../components/app/AppPrimitives';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { useAppActions } from '../store/use-app-action-set';
 import { useAchievementSnapshot, useHistorySnapshot, usePlanSnapshot, useShellSnapshot } from '../store/app-state-derived';
+import type { SkillProfile } from '../types/training';
 
-function getWeakFocus(skillProfile: any) {
+function getWeakFocus(skillProfile: SkillProfile | null) {
     return skillProfile?.topErrorChars?.slice(0, 3).join(' / ')
         || skillProfile?.weakZones?.[0]?.label
         || '';
@@ -23,7 +24,7 @@ function fillTemplate(template: string, values: Record<string, string | number>)
 function MissionCard({ body, cta, icon: Icon, meta, onClick, title, tone = 'default' }: {
     body: string,
     cta: string,
-    icon: any,
+    icon: LucideIcon,
     meta: string,
     onClick: () => void,
     title: string,

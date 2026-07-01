@@ -6,6 +6,7 @@ import { BarChart3, DoorOpen, Flame, Gauge, Keyboard, Play, Swords, Target } fro
 import { formatDateTime } from '../i18n';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { useHomePageStore } from '../store/app-state-selectors';
+import { getTypeRiftDepth, getTypeRiftEndReason, getTypeRiftSessions } from '../features/game/game-session';
 import {
     NextActionCard,
     ProgressStrip,
@@ -13,18 +14,15 @@ import {
     TodayHero,
     type ProgressItem
 } from '../features/home/components/HomeDashboardSections';
+import type { SkillProfile, TrainingSession } from '../types/training';
 import './home-page.css';
 
 const EmbeddedGamePage = dynamic(() => import('./GamePage'), {
     ssr: false
 });
 
-function getGameSessions(sessions: any[]) {
-    return sessions.filter((session) => session.kind === 'game' || session.trainingMeta?.type === 'game');
-}
-
-function getWeakFocus(skillProfile: any, sessions: any[]) {
-    const latestGame = getGameSessions(sessions)[0];
+function getWeakFocus(skillProfile: SkillProfile | null, sessions: TrainingSession[]) {
+    const latestGame = getTypeRiftSessions(sessions)[0];
     const chars = latestGame?.gameMeta?.weakestChars || latestGame?.trainingMeta?.focusChars || latestGame?.result?.topErrorChars;
     if (Array.isArray(chars) && chars.length) return chars.slice(0, 3).join(' / ');
     return skillProfile?.topErrorChars?.slice(0, 3).join(' / ')
@@ -50,11 +48,11 @@ export function HomePage() {
     const [isTypeRiftOpen, setIsTypeRiftOpen] = useState(false);
     const { copy, language, sessions, sessionStreak, skillProfile, weeklyGoal } = useHomePageStore();
     const homeCopy = copy.home;
-    const gameSessions = getGameSessions(sessions);
+    const gameSessions = getTypeRiftSessions(sessions);
     const latestGame = gameSessions[0] || null;
     const weakFocus = getWeakFocus(skillProfile, sessions);
-    const bestDepth = gameSessions.reduce((best, session) => Math.max(best, Number(session.gameMeta?.depth || session.trainingMeta?.depth || 0)), 0);
-    const extractCount = gameSessions.filter((session) => ['extract', 'victory'].includes(session.gameMeta?.endReason || session.trainingMeta?.endReason)).length;
+    const bestDepth = gameSessions.reduce((best, session) => Math.max(best, getTypeRiftDepth(session)), 0);
+    const extractCount = gameSessions.filter((session) => ['extract', 'victory'].includes(getTypeRiftEndReason(session))).length;
     const extractRate = gameSessions.length ? Math.round((extractCount / gameSessions.length) * 100) : 0;
     const metricItems: ProgressItem[] = [
         {
@@ -174,7 +172,7 @@ export function HomePage() {
             <RecentRunCard
                 accuracy={latestGame?.result?.accuracy || 0}
                 date={latestGame ? formatDateTime(latestGame.completedAt || latestGame.result?.completedAt, language) : ''}
-                depth={latestGame?.gameMeta?.depth || latestGame?.trainingMeta?.depth || 1}
+                depth={getTypeRiftDepth(latestGame) || 1}
                 depthLabel={homeCopy.depthLabel}
                 duration={formatDuration(latestGame?.durationSeconds || latestGame?.result?.durationSeconds || 0)}
                 emptyBody={homeCopy.firstRunBody}

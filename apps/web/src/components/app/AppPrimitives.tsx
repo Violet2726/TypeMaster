@@ -1,9 +1,10 @@
 'use client';
 
 import type { ButtonHTMLAttributes, ComponentType, CSSProperties, HTMLAttributes, ReactNode } from 'react';
+import type { LucideIcon } from 'lucide-react';
 import { Button } from '@typemaster/ui';
 
-type IconType = ComponentType<any>;
+type IconType = LucideIcon | ComponentType<{ size?: number; strokeWidth?: number; 'aria-hidden'?: boolean | 'true' | 'false' }>;
 
 function cx(...parts: Array<string | false | null | undefined>) {
     return parts.filter(Boolean).join(' ');

@@ -1,10 +1,10 @@
 'use client';
 
-import type { ComponentType, ReactNode } from 'react';
-import { DoorOpen, Gauge, ShieldCheck, Swords, Trophy } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { DoorOpen, Gauge, ShieldCheck, Swords, Trophy, type LucideIcon } from 'lucide-react';
 import { AppButton, AppCard, MetricCard, SectionHeader } from '../../../components/app/AppPrimitives';
 
-type IconType = ComponentType<any>;
+type IconType = LucideIcon;
 
 export type ProgressItem = {
     id: string;
