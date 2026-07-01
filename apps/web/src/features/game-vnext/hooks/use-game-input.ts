@@ -1,5 +1,5 @@
 import { useCallback, useEffect, type FormEvent, type KeyboardEvent as ReactKeyboardEvent, type RefObject } from 'react';
-import type { GameEngine } from '../runtime/game-engine';
+import type { GameCommand, GameEngine } from '../runtime/game-engine';
 import type { GameCommitUpdate } from './use-game-engine';
 import type { GameSnapshot } from '../../../types/game';
 
@@ -11,7 +11,7 @@ export function useGameInput({
     maybeSaveResult
 }: {
     commitUpdate: GameCommitUpdate;
-    dispatchAction: (command: any, payload?: Record<string, unknown>) => void;
+    dispatchAction: (command: GameCommand, payload?: Record<string, unknown>) => void;
     engineRef: RefObject<GameEngine | null>;
     inputRef: RefObject<HTMLInputElement>;
     maybeSaveResult: (snapshot: GameSnapshot | null) => void;
@@ -66,4 +66,3 @@ export function useGameInput({
         handleVirtualBeforeInput
     };
 }
-

@@ -1,10 +1,14 @@
 'use client';
 
 import { X } from 'lucide-react';
+import type { getCopy } from '../../../i18n';
+import type { GameCodexEntry, GameCodexProgress } from '../../../types/game';
 import './dialogs.css';
 import './codex.css';
 
-export default function CodexOverlay({ codex, copy, onClose }: { codex: any, copy: any, onClose: () => void }) {
+type GameCopy = ReturnType<typeof getCopy>;
+
+export default function CodexOverlay({ codex, copy, onClose }: { codex?: GameCodexProgress | null, copy: GameCopy, onClose: () => void }) {
     const enemies = codex?.enemies || [];
     const bosses = codex?.bosses || [];
     const upgrades = codex?.upgrades || [];
@@ -23,7 +27,7 @@ export default function CodexOverlay({ codex, copy, onClose }: { codex: any, cop
                         {codexCopy.close}
                     </button>
                     <div className="typerift-codex-grid">
-                        {[...enemies, ...bosses, ...upgrades].map((entry: any) => (
+                        {[...enemies, ...bosses, ...upgrades].map((entry: GameCodexEntry) => (
                             <div key={entry.id} className="typerift-codex-entry is-open">
                                 <strong>{entry.nameZh || entry.name || entry.id}</strong>
                                 <small>{entry.category || (entry.defeated ? codexCopy.bossDefeated : codexCopy.enemyDiscovered)}</small>

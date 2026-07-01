@@ -1,9 +1,13 @@
 'use client';
 
 import { DoorOpen, Home, Play, RotateCcw } from 'lucide-react';
+import type { getCopy } from '../../../i18n';
+import type { GameHudSnapshot } from '../../../types/game';
 import './dialogs.css';
 
-export default function PauseOverlay({ stats, copy, onAction }: { stats: any, copy: any, onAction: (action: string) => void }) {
+type GameCopy = ReturnType<typeof getCopy>;
+
+export default function PauseOverlay({ stats, copy, onAction }: { stats: GameHudSnapshot, copy: GameCopy, onAction: (action: string) => void }) {
     const gameCopy = copy.game;
 
     return (

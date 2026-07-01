@@ -6,7 +6,7 @@ import { drawBackground } from './rendering/background';
 import { drawEnemy } from './rendering/enemy';
 import { drawFallbackStatus } from './rendering/status';
 import type { EnemyView, RenderContext } from './rendering/types';
-import type { GameSnapshot } from '../../../types/game';
+import type { GameEvent, GameSnapshot } from '../../../types/game';
 
 export class TypeRiftRenderer {
     private camera: GameCamera = createCamera();
@@ -34,7 +34,7 @@ export class TypeRiftRenderer {
         if (value) this.particles = [];
     }
 
-    handleEvents(events: any[], snapshot: GameSnapshot | null) {
+    handleEvents(events: GameEvent[], snapshot: GameSnapshot | null) {
         if (this.reducedMotion) return;
 
         events.forEach((event) => {

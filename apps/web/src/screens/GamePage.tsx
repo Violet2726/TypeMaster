@@ -20,13 +20,19 @@ import { useGameLoop } from '../features/game-vnext/hooks/use-game-loop';
 import { useGameRenderer } from '../features/game-vnext/hooks/use-game-renderer';
 import { useGameResultPersistence } from '../features/game-vnext/hooks/use-game-result-persistence';
 import { useGameTestBridge } from '../features/game-vnext/hooks/use-game-test-bridge';
-import type { GameSnapshot } from '../types/game';
+import type { GameEvent, GameMode, GameSnapshot } from '../types/game';
 
 type GamePageProps = {
     onExit?: () => void;
 };
 
-function getFocusChars(keyboardHotspots: any) {
+type KeyboardHotspots = {
+    primaryZone?: {
+        chars?: Array<{ label?: string }>;
+    };
+};
+
+function getFocusChars(keyboardHotspots: KeyboardHotspots | null | undefined) {
     const chars = keyboardHotspots?.primaryZone?.chars;
     if (!Array.isArray(chars)) return [];
     return chars
@@ -61,7 +67,7 @@ export default function GamePage({ onExit }: GamePageProps) {
 
     const rendererRef = useGameRenderer({ canvasRef, containerRef });
 
-    const commitUpdate = useCallback((update: { snapshot: GameSnapshot; events: any[] }, immediate = false) => {
+    const commitUpdate = useCallback((update: { snapshot: GameSnapshot; events: GameEvent[] }, immediate = false) => {
         const renderer = rendererRef.current;
         const previous = snapshotRef.current;
         const next = update.snapshot;
@@ -92,7 +98,7 @@ export default function GamePage({ onExit }: GamePageProps) {
         inputRef.current?.focus({ preventScroll: true });
     }, [dispatchAction]);
 
-    const handleStart = useCallback((gameMode) => {
+    const handleStart = useCallback((gameMode: GameMode) => {
         startGame(gameMode);
         inputRef.current?.focus({ preventScroll: true });
     }, [startGame]);

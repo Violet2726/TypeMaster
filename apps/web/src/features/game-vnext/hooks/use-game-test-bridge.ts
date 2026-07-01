@@ -1,8 +1,13 @@
 import { useEffect, type RefObject } from 'react';
-import type { GameEngine } from '../runtime/game-engine';
+import type { GameEngine, GameEngineUpdate } from '../runtime/game-engine';
 import type { TypeRiftRenderer } from '../runtime/canvas-renderer';
 import type { GameCommitUpdate } from './use-game-engine';
 import type { GameSnapshot } from '../../../types/game';
+
+type GameTestWindow = Window & {
+    render_game_to_text?: () => string;
+    advanceTime?: (ms: number) => void;
+};
 
 export function useGameTestBridge({
     canvasRef,
@@ -20,7 +25,9 @@ export function useGameTestBridge({
     snapshotRef: RefObject<GameSnapshot | null>;
 }) {
     useEffect(() => {
-        (window as any).render_game_to_text = function () {
+        const testWindow = window as GameTestWindow;
+
+        testWindow.render_game_to_text = function () {
             const current = snapshotRef.current;
             if (!current) return '{}';
             return JSON.stringify({
@@ -37,7 +44,7 @@ export function useGameTestBridge({
             });
         };
 
-        (window as any).advanceTime = function (ms: number) {
+        testWindow.advanceTime = function (ms: number) {
             const engine = engineRef.current;
             const renderer = rendererRef.current;
             const canvas = canvasRef.current;
@@ -45,7 +52,7 @@ export function useGameTestBridge({
             if (!engine || !renderer || !ctx) return;
 
             const steps = Math.max(1, Math.round(ms / 16));
-            let update = { snapshot: engine.snapshot, events: [] as any[] };
+            let update: GameEngineUpdate = { snapshot: engine.snapshot, events: [] };
             for (let index = 0; index < steps; index += 1) {
                 update = engine.tick(1 / 60);
             }
@@ -55,9 +62,8 @@ export function useGameTestBridge({
         };
 
         return () => {
-            delete (window as any).render_game_to_text;
-            delete (window as any).advanceTime;
+            delete testWindow.render_game_to_text;
+            delete testWindow.advanceTime;
         };
     }, [canvasRef, commitUpdate, engineRef, maybeSaveResult, rendererRef, snapshotRef]);
 }
-

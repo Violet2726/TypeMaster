@@ -1,7 +1,11 @@
 'use client';
 
-import { BookOpen, DoorOpen, Home, RotateCcw, Trophy } from 'lucide-react';
+import { BookOpen, Home, RotateCcw, Trophy } from 'lucide-react';
+import type { getCopy } from '../../../i18n';
+import type { GameResult } from '../../../types/game';
 import './dialogs.css';
+
+type GameCopy = ReturnType<typeof getCopy>;
 
 function formatDuration(seconds = 0) {
     const minutes = Math.floor(seconds / 60);
@@ -9,14 +13,14 @@ function formatDuration(seconds = 0) {
     return `${minutes}:${String(rest).padStart(2, '0')}`;
 }
 
-function verdict(data: any, resultCopy: any) {
+function verdict(data: GameResult, resultCopy: GameCopy['game']['result']) {
     if (data.endReason === 'victory') return resultCopy.victory;
     if (data.endReason === 'extract') return resultCopy.extract;
     if (data.accuracy < 90) return resultCopy.unstable;
     return resultCopy.defeated;
 }
 
-export default function RunResultOverlay({ data, copy, onAction }: { data: any, copy: any, onAction: (action: string) => void }) {
+export default function RunResultOverlay({ data, copy, onAction }: { data: GameResult, copy: GameCopy, onAction: (action: string) => void }) {
     const build = data.upgradeBuild || [];
     const resultCopy = copy.game.result;
 
@@ -40,7 +44,7 @@ export default function RunResultOverlay({ data, copy, onAction }: { data: any, 
                     <div className="typerift-build">
                         <span>{resultCopy.build}</span>
                         <div className="typerift-pills">
-                            {build.length ? build.map((upgrade: any) => (
+                            {build.length ? build.map((upgrade) => (
                                 <b key={upgrade.id}>{upgrade.nameZh || upgrade.name} x{upgrade.stack || 1}</b>
                             )) : <b>{resultCopy.noUpgrades}</b>}
                         </div>

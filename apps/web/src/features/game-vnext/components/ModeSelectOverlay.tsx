@@ -2,7 +2,11 @@
 
 import { CalendarClock, Compass, GraduationCap, Trophy } from 'lucide-react';
 import { MetricCard } from '../../../components/app/AppPrimitives';
+import type { getCopy } from '../../../i18n';
+import type { GameCodexProgress, GameMode } from '../../../types/game';
 import './dialogs.css';
+
+type GameCopy = ReturnType<typeof getCopy>;
 
 export default function ModeSelectOverlay({
     bestScore,
@@ -11,9 +15,9 @@ export default function ModeSelectOverlay({
     onStart
 }: {
     bestScore: number,
-    codexProgress?: { discovered?: number, total?: number } | null,
-    copy: any,
-    onStart: (mode: 'expedition' | 'daily-anomaly' | 'first-descent') => void,
+    codexProgress?: Partial<GameCodexProgress> | null,
+    copy: GameCopy,
+    onStart: (mode: GameMode) => void,
 }) {
     const gameCopy = copy.game;
     const modes = [

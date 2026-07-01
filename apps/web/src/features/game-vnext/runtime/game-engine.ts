@@ -5,7 +5,7 @@ import {
     dispatchGameCommand,
     updateGameState
 } from '@typemaster/domain';
-import type { GameMode, GameResult, GameSnapshot } from '../../../types/game';
+import type { GameEvent, GameMode, GameResult, GameRuntimeState, GameSnapshot } from '../../../types/game';
 export type { GameMode } from '../../../types/game';
 
 export type GameCommand = 'start' | 'pause' | 'resume' | 'retry' | 'quit' | 'extract' | 'type-char' | 'choose-upgrade' | 'surge';
@@ -20,11 +20,11 @@ export interface GameEngineOptions {
 
 export interface GameEngineUpdate {
     snapshot: GameSnapshot;
-    events: any[];
+    events: GameEvent[];
 }
 
 export interface GameEngine {
-    readonly state: any;
+    readonly state: GameRuntimeState;
     readonly snapshot: GameSnapshot;
     tick(deltaTime: number): GameEngineUpdate;
     dispatch(command: GameCommand, payload?: Record<string, unknown>): GameEngineUpdate;
@@ -50,11 +50,11 @@ export function createGameEngine(options: GameEngineOptions = {}): GameEngine {
         focusChars: [],
         ...options
     };
-    let state = createGameState(engineOptions);
-    let snapshot = buildGameSnapshot(state);
+    let state = createGameState(engineOptions) as GameRuntimeState;
+    let snapshot = buildGameSnapshot(state) as GameSnapshot;
 
-    function refresh(events: any[] = []): GameEngineUpdate {
-        snapshot = buildGameSnapshot(state);
+    function refresh(events: GameEvent[] = []): GameEngineUpdate {
+        snapshot = buildGameSnapshot(state) as GameSnapshot;
         return { snapshot, events };
     }
 
@@ -80,14 +80,14 @@ export function createGameEngine(options: GameEngineOptions = {}): GameEngine {
             ...payload,
             gameMode: (payload.gameMode || payload.mode || engineOptions.gameMode) as GameMode
         });
-        state = result.state;
-        return refresh(result.events);
+        state = result.state as GameRuntimeState;
+        return refresh(result.events as GameEvent[]);
     }
 
     function tick(deltaTime: number): GameEngineUpdate {
         const result = updateGameState(state, deltaTime);
-        state = result.state;
-        return refresh(result.events);
+        state = result.state as GameRuntimeState;
+        return refresh(result.events as GameEvent[]);
     }
 
     function handleKey(event: KeyboardEvent): GameEngineUpdate {
@@ -145,7 +145,7 @@ export function createGameEngine(options: GameEngineOptions = {}): GameEngine {
         dispatch,
         handleKey,
         getResult() {
-            return buildGameResult(state);
+            return buildGameResult(state) as GameResult;
         },
         destroy() {}
     };

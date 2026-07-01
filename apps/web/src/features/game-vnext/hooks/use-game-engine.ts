@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { createGameEngine, type GameCommand, type GameEngine, type GameMode } from '../runtime/game-engine';
-import type { GameSnapshot } from '../../../types/game';
+import type { GameEvent, GameSnapshot } from '../../../types/game';
 
-export type GameCommitUpdate = (update: { snapshot: GameSnapshot; events: any[] }, immediate?: boolean) => void;
+export type GameCommitUpdate = (update: { snapshot: GameSnapshot; events: GameEvent[] }, immediate?: boolean) => void;
 
 export function useGameEngine({
     commitUpdate,
@@ -55,4 +55,3 @@ export function useGameEngine({
         startGame
     };
 }
-

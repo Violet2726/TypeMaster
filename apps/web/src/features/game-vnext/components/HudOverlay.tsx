@@ -1,7 +1,11 @@
 'use client';
 
 import { Activity, Crosshair, DoorOpen, Flame, Heart, Layers, RadioTower, Timer, Zap } from 'lucide-react';
+import type { getCopy } from '../../../i18n';
+import type { GameHudSnapshot } from '../../../types/game';
 import './hud.css';
+
+type GameCopy = ReturnType<typeof getCopy>;
 
 function formatDuration(seconds = 0) {
     const minutes = Math.floor(seconds / 60);
@@ -9,7 +13,7 @@ function formatDuration(seconds = 0) {
     return `${minutes}:${String(rest).padStart(2, '0')}`;
 }
 
-export default function HudOverlay({ data, copy, onSurge }: { data: any, copy: any, onSurge?: () => void }) {
+export default function HudOverlay({ data, copy, onSurge }: { data: GameHudSnapshot, copy: GameCopy, onSurge?: () => void }) {
     const hudCopy = copy.game.hud;
     const progress = `${Math.min(100, Math.round((data.progress || 0) * 100))}%`;
     const xpProgress = `${Math.min(100, Math.round(((data.xp || 0) / Math.max(1, data.nextUpgradeXp || 1)) * 100))}%`;

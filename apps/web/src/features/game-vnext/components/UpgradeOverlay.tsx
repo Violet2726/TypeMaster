@@ -1,13 +1,17 @@
 'use client';
 
 import { Sparkles } from 'lucide-react';
+import type { getCopy } from '../../../i18n';
+import type { GameUpgradeSnapshot } from '../../../types/game';
 import './dialogs.css';
+
+type GameCopy = ReturnType<typeof getCopy>;
 
 function assetPath(id: string) {
     return `/game/typerift/relics/${id}.webp`;
 }
 
-export default function UpgradeOverlay({ choices, copy, onChoose }: { choices: any[], copy: any, onChoose: (upgradeId: string) => void }) {
+export default function UpgradeOverlay({ choices, copy, onChoose }: { choices: GameUpgradeSnapshot[], copy: GameCopy, onChoose: (upgradeId: string) => void }) {
     if (!choices?.length) return null;
     const upgradeCopy = copy.game.upgrade;
 
