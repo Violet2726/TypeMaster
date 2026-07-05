@@ -89,4 +89,21 @@ describe('practice page CSS', () => {
         expect(pageRule).toContain('padding-bottom: calc(5.4rem + env(safe-area-inset-bottom, 0px));');
         expect(railRule).toContain('scroll-margin-bottom: calc(5.4rem + env(safe-area-inset-bottom, 0px));');
     });
+
+    test('keeps the default mobile settings rail title as a compact header', async () => {
+        const css = await readFile(cssPath, 'utf8');
+        const mobileCss = getMediaBlock(css, '@media (max-width: 720px)');
+        const inspectorHeadRule = getRuleBody(mobileCss, '.practice-workbench__rail .practice-toolbar .tm-inspector__head');
+        const inspectorKickerRule = getRuleBody(mobileCss, '.practice-workbench__rail .practice-toolbar .tm-inspector__head p');
+        const inspectorTitleRule = getRuleBody(mobileCss, '.practice-workbench__rail .practice-toolbar .tm-inspector__head h2');
+        const inspectorBadgeRule = getRuleBody(mobileCss, '.practice-workbench__rail .practice-toolbar .tm-inspector__badge');
+
+        expect(inspectorHeadRule).toContain('align-items: center;');
+        expect(inspectorHeadRule).toContain('gap: 0.52rem;');
+        expect(inspectorKickerRule).toContain('display: none;');
+        expect(inspectorTitleRule).toContain('font-size: 1.08rem;');
+        expect(inspectorTitleRule).toContain('line-height: 1.12;');
+        expect(inspectorBadgeRule).toContain('border-color: transparent;');
+        expect(inspectorBadgeRule).toContain('background: rgba(118, 118, 128, 0.08);');
+    });
 });

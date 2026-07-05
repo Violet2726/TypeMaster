@@ -221,6 +221,25 @@
         scroll-margin-bottom: calc(5.4rem + env(safe-area-inset-bottom, 0px));
     }
 
+    .practice-workbench__rail .practice-toolbar .tm-inspector__head {
+        align-items: center;
+        gap: 0.52rem;
+    }
+
+    .practice-workbench__rail .practice-toolbar .tm-inspector__head p {
+        display: none;
+    }
+
+    .practice-workbench__rail .practice-toolbar .tm-inspector__head h2 {
+        font-size: 1.08rem;
+        line-height: 1.12;
+    }
+
+    .practice-workbench__rail .practice-toolbar .tm-inspector__badge {
+        border-color: transparent;
+        background: rgba(118, 118, 128, 0.08);
+    }
+
     .practice-page--compose .practice-workbench {
         scroll-margin-top: 4.35rem;
     }
