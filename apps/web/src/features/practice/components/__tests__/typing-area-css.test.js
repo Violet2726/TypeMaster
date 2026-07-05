@@ -56,6 +56,26 @@ describe('typing area CSS', () => {
         expect(mobileWordsContainer).toContain('2.65');
     });
 
+    test('keeps the mobile typing header as a compact status strip', async () => {
+        const workshopCss = await readFile(resolve(componentRoot, 'practice-workshop.css'), 'utf8');
+        const mobileWorkshopCss = getMediaBlock(workshopCss, '@media (max-width: 720px)', '@media (max-width: 360px)');
+        const mobileHead = getBlock(mobileWorkshopCss, '.typing-stage__head');
+        const mobileStatus = getBlock(mobileWorkshopCss, '.typing-stage__status');
+        const mobileBadge = getBlock(mobileWorkshopCss, '.typing-stage__status .panel-badge');
+        const mobileReset = getBlock(mobileWorkshopCss, '.typing-stage__head .ghost-btn');
+
+        expect(mobileHead).toContain('gap: 0.56rem;');
+        expect(mobileStatus).toContain('display: flex;');
+        expect(mobileStatus).toContain('flex-direction: row;');
+        expect(mobileStatus).toContain('flex-wrap: nowrap;');
+        expect(mobileStatus).toContain('align-items: center;');
+        expect(mobileBadge).toContain('width: auto;');
+        expect(mobileBadge).toContain('flex: 0 0 auto;');
+        expect(mobileBadge).toContain('min-height: 1.8rem;');
+        expect(mobileReset).toContain('width: 2.75rem;');
+        expect(mobileReset).toContain('font-size: 0;');
+    });
+
     test('keeps custom compose source controls as a mobile summary', async () => {
         const workshopCss = await readFile(resolve(componentRoot, 'practice-workshop.css'), 'utf8');
         const mobileWorkshopCss = getMediaBlock(workshopCss, '@media (max-width: 720px)', '@media (max-width: 360px)');
