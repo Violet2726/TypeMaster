@@ -79,4 +79,14 @@ describe('practice page CSS', () => {
         expect(composeWorkbenchRule).toContain('scroll-margin-top: 4.35rem;');
         expect(composeRailRule).toContain('scroll-margin-bottom: calc(5.4rem + env(safe-area-inset-bottom, 0px));');
     });
+
+    test('keeps the default mobile settings rail clear of the bottom navigation', async () => {
+        const css = await readFile(cssPath, 'utf8');
+        const mobileCss = getMediaBlock(css, '@media (max-width: 720px)');
+        const pageRule = getRuleBody(mobileCss, '.practice-page--refined');
+        const railRule = getRuleBody(mobileCss, '.practice-workbench__rail');
+
+        expect(pageRule).toContain('padding-bottom: calc(5.4rem + env(safe-area-inset-bottom, 0px));');
+        expect(railRule).toContain('scroll-margin-bottom: calc(5.4rem + env(safe-area-inset-bottom, 0px));');
+    });
 });
