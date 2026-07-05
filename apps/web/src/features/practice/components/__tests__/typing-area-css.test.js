@@ -66,4 +66,20 @@ describe('typing area CSS', () => {
 
         expect(composeSourceBody).toContain('display: none;');
     });
+
+    test('keeps the custom text mobile footer as a light toolbar', async () => {
+        const workshopCss = await readFile(resolve(componentRoot, 'practice-workshop.css'), 'utf8');
+        const mobileWorkshopCss = getMediaBlock(workshopCss, '@media (max-width: 720px)', '@media (max-width: 360px)');
+        const footer = getBlock(mobileWorkshopCss, '.custom-text-workshop__footer');
+        const metrics = getBlock(mobileWorkshopCss, '.custom-text-workshop__metrics');
+        const metricItem = getBlock(mobileWorkshopCss, '.custom-text-workshop__metrics span');
+        const footerButton = getBlock(mobileWorkshopCss, '.custom-text-workshop__footer .action-btn');
+
+        expect(footer).toContain('grid-template-columns: minmax(0, 1fr) auto;');
+        expect(footer).toContain('border-radius: var(--radius-pill);');
+        expect(metrics).toContain('flex-wrap: nowrap;');
+        expect(metricItem).toContain('min-height: 2.35rem;');
+        expect(footerButton).toContain('width: auto;');
+        expect(footerButton).not.toContain('width: 100%;');
+    });
 });
