@@ -134,6 +134,23 @@ describe('typing area CSS', () => {
         expect(composeActionButton).toContain('background: rgba(118, 118, 128, 0.1);');
     });
 
+    test('keeps default mobile training settings as a lightweight inset summary', async () => {
+        const workshopCss = await readFile(resolve(componentRoot, 'practice-workshop.css'), 'utf8');
+        const mobileWorkshopCss = getMediaBlock(workshopCss, '@media (max-width: 720px)', '@media (max-width: 360px)');
+        const summaryList = getBlock(mobileWorkshopCss, '.config-summary-list');
+        const summaryItem = getBlock(mobileWorkshopCss, '.config-summary-list__item');
+        const actionButton = getBlock(mobileWorkshopCss, '.config-strip__actions .ghost-btn');
+
+        expect(summaryList).toContain('border-color: transparent;');
+        expect(summaryList).toContain('border-radius: var(--radius-md);');
+        expect(summaryList).toContain('background: rgba(118, 118, 128, 0.08);');
+        expect(summaryItem).toContain('min-height: 2.28rem;');
+        expect(summaryItem).toContain('padding: 0.48rem 0.64rem;');
+        expect(actionButton).toContain('min-height: 2.24rem;');
+        expect(actionButton).toContain('border-color: transparent;');
+        expect(actionButton).toContain('background: rgba(118, 118, 128, 0.08);');
+    });
+
     test('keeps the custom text mobile footer as a light toolbar', async () => {
         const workshopCss = await readFile(resolve(componentRoot, 'practice-workshop.css'), 'utf8');
         const mobileWorkshopCss = getMediaBlock(workshopCss, '@media (max-width: 720px)', '@media (max-width: 360px)');

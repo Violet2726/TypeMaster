@@ -793,7 +793,21 @@ body[data-theme='serika-light'] .keyboard-zone-row__bar { background: rgba(0, 0,
 
 @media (max-width: 720px) {
     .practice-toolbar h2 { font-size: 1.25rem; line-height: 1.12; }
-    .config-strip { gap: 0.72rem; }
+    .config-summary-list {
+        border-color: transparent;
+        border-radius: var(--radius-md);
+        background: rgba(118, 118, 128, 0.08);
+    }
+    .config-summary-list__item {
+        min-height: 2.28rem;
+        padding: 0.48rem 0.64rem;
+    }
+    .config-strip__actions .ghost-btn {
+        min-height: 2.24rem;
+        border-color: transparent;
+        border-radius: var(--radius-md);
+        background: rgba(118, 118, 128, 0.08);
+    }
     .config-setting-row { padding: 0.64rem; }
     .config-strip--compose .config-setting-row--source .config-setting-row__body { display: none; }
     .config-strip--compose { gap: 0.52rem; }
