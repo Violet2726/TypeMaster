@@ -111,37 +111,40 @@ body[data-theme='serika-light'] .practice-workshop-shell {
     gap: 0.72rem;
 }
 
-.config-strip__main,
-.config-strip__advanced {
+.config-settings-list {
     display: grid;
-    gap: 1px;
     overflow: hidden;
     border: 1px solid var(--panel-stroke);
     border-radius: var(--radius-sm);
-    background: var(--panel-stroke);
+    background: rgba(118, 118, 128, 0.12);
 }
 
-.config-strip__main {
+.config-settings-list--primary {
     grid-template-columns: 1fr;
     align-items: stretch;
 }
 
-.config-control-group {
+.config-setting-row {
     display: grid;
-    gap: 0.56rem;
+    gap: 0.58rem;
     min-width: 0;
     min-inline-size: 0;
     margin: 0;
-    padding: 0.72rem;
+    padding: 0.76rem;
     border: 0;
-    background: var(--bg-soft);
+    border-top: 1px solid var(--panel-stroke);
+    background: transparent;
 }
 
-body[data-theme='serika-light'] .config-control-group {
-    background: var(--tm-white-alpha-940);
+.config-setting-row:first-child {
+    border-top: 0;
 }
 
-.config-control-group__legend {
+body[data-theme='serika-light'] .config-settings-list {
+    background: var(--tm-white-alpha-820);
+}
+
+.config-setting-row__head {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -152,12 +155,12 @@ body[data-theme='serika-light'] .config-control-group {
     padding: 0;
 }
 
-.config-control-group__legend .control-label {
+.config-setting-row__head .control-label {
     min-width: 0;
     letter-spacing: 0;
 }
 
-.config-control-group__value {
+.config-setting-row__value {
     min-width: 0;
     max-width: 58%;
     overflow: hidden;
@@ -171,7 +174,7 @@ body[data-theme='serika-light'] .config-control-group {
     white-space: nowrap;
 }
 
-.config-control-group__body {
+.config-setting-row__body {
     display: grid;
     min-width: 0;
 }
@@ -644,7 +647,7 @@ body[data-theme='serika-light'] .keyboard-zone-row__bar { background: rgba(0, 0,
 @media (max-width: 720px) {
     .practice-toolbar h2 { font-size: 1.25rem; line-height: 1.12; }
     .config-strip { gap: 0.72rem; }
-    .config-control-group { padding: 0.64rem; }
+    .config-setting-row { padding: 0.64rem; }
     .segmented-group { padding: 0.16rem; }
     .segment-btn { min-height: 2.28rem; padding: 0.48rem 0.56rem; font-size: 0.8rem; }
     .typing-stage__source strong { font-size: 0.96rem; }

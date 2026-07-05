@@ -36,12 +36,12 @@ function SegmentedButton({ active, children, icon: Icon = null, onClick }) {
 
 function ConfigSection({ label, value, variant, children }) {
     return (
-        <fieldset className={`config-control-group config-control-group--${variant}`} aria-label={label}>
-            <legend className="config-control-group__legend">
-                <span className="control-label">{label}</span>
-                <strong className="config-control-group__value" aria-hidden="true">{value}</strong>
+        <fieldset className={`config-setting-row config-setting-row--${variant}`} aria-label={label}>
+            <legend className="config-setting-row__head">
+                <span className="config-setting-row__label control-label">{label}</span>
+                <strong className="config-setting-row__value" aria-hidden="true">{value}</strong>
             </legend>
-            <div className="config-control-group__body">
+            <div className="config-setting-row__body">
                 {children}
             </div>
         </fieldset>
@@ -76,7 +76,7 @@ export function ConfigPanel({ copy, language, config, onConfigChange, showAdvanc
 
     return (
         <div className="config-strip">
-            <div className="config-strip__main">
+            <div className="config-settings-list config-settings-list--primary">
                 <ConfigSection label={copy.practice.sourceTitle} value={sourceValue} variant="source">
                     <div className="segmented-group segmented-group--source">
                         <SegmentedButton icon={Library} active={config.source === 'builtin'} onClick={() => onConfigChange({ source: 'builtin' }, { risky: true, intent: 'config' })}>
@@ -155,7 +155,7 @@ export function ConfigPanel({ copy, language, config, onConfigChange, showAdvanc
             </div>
 
             {showAdvanced && (
-                <div className="config-strip__advanced" id={advancedPanelId}>
+                <div className="config-settings-list config-settings-list--advanced" id={advancedPanelId}>
                     <ConfigSection label={copy.practice.optionsTitle} value={activeOptions} variant="options">
                         <div className="segmented-group segmented-group--options">
                             <SegmentedButton active={config.includePunctuation} onClick={() => onConfigChange({ includePunctuation: !config.includePunctuation }, { risky: true, intent: 'config' })}>

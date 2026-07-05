@@ -14,10 +14,10 @@ const baseConfig = {
 };
 
 describe('ConfigPanel', () => {
-    test('organizes primary settings as named control groups', () => {
+    test('organizes primary settings as a single settings list with named rows', () => {
         const copy = getCopy('en-US');
 
-        render(
+        const { container } = render(
             <ConfigPanel
                 copy={copy}
                 language="en-US"
@@ -32,9 +32,11 @@ describe('ConfigPanel', () => {
         const modeGroup = screen.getByRole('group', { name: copy.practice.modeTitle });
         const volumeGroup = screen.getByRole('group', { name: copy.practice.volumeTitle });
 
-        expect(sourceGroup).toHaveClass('config-control-group', 'config-control-group--source');
-        expect(modeGroup).toHaveClass('config-control-group', 'config-control-group--mode');
-        expect(volumeGroup).toHaveClass('config-control-group', 'config-control-group--volume');
+        expect(container.querySelector('.config-settings-list')).not.toBeNull();
+        expect(container.querySelector('.config-control-group')).toBeNull();
+        expect(sourceGroup).toHaveClass('config-setting-row', 'config-setting-row--source');
+        expect(modeGroup).toHaveClass('config-setting-row', 'config-setting-row--mode');
+        expect(volumeGroup).toHaveClass('config-setting-row', 'config-setting-row--volume');
         expect(within(sourceGroup).getAllByRole('button')).toHaveLength(3);
         expect(within(modeGroup).getAllByRole('button')).toHaveLength(2);
         expect(within(volumeGroup).getAllByRole('button')).toHaveLength(4);

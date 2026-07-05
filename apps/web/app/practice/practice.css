@@ -138,33 +138,31 @@ body[data-theme='serika-light'] .practice-workbench__rail .practice-toolbar {
     gap: 0.62rem;
 }
 
-.practice-workbench__rail .config-strip__main,
-.practice-workbench__rail .config-strip__advanced {
+.practice-workbench__rail .config-settings-list {
     display: grid;
     grid-template-columns: 1fr;
     gap: 0;
 }
 
-.practice-workbench__rail .config-section {
+.practice-workbench__rail .config-setting-row {
     display: grid;
     gap: 0.44rem;
-    padding: 0.78rem 0;
+    padding: 0.72rem;
     border-top: 1px solid var(--panel-stroke);
 }
 
-.practice-workbench__rail .config-section:first-child {
-    padding-top: 0;
+.practice-workbench__rail .config-setting-row:first-child {
     border-top: 0;
 }
 
-.practice-workbench__rail .config-section__head {
+.practice-workbench__rail .config-setting-row__head {
     display: flex;
     gap: 0.8rem;
     align-items: baseline;
     justify-content: space-between;
 }
 
-.practice-workbench__rail .config-section__value {
+.practice-workbench__rail .config-setting-row__value {
     color: var(--text-main);
     font-size: 0.82rem;
     font-weight: 600;
@@ -315,13 +313,13 @@ body[data-theme='serika-light'] .practice-workbench__rail .ai-custom-panel {
     min-height: clamp(34rem, calc(100dvh - 6.3rem), 42rem);
 }
 
-.practice-workbench--compose .practice-workbench__rail .config-strip__main {
+.practice-workbench--compose .practice-workbench__rail .config-settings-list--primary {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: end;
 }
 
-.practice-workbench--compose .practice-workbench__rail .config-strip__main .config-section:first-child {
+.practice-workbench--compose .practice-workbench__rail .config-settings-list--primary .config-setting-row:first-child {
     grid-column: 1 / -1;
 }
 
@@ -380,7 +378,7 @@ body[data-theme='serika-light'] .practice-workbench__rail .ai-custom-panel {
         grid-template-columns: minmax(0, 1fr) minmax(18rem, 20.5rem);
     }
 
-    .practice-workbench--compose .practice-workbench__rail .config-strip__main {
+    .practice-workbench--compose .practice-workbench__rail .config-settings-list--primary {
         grid-template-columns: 1fr;
     }
 }
@@ -573,9 +571,9 @@ body[data-theme='serika-light'] .practice-workbench__rail .ai-custom-panel {
     text-align: right;
 }
 
-.practice-workbench__rail .config-section {
+.practice-workbench__rail .config-setting-row {
     gap: 0.36rem;
-    padding: 0.68rem 0;
+    padding: 0.68rem;
 }
 
 .practice-workbench__rail .segmented-group {
@@ -610,7 +608,7 @@ body[data-theme='serika-light'] .practice-workbench__rail .ai-custom-panel {
     grid-template-columns: minmax(0, 1fr) clamp(18rem, 24vw, 20.5rem);
 }
 
-.practice-workbench--compose .practice-workbench__rail .config-strip__main {
+.practice-workbench--compose .practice-workbench__rail .config-settings-list--primary {
     grid-template-columns: 1fr;
 }
 
