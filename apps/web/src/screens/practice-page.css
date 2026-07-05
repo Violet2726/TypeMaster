@@ -230,7 +230,7 @@ body[data-theme='serika-light'] .practice-page--refined .practice-toolbar__suppo
     }
 
     .practice-page--refined .practice-workbench__primary .typing-stage .words-container {
-        height: calc(var(--typing-size) * var(--typing-line-height) * 3.35);
+        height: calc(var(--typing-size) * var(--typing-line-height) * 2.65);
     }
 
     .practice-workbench__rail {

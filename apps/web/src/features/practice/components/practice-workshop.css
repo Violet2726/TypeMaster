@@ -653,12 +653,46 @@ body[data-theme='serika-light'] .keyboard-zone-row__bar { background: rgba(0, 0,
     .typing-stage__source strong { font-size: 0.96rem; }
     .typing-stage__status .panel-badge { min-height: 1.86rem; font-size: 0.68rem; }
     .typing-stage .words-shell { padding: 0.82rem; }
-    .typing-stage .live-stats { gap: 0.48rem; }
-    .typing-stage .live-stat { min-height: 4.15rem; padding: 0.62rem 0.58rem; }
-    .live-stat__icon { top: 0.52rem; right: 0.52rem; width: 1.46rem; height: 1.46rem; }
-    .live-stat__icon svg { width: 0.88rem; height: 0.88rem; }
-    .typing-stage .live-stat-value { font-size: 1.62rem; }
-    .typing-stage .live-stat-label { font-size: 0.66rem; }
+    .typing-stage__footer { gap: 0.48rem; }
+    .typing-stage__hint { font-size: 0.78rem; line-height: 1.36; }
+    .typing-stage .live-stats {
+        gap: 0.28rem;
+        padding: 0.22rem;
+        border: 1px solid var(--panel-stroke);
+        border-radius: var(--radius-pill);
+        background: rgba(118, 118, 128, 0.12);
+    }
+    .typing-stage .live-stat {
+        min-height: 3.05rem;
+        align-content: center;
+        gap: 0.14rem;
+        justify-items: center;
+        padding: 0.42rem 0.38rem;
+        border-color: transparent;
+        border-radius: var(--radius-pill);
+        background: transparent;
+    }
+    .typing-stage .live-stat__top {
+        justify-content: center;
+        gap: 0.22rem;
+        min-width: 0;
+        width: 100%;
+    }
+    .live-stat__icon {
+        position: static;
+        width: 1.12rem;
+        height: 1.12rem;
+        background: transparent;
+    }
+    .live-stat__icon svg { width: 0.78rem; height: 0.78rem; }
+    .typing-stage .live-stat-value { font-size: 1.18rem; }
+    .typing-stage .live-stat-label {
+        margin-left: 0;
+        overflow: hidden;
+        font-size: 0.6rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
     .ai-custom-panel { padding: 0.82rem; }
     .ai-custom-panel__head { grid-template-columns: auto minmax(0, 1fr); align-items: start; }
     .ai-custom-panel__command { grid-column: 1 / -1; justify-items: stretch; }
