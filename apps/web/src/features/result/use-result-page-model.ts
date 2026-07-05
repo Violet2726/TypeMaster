@@ -66,8 +66,10 @@ function formatSigned(value, suffix = '') {
     return `${sign}${safe}${suffix}`;
 }
 
-function buildBeforeAfterValue(current, baseline, suffix = '') {
-    return `${current}${suffix} now / ${baseline}${suffix} before`;
+function buildBeforeAfterValue(copy, current, baseline, suffix = '') {
+    return (copy.result.targetedFeedbackBeforeAfter || '{current} now / {baseline} before')
+        .replace('{current}', `${current}${suffix}`)
+        .replace('{baseline}', `${baseline}${suffix}`);
 }
 
 function buildTargetedFeedbackModel(copy, trainingCopy, session) {
@@ -109,7 +111,7 @@ function buildTargetedFeedbackModel(copy, trainingCopy, session) {
                 },
                 {
                     label: copy.result.targetedFeedbackMissesLabel,
-                    value: buildBeforeAfterValue(summary.currentCount, summary.baselineCount)
+                    value: buildBeforeAfterValue(copy, summary.currentCount, summary.baselineCount)
                 },
                 {
                     label: copy.result.targetedFeedbackRemainingLabel,
@@ -140,7 +142,7 @@ function buildTargetedFeedbackModel(copy, trainingCopy, session) {
             },
             {
                 label: copy.result.targetedFeedbackPressureLabel,
-                value: buildBeforeAfterValue(summary.currentShare, summary.baselineShare, '%')
+                value: buildBeforeAfterValue(copy, summary.currentShare, summary.baselineShare, '%')
             },
             {
                 label: copy.result.targetedFeedbackRemainingLabel,

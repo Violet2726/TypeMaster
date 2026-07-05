@@ -384,6 +384,7 @@ export const enUSMessages = {
             targetedFeedbackPressureLabel: 'Zone pressure',
             targetedFeedbackRemainingLabel: 'Still showing',
             targetedFeedbackCleared: 'Cleared for now',
+            targetedFeedbackBeforeAfter: '{current} now / {baseline} before',
             prescriptionFocusLabel: 'Focus',
             prescriptionDoseLabel: 'Dose',
             prescriptionCheckpointLabel: 'Checkpoint',

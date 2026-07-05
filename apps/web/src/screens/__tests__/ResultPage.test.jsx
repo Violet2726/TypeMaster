@@ -279,6 +279,43 @@ describe('ResultPage', () => {
         expect(screen.queryByText('12s')).not.toBeInTheDocument();
     });
 
+    test('keeps fixed Chinese result decision copy localized', async () => {
+        Object.assign(mockStore, {
+            ...baseStore,
+            copy: getCopy('zh-CN'),
+            language: 'zh-CN'
+        });
+
+        render(<ResultPage />);
+
+        expect(screen.getByText('本轮结果')).toBeInTheDocument();
+        expect(screen.getByText('下一步')).toBeInTheDocument();
+        expect(screen.getByText('建议')).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: '继续冲榜' })).toBeInTheDocument();
+        expect(screen.getByText('下一轮重点')).toBeInTheDocument();
+        expect(screen.getByText('小幅提速')).toBeInTheDocument();
+        expect(screen.getByText('10 词')).toBeInTheDocument();
+        expect(await screen.findByRole('heading', { name: '每日挑战排名' })).toBeInTheDocument();
+        expect(screen.getByText('本轮关注')).toBeInTheDocument();
+        expect(screen.getByText('较上一轮: +8 WPM / 0%')).toBeInTheDocument();
+
+        [
+            'This round',
+            'Next action',
+            'Recommended',
+            'Push the board again',
+            'Next round brief',
+            'Add controlled speed',
+            '10 words',
+            'Daily challenge standing',
+            'Run focus',
+            'This run gained speed without giving up accuracy. Keep the challenge pressure on.',
+            'Vs previous: +8 WPM / 0%'
+        ].forEach((text) => {
+            expect(screen.queryByText(text)).not.toBeInTheDocument();
+        });
+    });
+
     test('routes risk-focused challenge results back into the active plan', async () => {
         Object.assign(mockStore, {
             ...baseStore,
@@ -390,6 +427,30 @@ describe('ResultPage', () => {
         expect(screen.getByText('Protect accuracy')).toBeInTheDocument();
         expect(screen.getByText('2 now / 5 before')).toBeInTheDocument();
         expect(screen.getByText('alpha / a')).toBeInTheDocument();
+    });
+
+    test('keeps Chinese targeted feedback copy localized', () => {
+        Object.assign(mockStore, {
+            ...baseStore,
+            copy: getCopy('zh-CN'),
+            language: 'zh-CN',
+            sessions: [adaptiveSession, previousChallengeSession],
+            lastCompletedSession: adaptiveSession,
+            dailyChallenge: null
+        });
+        setMockNavigation({ route: '/result?session=session-adaptive' });
+
+        render(<ResultPage />);
+
+        expect(screen.getByRole('heading', { name: '定向反馈' })).toBeInTheDocument();
+        expect(screen.getByText('仍在改善')).toBeInTheDocument();
+        expect(screen.getByText('目标失误正在减少，但仍影响这一轮。')).toBeInTheDocument();
+        expect(screen.getByText('守住准确率')).toBeInTheDocument();
+        expect(screen.getByText('2 / 原来 5')).toBeInTheDocument();
+        expect(screen.queryByText('Targeted feedback')).not.toBeInTheDocument();
+        expect(screen.queryByText('Still improving')).not.toBeInTheDocument();
+        expect(screen.queryByText('The targeted misses are shrinking, but a few are still shaping the round.')).not.toBeInTheDocument();
+        expect(screen.queryByText('2 now / 5 before')).not.toBeInTheDocument();
     });
 
     test('shows targeted feedback for keyboard-zone drills', () => {

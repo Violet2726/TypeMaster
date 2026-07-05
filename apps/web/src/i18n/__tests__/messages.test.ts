@@ -46,4 +46,62 @@ describe('i18n messages', () => {
             expect(localizedValue).not.toMatch(/[A-Za-z]{3,}/);
         }
     });
+
+    it('keeps Chinese result review copy localized', () => {
+        const resultKeys = [
+            'heroKicker',
+            'metricsTitle',
+            'adviceTitle',
+            'challengeStandingTitle',
+            'primaryAction',
+            'prescriptionTitle',
+            'prescriptionFocusLabel',
+            'prescriptionDoseLabel',
+            'prescriptionCheckpointLabel',
+            'prescriptionAccuracyFocus',
+            'prescriptionSpeedFocus'
+        ] as const;
+        const chartKeys = [
+            'kicker',
+            'title',
+            'summaryTitle',
+            'avgRaw',
+            'peakBurst',
+            'dataNote',
+            'rawLabel',
+            'burstLabel'
+        ] as const;
+        const trainingResultKeys = [
+            'planTitle',
+            'decisionBadge',
+            'signalLabel',
+            'challengePushTitle',
+            'challengePlanTitle',
+            'challengeFreeTitle'
+        ] as const;
+        const trainingChallengeKeys = [
+            'retryCta',
+            'leaderboard',
+            'trendFocusTitle',
+            'trendPrevDeltaLabel',
+            'trendFocusBreakthrough',
+            'trendFocusAccuracyRisk'
+        ] as const;
+
+        for (const key of resultKeys) {
+            expect(zhCNMessages.result[key]).not.toBe(enUSMessages.result[key]);
+        }
+
+        for (const key of chartKeys) {
+            expect(zhCNMessages.chart[key]).not.toBe(enUSMessages.chart[key]);
+        }
+
+        for (const key of trainingResultKeys) {
+            expect(zhCNMessages.training.result[key]).not.toBe(enUSMessages.training.result[key]);
+        }
+
+        for (const key of trainingChallengeKeys) {
+            expect(zhCNMessages.training.challenge[key]).not.toBe(enUSMessages.training.challenge[key]);
+        }
+    });
 });
