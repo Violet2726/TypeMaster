@@ -27,7 +27,9 @@ vi.mock('../../features/practice/components/AIWorkshop', () => ({
 }));
 
 vi.mock('../../features/practice/components/ConfigPanel', () => ({
-    ConfigPanel: () => <div data-testid="config-panel" />
+    ConfigPanel: ({ isCustomComposeMode }) => (
+        <div data-testid="config-panel" data-custom-compose-mode={String(Boolean(isCustomComposeMode))} />
+    )
 }));
 
 vi.mock('../../features/practice/components/CustomTextWorkshop', () => ({
@@ -347,6 +349,7 @@ describe('PracticePage', () => {
         expect(document.querySelector('.practice-page--compose')).toBeInTheDocument();
         expect(document.querySelector('.practice-workbench--compose')).toBeInTheDocument();
         expect(screen.getByTestId('typing-area')).toHaveAttribute('data-show-reset', 'false');
+        expect(screen.getByTestId('config-panel')).toHaveAttribute('data-custom-compose-mode', 'true');
         expect(screen.getByTestId('custom-workshop').compareDocumentPosition(screen.getByTestId('typing-area')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
         expect(screen.getByLabelText(baseStore.copy.practice.configTitle)).toContainElement(screen.getByTestId('typing-area'));
         expect(document.querySelector('.practice-toolbar__snapshot')).not.toBeInTheDocument();

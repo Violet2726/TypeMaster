@@ -55,4 +55,15 @@ describe('typing area CSS', () => {
         expect(mobileLiveStat).not.toContain('4.15rem');
         expect(mobileWordsContainer).toContain('2.65');
     });
+
+    test('keeps custom compose source controls as a mobile summary', async () => {
+        const workshopCss = await readFile(resolve(componentRoot, 'practice-workshop.css'), 'utf8');
+        const mobileWorkshopCss = getMediaBlock(workshopCss, '@media (max-width: 720px)', '@media (max-width: 360px)');
+        const composeSourceBody = getBlock(
+            mobileWorkshopCss,
+            '.config-strip--compose .config-setting-row--source .config-setting-row__body'
+        );
+
+        expect(composeSourceBody).toContain('display: none;');
+    });
 });

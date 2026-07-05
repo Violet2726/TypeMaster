@@ -360,6 +360,7 @@ export function PracticePage() {
                             copy={store.copy}
                             language={store.language}
                             config={store.config}
+                            isCustomComposeMode={isCustomComposeMode}
                             onConfigChange={handleConfigChange}
                             showAdvanced={controlsOpen}
                             onToggleAdvanced={() => setControlsOpen((value) => !value)}

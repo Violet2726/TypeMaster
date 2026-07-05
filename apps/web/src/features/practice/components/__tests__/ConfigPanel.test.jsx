@@ -62,6 +62,32 @@ describe('ConfigPanel', () => {
         expect(screen.getByRole('button', { name: copy.practice.settingsToggle })).toHaveAttribute('aria-expanded', 'false');
     });
 
+    test('marks the custom compose setting panel for responsive density', () => {
+        const copy = getCopy('en-US');
+
+        const { container } = render(
+            <ConfigPanel
+                copy={copy}
+                language="en-US"
+                config={{
+                    ...baseConfig,
+                    source: 'custom'
+                }}
+                isCustomComposeMode
+                onConfigChange={vi.fn()}
+                showAdvanced={false}
+                onToggleAdvanced={vi.fn()}
+            />
+        );
+
+        const strip = container.querySelector('.config-strip');
+        const sourceGroup = screen.getByRole('group', { name: copy.practice.sourceTitle });
+
+        expect(strip).toHaveClass('config-strip--compose');
+        expect(sourceGroup).toHaveClass('config-setting-row--source');
+        expect(sourceGroup.querySelector('.config-setting-row__value')).toHaveTextContent('Custom bank');
+    });
+
     test('keeps configuration changes wired through segmented controls', () => {
         const copy = getCopy('en-US');
         const onConfigChange = vi.fn();

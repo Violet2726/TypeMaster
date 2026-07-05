@@ -62,7 +62,7 @@ function getVolumeValue(config, language) {
     return config.mode === 'time' ? formatDurationLabel(config.durationSeconds, language) : `${config.wordCount}`;
 }
 
-export function ConfigPanel({ copy, language, config, onConfigChange, showAdvanced, onToggleAdvanced }) {
+export function ConfigPanel({ copy, language, config, isCustomComposeMode = false, onConfigChange, showAdvanced, onToggleAdvanced }) {
     const trainingCopy = getTrainingCopy(language);
     const sourceValue = getSourceValue(copy, trainingCopy, config.source);
     const modeValue = getModeValue(copy, config.mode);
@@ -75,7 +75,7 @@ export function ConfigPanel({ copy, language, config, onConfigChange, showAdvanc
     ].filter(Boolean).join(' / ') || copy.common.emptyValue;
 
     return (
-        <div className="config-strip">
+        <div className={`config-strip${isCustomComposeMode ? ' config-strip--compose' : ''}`}>
             <div className="config-settings-list config-settings-list--primary">
                 <ConfigSection label={copy.practice.sourceTitle} value={sourceValue} variant="source">
                     <div className="segmented-group segmented-group--source">
