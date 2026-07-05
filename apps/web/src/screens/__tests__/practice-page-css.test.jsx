@@ -49,6 +49,25 @@ describe('practice page CSS', () => {
         expect(previewFooterRule).toContain('display: none;');
     });
 
+    test('keeps the custom compose typing preview visually light on mobile', async () => {
+        const css = await readFile(cssPath, 'utf8');
+        const mobileCss = getMediaBlock(css, '@media (max-width: 720px)');
+        const previewStageRule = getRuleBody(mobileCss, '.practice-page--compose .practice-toolbar__studio--typing-preview .typing-stage');
+        const previewOverlayRule = getRuleBody(mobileCss, '.practice-page--compose .practice-toolbar__studio--typing-preview .typing-stage::after');
+        const previewSummaryRule = getRuleBody(mobileCss, '.practice-page--compose .practice-toolbar__studio--typing-preview .typing-stage__summary');
+        const previewStatusRule = getRuleBody(mobileCss, '.practice-page--compose .practice-toolbar__studio--typing-preview .typing-stage__status');
+        const previewBadgeRule = getRuleBody(mobileCss, '.practice-page--compose .practice-toolbar__studio--typing-preview .typing-stage__status .panel-badge');
+
+        expect(previewStageRule).toContain('padding: 0.72rem;');
+        expect(previewStageRule).toContain('background: rgba(118, 118, 128, 0.1);');
+        expect(previewStageRule).toContain('box-shadow: none;');
+        expect(previewOverlayRule).toContain('display: none;');
+        expect(previewSummaryRule).toContain('gap: 0.48rem;');
+        expect(previewStatusRule).toContain('grid-template-columns: repeat(2, minmax(0, 1fr));');
+        expect(previewBadgeRule).toContain('min-height: 2.08rem;');
+        expect(previewBadgeRule).toContain('border-radius: var(--radius-pill);');
+    });
+
     test('gives custom compose mobile chrome clear scroll safety', async () => {
         const css = await readFile(cssPath, 'utf8');
         const mobileCss = getMediaBlock(css, '@media (max-width: 720px)');
