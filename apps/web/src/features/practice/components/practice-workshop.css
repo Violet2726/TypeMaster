@@ -124,6 +124,51 @@ body[data-theme='serika-light'] .practice-workshop-shell {
     align-items: stretch;
 }
 
+.config-summary-list {
+    display: grid;
+    gap: 0;
+    overflow: hidden;
+    border: 1px solid var(--panel-stroke);
+    border-radius: var(--radius-sm);
+    background: rgba(118, 118, 128, 0.1);
+}
+
+.config-summary-list__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-width: 0;
+    padding: 0.68rem 0.76rem;
+    border-top: 1px solid var(--panel-stroke);
+}
+
+.config-summary-list__item:first-child {
+    border-top: 0;
+}
+
+.config-summary-list__item .control-label {
+    min-width: 0;
+}
+
+.config-summary-list__item strong {
+    min-width: 0;
+    max-width: 62%;
+    overflow: hidden;
+    color: var(--text-strong);
+    font-family: var(--font-ui);
+    font-size: 0.82rem;
+    font-weight: 720;
+    line-height: 1.2;
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+body[data-theme='serika-light'] .config-summary-list {
+    background: var(--tm-white-alpha-820);
+}
+
 .config-setting-row {
     display: grid;
     gap: 0.58rem;

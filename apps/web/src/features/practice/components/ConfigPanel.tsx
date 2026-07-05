@@ -48,6 +48,19 @@ function ConfigSection({ label, value, variant, children }) {
     );
 }
 
+function ConfigSummary({ copy, items }) {
+    return (
+        <div className="config-summary-list" aria-label={copy.practice.configTitle}>
+            {items.map((item) => (
+                <div key={item.label} className="config-summary-list__item">
+                    <span className="control-label">{item.label}</span>
+                    <strong>{item.value}</strong>
+                </div>
+            ))}
+        </div>
+    );
+}
+
 function getSourceValue(copy, trainingCopy, source) {
     if (source === 'custom') return trainingCopy.practice.customSource;
     if (source === 'ai') return copy.practice.sourceAi;
@@ -73,65 +86,75 @@ export function ConfigPanel({ copy, language, config, isCustomComposeMode = fals
         config.includePunctuation ? copy.common.punctuation : null,
         config.includeNumbers ? copy.common.numbers : null
     ].filter(Boolean).join(' / ') || copy.common.emptyValue;
+    const shouldShowPrimarySettings = showAdvanced || isCustomComposeMode;
+    const summaryItems = [
+        { label: copy.practice.sourceTitle, value: sourceValue },
+        { label: copy.practice.modeTitle, value: modeValue },
+        { label: copy.practice.volumeTitle, value: volumeValue }
+    ];
 
     return (
         <div className={`config-strip${isCustomComposeMode ? ' config-strip--compose' : ''}`}>
-            <div className="config-settings-list config-settings-list--primary">
-                <ConfigSection label={copy.practice.sourceTitle} value={sourceValue} variant="source">
-                    <div className="segmented-group segmented-group--source">
-                        <SegmentedButton icon={Library} active={config.source === 'builtin'} onClick={() => onConfigChange({ source: 'builtin' }, { risky: true, intent: 'config' })}>
-                            {copy.practice.sourceBuiltin}
-                        </SegmentedButton>
-                        <SegmentedButton icon={PencilLine} active={config.source === 'custom'} onClick={() => onConfigChange({ source: 'custom' }, { risky: true, intent: 'config' })}>
-                            {trainingCopy.practice.customSource}
-                        </SegmentedButton>
-                        <SegmentedButton icon={Bot} active={config.source === 'ai'} onClick={() => onConfigChange({ source: 'ai' }, { risky: true, intent: 'config' })}>
-                            {copy.practice.sourceAi}
-                        </SegmentedButton>
-                    </div>
-                </ConfigSection>
-
-                <ConfigSection label={copy.practice.modeTitle} value={modeValue} variant="mode">
-                    <div className="segmented-group segmented-group--mode">
-                        <SegmentedButton icon={Timer} active={config.mode === 'time'} onClick={() => onConfigChange({ mode: 'time' }, { risky: true, intent: 'config' })}>
-                            {copy.common.timeMode}
-                        </SegmentedButton>
-                        <SegmentedButton icon={Hash} active={config.mode === 'words'} onClick={() => onConfigChange({ mode: 'words' }, { risky: true, intent: 'config' })}>
-                            {copy.common.wordsMode}
-                        </SegmentedButton>
-                    </div>
-                </ConfigSection>
-
-                <ConfigSection label={copy.practice.volumeTitle} value={volumeValue} variant="volume">
-                    {config.mode === 'time' ? (
-                        <div className="segmented-group segmented-group--volume">
-                            {durationOptions.map((value) => (
-                                <SegmentedButton
-                                    icon={Clock3}
-                                    key={value}
-                                    active={config.durationSeconds === value}
-                                    onClick={() => onConfigChange({ durationSeconds: value }, { risky: true, intent: 'config' })}
-                                >
-                                    {formatDurationLabel(value, language)}
-                                </SegmentedButton>
-                            ))}
+            {shouldShowPrimarySettings ? (
+                <div className="config-settings-list config-settings-list--primary">
+                    <ConfigSection label={copy.practice.sourceTitle} value={sourceValue} variant="source">
+                        <div className="segmented-group segmented-group--source">
+                            <SegmentedButton icon={Library} active={config.source === 'builtin'} onClick={() => onConfigChange({ source: 'builtin' }, { risky: true, intent: 'config' })}>
+                                {copy.practice.sourceBuiltin}
+                            </SegmentedButton>
+                            <SegmentedButton icon={PencilLine} active={config.source === 'custom'} onClick={() => onConfigChange({ source: 'custom' }, { risky: true, intent: 'config' })}>
+                                {trainingCopy.practice.customSource}
+                            </SegmentedButton>
+                            <SegmentedButton icon={Bot} active={config.source === 'ai'} onClick={() => onConfigChange({ source: 'ai' }, { risky: true, intent: 'config' })}>
+                                {copy.practice.sourceAi}
+                            </SegmentedButton>
                         </div>
-                    ) : (
-                        <div className="segmented-group segmented-group--volume">
-                            {activeWordOptions.map((value) => (
-                                <SegmentedButton
-                                    icon={Hash}
-                                    key={value}
-                                    active={config.wordCount === value}
-                                    onClick={() => onConfigChange({ wordCount: value }, { risky: true, intent: 'config' })}
-                                >
-                                    {value}
-                                </SegmentedButton>
-                            ))}
+                    </ConfigSection>
+
+                    <ConfigSection label={copy.practice.modeTitle} value={modeValue} variant="mode">
+                        <div className="segmented-group segmented-group--mode">
+                            <SegmentedButton icon={Timer} active={config.mode === 'time'} onClick={() => onConfigChange({ mode: 'time' }, { risky: true, intent: 'config' })}>
+                                {copy.common.timeMode}
+                            </SegmentedButton>
+                            <SegmentedButton icon={Hash} active={config.mode === 'words'} onClick={() => onConfigChange({ mode: 'words' }, { risky: true, intent: 'config' })}>
+                                {copy.common.wordsMode}
+                            </SegmentedButton>
                         </div>
-                    )}
-                </ConfigSection>
-            </div>
+                    </ConfigSection>
+
+                    <ConfigSection label={copy.practice.volumeTitle} value={volumeValue} variant="volume">
+                        {config.mode === 'time' ? (
+                            <div className="segmented-group segmented-group--volume">
+                                {durationOptions.map((value) => (
+                                    <SegmentedButton
+                                        icon={Clock3}
+                                        key={value}
+                                        active={config.durationSeconds === value}
+                                        onClick={() => onConfigChange({ durationSeconds: value }, { risky: true, intent: 'config' })}
+                                    >
+                                        {formatDurationLabel(value, language)}
+                                    </SegmentedButton>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="segmented-group segmented-group--volume">
+                                {activeWordOptions.map((value) => (
+                                    <SegmentedButton
+                                        icon={Hash}
+                                        key={value}
+                                        active={config.wordCount === value}
+                                        onClick={() => onConfigChange({ wordCount: value }, { risky: true, intent: 'config' })}
+                                    >
+                                        {value}
+                                    </SegmentedButton>
+                                ))}
+                            </div>
+                        )}
+                    </ConfigSection>
+                </div>
+            ) : (
+                <ConfigSummary copy={copy} items={summaryItems} />
+            )}
 
             <div className="config-strip__actions">
                 <button

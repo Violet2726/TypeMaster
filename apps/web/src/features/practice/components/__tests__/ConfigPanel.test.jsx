@@ -14,7 +14,7 @@ const baseConfig = {
 };
 
 describe('ConfigPanel', () => {
-    test('organizes primary settings as a single settings list with named rows', () => {
+    test('summarizes primary settings until the panel is expanded', () => {
         const copy = getCopy('en-US');
 
         const { container } = render(
@@ -28,18 +28,19 @@ describe('ConfigPanel', () => {
             />
         );
 
-        const sourceGroup = screen.getByRole('group', { name: copy.practice.sourceTitle });
-        const modeGroup = screen.getByRole('group', { name: copy.practice.modeTitle });
-        const volumeGroup = screen.getByRole('group', { name: copy.practice.volumeTitle });
+        const summary = screen.getByLabelText(copy.practice.configTitle);
 
-        expect(container.querySelector('.config-settings-list')).not.toBeNull();
+        expect(summary).toHaveClass('config-summary-list');
+        expect(summary).toHaveTextContent(copy.practice.sourceTitle);
+        expect(summary).toHaveTextContent(copy.practice.sourceBuiltin);
+        expect(summary).toHaveTextContent(copy.practice.modeTitle);
+        expect(summary).toHaveTextContent(copy.common.timeMode);
+        expect(summary).toHaveTextContent(copy.practice.volumeTitle);
+        expect(summary).toHaveTextContent('30s');
+        expect(container.querySelector('.config-settings-list--primary')).toBeNull();
         expect(container.querySelector('.config-control-group')).toBeNull();
-        expect(sourceGroup).toHaveClass('config-setting-row', 'config-setting-row--source');
-        expect(modeGroup).toHaveClass('config-setting-row', 'config-setting-row--mode');
-        expect(volumeGroup).toHaveClass('config-setting-row', 'config-setting-row--volume');
-        expect(within(sourceGroup).getAllByRole('button')).toHaveLength(3);
-        expect(within(modeGroup).getAllByRole('button')).toHaveLength(2);
-        expect(within(volumeGroup).getAllByRole('button')).toHaveLength(4);
+        expect(screen.queryByRole('group', { name: copy.practice.sourceTitle })).not.toBeInTheDocument();
+        expect(screen.getByRole('button', { name: copy.practice.settingsToggle })).toHaveAttribute('aria-expanded', 'false');
     });
 
     test('marks active segmented controls as pressed', () => {
@@ -51,7 +52,7 @@ describe('ConfigPanel', () => {
                 language="en-US"
                 config={baseConfig}
                 onConfigChange={vi.fn()}
-                showAdvanced={false}
+                showAdvanced
                 onToggleAdvanced={vi.fn()}
             />
         );
@@ -59,7 +60,7 @@ describe('ConfigPanel', () => {
         expect(screen.getByRole('button', { name: copy.practice.sourceBuiltin })).toHaveAttribute('aria-pressed', 'true');
         expect(screen.getByRole('button', { name: copy.common.timeMode })).toHaveAttribute('aria-pressed', 'true');
         expect(screen.getByRole('button', { name: '30s' })).toHaveAttribute('aria-pressed', 'true');
-        expect(screen.getByRole('button', { name: copy.practice.settingsToggle })).toHaveAttribute('aria-expanded', 'false');
+        expect(screen.getByRole('button', { name: copy.practice.settingsHide })).toHaveAttribute('aria-expanded', 'true');
     });
 
     test('marks the custom compose setting panel for responsive density', () => {
@@ -98,7 +99,7 @@ describe('ConfigPanel', () => {
                 language="en-US"
                 config={baseConfig}
                 onConfigChange={onConfigChange}
-                showAdvanced={false}
+                showAdvanced
                 onToggleAdvanced={vi.fn()}
             />
         );
@@ -121,7 +122,7 @@ describe('ConfigPanel', () => {
                     wordCount: 28
                 }}
                 onConfigChange={vi.fn()}
-                showAdvanced={false}
+                showAdvanced
                 onToggleAdvanced={vi.fn()}
             />
         );
@@ -142,7 +143,7 @@ describe('ConfigPanel', () => {
                 language="zh-CN"
                 config={baseConfig}
                 onConfigChange={vi.fn()}
-                showAdvanced={false}
+                showAdvanced
                 onToggleAdvanced={vi.fn()}
             />
         );
