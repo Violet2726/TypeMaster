@@ -34,6 +34,24 @@ describe('MissionsPage', () => {
         expect(container.querySelectorAll('.mission-action-row')).toHaveLength(3);
     });
 
+    test('keeps the mission command area as a light title and status row', async () => {
+        const { container } = renderWithProvider(<MissionsPage />, {
+            route: '/missions',
+            storageState: {
+                'typemaster:v7:settings': {
+                    language: 'zh-CN'
+                }
+            }
+        });
+
+        expect(container.querySelector('h1')).toBeInTheDocument();
+        expect(container.querySelector('.app-sheet')).not.toBeInTheDocument();
+        expect(container.querySelector('.app-progress-strip')).not.toBeInTheDocument();
+        expect(container.querySelector('.mission-command')).toBeInTheDocument();
+        expect(container.querySelector('.mission-status-row')).toBeInTheDocument();
+        expect(container.querySelectorAll('.mission-status-item')).toHaveLength(3);
+    });
+
     test('routes mission action rows to their selected workflow', async () => {
         const { container } = renderWithProvider(<MissionsPage />, {
             route: '/missions',

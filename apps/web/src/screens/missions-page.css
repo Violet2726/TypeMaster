@@ -2,6 +2,131 @@
    Missions Page - Compact action list
    ============================================ */
 
+.mission-command {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 1rem;
+    padding: 0.28rem 0 0.1rem;
+    background: transparent;
+}
+
+.mission-command__copy {
+    display: grid;
+    gap: 0.46rem;
+    min-width: 0;
+}
+
+.mission-command__kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.42rem;
+    width: fit-content;
+    color: var(--text-dim);
+    font-size: 0.78rem;
+    font-weight: 750;
+}
+
+.mission-command__kicker svg {
+    color: var(--main-color);
+}
+
+.mission-command h1 {
+    margin: 0;
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: clamp(1.7rem, 3.1vw, 2.35rem);
+    line-height: 1.06;
+    letter-spacing: 0;
+}
+
+.mission-command__body {
+    max-width: 35rem;
+    margin: 0;
+    color: var(--text-color);
+    font-size: 0.95rem;
+    line-height: 1.46;
+}
+
+.mission-command__actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.mission-status-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+    border-top: 1px solid var(--panel-stroke);
+    border-bottom: 1px solid var(--panel-stroke);
+    background: transparent;
+}
+
+.mission-status-item {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.58rem;
+    min-height: 3.5rem;
+    padding: 0.64rem 0;
+}
+
+.mission-status-item + .mission-status-item {
+    padding-left: 0.8rem;
+    border-left: 1px solid var(--panel-stroke);
+}
+
+.mission-status-item__icon {
+    display: inline-grid;
+    place-items: center;
+    width: 1.64rem;
+    height: 1.64rem;
+    border-radius: 50%;
+    background: var(--surface-3);
+    color: var(--text-strong);
+}
+
+.mission-status-item--primary .mission-status-item__icon {
+    background: var(--main-soft);
+    color: var(--main-color);
+}
+
+.mission-status-item--success .mission-status-item__icon {
+    background: var(--success-soft);
+    color: var(--success-color);
+}
+
+.mission-status-item--warning .mission-status-item__icon {
+    background: var(--warning-soft);
+    color: var(--warning-color);
+}
+
+.mission-status-item__copy {
+    display: grid;
+    gap: 0.04rem;
+    min-width: 0;
+}
+
+.mission-status-item__copy small {
+    overflow: hidden;
+    color: var(--text-dim);
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1.15;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mission-status-item__copy strong {
+    overflow: hidden;
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: 1rem;
+    line-height: 1.1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .mission-action-list {
     display: grid;
     gap: 0;
@@ -99,6 +224,31 @@
 }
 
 @media (max-width: 720px) {
+    .mission-command {
+        grid-template-columns: 1fr;
+        align-items: start;
+        gap: 0.82rem;
+    }
+
+    .mission-command h1 {
+        font-size: clamp(1.58rem, 7vw, 2rem);
+    }
+
+    .mission-command__actions,
+    .mission-command__actions .tm-button {
+        width: 100%;
+    }
+
+    .mission-status-row {
+        grid-template-columns: 1fr;
+    }
+
+    .mission-status-item + .mission-status-item {
+        padding-left: 0;
+        border-left: 0;
+        border-top: 1px solid var(--panel-stroke);
+    }
+
     .mission-action-row {
         gap: 0.64rem;
     }

@@ -3,7 +3,7 @@
 import { BarChart3, ChevronRight, Flag, Keyboard, ShieldCheck, Swords, Target, Trophy, type LucideIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { buildInsights } from '@typemaster/domain';
-import { AppButton, AppSheet, MetricCard, SectionHeader } from '../components/app/AppPrimitives';
+import { AppButton, SectionHeader } from '../components/app/AppPrimitives';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { useAppActions } from '../store/use-app-action-set';
 import { useAchievementSnapshot, useHistorySnapshot, usePlanSnapshot, useShellSnapshot } from '../store/app-state-derived';
@@ -49,6 +49,25 @@ function MissionActionRow({ body, cta, icon: Icon, meta, onClick, title, tone = 
     );
 }
 
+function MissionStatusItem({ icon: Icon, label, value, tone = 'default' }: {
+    icon: LucideIcon,
+    label: string,
+    value: string | number,
+    tone?: string
+}) {
+    return (
+        <div className={`mission-status-item mission-status-item--${tone}`}>
+            <span className="mission-status-item__icon" aria-hidden="true">
+                <Icon size={15} strokeWidth={2.2} />
+            </span>
+            <span className="mission-status-item__copy">
+                <small>{label}</small>
+                <strong>{value}</strong>
+            </span>
+        </div>
+    );
+}
+
 export function MissionsPage() {
     const navigate = useAppNavigate();
     const { copy } = useShellSnapshot();
@@ -88,24 +107,26 @@ export function MissionsPage() {
 
     return (
         <div className="page-stack page-stack--home">
-            <AppSheet
-                aria-label={missionCopy.title}
-                body={missionCopy.body}
-                icon={Flag}
-                kicker={missionCopy.kicker}
-                title={missionCopy.title}
-                variant="hero"
-                actions={(
+            <section className="mission-command" aria-label={missionCopy.title}>
+                <div className="mission-command__copy">
+                    <span className="mission-command__kicker">
+                        <Flag aria-hidden="true" size={15} strokeWidth={2.2} />
+                        {missionCopy.kicker}
+                    </span>
+                    <h1>{missionCopy.title}</h1>
+                    <p className="hero-body mission-command__body">{missionCopy.body}</p>
+                </div>
+                <div className="mission-command__actions">
                     <AppButton variant="primary" icon={Swords} onClick={startGame}>
                         {missionCopy.backToGame}
                     </AppButton>
-                )}
-            />
+                </div>
+            </section>
 
-            <section className="app-progress-strip" aria-label={missionCopy.progressLabel}>
-                <MetricCard icon={Trophy} label={missionCopy.unlocked} value={unlocked} tone="warning" />
-                <MetricCard icon={ShieldCheck} label={missionCopy.weeklyMissions} value={`${weeklyGoal.completed}/${weeklyGoal.target}`} tone="success" />
-                <MetricCard icon={BarChart3} label={missionCopy.recentWpm} value={insights.recent7.avgWpm || copy.common.emptyValue} tone="primary" />
+            <section className="mission-status-row" aria-label={missionCopy.progressLabel}>
+                <MissionStatusItem icon={Trophy} label={missionCopy.unlocked} value={unlocked} tone="warning" />
+                <MissionStatusItem icon={ShieldCheck} label={missionCopy.weeklyMissions} value={`${weeklyGoal.completed}/${weeklyGoal.target}`} tone="success" />
+                <MissionStatusItem icon={BarChart3} label={missionCopy.recentWpm} value={insights.recent7.avgWpm || copy.common.emptyValue} tone="primary" />
             </section>
 
             <section className="mission-action-list" aria-label={missionCopy.missionList}>
