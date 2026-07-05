@@ -124,6 +124,7 @@ export function PracticePage() {
     const keyboardLayoutLabel = store.settings.keyboardLayout.toUpperCase();
     const sessionStatusLabel = store.copy.statuses[typingSession.status] || store.copy.statuses.idle;
     const currentTaskBadgeLabel = getTrainingTaskBadgeLabel(currentTrainingTask, trainingCopy);
+    const shouldShowPracticeSupport = !isCustomComposeMode && Boolean(nextRoundBrief || adaptiveDrillInsight);
     const practiceHeadline = currentTrainingTask
         ? currentTrainingTask.title
         : store.config.source === 'custom'
@@ -241,7 +242,7 @@ export function PracticePage() {
                 </div>
             </header>
 
-            {(nextRoundBrief || adaptiveDrillInsight) ? (
+            {shouldShowPracticeSupport ? (
                 <section className={`practice-support-grid ${adaptiveDrillInsight && nextRoundBrief ? 'practice-support-grid--split' : ''}`}>
                     {nextRoundBrief ? (
                         <section className="panel practice-brief-panel" aria-labelledby="practice-brief-title">
