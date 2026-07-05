@@ -164,36 +164,23 @@
 .result-completion-stage {
     position: relative;
     display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(22rem, 0.78fr);
+    grid-template-columns: minmax(0, 1.18fr) minmax(20rem, 0.72fr);
     grid-template-areas:
         "summary decision"
         "metrics metrics";
     align-items: stretch;
-    gap: 1rem;
+    gap: 1.1rem;
     overflow: hidden;
-    padding: 1rem;
+    padding: 1.1rem;
     border: 1px solid var(--tm-white-alpha-110);
     border-radius: var(--radius-sm);
     background: var(--bg-panel);
-}
-
-.result-completion-stage::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    border-radius: inherit;
-    background: radial-gradient(circle at 88% 18%, rgba(52, 199, 89, 0.14), transparent 28%);
 }
 
 body[data-theme='serika-light'] .result-completion-stage {
     border-color: rgba(60, 60, 67, 0.12);
     background: var(--bg-panel);
     box-shadow: 0 24px 64px rgba(29, 29, 31, 0.08);
-}
-
-body[data-theme='serika-light'] .result-completion-stage::before {
-    background: radial-gradient(circle at 88% 18%, rgba(52, 199, 89, 0.11), transparent 28%);
 }
 
 .result-completion-stage > * {
@@ -209,10 +196,10 @@ body[data-theme='serika-light'] .result-completion-stage::before {
 
 .result-summary-hero {
     display: grid;
-    grid-template-columns: 1fr;
-    align-content: space-between;
-    align-items: stretch;
-    gap: 1.05rem;
+    grid-template-columns: minmax(0, 1fr) minmax(10.5rem, 0.42fr);
+    align-content: start;
+    align-items: start;
+    gap: 1rem;
     min-height: auto;
     padding: 0;
     border: 0;
@@ -222,15 +209,18 @@ body[data-theme='serika-light'] .result-completion-stage::before {
 
 .result-summary-hero .result-summary__scores {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.7rem;
+    grid-template-columns: 1fr;
+    align-self: start;
+    gap: 0.62rem;
     order: 2;
 }
 
 .result-score-card {
-    align-content: end;
-    min-height: 10.6rem;
-    padding: 1rem;
+    display: grid;
+    align-content: center;
+    gap: 0.2rem;
+    min-height: 6.45rem;
+    padding: 0.82rem 0.9rem;
     border: 1px solid var(--panel-stroke);
     border-radius: var(--radius-sm);
     background: var(--surface-2);
@@ -251,30 +241,30 @@ body[data-theme='serika-light'] .result-score-card--accuracy { border-color: rgb
     display: block;
     color: var(--text-strong);
     font-family: var(--font-display);
-    font-size: 4.6rem;
+    font-size: 3.2rem;
     font-weight: 750;
     line-height: 1;
     letter-spacing: 0;
 }
 
 .result-unit {
-    font-size: 1.45rem;
+    font-size: 1rem;
     opacity: 0.7;
 }
 
 .result-summary-hero .result-copy {
     order: 1;
     align-content: start;
-    gap: 0.7rem;
-    padding: 0.2rem 0;
+    gap: 0.72rem;
+    padding: 0.15rem 0 0;
 }
 
 .result-summary-hero .result-copy h2 {
-    max-width: 34rem;
+    max-width: 36rem;
     color: var(--text-strong);
     font-family: var(--font-display);
-    font-size: 2.05rem;
-    line-height: 1.08;
+    font-size: 2.12rem;
+    line-height: 1.1;
     letter-spacing: 0;
 }
 
@@ -308,9 +298,9 @@ body[data-theme='serika-light'] .result-summary__chips span {
 .result-completion-stage__decision {
     display: grid;
     align-content: start;
-    gap: 0.9rem;
+    gap: 1rem;
     min-width: 0;
-    padding: 1rem;
+    padding: 1.06rem;
     border: 1px solid var(--tm-white-alpha-110);
     border-radius: var(--radius-sm);
     background: var(--surface-2);
@@ -374,32 +364,48 @@ body[data-theme='serika-light'] .result-completion-stage__decision .result-decis
 /* --- Prescription (inside completion stage) --- */
 
 .result-completion-stage .result-prescription {
-    gap: 0.72rem;
-    padding: 0.85rem;
-    border-radius: var(--radius-sm);
-    border-color: var(--tm-white-alpha-100);
-    background: var(--bg-soft);
+    gap: 0.76rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
 }
 
 body[data-theme='serika-light'] .result-completion-stage .result-prescription {
-    border-color: rgba(60, 60, 67, 0.12);
-    background: var(--tm-white-alpha-940);
+    background: transparent;
+}
+
+.result-completion-stage .result-prescription__head {
+    display: grid;
+    gap: 0.18rem;
 }
 
 .result-completion-stage .result-prescription__grid {
-    gap: 0.55rem;
+    grid-template-columns: 1fr;
+    gap: 0;
 }
 
 .result-completion-stage .result-prescription__item {
-    padding: 0.72rem 0.78rem;
-    border-radius: var(--radius-sm);
-    border-color: var(--surface-2);
-    background: rgba(0, 0, 0, 0.08);
+    display: grid;
+    grid-template-columns: minmax(4.5rem, 0.34fr) minmax(0, 1fr);
+    gap: 0.14rem 0.7rem;
+    padding: 0.66rem 0;
+    border: 0;
+    border-top: 1px solid var(--tm-white-alpha-100);
+    border-radius: 0;
+    background: transparent;
 }
 
 body[data-theme='serika-light'] .result-completion-stage .result-prescription__item {
-    border-color: rgba(60, 60, 67, 0.1);
-    background: rgba(242, 242, 247, 0.76);
+    border-color: rgba(60, 60, 67, 0.12);
+    background: transparent;
+}
+
+.result-completion-stage .result-prescription__item .summary-label {
+    grid-row: 1 / span 2;
+}
+
+.result-completion-stage .result-prescription__item p {
+    margin: 0;
 }
 
 /* --- KPI Strip (inside completion stage) --- */
@@ -411,7 +417,7 @@ body[data-theme='serika-light'] .result-completion-stage .result-prescription__i
 }
 
 .result-completion-stage__metrics .result-kpi-item {
-    min-height: 4.95rem;
+    min-height: 4.45rem;
     border-color: var(--tm-white-alpha-100);
     background: var(--bg-soft);
 }
@@ -1026,11 +1032,12 @@ body[data-theme='serika-light'] .replay-floating-inspect {
     }
 
     .result-summary-hero .result-summary__scores {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 0.62rem;
     }
 
     .result-score-card {
-        min-height: 7.15rem;
+        min-height: 6.4rem;
         padding: 0.82rem;
     }
 
@@ -1103,9 +1110,12 @@ body[data-theme='serika-light'] .replay-floating-inspect {
         grid-column: 1 / -1;
     }
 
-    .result-completion-stage .result-prescription__grid,
     .result-completion-stage__metrics {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .result-completion-stage .result-prescription__grid {
+        grid-template-columns: 1fr;
     }
 
     .result-challenge-route {
@@ -1113,7 +1123,7 @@ body[data-theme='serika-light'] .replay-floating-inspect {
     }
 
     .result-completion-stage .result-prescription__item {
-        min-height: 6rem;
+        min-height: auto;
     }
 
     .result-completion-stage__metrics .result-kpi-item {
