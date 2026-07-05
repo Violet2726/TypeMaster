@@ -228,19 +228,18 @@ export function PracticePage() {
 
     return (
         <div className={`page-stack practice-page practice-page--refined ${isCustomComposeMode ? 'practice-page--compose' : ''}`}>
-            <section className="panel practice-hero">
-                <div className="practice-hero__copy">
-                    <div className="practice-hero__eyebrow">
-                        <p className="hero-kicker">{currentTrainingTask ? trainingCopy.practice.taskKicker : store.copy.practice.pageTitle}</p>
+            <header className="practice-context" aria-labelledby="practice-context-title" aria-describedby="practice-context-body">
+                <div className="practice-context__copy">
+                    <div className="practice-context__label-row">
+                        <p className="practice-context__kicker">{currentTrainingTask ? trainingCopy.practice.taskKicker : store.copy.practice.pageTitle}</p>
                         {currentTaskBadgeLabel ? (
                             <span className="panel-badge badge-ready">{currentTaskBadgeLabel}</span>
                         ) : null}
                     </div>
-                    <h1>{practiceHeadline}</h1>
-                    <p className="hero-body">{practiceBody}</p>
+                    <h1 id="practice-context-title">{practiceHeadline}</h1>
+                    <p id="practice-context-body" className="practice-context__body">{practiceBody}</p>
                 </div>
-
-            </section>
+            </header>
 
             {(nextRoundBrief || adaptiveDrillInsight) ? (
                 <section className={`practice-support-grid ${adaptiveDrillInsight && nextRoundBrief ? 'practice-support-grid--split' : ''}`}>

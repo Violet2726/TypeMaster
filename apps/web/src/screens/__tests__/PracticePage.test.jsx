@@ -201,6 +201,21 @@ describe('PracticePage', () => {
         window.matchMedia = originalMatchMedia;
     });
 
+    test('renders the practice context as a lightweight header', () => {
+        render(<PracticePage />);
+
+        const heading = screen.getByRole('heading', {
+            level: 1,
+            name: baseStore.copy.practice.pageTitle
+        });
+        const context = heading.closest('.practice-context');
+
+        expect(context).not.toBeNull();
+        expect(context).not.toHaveClass('panel');
+        expect(context?.querySelector('.practice-context__kicker')).toHaveTextContent(baseStore.copy.practice.pageTitle);
+        expect(document.querySelector('.practice-hero')).toBeNull();
+    });
+
     test('carries the last result prescription into the next practice setup', () => {
         render(<PracticePage />);
 
