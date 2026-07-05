@@ -208,44 +208,6 @@ body[data-theme='serika-light'] .word[data-line-state='current'] .letter.pending
     font-weight: 650;
 }
 
-/* --- Empty State --- */
-
-.typing-empty-state {
-    display: grid;
-    gap: 1rem;
-    place-items: center;
-    text-align: center;
-}
-
-.typing-empty-state__copy {
-    display: grid;
-    gap: 0.66rem;
-    place-items: center;
-}
-
-.typing-empty-state__copy p {
-    max-width: 26rem;
-    color: var(--text-color);
-}
-
-.typing-empty-state__actions {
-    margin-top: 0.1rem;
-}
-
-.typing-empty-state__preview {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.45rem;
-    justify-content: center;
-    min-height: 4.5rem;
-}
-
-.typing-empty-state__step,
-.typing-empty-state__preview,
-.typing-empty-state__preflight li {
-    border-radius: 18px;
-}
-
 /* --- Focus Overlay --- */
 
 body[data-theme='serika-light'] .focus-overlay {

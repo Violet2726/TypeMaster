@@ -33,7 +33,7 @@
     justify-content: flex-start;
 }
 
-.practice-workbench__primary .typing-empty-state__preflight {
+.practice-workbench__primary .typing-empty-state__rail {
     margin: 0;
     padding: 0;
     list-style: none;
@@ -360,8 +360,7 @@ body[data-theme='serika-light'] .practice-workbench__rail .ai-custom-panel {
     grid-template-columns: 1fr;
     grid-template-areas:
         'copy'
-        'preflight'
-        'preview';
+        'rail';
     align-content: start;
     gap: 0.72rem;
     width: 100%;
@@ -526,8 +525,7 @@ body[data-theme='serika-light'] .practice-workbench__rail .ai-custom-panel {
     align-content: center;
 }
 
-.practice-workbench__primary .typing-empty-state__step,
-.practice-workbench__primary .typing-empty-state__preview {
+.practice-workbench__primary .typing-empty-state__step {
     border-radius: 8px;
     box-shadow: none;
 }

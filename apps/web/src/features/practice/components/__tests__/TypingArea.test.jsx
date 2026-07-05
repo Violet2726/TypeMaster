@@ -1,6 +1,6 @@
 /** @vitest-environment jsdom */
 import { createRef } from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
 import { getCopy } from '../../../../i18n';
 import { TypingArea } from '../TypingArea';
@@ -47,7 +47,8 @@ describe('TypingArea', () => {
         expect(screen.getAllByText(copy.practice.textPendingLabel).length).toBeGreaterThan(0);
         expect(screen.getByText(copy.practice.sourceTitle)).toBeInTheDocument();
         expect(screen.getByText(copy.practice.sessionLabel)).toBeInTheDocument();
-        expect(container.querySelector('.typing-empty-state__preflight')).not.toBeNull();
+        expect(container.querySelector('.typing-empty-state__rail')).not.toBeNull();
+        expect(container.querySelector('.typing-empty-state__preview')).toBeNull();
         expect(container.querySelector('.typing-ready-panel')).toBeNull();
         expect(screen.queryByText('100%')).not.toBeInTheDocument();
         expect(screen.queryByText('30')).not.toBeInTheDocument();
@@ -89,5 +90,25 @@ describe('TypingArea', () => {
         expect(screen.getByRole('button', { name: copy.common.generateAiText })).toBeDisabled();
         expect(screen.getByRole('button', { name: copy.common.useBuiltIn })).toBeInTheDocument();
         expect(screen.getAllByRole('listitem')).toHaveLength(3);
+    });
+
+    test('keeps locked recovery actions from activating the typing shell', () => {
+        const copy = getCopy('en-US');
+        const onActivate = vi.fn();
+        const onLockedPrimaryAction = vi.fn();
+
+        renderTypingArea({
+            onActivate,
+            lockedPrimaryActionLabel: copy.common.generateAiText,
+            onLockedPrimaryAction
+        });
+
+        const recoveryButton = screen.getByRole('button', { name: copy.common.generateAiText });
+
+        fireEvent.pointerDown(recoveryButton);
+        fireEvent.click(recoveryButton);
+
+        expect(onLockedPrimaryAction).toHaveBeenCalledTimes(1);
+        expect(onActivate).not.toHaveBeenCalled();
     });
 });

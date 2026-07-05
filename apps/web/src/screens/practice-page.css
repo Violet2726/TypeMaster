@@ -137,9 +137,7 @@
     height: clamp(18.5rem, 40vh, 25.5rem);
 }
 
-.practice-page--refined .practice-workbench__primary .typing-empty-state__step,
-.practice-page--refined .practice-workbench__primary .typing-empty-state__preview,
-.practice-page--refined .practice-workbench__primary .typing-empty-state__preflight li {
+.practice-page--refined .practice-workbench__primary .typing-empty-state__step {
     border-radius: 18px;
 }
 

@@ -1,5 +1,9 @@
 import { ShieldCheck } from 'lucide-react';
 
+function stopTypingShellActivation(event) {
+    event.stopPropagation();
+}
+
 export function TypingAreaEmptyState({
     copy,
     unavailableTitle,
@@ -16,16 +20,20 @@ export function TypingAreaEmptyState({
     onLockedSecondaryAction
 }) {
     return (
-        <div className="typing-empty-state">
+        <div className="typing-empty-state" role="group" aria-labelledby="typing-empty-state-title">
             <div className="typing-empty-state__copy">
                 <span className="typing-empty-state__icon" aria-hidden="true">
                     <ShieldCheck size={22} strokeWidth={2.25} />
                 </span>
                 <span className="summary-label">{copy.common.status}</span>
-                <strong>{unavailableTitle}</strong>
+                <strong id="typing-empty-state-title">{unavailableTitle}</strong>
                 <p>{unavailableBody}</p>
                 {(hasLockedPrimaryAction || hasLockedSecondaryAction) && (
-                    <div className="typing-empty-state__actions">
+                    <div
+                        className="typing-empty-state__actions"
+                        onClick={stopTypingShellActivation}
+                        onPointerDown={stopTypingShellActivation}
+                    >
                         {hasLockedPrimaryAction && (
                             <button
                                 type="button"
@@ -47,7 +55,7 @@ export function TypingAreaEmptyState({
                 )}
             </div>
 
-            <ul className="typing-empty-state__preflight" aria-label={unavailableTitle}>
+            <ul className="typing-empty-state__rail" aria-label={unavailableTitle}>
                 {preparationItems.map(({ key, icon: Icon, label, value }) => (
                     <li key={key} className="typing-empty-state__step">
                         <span aria-hidden="true">
@@ -60,12 +68,6 @@ export function TypingAreaEmptyState({
                     </li>
                 ))}
             </ul>
-
-            <div className="typing-empty-state__preview" aria-hidden="true">
-                <span />
-                <span />
-                <span />
-            </div>
         </div>
     );
 }
