@@ -31,44 +31,34 @@
     letter-spacing: 0;
 }
 
-.home-recent-list {
-    display: grid;
-    gap: 0;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--panel-stroke);
-    background: var(--bg-soft);
-}
-
-.home-recent-item {
+.home-recent-summary {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
-    gap: 0.72rem;
-    min-height: 4.4rem;
-    padding: 0.82rem 0.92rem;
-}
-
-.home-recent-item + .home-recent-item {
+    gap: 0.68rem;
+    min-height: 3.55rem;
+    padding: 0.72rem 0;
     border-top: 1px solid var(--panel-stroke);
+    background: transparent;
 }
 
-.home-recent-item__icon {
+.home-recent-summary__icon {
     display: inline-grid;
     place-items: center;
-    width: 1.9rem;
-    height: 1.9rem;
+    width: 1.72rem;
+    height: 1.72rem;
     border-radius: 50%;
-    background: var(--surface-3);
-    color: var(--text-strong);
+    background: var(--main-soft);
+    color: var(--main-color);
 }
 
-.home-recent-item__body {
+.home-recent-summary__body {
     display: grid;
     gap: 0.08rem;
     min-width: 0;
 }
 
-.home-recent-item__body strong {
+.home-recent-summary__body strong {
     display: block;
     overflow: hidden;
     color: var(--text-strong);
@@ -79,18 +69,29 @@
     text-overflow: ellipsis;
 }
 
-.home-recent-item__body p {
+.home-recent--empty .home-recent-summary__body strong {
+    display: -webkit-box;
+    white-space: normal;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.home-recent-summary__detail {
     margin: 0;
     color: var(--text-dim);
     font-size: 0.78rem;
     line-height: 1.35;
 }
 
-.home-recent-item__metrics {
+.home-recent-summary__metrics {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;
     gap: 0.34rem;
+}
+
+.home-recent-summary > .tm-button {
+    justify-self: end;
 }
 
 .home-recent-chip {
@@ -112,12 +113,18 @@
 }
 
 @media (max-width: 720px) {
-    .home-recent-item {
+    .home-recent-summary {
         grid-template-columns: auto minmax(0, 1fr);
     }
 
-    .home-recent-item__metrics {
+    .home-recent-summary__metrics {
         grid-column: 2 / -1;
         justify-content: flex-start;
+    }
+
+    .home-recent-summary > .tm-button {
+        grid-column: 1 / -1;
+        justify-self: stretch;
+        width: 100%;
     }
 }

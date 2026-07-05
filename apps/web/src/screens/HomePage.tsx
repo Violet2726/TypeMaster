@@ -157,7 +157,6 @@ export function HomePage() {
                 depthLabel={homeCopy.depthLabel}
                 duration={formatDuration(latestGame?.durationSeconds || latestGame?.result?.durationSeconds || 0)}
                 emptyBody={homeCopy.firstRunBody}
-                emptyDescription={homeCopy.typeRiftLaneBody}
                 isEmpty={!latestGame}
                 kicker={latestGame ? homeCopy.latestTypeRift : homeCopy.firstRunKicker}
                 runTitle={latestGame?.trainingMeta?.title || homeCopy.defaultRunTitle}

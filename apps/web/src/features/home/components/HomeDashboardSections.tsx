@@ -112,7 +112,6 @@ export function RecentRunCard({
     depthLabel,
     duration,
     emptyBody,
-    emptyDescription,
     isEmpty,
     kicker,
     title,
@@ -124,32 +123,29 @@ export function RecentRunCard({
     depthLabel: string;
     duration?: string;
     emptyBody: string;
-    emptyDescription: string;
     isEmpty: boolean;
     kicker: string;
     title: string;
     runTitle?: string;
 }) {
     return (
-        <section className="home-recent">
+        <section className={`home-recent${isEmpty ? ' home-recent--empty' : ''}`}>
             <SectionHeader kicker={kicker} title={title} />
-            <div className="home-recent-list">
-                <div className="home-recent-item">
-                    <span className="home-recent-item__icon" aria-hidden="true">
-                        <Swords size={16} strokeWidth={2.2} />
-                    </span>
-                    <div className="home-recent-item__body">
-                        <strong>{isEmpty ? emptyBody : runTitle}</strong>
-                        <p>{isEmpty ? emptyDescription : date}</p>
-                    </div>
-                    {!isEmpty ? (
-                        <div className="home-recent-item__metrics">
-                            <RecentChip icon={Gauge}>{depthLabel} {depth || 1}</RecentChip>
-                            <RecentChip icon={ShieldCheck} accent>{accuracy || 0}%</RecentChip>
-                            <RecentChip icon={DoorOpen}>{duration}</RecentChip>
-                        </div>
-                    ) : null}
+            <div className="home-recent-summary" aria-label="TypeRift recent status">
+                <span className="home-recent-summary__icon" aria-hidden="true">
+                    <Swords size={16} strokeWidth={2.2} />
+                </span>
+                <div className="home-recent-summary__body">
+                    <strong>{isEmpty ? emptyBody : runTitle}</strong>
+                    {!isEmpty ? <p className="home-recent-summary__detail">{date}</p> : null}
                 </div>
+                {!isEmpty ? (
+                    <div className="home-recent-summary__metrics">
+                        <RecentChip icon={Gauge}>{depthLabel} {depth || 1}</RecentChip>
+                        <RecentChip icon={ShieldCheck} accent>{accuracy || 0}%</RecentChip>
+                        <RecentChip icon={DoorOpen}>{duration}</RecentChip>
+                    </div>
+                ) : null}
             </div>
         </section>
     );

@@ -136,19 +136,17 @@ export function MissionsPage() {
             {activeTrainingStep ? (
                 <section className="home-recent">
                     <SectionHeader kicker={missionCopy.activeMission} title={activeTrainingStep.title} />
-                    <div className="home-recent-list">
-                        <div className="home-recent-item">
-                            <span className="home-recent-item__icon" aria-hidden="true">
-                                <Flag size={16} strokeWidth={2.2} />
-                            </span>
-                            <div className="home-recent-item__body">
-                                <strong>{activeTrainingStep.summary}</strong>
-                                <p>{fillTemplate(missionCopy.planProgress, { value: trainingPlanProgress?.percent || 0 })}</p>
-                            </div>
-                            <AppButton onClick={continuePlan}>
-                                {missionCopy.continue}
-                            </AppButton>
+                    <div className="home-recent-summary">
+                        <span className="home-recent-summary__icon" aria-hidden="true">
+                            <Flag size={16} strokeWidth={2.2} />
+                        </span>
+                        <div className="home-recent-summary__body">
+                            <strong>{activeTrainingStep.summary}</strong>
+                            <p className="home-recent-summary__detail">{fillTemplate(missionCopy.planProgress, { value: trainingPlanProgress?.percent || 0 })}</p>
                         </div>
+                        <AppButton onClick={continuePlan}>
+                            {missionCopy.continue}
+                        </AppButton>
                     </div>
                 </section>
             ) : null}

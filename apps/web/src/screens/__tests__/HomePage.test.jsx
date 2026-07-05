@@ -82,6 +82,9 @@ describe('HomePage', () => {
         expect(container.querySelector('.home-typerift')).not.toBeInTheDocument();
         expect(container.querySelectorAll('.app-card-grid .app-card')).toHaveLength(3);
         expect(container.querySelector('.app-card-grid .app-card--primary')).not.toBeInTheDocument();
+        expect(container.querySelector('.home-recent-list')).not.toBeInTheDocument();
+        expect(container.querySelector('.home-recent-summary')).toBeInTheDocument();
+        expect(container.querySelector('.home-recent-summary__detail')).not.toBeInTheDocument();
     });
 
     test('opens TypeRift as a cardized command-center experience', async () => {
@@ -144,6 +147,7 @@ describe('HomePage', () => {
 
         expect(await screen.findByRole('heading', { name: '上一局信号' })).toBeInTheDocument();
         expect(screen.getByText('层数 4')).toBeInTheDocument();
+        expect(screen.getByLabelText('TypeRift recent status')).toBeInTheDocument();
         expect(screen.getByText('97%')).toBeInTheDocument();
     });
 });
