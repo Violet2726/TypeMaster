@@ -1,20 +1,8 @@
 import { BadgeCheck, FileText, PencilLine } from 'lucide-react';
 import { getCopy } from '../../../i18n';
 import { getTrainingCopy } from '../../../training/copy';
-import { PracticeWorkshopField, PracticeWorkshopSnapshot } from './PracticeWorkshopBlocks';
+import { PracticeWorkshopField } from './PracticeWorkshopBlocks';
 import { PracticeWorkshopShell } from './PracticeWorkshopShell';
-
-function getPreviewText(value) {
-    const normalizedValue = value.replace(/\s+/g, ' ').trim();
-
-    if (!normalizedValue) {
-        return '';
-    }
-
-    return normalizedValue.length > 84
-        ? `${normalizedValue.slice(0, 84).trimEnd()}...`
-        : normalizedValue;
-}
 
 export function CustomTextWorkshop({
     language,
@@ -32,7 +20,6 @@ export function CustomTextWorkshop({
     const numberFormatter = new Intl.NumberFormat(language);
     const statusVariant = hasText ? 'ready' : 'idle';
     const statusLabel = hasText ? copy.common.aiReady : copy.common.aiNeedsGenerate;
-    const previewText = hasText ? getPreviewText(trimmedValue) : trainingCopy.practice.customPlaceholder;
 
     return (
         <PracticeWorkshopShell
@@ -44,14 +31,8 @@ export function CustomTextWorkshop({
             description={trainingCopy.practice.customBody}
             statusCaption={copy.common.status}
             statusLabel={statusLabel}
-            actions={(
-                <button type="button" className="action-btn primary" onClick={onApply} disabled={!hasText}>
-                    <BadgeCheck aria-hidden="true" size={18} strokeWidth={2.25} />
-                    {trainingCopy.practice.customApply}
-                </button>
-            )}
         >
-            <div className="custom-text-workshop__body practice-workshop-grid practice-workshop-grid--editor">
+            <div className="custom-text-workshop__body">
                 <PracticeWorkshopField
                     className="practice-workshop-grid__main practice-workshop-grid__main--editor workshop-field--textarea custom-text-workshop__editor"
                     icon={FileText}
@@ -66,22 +47,22 @@ export function CustomTextWorkshop({
                     />
                 </PracticeWorkshopField>
 
-                <PracticeWorkshopSnapshot
-                    className="custom-text-workshop__summary"
-                    eyebrow={copy.common.currentText}
-                    title={previewText}
-                    description={hasText ? copy.common.aiReady : copy.common.aiNeedsGenerate}
-                    metrics={[
-                        {
-                            label: copy.common.wordsMode,
-                            value: numberFormatter.format(wordCount)
-                        },
-                        {
-                            label: copy.common.characterStats,
-                            value: numberFormatter.format(characterCount)
-                        }
-                    ]}
-                />
+                <div className="custom-text-workshop__footer">
+                    <div className="custom-text-workshop__metrics" aria-label={copy.common.currentText}>
+                        <span>
+                            <small>{copy.common.wordsMode}</small>
+                            <strong>{numberFormatter.format(wordCount)}</strong>
+                        </span>
+                        <span>
+                            <small>{copy.common.characterStats}</small>
+                            <strong>{numberFormatter.format(characterCount)}</strong>
+                        </span>
+                    </div>
+                    <button type="button" className="action-btn primary" onClick={onApply} disabled={!hasText}>
+                        <BadgeCheck aria-hidden="true" size={18} strokeWidth={2.25} />
+                        {trainingCopy.practice.customApply}
+                    </button>
+                </div>
             </div>
         </PracticeWorkshopShell>
     );

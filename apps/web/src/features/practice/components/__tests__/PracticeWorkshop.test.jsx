@@ -65,8 +65,9 @@ describe('Practice workshop panels', () => {
         );
 
         expect(screen.getByRole('button', { name: trainingCopy.practice.customApply })).toBeDisabled();
-        expect(screen.getAllByText(copy.common.aiNeedsGenerate).length).toBeGreaterThan(0);
+        expect(screen.getAllByText(copy.common.aiNeedsGenerate)).toHaveLength(1);
         expect(screen.getAllByText(copy.common.status).length).toBeGreaterThan(0);
+        expect(document.querySelector('.custom-text-workshop__summary')).toBeNull();
 
         rerender(
             <CustomTextWorkshop
@@ -77,7 +78,8 @@ describe('Practice workshop panels', () => {
             />
         );
 
-        expect(screen.getAllByText(copy.common.aiReady).length).toBeGreaterThan(0);
+        expect(screen.getAllByText(copy.common.aiReady)).toHaveLength(1);
+        expect(document.querySelector('.custom-text-workshop__summary')).toBeNull();
         expect(screen.getByText(copy.common.wordsMode)).toBeInTheDocument();
         expect(screen.getByText(copy.common.characterStats)).toBeInTheDocument();
         expect(screen.getByText('3')).toBeInTheDocument();

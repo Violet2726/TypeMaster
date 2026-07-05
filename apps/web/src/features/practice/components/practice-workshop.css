@@ -594,8 +594,12 @@ body[data-theme='serika-light'] .ai-custom-panel__state-grid span { background: 
 /* --- Custom Text Workshop --- */
 .custom-text-workshop { gap: 0.86rem; }
 
+.custom-text-workshop__body {
+    display: grid;
+    gap: 0.72rem;
+}
+
 .custom-text-workshop__editor {
-    min-height: 100%;
     padding: 0.74rem;
     border: 1px solid var(--panel-stroke);
     border-radius: var(--radius-sm);
@@ -606,13 +610,45 @@ body[data-theme='serika-light'] .custom-text-workshop__editor { background: var(
 
 .custom-text-workshop__editor textarea { min-height: 10.6rem; resize: vertical; }
 
-.custom-text-workshop__summary {
-    grid-template-columns: minmax(0, 1fr);
-    min-height: auto;
-    align-content: start;
+.custom-text-workshop__footer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.72rem;
+    align-items: center;
 }
 
-.custom-text-workshop__summary .ai-custom-panel__state-grid strong { font-size: 1.04rem; }
+.custom-text-workshop__metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.46rem;
+    min-width: 0;
+}
+
+.custom-text-workshop__metrics span {
+    display: grid;
+    min-width: 5.8rem;
+    min-height: 3rem;
+    padding: 0.55rem 0.68rem;
+    align-content: end;
+    border: 1px solid var(--panel-stroke);
+    border-radius: var(--radius-sm);
+    background: var(--bg-soft);
+}
+
+body[data-theme='serika-light'] .custom-text-workshop__metrics span { background: rgba(244, 247, 252, 0.72); }
+
+.custom-text-workshop__metrics small {
+    color: var(--text-dim);
+    font-size: 0.68rem;
+    font-weight: 700;
+}
+
+.custom-text-workshop__metrics strong {
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: 1.04rem;
+    line-height: 1.15;
+}
 
 /* --- Status Card Workshop --- */
 .status-card--workshop {
@@ -770,8 +806,10 @@ body[data-theme='serika-light'] .keyboard-zone-row__bar { background: rgba(0, 0,
     .ai-custom-panel__state-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .workshop-field textarea { min-height: 7.6rem; }
     .custom-text-workshop__editor textarea { min-height: 9rem; }
+    .custom-text-workshop__footer { grid-template-columns: 1fr; }
     .ai-custom-panel .workshop-actions { align-items: stretch; justify-content: stretch; }
     .ai-custom-panel .workshop-actions .action-btn { width: 100%; }
+    .custom-text-workshop__footer .action-btn { width: 100%; }
     .keyboard-hotspots { grid-template-columns: 1fr; gap: 0.72rem; }
     .keyboard-hotspots__primary { padding: 0.9rem; }
     .keyboard-zone-row { min-height: 5rem; padding: 0.8rem 0.82rem 1.15rem; }
