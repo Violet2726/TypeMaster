@@ -334,31 +334,69 @@ body[data-theme='serika-light'] .result-completion-stage__decision {
 
 .result-completion-stage__decision .result-decision-panel__body {
     grid-template-columns: 1fr;
-    gap: 0.72rem;
+    gap: 0.64rem;
 }
 
 .result-completion-stage__decision .result-decision-signal {
+    display: flex;
+    align-items: baseline;
+    gap: 0.62rem;
     min-height: auto;
-    padding: 0.78rem 0.86rem;
-    border-radius: var(--radius-sm);
-    background: var(--bg-soft);
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
 }
 
 body[data-theme='serika-light'] .result-completion-stage__decision .result-decision-signal {
     border-color: rgba(60, 60, 67, 0.1);
-    background: rgba(242, 242, 247, 0.76);
+    background: transparent;
 }
 
-.result-completion-stage__decision .results-actions {
-    gap: 0.55rem;
+.result-completion-stage__decision .result-decision-signal .summary-label {
+    flex: 0 0 auto;
+}
+
+.result-completion-stage__decision .result-decision-signal strong {
+    min-width: 0;
+}
+
+.result-completion-stage__decision .result-decision-actions {
+    display: grid;
+    gap: 0.48rem;
 }
 
 .result-completion-stage__decision .results-actions .action-btn {
     min-height: 2.8rem;
 }
 
-.result-completion-stage__decision .results-actions .action-btn.primary {
-    flex: 1 1 11.5rem;
+.result-completion-stage__decision .result-decision-primary-action {
+    justify-content: center;
+    width: 100%;
+    min-height: 3.08rem;
+}
+
+.result-completion-stage__decision .result-decision-secondary-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.28rem 0.62rem;
+}
+
+.result-completion-stage__decision .result-decision-secondary-action {
+    min-height: 2.24rem;
+    padding: 0.36rem 0.5rem;
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+    color: var(--text-dim);
+}
+
+.result-completion-stage__decision .result-decision-secondary-action:hover,
+.result-completion-stage__decision .result-decision-secondary-action:focus-visible {
+    border-color: var(--tm-white-alpha-100);
+    background: var(--bg-soft);
+    color: var(--text-strong);
 }
 
 /* --- Prescription (inside completion stage) --- */
@@ -1110,19 +1148,21 @@ body[data-theme='serika-light'] .replay-floating-inspect {
         line-height: 1.14;
     }
 
-    .result-completion-stage__decision .results-actions .action-btn {
-        flex: 0 0 auto;
+    .result-completion-stage__decision .result-decision-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .result-completion-stage__decision .result-decision-primary-action {
         width: 100%;
     }
 
-    .result-completion-stage__decision .results-actions {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    .result-completion-stage__decision .result-decision-secondary-actions {
+        justify-content: center;
     }
 
-    .result-completion-stage__decision .results-actions .action-btn.primary {
-        flex: 0 0 auto;
-        grid-column: 1 / -1;
+    .result-completion-stage__decision .result-decision-secondary-action {
+        width: auto;
     }
 
     .result-completion-stage__metrics {
@@ -1145,7 +1185,7 @@ body[data-theme='serika-light'] .replay-floating-inspect {
         min-height: 4.75rem;
     }
 
-    .result-decision-panel .results-actions .action-btn {
+    .result-decision-panel .result-decision-primary-action {
         width: 100%;
     }
 

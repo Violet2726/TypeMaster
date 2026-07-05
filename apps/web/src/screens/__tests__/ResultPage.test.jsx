@@ -410,6 +410,23 @@ describe('ResultPage', () => {
         expect(mockRouterPush).toHaveBeenCalledWith('/practice');
     });
 
+    test('renders one dominant result decision action with secondary actions grouped below it', () => {
+        const { container } = render(<ResultPage />);
+        const actionGroup = container.querySelector('.result-decision-actions');
+
+        expect(actionGroup).toBeInTheDocument();
+        expect(actionGroup.querySelectorAll('.result-decision-primary-action')).toHaveLength(1);
+
+        const primaryAction = actionGroup.querySelector('.result-decision-primary-action');
+        const secondaryGroup = actionGroup.querySelector('.result-decision-secondary-actions');
+
+        expect(primaryAction).toHaveTextContent('Retry challenge');
+        expect(secondaryGroup).toBeInTheDocument();
+        expect(secondaryGroup).not.toContainElement(primaryAction);
+        expect(secondaryGroup.querySelectorAll('.result-decision-secondary-action').length).toBeGreaterThan(0);
+        expect(secondaryGroup).toContainElement(screen.getByRole('button', { name: 'View leaderboard' }));
+    });
+
     test('shows targeted feedback for adaptive drills', () => {
         Object.assign(mockStore, {
             ...baseStore,

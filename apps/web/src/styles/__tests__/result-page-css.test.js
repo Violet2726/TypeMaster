@@ -53,4 +53,24 @@ describe('result page CSS', () => {
         expect(burstBar).toContain('stroke: rgba(255, 159, 10, 0.2);');
         expect(burstBar).toContain('stroke-width: 5;');
     });
+
+    test('keeps the result decision actions primary-first and low-noise', async () => {
+        const css = await readFile(resolve(stylesRoot, 'result-page.css'), 'utf8');
+        const signal = getBlock(css, '.result-completion-stage__decision .result-decision-signal');
+        const actions = getBlock(css, '.result-completion-stage__decision .result-decision-actions');
+        const primaryAction = getBlock(css, '.result-completion-stage__decision .result-decision-primary-action');
+        const secondaryActions = getBlock(css, '.result-completion-stage__decision .result-decision-secondary-actions');
+        const secondaryAction = getBlock(css, '.result-completion-stage__decision .result-decision-secondary-action');
+
+        expect(signal).toContain('border: 0;');
+        expect(signal).toContain('background: transparent;');
+        expect(actions).toContain('display: grid;');
+        expect(primaryAction).toContain('width: 100%;');
+        expect(primaryAction).toContain('min-height: 3.08rem;');
+        expect(secondaryActions).toContain('justify-content: center;');
+        expect(secondaryAction).toContain('border-color: transparent;');
+        expect(secondaryAction).toContain('background: transparent;');
+        expect(secondaryAction).toContain('box-shadow: none;');
+        expect(css).not.toMatch(/\.result-completion-stage__decision \.results-actions\s*\{[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
+    });
 });

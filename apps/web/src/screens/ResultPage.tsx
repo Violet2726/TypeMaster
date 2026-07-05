@@ -195,27 +195,31 @@ export function ResultPage() {
                         </div>
                     </div>
 
-                    <div className="results-actions">
+                    <div className="results-actions result-decision-actions">
                         <button
                             type="button"
-                            className="action-btn primary"
+                            className="action-btn primary result-decision-primary-action"
                             onClick={() => handleDecisionAction(resultDecision.primaryAction)}
                             disabled={resultDecision.isLoading}
                         >
                             <DecisionActionIcon action={resultDecision.primaryAction} />
                             {resultDecision.isLoading ? copy.common.loading : resultDecision.primaryLabel}
                         </button>
-                        {resultDecision.secondaryActions.map((action) => (
-                            <button
-                                key={action.action}
-                                type="button"
-                                className="action-btn"
-                                onClick={() => handleDecisionAction(action.action)}
-                            >
-                                <DecisionActionIcon action={action.action} />
-                                {action.label}
-                            </button>
-                        ))}
+                        {resultDecision.secondaryActions.length ? (
+                            <div className="result-decision-secondary-actions">
+                                {resultDecision.secondaryActions.map((action) => (
+                                    <button
+                                        key={action.action}
+                                        type="button"
+                                        className="action-btn result-decision-secondary-action"
+                                        onClick={() => handleDecisionAction(action.action)}
+                                    >
+                                        <DecisionActionIcon action={action.action} />
+                                        {action.label}
+                                    </button>
+                                ))}
+                            </div>
+                        ) : null}
                     </div>
 
                     {resultPrescription && (
