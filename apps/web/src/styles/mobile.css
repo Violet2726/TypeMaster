@@ -159,8 +159,7 @@ body[data-theme='serika-light'] .typing-stage {
 }
 
 .practice-toolbar .segmented-group {
-    min-height: 2.62rem;
-    border-color: var(--surface-2);
+    border-color: rgba(118, 118, 128, 0.16);
     background: rgba(118, 118, 128, 0.18);
 }
 
@@ -170,7 +169,7 @@ body[data-theme='serika-light'] .practice-toolbar .segmented-group {
 }
 
 .practice-toolbar .segment-btn {
-    min-height: 2.12rem;
+    min-height: 2.18rem;
     border-radius: var(--radius-pill);
     transition:
         background-color 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
@@ -180,9 +179,9 @@ body[data-theme='serika-light'] .practice-toolbar .segmented-group {
 
 .practice-toolbar .segment-btn.active,
 .practice-toolbar .segment-btn[aria-pressed='true'] {
-    background: var(--panel-stroke);
+    background: var(--bg-elevated);
     box-shadow:
-        inset 0 1px 0 var(--panel-stroke),
+        inset 0 1px 0 var(--tm-white-alpha-120),
         0 8px 22px rgba(0, 0, 0, 0.14);
 }
 
@@ -252,13 +251,12 @@ body[data-theme='serika-light'] .typing-stage .live-stat {
     }
 
     .practice-toolbar .segmented-group {
-        min-height: 3rem;
-        padding: 0.24rem;
+        padding: 0.16rem;
     }
 
     .practice-toolbar .segment-btn {
-        min-height: 2.46rem;
-        padding-inline: 0.92rem;
+        min-height: 2.28rem;
+        padding-inline: 0.56rem;
     }
 
     .typing-stage {

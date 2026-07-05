@@ -6,11 +6,25 @@ const timeOptions = [15, 30, 60, 120];
 const wordOptions = [10, 25, 50, 100];
 const advancedPanelId = 'practice-config-advanced';
 
+function getDisplayOptions(defaultOptions, activeValue) {
+    if (!Number.isFinite(activeValue) || defaultOptions.includes(activeValue)) {
+        return defaultOptions;
+    }
+
+    const nearestOption = defaultOptions.reduce((nearest, option) => (
+        Math.abs(option - activeValue) < Math.abs(nearest - activeValue) ? option : nearest
+    ), defaultOptions[0]);
+
+    return defaultOptions
+        .map((option) => (option === nearestOption ? activeValue : option))
+        .sort((left, right) => left - right);
+}
+
 function SegmentedButton({ active, children, icon: Icon = null, onClick }) {
     return (
         <button
             type="button"
-            className={`segment-btn ${active ? 'active' : ''}`}
+            className={`segment-btn${active ? ' active' : ''}`}
             aria-pressed={active}
             onClick={onClick}
         >
@@ -20,15 +34,17 @@ function SegmentedButton({ active, children, icon: Icon = null, onClick }) {
     );
 }
 
-function ConfigSection({ label, value, children }) {
+function ConfigSection({ label, value, variant, children }) {
     return (
-        <section className="config-section">
-            <div className="config-section__head">
+        <fieldset className={`config-control-group config-control-group--${variant}`} aria-label={label}>
+            <legend className="config-control-group__legend">
                 <span className="control-label">{label}</span>
-                <strong className="config-section__value">{value}</strong>
+                <strong className="config-control-group__value" aria-hidden="true">{value}</strong>
+            </legend>
+            <div className="config-control-group__body">
+                {children}
             </div>
-            {children}
-        </section>
+        </fieldset>
     );
 }
 
@@ -51,6 +67,8 @@ export function ConfigPanel({ copy, language, config, onConfigChange, showAdvanc
     const sourceValue = getSourceValue(copy, trainingCopy, config.source);
     const modeValue = getModeValue(copy, config.mode);
     const volumeValue = getVolumeValue(config, language);
+    const durationOptions = getDisplayOptions(timeOptions, config.durationSeconds);
+    const activeWordOptions = getDisplayOptions(wordOptions, config.wordCount);
     const activeOptions = [
         config.includePunctuation ? copy.common.punctuation : null,
         config.includeNumbers ? copy.common.numbers : null
@@ -59,8 +77,8 @@ export function ConfigPanel({ copy, language, config, onConfigChange, showAdvanc
     return (
         <div className="config-strip">
             <div className="config-strip__main">
-                <ConfigSection label={copy.practice.sourceTitle} value={sourceValue}>
-                    <div className="segmented-group">
+                <ConfigSection label={copy.practice.sourceTitle} value={sourceValue} variant="source">
+                    <div className="segmented-group segmented-group--source">
                         <SegmentedButton icon={Library} active={config.source === 'builtin'} onClick={() => onConfigChange({ source: 'builtin' }, { risky: true, intent: 'config' })}>
                             {copy.practice.sourceBuiltin}
                         </SegmentedButton>
@@ -73,8 +91,8 @@ export function ConfigPanel({ copy, language, config, onConfigChange, showAdvanc
                     </div>
                 </ConfigSection>
 
-                <ConfigSection label={copy.practice.modeTitle} value={modeValue}>
-                    <div className="segmented-group">
+                <ConfigSection label={copy.practice.modeTitle} value={modeValue} variant="mode">
+                    <div className="segmented-group segmented-group--mode">
                         <SegmentedButton icon={Timer} active={config.mode === 'time'} onClick={() => onConfigChange({ mode: 'time' }, { risky: true, intent: 'config' })}>
                             {copy.common.timeMode}
                         </SegmentedButton>
@@ -84,10 +102,10 @@ export function ConfigPanel({ copy, language, config, onConfigChange, showAdvanc
                     </div>
                 </ConfigSection>
 
-                <ConfigSection label={copy.practice.volumeTitle} value={volumeValue}>
+                <ConfigSection label={copy.practice.volumeTitle} value={volumeValue} variant="volume">
                     {config.mode === 'time' ? (
-                        <div className="segmented-group">
-                            {timeOptions.map((value) => (
+                        <div className="segmented-group segmented-group--volume">
+                            {durationOptions.map((value) => (
                                 <SegmentedButton
                                     icon={Clock3}
                                     key={value}
@@ -99,8 +117,8 @@ export function ConfigPanel({ copy, language, config, onConfigChange, showAdvanc
                             ))}
                         </div>
                     ) : (
-                        <div className="segmented-group">
-                            {wordOptions.map((value) => (
+                        <div className="segmented-group segmented-group--volume">
+                            {activeWordOptions.map((value) => (
                                 <SegmentedButton
                                     icon={Hash}
                                     key={value}
@@ -138,8 +156,8 @@ export function ConfigPanel({ copy, language, config, onConfigChange, showAdvanc
 
             {showAdvanced && (
                 <div className="config-strip__advanced" id={advancedPanelId}>
-                    <ConfigSection label={copy.practice.optionsTitle} value={activeOptions}>
-                        <div className="segmented-group">
+                    <ConfigSection label={copy.practice.optionsTitle} value={activeOptions} variant="options">
+                        <div className="segmented-group segmented-group--options">
                             <SegmentedButton active={config.includePunctuation} onClick={() => onConfigChange({ includePunctuation: !config.includePunctuation }, { risky: true, intent: 'config' })}>
                                 {copy.common.punctuation}
                             </SegmentedButton>

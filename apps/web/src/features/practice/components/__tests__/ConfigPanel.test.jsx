@@ -14,6 +14,32 @@ const baseConfig = {
 };
 
 describe('ConfigPanel', () => {
+    test('organizes primary settings as named control groups', () => {
+        const copy = getCopy('en-US');
+
+        render(
+            <ConfigPanel
+                copy={copy}
+                language="en-US"
+                config={baseConfig}
+                onConfigChange={vi.fn()}
+                showAdvanced={false}
+                onToggleAdvanced={vi.fn()}
+            />
+        );
+
+        const sourceGroup = screen.getByRole('group', { name: copy.practice.sourceTitle });
+        const modeGroup = screen.getByRole('group', { name: copy.practice.modeTitle });
+        const volumeGroup = screen.getByRole('group', { name: copy.practice.volumeTitle });
+
+        expect(sourceGroup).toHaveClass('config-control-group', 'config-control-group--source');
+        expect(modeGroup).toHaveClass('config-control-group', 'config-control-group--mode');
+        expect(volumeGroup).toHaveClass('config-control-group', 'config-control-group--volume');
+        expect(within(sourceGroup).getAllByRole('button')).toHaveLength(3);
+        expect(within(modeGroup).getAllByRole('button')).toHaveLength(2);
+        expect(within(volumeGroup).getAllByRole('button')).toHaveLength(4);
+    });
+
     test('marks active segmented controls as pressed', () => {
         const copy = getCopy('en-US');
 
@@ -52,6 +78,31 @@ describe('ConfigPanel', () => {
         fireEvent.click(screen.getByRole('button', { name: copy.common.wordsMode }));
 
         expect(onConfigChange).toHaveBeenCalledWith({ mode: 'words' }, { risky: true, intent: 'config' });
+    });
+
+    test('keeps custom training volumes selected in the compact option set', () => {
+        const copy = getCopy('en-US');
+
+        render(
+            <ConfigPanel
+                copy={copy}
+                language="en-US"
+                config={{
+                    ...baseConfig,
+                    mode: 'words',
+                    wordCount: 28
+                }}
+                onConfigChange={vi.fn()}
+                showAdvanced={false}
+                onToggleAdvanced={vi.fn()}
+            />
+        );
+
+        const volumeGroup = screen.getByRole('group', { name: copy.practice.volumeTitle });
+
+        expect(screen.getByRole('button', { name: '28' })).toHaveAttribute('aria-pressed', 'true');
+        expect(within(volumeGroup).getAllByRole('button')).toHaveLength(4);
+        expect(within(volumeGroup).queryByRole('button', { name: '25' })).not.toBeInTheDocument();
     });
 
     test('uses localized duration labels in Chinese', () => {
