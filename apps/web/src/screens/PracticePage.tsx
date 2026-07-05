@@ -351,12 +351,6 @@ export function PracticePage() {
                             </div>
                         ) : null}
 
-                        {!controlsOpen && store.config.source === 'builtin' ? (
-                            <div className="practice-toolbar__support-note" role="note">
-                                <p className="muted-text practice-toolbar__hint">{store.copy.practice.builtInReady}</p>
-                            </div>
-                        ) : null}
-
                         {store.config.source === 'custom' && !isCustomComposeMode ? (
                             <div className="practice-toolbar__studio">
                                 {customTextWorkshop}

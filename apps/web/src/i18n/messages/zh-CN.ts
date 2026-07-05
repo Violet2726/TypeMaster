@@ -336,7 +336,6 @@ export const zhCNMessages = {
         settingsHide: '收起设置',
         customTitle: '自定义文本',
         customBody: '需要指定内容时再生成或粘贴。',
-        builtInReady: '内置文本已就绪，可以直接开始。',
         aiIdle: '还没有自定义文本，请先生成。',
         aiReady: '自定义文本已就绪，准备好就开始输入。',
         completeHint: '本轮已完成。'

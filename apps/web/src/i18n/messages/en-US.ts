@@ -292,7 +292,6 @@ export const enUSMessages = {
             settingsHide: 'Hide settings',
             customTitle: 'AI custom text',
             customBody: 'Generate only when you need custom content.',
-            builtInReady: 'Built-in text is ready. You can start immediately.',
             aiIdle: 'No custom text yet. Generate it before you start.',
             aiReady: 'Custom text is ready. Start typing when you are ready.',
             aiStale: 'The setup changed, so this text needs to be regenerated.',

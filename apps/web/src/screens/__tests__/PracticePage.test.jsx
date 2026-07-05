@@ -324,6 +324,13 @@ describe('PracticePage', () => {
         expect(document.querySelector('.practice-toolbar__snapshot')).not.toBeInTheDocument();
     });
 
+    test('does not repeat built-in readiness after the settings summary', () => {
+        render(<PracticePage />);
+
+        expect(screen.queryByText('Built-in text is ready. You can start immediately.')).not.toBeInTheDocument();
+        expect(document.querySelector('.practice-toolbar__support-note')).not.toBeInTheDocument();
+    });
+
     test('passes Chinese time settings into the practice controls', () => {
         const copy = getCopy('zh-CN');
 
