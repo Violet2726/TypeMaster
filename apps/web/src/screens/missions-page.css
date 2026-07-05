@@ -1,0 +1,109 @@
+/* ============================================
+   Missions Page - Compact action list
+   ============================================ */
+
+.mission-action-list {
+    display: grid;
+    gap: 0;
+    border-top: 1px solid var(--panel-stroke);
+    border-bottom: 1px solid var(--panel-stroke);
+    background: transparent;
+}
+
+.mission-action-row {
+    appearance: none;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.74rem;
+    width: 100%;
+    min-height: 4rem;
+    padding: 0.86rem 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.mission-action-row + .mission-action-row {
+    border-top: 1px solid var(--panel-stroke);
+}
+
+.mission-action-row:hover {
+    background: var(--bg-soft);
+}
+
+.mission-action-row:focus-visible {
+    outline: 2px solid var(--main-color);
+    outline-offset: 3px;
+}
+
+.mission-action-row__icon {
+    display: inline-grid;
+    place-items: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 50%;
+    background: var(--surface-3);
+    color: var(--text-strong);
+}
+
+.mission-action-row--primary .mission-action-row__icon {
+    background: var(--main-soft);
+    color: var(--main-color);
+}
+
+.mission-action-row__copy {
+    display: grid;
+    gap: 0.08rem;
+    min-width: 0;
+}
+
+.mission-action-row__copy small {
+    color: var(--text-dim);
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1.12;
+}
+
+.mission-action-row__copy strong {
+    overflow: hidden;
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: 1rem;
+    line-height: 1.18;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mission-action-row__copy span {
+    overflow: hidden;
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    line-height: 1.34;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mission-action-row__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.28rem;
+    color: var(--main-color);
+    font-size: 0.82rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+    .mission-action-row {
+        gap: 0.64rem;
+    }
+
+    .mission-action-row__cta span {
+        display: none;
+    }
+}

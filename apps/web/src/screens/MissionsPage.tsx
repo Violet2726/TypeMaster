@@ -1,13 +1,14 @@
 'use client';
 
-import { ArrowRight, BarChart3, Flag, Keyboard, ShieldCheck, Swords, Target, Trophy, type LucideIcon } from 'lucide-react';
+import { BarChart3, ChevronRight, Flag, Keyboard, ShieldCheck, Swords, Target, Trophy, type LucideIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { buildInsights } from '@typemaster/domain';
-import { AppButton, AppCard, AppSheet, MetricCard, SectionHeader } from '../components/app/AppPrimitives';
+import { AppButton, AppSheet, MetricCard, SectionHeader } from '../components/app/AppPrimitives';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { useAppActions } from '../store/use-app-action-set';
 import { useAchievementSnapshot, useHistorySnapshot, usePlanSnapshot, useShellSnapshot } from '../store/app-state-derived';
 import type { SkillProfile } from '../types/training';
+import './missions-page.css';
 
 function getWeakFocus(skillProfile: SkillProfile | null) {
     return skillProfile?.topErrorChars?.slice(0, 3).join(' / ')
@@ -21,7 +22,7 @@ function fillTemplate(template: string, values: Record<string, string | number>)
     ), template);
 }
 
-function MissionCard({ body, cta, icon: Icon, meta, onClick, title, tone = 'default' }: {
+function MissionActionRow({ body, cta, icon: Icon, meta, onClick, title, tone = 'default' }: {
     body: string,
     cta: string,
     icon: LucideIcon,
@@ -31,18 +32,20 @@ function MissionCard({ body, cta, icon: Icon, meta, onClick, title, tone = 'defa
     tone?: string
 }) {
     return (
-        <AppCard
-            icon={Icon}
-            kicker={meta}
-            title={title}
-            body={body}
-            tone={tone === 'primary' ? 'primary' : 'default'}
-            action={(
-                <AppButton variant="primary" icon={ArrowRight} iconPosition="end" onClick={onClick}>
-                    {cta}
-                </AppButton>
-            )}
-        />
+        <button className={`mission-action-row mission-action-row--${tone}`} type="button" onClick={onClick}>
+            <span className="mission-action-row__icon" aria-hidden="true">
+                <Icon size={18} strokeWidth={2.2} />
+            </span>
+            <span className="mission-action-row__copy">
+                <small>{meta}</small>
+                <strong>{title}</strong>
+                <span>{body}</span>
+            </span>
+            <span className="mission-action-row__cta">
+                <span>{cta}</span>
+                <ChevronRight aria-hidden="true" size={17} strokeWidth={2.2} />
+            </span>
+        </button>
     );
 }
 
@@ -105,8 +108,8 @@ export function MissionsPage() {
                 <MetricCard icon={BarChart3} label={missionCopy.recentWpm} value={insights.recent7.avgWpm || copy.common.emptyValue} tone="primary" />
             </section>
 
-            <section className="app-card-grid" aria-label={missionCopy.missionList}>
-                <MissionCard
+            <section className="mission-action-list" aria-label={missionCopy.missionList}>
+                <MissionActionRow
                     icon={Target}
                     meta={missionCopy.baselineMeta}
                     title={missionCopy.baselineTitle}
@@ -115,7 +118,7 @@ export function MissionsPage() {
                     tone="primary"
                     onClick={startBaseline}
                 />
-                <MissionCard
+                <MissionActionRow
                     icon={Keyboard}
                     meta={missionCopy.focusMeta}
                     title={fillTemplate(missionCopy.focusTitle, { value: weakFocus })}
@@ -123,7 +126,7 @@ export function MissionsPage() {
                     cta={missionCopy.focusCta}
                     onClick={startFocus}
                 />
-                <MissionCard
+                <MissionActionRow
                     icon={Trophy}
                     meta={missionCopy.dailyMeta}
                     title={dailyChallenge?.title || missionCopy.dailyTitle}
