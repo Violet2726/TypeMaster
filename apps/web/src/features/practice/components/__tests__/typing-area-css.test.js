@@ -82,4 +82,20 @@ describe('typing area CSS', () => {
         expect(footerButton).toContain('width: auto;');
         expect(footerButton).not.toContain('width: 100%;');
     });
+
+    test('keeps the custom text mobile editor as a light input tray', async () => {
+        const workshopCss = await readFile(resolve(componentRoot, 'practice-workshop.css'), 'utf8');
+        const mobileWorkshopCss = getMediaBlock(workshopCss, '@media (max-width: 720px)', '@media (max-width: 360px)');
+        const editor = getBlock(mobileWorkshopCss, '.custom-text-workshop__editor');
+        const textarea = getBlock(mobileWorkshopCss, '.custom-text-workshop__editor textarea');
+        const focusedTextarea = getBlock(mobileWorkshopCss, '.custom-text-workshop__editor textarea:focus-visible');
+
+        expect(editor).toContain('padding: 0.42rem;');
+        expect(editor).toContain('background: rgba(118, 118, 128, 0.1);');
+        expect(textarea).toContain('min-height: 8.4rem;');
+        expect(textarea).toContain('border-color: transparent;');
+        expect(textarea).toContain('background: rgba(255, 255, 255, 0.045);');
+        expect(focusedTextarea).toContain('border-color: var(--accent-blue-border);');
+        expect(focusedTextarea).toContain('box-shadow: 0 0 0 3px var(--accent-blue-bg);');
+    });
 });

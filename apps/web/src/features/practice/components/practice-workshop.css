@@ -806,7 +806,20 @@ body[data-theme='serika-light'] .keyboard-zone-row__bar { background: rgba(0, 0,
     .ai-custom-panel__state { min-height: auto; }
     .ai-custom-panel__state-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .workshop-field textarea { min-height: 7.6rem; }
-    .custom-text-workshop__editor textarea { min-height: 9rem; }
+    .custom-text-workshop__editor {
+        padding: 0.42rem;
+        border-radius: var(--radius-md);
+        background: rgba(118, 118, 128, 0.1);
+    }
+    .custom-text-workshop__editor textarea {
+        min-height: 8.4rem;
+        border-color: transparent;
+        background: rgba(255, 255, 255, 0.045);
+    }
+    .custom-text-workshop__editor textarea:focus-visible {
+        border-color: var(--accent-blue-border);
+        box-shadow: 0 0 0 3px var(--accent-blue-bg);
+    }
     .custom-text-workshop__footer {
         grid-template-columns: minmax(0, 1fr) auto;
         gap: 0.38rem;
