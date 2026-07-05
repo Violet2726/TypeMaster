@@ -13,6 +13,12 @@ function getRuleBody(css, selector) {
     return match?.[1] ?? '';
 }
 
+function getMediaBlock(css, startMarker) {
+    const start = css.indexOf(startMarker);
+
+    return start === -1 ? '' : css.slice(start);
+}
+
 describe('practice page CSS', () => {
     test('keeps the practice context visually lighter than a panel', async () => {
         const css = await readFile(cssPath, 'utf8');
@@ -41,5 +47,17 @@ describe('practice page CSS', () => {
         expect(previewStageRule).toContain('min-height: 0;');
         expect(previewBodyRule).toContain('display: none;');
         expect(previewFooterRule).toContain('display: none;');
+    });
+
+    test('gives custom compose mobile chrome clear scroll safety', async () => {
+        const css = await readFile(cssPath, 'utf8');
+        const mobileCss = getMediaBlock(css, '@media (max-width: 720px)');
+        const composePageRule = getRuleBody(mobileCss, '.practice-page--refined.practice-page--compose');
+        const composeWorkbenchRule = getRuleBody(mobileCss, '.practice-page--compose .practice-workbench');
+        const composeRailRule = getRuleBody(mobileCss, '.practice-page--compose .practice-workbench__rail');
+
+        expect(composePageRule).toContain('padding-bottom: calc(2.8rem + env(safe-area-inset-bottom, 0px));');
+        expect(composeWorkbenchRule).toContain('scroll-margin-top: 4.35rem;');
+        expect(composeRailRule).toContain('scroll-margin-bottom: calc(5.4rem + env(safe-area-inset-bottom, 0px));');
     });
 });

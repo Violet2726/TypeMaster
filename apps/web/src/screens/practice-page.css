@@ -217,6 +217,10 @@ body[data-theme='serika-light'] .practice-page--refined .practice-toolbar__suppo
         gap: 0.78rem;
     }
 
+    .practice-page--refined.practice-page--compose {
+        padding-bottom: calc(2.8rem + env(safe-area-inset-bottom, 0px));
+    }
+
     .adaptive-drill-panel__chips {
         grid-template-columns: 1fr;
     }
@@ -249,6 +253,14 @@ body[data-theme='serika-light'] .practice-page--refined .practice-toolbar__suppo
 
     .practice-workbench__rail {
         order: 2;
+    }
+
+    .practice-page--compose .practice-workbench {
+        scroll-margin-top: 4.35rem;
+    }
+
+    .practice-page--compose .practice-workbench__rail {
+        scroll-margin-bottom: calc(5.4rem + env(safe-area-inset-bottom, 0px));
     }
 
     .practice-page--compose .practice-toolbar__studio--typing-preview .typing-stage {
