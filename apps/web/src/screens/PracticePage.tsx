@@ -227,6 +227,51 @@ export function PracticePage() {
         setPendingNavigation(null);
     }, [pathname]);
 
+    const typingArea = (
+        <TypingArea
+            copy={store.copy}
+            words={typingSession.words}
+            typedHistory={typingSession.typedHistory}
+            currentInput={typingSession.currentInput}
+            currentWordIndex={typingSession.currentWordIndex}
+            isFocused={typingSession.isFocused}
+            status={typingSession.status}
+            liveMetrics={typingSession.liveMetrics}
+            timerDisplay={typingSession.timerDisplay}
+            mode={store.config.mode}
+            sourceLabel={sourceLabel}
+            inputRef={typingSession.inputRef}
+            onInputChange={typingSession.handleInputChange}
+            onKeyDown={typingSession.handleKeyDown}
+            onCompositionStart={typingSession.handleCompositionStart}
+            onCompositionEnd={typingSession.handleCompositionEnd}
+            onFocus={typingSession.handleFocus}
+            onBlur={typingSession.handleBlur}
+            onActivate={typingSession.focusInput}
+            onReset={handleReset}
+            isLocked={(store.config.source === 'ai' && aiPracticeStatus !== 'ready') || isCustomEmpty}
+            lockTitle={lockTitle}
+            lockBody={lockBody}
+            showReset={!isCustomComposeMode}
+            lockedPrimaryActionLabel={lockedPrimaryActionLabel}
+            lockedPrimaryActionIcon={lockedPrimaryActionIcon}
+            lockedPrimaryActionDisabled={isAiTextPending && aiPracticeStatus === 'loading'}
+            onLockedPrimaryAction={onLockedPrimaryAction}
+            lockedSecondaryActionLabel={lockedSecondaryActionLabel}
+            lockedSecondaryActionIcon={lockedSecondaryActionIcon}
+            onLockedSecondaryAction={onLockedSecondaryAction}
+        />
+    );
+    const customTextWorkshop = (
+        <CustomTextWorkshop
+            language={store.language}
+            value={customText}
+            editorRef={customTextEditorRef}
+            onChange={setCustomText}
+            onApply={handleApplyCustomText}
+        />
+    );
+
     return (
         <div className={`page-stack practice-page practice-page--refined ${isCustomComposeMode ? 'practice-page--compose' : ''}`}>
             <header className="practice-context" aria-labelledby="practice-context-title" aria-describedby="practice-context-body">
@@ -290,39 +335,7 @@ export function PracticePage() {
 
             <div className={`practice-workbench ${isCustomComposeMode ? 'practice-workbench--compose' : ''} ${isAiTextPending ? 'practice-workbench--ai-pending' : ''}`}>
                 <div className="practice-workbench__primary">
-                    <TypingArea
-                        copy={store.copy}
-                        words={typingSession.words}
-                        typedHistory={typingSession.typedHistory}
-                        currentInput={typingSession.currentInput}
-                        currentWordIndex={typingSession.currentWordIndex}
-                        isFocused={typingSession.isFocused}
-                        status={typingSession.status}
-                        liveMetrics={typingSession.liveMetrics}
-                        timerDisplay={typingSession.timerDisplay}
-                        mode={store.config.mode}
-                        sourceLabel={sourceLabel}
-                        inputRef={typingSession.inputRef}
-                        onInputChange={typingSession.handleInputChange}
-                        onKeyDown={typingSession.handleKeyDown}
-                        onCompositionStart={typingSession.handleCompositionStart}
-                        onCompositionEnd={typingSession.handleCompositionEnd}
-                        onFocus={typingSession.handleFocus}
-                        onBlur={typingSession.handleBlur}
-                        onActivate={typingSession.focusInput}
-                        onReset={handleReset}
-                        isLocked={(store.config.source === 'ai' && aiPracticeStatus !== 'ready') || isCustomEmpty}
-                        lockTitle={lockTitle}
-                        lockBody={lockBody}
-                        showReset={!isCustomComposeMode}
-                        lockedPrimaryActionLabel={lockedPrimaryActionLabel}
-                        lockedPrimaryActionIcon={lockedPrimaryActionIcon}
-                        lockedPrimaryActionDisabled={isAiTextPending && aiPracticeStatus === 'loading'}
-                        onLockedPrimaryAction={onLockedPrimaryAction}
-                        lockedSecondaryActionLabel={lockedSecondaryActionLabel}
-                        lockedSecondaryActionIcon={lockedSecondaryActionIcon}
-                        onLockedSecondaryAction={onLockedSecondaryAction}
-                    />
+                    {isCustomComposeMode ? customTextWorkshop : typingArea}
                 </div>
 
                 <aside className="practice-workbench__rail" aria-label={store.copy.practice.configTitle}>
@@ -367,21 +380,21 @@ export function PracticePage() {
                             </div>
                         ) : null}
 
+                        {isCustomComposeMode ? (
+                            <div className="practice-toolbar__studio practice-toolbar__studio--typing-preview">
+                                {typingArea}
+                            </div>
+                        ) : null}
+
                         {!controlsOpen && store.config.source === 'builtin' ? (
                             <div className="practice-toolbar__support-note" role="note">
                                 <p className="muted-text practice-toolbar__hint">{store.copy.practice.builtInReady}</p>
                             </div>
                         ) : null}
 
-                        {store.config.source === 'custom' ? (
+                        {store.config.source === 'custom' && !isCustomComposeMode ? (
                             <div className="practice-toolbar__studio">
-                                <CustomTextWorkshop
-                                    language={store.language}
-                                    value={customText}
-                                    editorRef={customTextEditorRef}
-                                    onChange={setCustomText}
-                                    onApply={handleApplyCustomText}
-                                />
+                                {customTextWorkshop}
                             </div>
                         ) : null}
                     </Inspector>

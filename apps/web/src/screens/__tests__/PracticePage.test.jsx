@@ -347,6 +347,8 @@ describe('PracticePage', () => {
         expect(document.querySelector('.practice-page--compose')).toBeInTheDocument();
         expect(document.querySelector('.practice-workbench--compose')).toBeInTheDocument();
         expect(screen.getByTestId('typing-area')).toHaveAttribute('data-show-reset', 'false');
+        expect(screen.getByTestId('custom-workshop').compareDocumentPosition(screen.getByTestId('typing-area')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+        expect(screen.getByLabelText(baseStore.copy.practice.configTitle)).toContainElement(screen.getByTestId('typing-area'));
         expect(screen.queryByRole('heading', { name: 'Next round brief' })).not.toBeInTheDocument();
         expect(screen.queryByRole('button', { name: baseStore.copy.common.resetRound })).not.toBeInTheDocument();
         expect(screen.queryByText(baseStore.copy.practice.helperTitle)).not.toBeInTheDocument();

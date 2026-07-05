@@ -22,4 +22,12 @@ describe('practice page CSS', () => {
         expect(contextRule).toContain('background: transparent;');
         expect(contextRule).toContain('box-shadow: none;');
     });
+
+    test('keeps custom compose layout weighted toward the editor', async () => {
+        const css = await readFile(cssPath, 'utf8');
+        const composeWorkbenchRule = getRuleBody(css, '.practice-page--refined.practice-page--compose .practice-workbench');
+
+        expect(composeWorkbenchRule).toContain('minmax(0, 1.18fr)');
+        expect(composeWorkbenchRule).toContain('minmax(18rem, 0.82fr)');
+    });
 });

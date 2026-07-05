@@ -138,7 +138,7 @@
 }
 
 .practice-page--refined.practice-page--compose .practice-workbench {
-    grid-template-columns: minmax(0, 0.92fr) minmax(17rem, 1.08fr);
+    grid-template-columns: minmax(0, 1.18fr) minmax(18rem, 0.82fr);
 }
 
 .practice-page--refined.practice-page--compose .practice-workbench__primary .typing-stage {
