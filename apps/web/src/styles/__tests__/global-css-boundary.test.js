@@ -22,6 +22,14 @@ describe('global CSS boundary', () => {
         expect(legacyGlobalCss).not.toMatch(/\.(app-header|panel|practice-page|result-summary|settings-drawer)\b/);
     });
 
+    test('declares intentional smooth scrolling on the root html element', async () => {
+        const rootLayout = await readFile(resolve(appRoot, 'app/layout.tsx'), 'utf8');
+        const layoutCss = await readFile(resolve(appRoot, 'src/styles/layout.css'), 'utf8');
+
+        expect(layoutCss).toMatch(/html\s*\{[\s\S]*scroll-behavior:\s*smooth;/);
+        expect(rootLayout).toContain('data-scroll-behavior="smooth"');
+    });
+
     test('keeps practice route CSS out of TypingArea component visuals', async () => {
         const practiceRouteCss = await readFile(resolve(appRoot, 'app/practice/practice.css'), 'utf8');
         const practiceWorkshopCss = await readFile(resolve(appRoot, 'src/features/practice/components/practice-workshop.css'), 'utf8');
