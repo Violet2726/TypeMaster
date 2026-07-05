@@ -30,4 +30,16 @@ describe('practice page CSS', () => {
         expect(composeWorkbenchRule).toContain('minmax(0, 1.18fr)');
         expect(composeWorkbenchRule).toContain('minmax(18rem, 0.82fr)');
     });
+
+    test('keeps the custom compose typing preview compact on mobile', async () => {
+        const css = await readFile(cssPath, 'utf8');
+        const previewStageRule = getRuleBody(css, '.practice-page--compose .practice-toolbar__studio--typing-preview .typing-stage');
+        const previewBodyRule = getRuleBody(css, '.practice-page--compose .practice-toolbar__studio--typing-preview .words-shell');
+        const previewFooterRule = getRuleBody(css, '.practice-page--compose .practice-toolbar__studio--typing-preview .typing-stage__footer');
+
+        expect(css).toContain('@media (max-width: 720px)');
+        expect(previewStageRule).toContain('min-height: 0;');
+        expect(previewBodyRule).toContain('display: none;');
+        expect(previewFooterRule).toContain('display: none;');
+    });
 });

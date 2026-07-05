@@ -251,6 +251,24 @@ body[data-theme='serika-light'] .practice-page--refined .practice-toolbar__suppo
         order: 2;
     }
 
+    .practice-page--compose .practice-toolbar__studio--typing-preview .typing-stage {
+        min-height: 0;
+        gap: 0.58rem;
+        padding: 0.92rem;
+    }
+
+    .practice-page--compose .practice-toolbar__studio--typing-preview .typing-stage__head {
+        margin: 0;
+    }
+
+    .practice-page--compose .practice-toolbar__studio--typing-preview .words-shell {
+        display: none;
+    }
+
+    .practice-page--compose .practice-toolbar__studio--typing-preview .typing-stage__footer {
+        display: none;
+    }
+
     .practice-page .sticky-action-bar {
         position: static;
         bottom: auto;
