@@ -151,6 +151,19 @@ describe('typing area CSS', () => {
         expect(actionButton).toContain('background: rgba(118, 118, 128, 0.08);');
     });
 
+    test('keeps expanded mobile training controls as lightweight segmented rows', async () => {
+        const workshopCss = await readFile(resolve(componentRoot, 'practice-workshop.css'), 'utf8');
+        const mobileWorkshopCss = getMediaBlock(workshopCss, '@media (max-width: 720px)', '@media (max-width: 360px)');
+        const configSegmentedGroup = getBlock(mobileWorkshopCss, '.config-strip .segmented-group');
+        const configSegmentButton = getBlock(mobileWorkshopCss, '.config-strip .segment-btn');
+        const activeConfigSegment = getBlock(mobileWorkshopCss, ".config-strip .segment-btn[aria-pressed='true']");
+
+        expect(configSegmentedGroup).toContain('border-color: transparent;');
+        expect(configSegmentedGroup).toContain('background: rgba(118, 118, 128, 0.1);');
+        expect(configSegmentButton).toContain('min-height: 2.1rem;');
+        expect(activeConfigSegment).toContain('box-shadow: none;');
+    });
+
     test('keeps the custom text mobile footer as a light toolbar', async () => {
         const workshopCss = await readFile(resolve(componentRoot, 'practice-workshop.css'), 'utf8');
         const mobileWorkshopCss = getMediaBlock(workshopCss, '@media (max-width: 720px)', '@media (max-width: 360px)');

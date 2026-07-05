@@ -808,6 +808,16 @@ body[data-theme='serika-light'] .keyboard-zone-row__bar { background: rgba(0, 0,
         border-radius: var(--radius-md);
         background: rgba(118, 118, 128, 0.08);
     }
+    .config-strip .segmented-group {
+        border-color: transparent;
+        background: rgba(118, 118, 128, 0.1);
+    }
+    .config-strip .segment-btn {
+        min-height: 2.1rem;
+    }
+    .config-strip .segment-btn[aria-pressed='true'] {
+        box-shadow: none;
+    }
     .config-setting-row { padding: 0.64rem; }
     .config-strip--compose .config-setting-row--source .config-setting-row__body { display: none; }
     .config-strip--compose { gap: 0.52rem; }
