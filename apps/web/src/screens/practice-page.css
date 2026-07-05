@@ -8,8 +8,7 @@
     gap: 0.95rem;
 }
 
-.practice-page--refined .panel,
-.practice-page--refined .sticky-action-bar {
+.practice-page--refined .panel {
     border-radius: 24px;
 }
 
@@ -133,10 +132,6 @@
     height: clamp(18.5rem, 40vh, 25.5rem);
 }
 
-.practice-page--refined .sticky-action-bar {
-    border-radius: 22px;
-}
-
 .practice-page--refined.practice-page--compose .practice-workbench {
     grid-template-columns: minmax(0, 1.18fr) minmax(18rem, 0.82fr);
 }
@@ -175,7 +170,6 @@ body[data-theme='serika-light'] .practice-page--refined .practice-toolbar__suppo
 }
 
 .practice-page--refined .panel,
-.practice-page--refined .sticky-action-bar,
 .practice-workbench__rail .practice-toolbar {
     border-radius: var(--tm-radius-panel);
 }
@@ -226,7 +220,6 @@ body[data-theme='serika-light'] .practice-page--refined .practice-toolbar__suppo
     }
 
     .practice-page--refined .panel,
-    .practice-page--refined .sticky-action-bar,
     .practice-workbench__rail .practice-toolbar,
     .practice-brief-panel,
     .adaptive-drill-panel {
@@ -303,21 +296,5 @@ body[data-theme='serika-light'] .practice-page--refined .practice-toolbar__suppo
         display: none;
     }
 
-    .practice-page .sticky-action-bar {
-        position: static;
-        bottom: auto;
-        margin-top: 0.2rem;
-        padding: 0.82rem;
-        grid-template-columns: minmax(0, 1fr);
-    }
-
-    .practice-page .sticky-action-bar > div {
-        display: grid;
-        gap: 0.1rem;
-    }
-
-    .practice-page .sticky-action-bar .action-btn {
-        width: 100%;
-    }
 }
 

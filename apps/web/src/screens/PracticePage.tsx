@@ -48,17 +48,14 @@ export function PracticePage() {
         handleApplyCustomText,
         handleConfigChange,
         handleGenerateAi,
-        handlePrimaryAction,
         handleReset,
         handleUseBuiltin,
         isCustomEmpty,
         isDirty,
-        isPrimaryActionDisabled,
         lockBody,
         lockTitle,
         nextRoundBrief,
         practiceError,
-        primaryActionLabel,
         primaryActionHint,
         restoreAiDraftConfig,
         handleBeforeUnload,
@@ -403,23 +400,6 @@ export function PracticePage() {
                     </Inspector>
                 </aside>
             </div>
-
-            {!isCustomComposeMode ? (
-                <div className="sticky-action-bar">
-                    <div>
-                        <span className="summary-label">{store.copy.practice.helperTitle}</span>
-                        <strong>{primaryActionHint}</strong>
-                    </div>
-                    <button
-                        type="button"
-                        className="action-btn primary"
-                        onClick={handlePrimaryAction}
-                        disabled={isPrimaryActionDisabled}
-                    >
-                        {primaryActionLabel}
-                    </button>
-                </div>
-            ) : null}
 
             <ConfirmDialog
                 isOpen={Boolean(confirmState)}

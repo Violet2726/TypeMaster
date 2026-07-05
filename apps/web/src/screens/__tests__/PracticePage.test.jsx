@@ -334,6 +334,14 @@ describe('PracticePage', () => {
         expect(screen.getAllByRole('button', { name: baseStore.copy.common.resetRound })).toHaveLength(1);
     });
 
+    test('does not duplicate the start action below the built-in typing surface', () => {
+        render(<PracticePage />);
+
+        expect(document.querySelector('.sticky-action-bar')).not.toBeInTheDocument();
+        expect(screen.queryByText(baseStore.copy.practice.helperTitle)).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: baseStore.copy.common.startTyping })).not.toBeInTheDocument();
+    });
+
     test('shows the custom word bank workshop immediately when custom source is selected', () => {
         Object.assign(mockStore, {
             config: {
