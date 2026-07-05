@@ -15,6 +15,16 @@ function getBlock(css, selector) {
     return match?.[1] || '';
 }
 
+function getStandaloneBlock(css, selector) {
+    const match = css.match(new RegExp(`(?:^|\\n)${escapeSelector(selector)}\\s*\\{([\\s\\S]*?)\\}`));
+    return match?.[1] || '';
+}
+
+function getLastBlock(css, selector) {
+    const matches = [...css.matchAll(new RegExp(`${escapeSelector(selector)}\\s*\\{([\\s\\S]*?)\\}`, 'g'))];
+    return matches.at(-1)?.[1] || '';
+}
+
 function getMediaBlock(css, startMarker, endMarker) {
     const start = css.indexOf(startMarker);
 
@@ -58,6 +68,18 @@ describe('typing area CSS', () => {
         expect(mobileLiveStat).not.toContain('4.15rem');
         expect(mobileLiveStatValue).toContain('font-size: 1.04rem;');
         expect(mobileWordsContainer).toContain('2.65');
+    });
+
+    test('keeps the mobile typing window overlay light enough for reading', async () => {
+        const mobileCss = await readFile(resolve(stylesRoot, 'mobile.css'), 'utf8');
+        const typingExperienceCss = await readFile(resolve(stylesRoot, 'typing-experience.css'), 'utf8');
+        const mobileWordsAfter = getLastBlock(mobileCss, '.typing-stage .words-shell::after');
+        const focusOverlay = getStandaloneBlock(typingExperienceCss, '.focus-overlay');
+
+        expect(mobileWordsAfter).toContain('rgba(13, 14, 17, 0.62)');
+        expect(mobileWordsAfter).not.toContain('0.94');
+        expect(focusOverlay).toContain('background: rgba(0, 0, 0, 0.24);');
+        expect(focusOverlay).toContain('backdrop-filter: blur(8px);');
     });
 
     test('keeps the mobile typing header as a compact status strip', async () => {

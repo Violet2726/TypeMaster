@@ -216,9 +216,9 @@ body[data-theme='serika-light'] .focus-overlay {
 }
 
 .focus-overlay {
-    background: rgba(0, 0, 0, 0.42);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(0, 0, 0, 0.24);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     color: #ffffff;
     font-weight: 650;
     font-size: 0.95rem;
