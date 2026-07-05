@@ -3,8 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { BadgeCheck, FileText, PencilLine, WandSparkles } from 'lucide-react';
-import { ConfirmDialog, Inspector, MetricStrip } from '@typemaster/ui';
-import { formatDurationLabel } from '../i18n';
+import { ConfirmDialog, Inspector } from '@typemaster/ui';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { AIWorkshop } from '../features/practice/components/AIWorkshop';
 import { ConfigPanel } from '../features/practice/components/ConfigPanel';
@@ -114,11 +113,6 @@ export function PracticePage() {
             ? trainingCopy.practice.customEditText
             : undefined;
     const lockedSecondaryActionIcon = isAiTextPending ? FileText : PencilLine;
-    const activeModeLabel = store.config.mode === 'time' ? store.copy.common.timeMode : store.copy.common.wordsMode;
-    const activeVolumeLabel = store.config.mode === 'time'
-        ? formatDurationLabel(store.config.durationSeconds, store.language)
-        : `${store.config.wordCount}`;
-    const keyboardLayoutLabel = store.settings.keyboardLayout.toUpperCase();
     const sessionStatusLabel = store.copy.statuses[typingSession.status] || store.copy.statuses.idle;
     const currentTaskBadgeLabel = getTrainingTaskBadgeLabel(currentTrainingTask, trainingCopy);
     const shouldShowPracticeSupport = !isCustomComposeMode && Boolean(nextRoundBrief || adaptiveDrillInsight);
@@ -136,24 +130,6 @@ export function PracticePage() {
             : store.config.source === 'ai' && aiPracticeStatus !== 'ready'
                 ? store.copy.practice.customBody
                 : primaryActionHint;
-    const toolbarHighlights = [
-        {
-            label: store.copy.practice.sourceTitle,
-            value: sourceLabel
-        },
-        {
-            label: store.copy.practice.modeTitle,
-            value: activeModeLabel
-        },
-        {
-            label: store.copy.practice.volumeTitle,
-            value: activeVolumeLabel
-        },
-        {
-            label: trainingCopy.practice.layoutLabel,
-            value: keyboardLayoutLabel
-        }
-    ];
     const onLockedPrimaryAction = isAiTextPending
         ? handleGenerateAi
         : isCustomTextPending
@@ -342,17 +318,6 @@ export function PracticePage() {
                         title={store.copy.practice.configTitle}
                         badge={sessionStatusLabel}
                     >
-                        {!isCustomComposeMode ? (
-                            <MetricStrip
-                                className="practice-toolbar__snapshot"
-                                items={toolbarHighlights.map((item) => ({
-                                    id: item.label,
-                                    label: item.label,
-                                    value: item.value
-                                }))}
-                            />
-                        ) : null}
-
                         <ConfigPanel
                             copy={store.copy}
                             language={store.language}

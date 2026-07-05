@@ -27,8 +27,14 @@ vi.mock('../../features/practice/components/AIWorkshop', () => ({
 }));
 
 vi.mock('../../features/practice/components/ConfigPanel', () => ({
-    ConfigPanel: ({ isCustomComposeMode }) => (
-        <div data-testid="config-panel" data-custom-compose-mode={String(Boolean(isCustomComposeMode))} />
+    ConfigPanel: ({ config, isCustomComposeMode, language }) => (
+        <div
+            data-testid="config-panel"
+            data-custom-compose-mode={String(Boolean(isCustomComposeMode))}
+            data-duration-seconds={String(config.durationSeconds)}
+            data-language={language}
+            data-mode={config.mode}
+        />
     )
 }));
 
@@ -309,7 +315,16 @@ describe('PracticePage', () => {
         expect(typingArea.compareDocumentPosition(configPanel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     });
 
-    test('uses localized duration summary in Chinese practice controls', () => {
+    test('keeps the default practice rail to one settings summary', () => {
+        render(<PracticePage />);
+
+        const controlsRail = screen.getByLabelText(baseStore.copy.practice.configTitle);
+
+        expect(controlsRail).toContainElement(screen.getByTestId('config-panel'));
+        expect(document.querySelector('.practice-toolbar__snapshot')).not.toBeInTheDocument();
+    });
+
+    test('passes Chinese time settings into the practice controls', () => {
         const copy = getCopy('zh-CN');
 
         Object.assign(mockStore, {
@@ -324,7 +339,9 @@ describe('PracticePage', () => {
 
         render(<PracticePage />);
 
-        expect(screen.getByText('30 秒')).toBeInTheDocument();
+        expect(screen.getByTestId('config-panel')).toHaveAttribute('data-language', 'zh-CN');
+        expect(screen.getByTestId('config-panel')).toHaveAttribute('data-mode', 'time');
+        expect(screen.getByTestId('config-panel')).toHaveAttribute('data-duration-seconds', '30');
         expect(screen.queryByText('30s')).not.toBeInTheDocument();
     });
 
