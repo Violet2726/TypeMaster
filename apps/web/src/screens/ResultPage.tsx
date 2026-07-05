@@ -2,7 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import { ArrowRight, BarChart3, Clock3, Gauge, Hash, Keyboard, RotateCw, Sparkles, Target, Trophy } from 'lucide-react';
-import { getErrorMessage } from '../i18n';
+import { formatDurationLabel, getErrorMessage } from '../i18n';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { TrendChart } from '../features/result/components/TrendChart';
 import { useResultPageModel, getCoachBadgeLabel } from '../features/result/use-result-page-model';
@@ -120,6 +120,7 @@ export function ResultPage() {
     const visibleChallengeStanding = challengeStanding?.standing
         ? challengeStanding
         : previewChallengeStanding || null;
+    const resultDurationLabel = formatDurationLabel(session.result.durationSeconds, store.language);
     const challengeAfterRunSteps = isChallengeSession
         ? [
             {
@@ -167,7 +168,7 @@ export function ResultPage() {
                             {session.sourceTextMeta?.label || copy.common.emptyValue}{summarySeparator}{copy.common.consistency} {session.result.consistency}%
                         </p>
                         <div className="result-summary__chips" aria-label={copy.result.metricsTitle}>
-                            <span>{copy.common.duration} {session.result.durationSeconds}s</span>
+                            <span>{copy.common.duration} {resultDurationLabel}</span>
                             <span>{copy.common.rawWpm} {session.result.rawWpm}</span>
                             <span>{copy.common.characterStats} {session.result.correctChars}/{session.result.incorrectChars}</span>
                         </div>
@@ -250,7 +251,7 @@ export function ResultPage() {
                     <div className="result-item result-kpi-item">
                         <Clock3 aria-hidden="true" size={18} strokeWidth={2.2} />
                         <span className="result-item-label">{copy.common.duration}</span>
-                        <span className="result-item-value">{session.result.durationSeconds}s</span>
+                        <span className="result-item-value">{resultDurationLabel}</span>
                     </div>
                     <div className="result-item result-kpi-item">
                         <Hash aria-hidden="true" size={18} strokeWidth={2.2} />
@@ -411,6 +412,7 @@ export function ResultPage() {
             {session.timeline?.wpm?.length ? (
                 <TrendChart
                     copy={copy}
+                    language={store.language}
                     timeline={session.timeline || { samples: [], labels: [], wpm: [], raw: [], accuracy: [], burst: [], errors: [], pauseMoments: [] }}
                 />
             ) : null}

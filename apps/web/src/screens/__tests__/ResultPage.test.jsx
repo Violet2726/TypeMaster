@@ -263,6 +263,22 @@ describe('ResultPage', () => {
         expect(mockGetChallengeLeaderboard).not.toHaveBeenCalled();
     });
 
+    test('uses localized duration labels in Chinese result metrics', () => {
+        Object.assign(mockStore, {
+            ...baseStore,
+            copy: getCopy('zh-CN'),
+            language: 'zh-CN',
+            sessions: [challengeSession],
+            lastCompletedSession: challengeSession,
+            dailyChallenge: null
+        });
+
+        render(<ResultPage />);
+
+        expect(screen.getAllByText('12 秒').length).toBeGreaterThan(0);
+        expect(screen.queryByText('12s')).not.toBeInTheDocument();
+    });
+
     test('routes risk-focused challenge results back into the active plan', async () => {
         Object.assign(mockStore, {
             ...baseStore,

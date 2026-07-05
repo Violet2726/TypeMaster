@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { formatDurationLabel } from '../../../i18n';
 import {
     average,
     buildAreaPath,
@@ -13,7 +14,7 @@ import {
     normalizeReplay
 } from './trend-chart-helpers';
 
-export function TrendChart({ copy, timeline }) {
+export function TrendChart({ copy, language = 'zh-CN', timeline }) {
     const svgRef = useRef(null);
     const interactionRef = useRef({
         dragging: false,
@@ -231,7 +232,7 @@ export function TrendChart({ copy, timeline }) {
             <div className="chart-canvas replay-canvas replay-canvas--merged">
                 {activeSample && (
                     <div className="replay-floating-inspect" style={{ left: `${tooltipLeft}%`, top: `${tooltipTop}%` }}>
-                        <strong>{activeSample.time}s</strong>
+                        <strong>{formatDurationLabel(activeSample.time, language)}</strong>
                         <span>{copy.common.wpm} {activeSample.wpm}</span>
                         <span>{copy.chart.rawLabel} {activeSample.raw}</span>
                         <span>{copy.chart.burstLabel} {activeSample.burst}</span>
@@ -316,7 +317,7 @@ export function TrendChart({ copy, timeline }) {
                                 textAnchor={tick.index === 0 ? 'start' : tick.index === samples.length - 1 ? 'end' : 'middle'}
                                 className="replay-axis-label replay-axis-label--x"
                             >
-                                {tick.time}s
+                                {formatDurationLabel(tick.time, language)}
                             </text>
                         );
                     })}

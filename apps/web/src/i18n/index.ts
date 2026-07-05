@@ -46,6 +46,11 @@ export function formatPercent(value) {
     return `${Math.round(Number(value || 0))}%`;
 }
 
+export function formatDurationLabel(seconds = 0, language = 'zh-CN') {
+    const normalizedSeconds = Math.max(0, Math.round(Number(seconds || 0)));
+    return language?.startsWith('zh') ? `${normalizedSeconds} 秒` : `${normalizedSeconds}s`;
+}
+
 export function getInlineSeparator(language = 'zh-CN') {
     return language === 'en-US' ? ' · ' : ' / ';
 }

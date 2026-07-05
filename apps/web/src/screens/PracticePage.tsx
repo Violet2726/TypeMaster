@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { BadgeCheck, FileText, PencilLine, WandSparkles } from 'lucide-react';
 import { ConfirmDialog, Inspector, MetricStrip } from '@typemaster/ui';
+import { formatDurationLabel } from '../i18n';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { AIWorkshop } from '../features/practice/components/AIWorkshop';
 import { ConfigPanel } from '../features/practice/components/ConfigPanel';
@@ -27,10 +28,6 @@ function getTrainingTaskBadgeLabel(task, trainingCopy) {
     }
 
     return trainingCopy.practice.planBadge;
-}
-
-function formatDurationLabel(language, seconds) {
-    return language?.startsWith('zh') ? `${seconds} 秒` : `${seconds}s`;
 }
 
 export function PracticePage() {
@@ -122,7 +119,7 @@ export function PracticePage() {
     const lockedSecondaryActionIcon = isAiTextPending ? FileText : PencilLine;
     const activeModeLabel = store.config.mode === 'time' ? store.copy.common.timeMode : store.copy.common.wordsMode;
     const activeVolumeLabel = store.config.mode === 'time'
-        ? formatDurationLabel(store.language, store.config.durationSeconds)
+        ? formatDurationLabel(store.config.durationSeconds, store.language)
         : `${store.config.wordCount}`;
     const keyboardLayoutLabel = store.settings.keyboardLayout.toUpperCase();
     const sessionStatusLabel = store.copy.statuses[typingSession.status] || store.copy.statuses.idle;

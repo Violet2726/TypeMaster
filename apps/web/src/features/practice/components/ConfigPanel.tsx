@@ -1,4 +1,5 @@
 import { Bot, ChevronDown, Clock3, Hash, Library, PencilLine, SlidersHorizontal, Timer } from 'lucide-react';
+import { formatDurationLabel } from '../../../i18n';
 import { getTrainingCopy } from '../../../training/copy';
 
 const timeOptions = [15, 30, 60, 120];
@@ -41,16 +42,8 @@ function getModeValue(copy, mode) {
     return mode === 'time' ? copy.common.timeMode : copy.common.wordsMode;
 }
 
-function isChineseLocale(language) {
-    return language?.startsWith('zh');
-}
-
-function formatDurationLabel(language, seconds) {
-    return isChineseLocale(language) ? `${seconds} 秒` : `${seconds}s`;
-}
-
 function getVolumeValue(config, language) {
-    return config.mode === 'time' ? formatDurationLabel(language, config.durationSeconds) : `${config.wordCount}`;
+    return config.mode === 'time' ? formatDurationLabel(config.durationSeconds, language) : `${config.wordCount}`;
 }
 
 export function ConfigPanel({ copy, language, config, onConfigChange, showAdvanced, onToggleAdvanced }) {
@@ -101,7 +94,7 @@ export function ConfigPanel({ copy, language, config, onConfigChange, showAdvanc
                                     active={config.durationSeconds === value}
                                     onClick={() => onConfigChange({ durationSeconds: value }, { risky: true, intent: 'config' })}
                                 >
-                                    {formatDurationLabel(language, value)}
+                                    {formatDurationLabel(value, language)}
                                 </SegmentedButton>
                             ))}
                         </div>
