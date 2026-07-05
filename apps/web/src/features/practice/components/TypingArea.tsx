@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Clock3, FileText, Gauge, Keyboard, RotateCcw, ShieldCheck, WandSparkles } from 'lucide-react';
 import { buildRenderedWords } from '@typemaster/domain';
 import { TypingAreaEmptyState } from './TypingAreaEmptyState';
@@ -63,8 +63,10 @@ export function TypingArea({
     const charRefs = useRef(new Map());
     const extraRefs = useRef(new Map());
     const [caretStyle, setCaretStyle] = useState({});
+    const [hasInputDomFocus, setHasInputDomFocus] = useState(false);
     const [layoutVersion, setLayoutVersion] = useState(0);
     const isTypingUnavailable = isLocked || !words.length;
+    const isVisuallyFocused = isFocused || hasInputDomFocus;
     const unavailableTitle = lockTitle || copy.practice.wordsLockedTitle;
     const unavailableBody = lockBody || copy.practice.wordsLockedBody;
     const textAvailabilityLabel = isTypingUnavailable ? copy.practice.textPendingLabel : copy.practice.textReadyLabel;
@@ -140,6 +142,42 @@ export function TypingArea({
         [words, typedHistory, currentInput, currentWordIndex]
     );
 
+    const syncInputDomFocus = useCallback(() => {
+        setHasInputDomFocus(Boolean(inputRef.current && document.activeElement === inputRef.current));
+    }, [inputRef]);
+
+    const requestInputDomFocusSync = useCallback(() => {
+        syncInputDomFocus();
+
+        if (typeof window.requestAnimationFrame === 'function') {
+            window.requestAnimationFrame(syncInputDomFocus);
+            return;
+        }
+
+        window.setTimeout(syncInputDomFocus, 0);
+    }, [syncInputDomFocus]);
+
+    const handleStageActivate = useCallback((event) => {
+        onActivate?.(event);
+        requestInputDomFocusSync();
+    }, [onActivate, requestInputDomFocusSync]);
+
+    const handleInputFocus = useCallback((event) => {
+        setHasInputDomFocus(true);
+        onFocus?.(event);
+    }, [onFocus]);
+
+    const handleInputBlur = useCallback((event) => {
+        setHasInputDomFocus(false);
+        onBlur?.(event);
+    }, [onBlur]);
+
+    useEffect(() => {
+        if (isTypingUnavailable) {
+            setHasInputDomFocus(false);
+        }
+    }, [isTypingUnavailable]);
+
     useEffect(() => {
         let frameId = 0;
 
@@ -166,11 +204,12 @@ export function TypingArea({
     }, []);
 
     useEffect(() => {
-        if (!isFocused || isLocked || !words.length || !shellRef.current) {
+        if (!isVisuallyFocused || isLocked || !words.length || !shellRef.current) {
             return undefined;
         }
 
-        const isMobileViewport = window.matchMedia('(max-width: 720px)').matches;
+        const isMobileViewport = typeof window.matchMedia === 'function'
+            && window.matchMedia('(max-width: 720px)').matches;
         if (!isMobileViewport) {
             return undefined;
         }
@@ -186,7 +225,7 @@ export function TypingArea({
         return () => {
             window.clearTimeout(timer);
         };
-    }, [isFocused, isLocked, words.length]);
+    }, [isLocked, isVisuallyFocused, words.length]);
 
     useLayoutEffect(() => {
         const currentWordEl = wordRefs.current.get(currentWordIndex);
@@ -262,13 +301,13 @@ export function TypingArea({
         const nextTop = targetRect.top - wrapperRect.top + (targetRect.height - caretHeight) / 2;
 
         setCaretStyle({
-            opacity: isFocused ? 1 : 0,
+            opacity: isVisuallyFocused ? 1 : 0,
             width: `${caretWidth}px`,
             height: `${caretHeight}px`,
             left: `${Math.max(0, nextLeft - caretWidth / 2)}px`,
             top: `${Math.max(0, nextTop)}px`
         });
-    }, [currentInput, currentWordIndex, isFocused, isLocked, layoutVersion, renderedWords, status, words]);
+    }, [currentInput, currentWordIndex, isLocked, isVisuallyFocused, layoutVersion, renderedWords, status, words]);
 
     return (
         <section className={`panel typing-stage ${isTypingUnavailable ? 'typing-stage--unavailable' : ''}`}>
@@ -312,9 +351,9 @@ export function TypingArea({
 
             <div
                 ref={shellRef}
-                className={`words-shell ${isFocused ? 'is-focused' : ''} ${status === 'paused' ? 'is-paused' : ''} ${isLocked ? 'is-locked' : ''}`}
-                onClick={onActivate}
-                onPointerDown={onActivate}
+                className={`words-shell ${isVisuallyFocused ? 'is-focused' : ''} ${status === 'paused' ? 'is-paused' : ''} ${isLocked ? 'is-locked' : ''}`}
+                onClick={handleStageActivate}
+                onPointerDown={handleStageActivate}
                 role="presentation"
             >
                 {!isLocked && words.length > 0 && (
@@ -327,8 +366,8 @@ export function TypingArea({
                         onKeyDown={onKeyDown}
                         onCompositionStart={onCompositionStart}
                         onCompositionEnd={onCompositionEnd}
-                        onFocus={onFocus}
-                        onBlur={onBlur}
+                        onFocus={handleInputFocus}
+                        onBlur={handleInputBlur}
                         autoComplete="off"
                         autoCapitalize="off"
                         autoCorrect="off"
@@ -369,7 +408,7 @@ export function TypingArea({
                     )}
                 </div>
 
-                {!isFocused && status !== 'complete' && !isLocked && words.length > 0 && (
+                {!isVisuallyFocused && status !== 'complete' && !isLocked && words.length > 0 && (
                     <div className="focus-overlay">{copy.practice.focusLost}</div>
                 )}
             </div>

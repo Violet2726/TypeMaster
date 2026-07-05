@@ -76,6 +76,34 @@ describe('TypingArea', () => {
         expect(screen.getByText(copy.common.accuracy)).toBeInTheDocument();
     });
 
+    test('shows focus feedback as soon as activation focuses the capture input', () => {
+        const inputRef = createRef();
+        const onActivate = vi.fn(() => {
+            inputRef.current?.focus();
+        });
+        const { container, copy } = renderTypingArea({
+            words: ['steady'],
+            sourceLabel: getCopy('en-US').practice.sourceBuiltin,
+            inputRef,
+            onActivate,
+            isLocked: false,
+            lockTitle: '',
+            lockBody: ''
+        });
+
+        const shell = container.querySelector('.words-shell');
+
+        expect(shell).not.toHaveClass('is-focused');
+        expect(screen.getByText(copy.practice.focusLost)).toBeInTheDocument();
+
+        fireEvent.pointerDown(shell);
+
+        expect(onActivate).toHaveBeenCalledTimes(1);
+        expect(document.activeElement).toBe(inputRef.current);
+        expect(shell).toHaveClass('is-focused');
+        expect(screen.queryByText(copy.practice.focusLost)).not.toBeInTheDocument();
+    });
+
     test('renders recovery actions when locked actions are available', () => {
         const copy = getCopy('en-US');
 
