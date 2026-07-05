@@ -345,14 +345,16 @@ export function PracticePage() {
                         title={store.copy.practice.configTitle}
                         badge={sessionStatusLabel}
                     >
-                        <MetricStrip
-                            className="practice-toolbar__snapshot"
-                            items={toolbarHighlights.map((item) => ({
-                                id: item.label,
-                                label: item.label,
-                                value: item.value
-                            }))}
-                        />
+                        {!isCustomComposeMode ? (
+                            <MetricStrip
+                                className="practice-toolbar__snapshot"
+                                items={toolbarHighlights.map((item) => ({
+                                    id: item.label,
+                                    label: item.label,
+                                    value: item.value
+                                }))}
+                            />
+                        ) : null}
 
                         <ConfigPanel
                             copy={store.copy}
