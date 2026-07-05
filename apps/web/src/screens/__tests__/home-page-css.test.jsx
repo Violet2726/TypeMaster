@@ -15,6 +15,17 @@ function getBlock(css, selector) {
 }
 
 describe('home page CSS', () => {
+    test('keeps home actions as a compact list instead of cards', async () => {
+        const css = await readFile(resolve(screenDir, 'home-page.css'), 'utf8');
+        const actionList = getBlock(css, '.home-action-list');
+        const actionRow = getBlock(css, '.home-action-row');
+
+        expect(actionList).toContain('display: grid;');
+        expect(actionList).toContain('background: transparent;');
+        expect(actionRow).toContain('grid-template-columns: auto minmax(0, 1fr) auto;');
+        expect(actionRow).toContain('min-height: 3.55rem;');
+    });
+
     test('keeps the recent run area as a light status row', async () => {
         const css = await readFile(resolve(screenDir, 'home-page.css'), 'utf8');
         const emptyStatus = getBlock(css, '.home-recent--empty .home-recent-summary__body strong');

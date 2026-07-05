@@ -1,8 +1,8 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { DoorOpen, Gauge, ShieldCheck, Swords, Trophy, type LucideIcon } from 'lucide-react';
-import { AppButton, AppCard, MetricCard, SectionHeader } from '../../../components/app/AppPrimitives';
+import { ChevronRight, DoorOpen, Gauge, ShieldCheck, Swords, Trophy, type LucideIcon } from 'lucide-react';
+import { AppButton, MetricCard, SectionHeader } from '../../../components/app/AppPrimitives';
 
 type IconType = LucideIcon;
 
@@ -69,9 +69,9 @@ export function ProgressStrip({ ariaLabel, items }: { ariaLabel: string; items: 
     );
 }
 
-export function NextActionCard({
+export function NextActionRow({
     description,
-    icon,
+    icon: Icon,
     kicker,
     label,
     onClick,
@@ -85,14 +85,17 @@ export function NextActionCard({
     tone?: 'default' | 'primary' | 'success' | 'warning';
 }) {
     return (
-        <AppCard
-            icon={icon}
-            kicker={kicker}
-            title={label}
-            body={description}
-            tone={tone}
-            onClick={onClick}
-        />
+        <button className={`home-action-row home-action-row--${tone}`} type="button" onClick={onClick}>
+            <span className="home-action-row__icon" aria-hidden="true">
+                <Icon size={18} strokeWidth={2.2} />
+            </span>
+            <span className="home-action-row__copy">
+                <small>{kicker}</small>
+                <strong>{label}</strong>
+                <span>{description}</span>
+            </span>
+            <ChevronRight className="home-action-row__chevron" aria-hidden="true" size={17} strokeWidth={2.2} />
+        </button>
     );
 }
 

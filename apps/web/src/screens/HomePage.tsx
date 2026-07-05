@@ -8,7 +8,7 @@ import { useAppNavigate } from '../application/use-app-navigate';
 import { useHomePageStore } from '../store/app-state-selectors';
 import { getTypeRiftDepth, getTypeRiftEndReason, getTypeRiftSessions } from '../features/game/game-session';
 import {
-    NextActionCard,
+    NextActionRow,
     ProgressStrip,
     RecentRunCard,
     TodayHero,
@@ -126,22 +126,22 @@ export function HomePage() {
                 </section>
             ) : null}
 
-            <section className="app-card-grid" aria-label={homeCopy.loopActionsAria}>
-                <NextActionCard
+            <section className="home-action-list" aria-label={homeCopy.loopActionsAria}>
+                <NextActionRow
                     icon={Keyboard}
                     kicker={copy.nav.practice}
                     label={fillTemplate(homeCopy.focusLane, { value: weakFocus || homeCopy.noWeakFocus })}
                     description={homeCopy.focusLaneBody}
                     onClick={() => navigate('/practice')}
                 />
-                <NextActionCard
+                <NextActionRow
                     icon={Target}
                     kicker={copy.nav.missions}
                     label={homeCopy.missionLane}
                     description={fillTemplate(homeCopy.missionLaneBody, { completed: weeklyGoal.completed, target: weeklyGoal.target })}
                     onClick={() => navigate('/missions')}
                 />
-                <NextActionCard
+                <NextActionRow
                     icon={BarChart3}
                     kicker={copy.nav.insights}
                     label={homeCopy.insightLane}

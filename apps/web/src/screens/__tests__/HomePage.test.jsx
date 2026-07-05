@@ -2,7 +2,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import HomePage from '../HomePage';
 import { renderWithProvider } from '../../test/render-with-provider';
-import { resetMockNavigation } from '../../test/next-navigation';
+import { mockRouterPush, resetMockNavigation } from '../../test/next-navigation';
 
 const baseConfig = {
     source: 'builtin',
@@ -80,8 +80,8 @@ describe('HomePage', () => {
         expect(screen.getByText('不迁移旧游戏记录。TypeRift 会从第一次下潜开始建立全新的图鉴和成绩。')).toBeInTheDocument();
         expect(screen.queryByRole('button', { name: /Start assessment/i })).not.toBeInTheDocument();
         expect(container.querySelector('.home-typerift')).not.toBeInTheDocument();
-        expect(container.querySelectorAll('.app-card-grid .app-card')).toHaveLength(3);
-        expect(container.querySelector('.app-card-grid .app-card--primary')).not.toBeInTheDocument();
+        expect(container.querySelector('.app-card-grid')).not.toBeInTheDocument();
+        expect(container.querySelectorAll('.home-action-row')).toHaveLength(3);
         expect(container.querySelector('.home-recent-list')).not.toBeInTheDocument();
         expect(container.querySelector('.home-recent-summary')).toBeInTheDocument();
         expect(container.querySelector('.home-recent-summary__detail')).not.toBeInTheDocument();
@@ -100,6 +100,24 @@ describe('HomePage', () => {
         fireEvent.click(await screen.findByRole('button', { name: '开始 TypeRift' }));
 
         await waitFor(() => expect(screen.getByRole('application')).toBeInTheDocument());
+    });
+
+    test('routes compact action rows to the selected workflow', async () => {
+        const { container } = renderWithProvider(<HomePage />, {
+            storageState: {
+                'typemaster:v7:settings': {
+                    language: 'zh-CN',
+                    lastConfig: baseConfig
+                }
+            }
+        });
+
+        const rows = container.querySelectorAll('.home-action-row');
+        expect(rows).toHaveLength(3);
+
+        fireEvent.click(rows[1]);
+
+        expect(mockRouterPush).toHaveBeenCalledWith('/missions');
     });
 
     test('renders the latest v7 TypeRift feedback when evidence exists', async () => {
