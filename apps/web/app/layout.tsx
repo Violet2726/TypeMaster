@@ -2,7 +2,6 @@
 import type { ReactNode } from 'react';
 import { AppFrameWrapper } from '../src/application/AppFrameWrapper';
 import { AppProviders } from '../src/application/AppProviders';
-import '../index.css';
 import '../src/styles/layout.css';
 import '../src/styles/header.css';
 import '../src/styles/buttons.css';

@@ -15,6 +15,7 @@ export default defineConfig({
             'src/hooks/__tests__/**/*.test.tsx',
             'src/i18n/__tests__/**/*.test.{ts,js}',
             'src/services/__tests__/**/*.test.js',
+            'src/styles/__tests__/**/*.test.{ts,js}',
             'src/store/__tests__/**/*.test.js',
             'src/training/__tests__/**/*.test.js',
             'src/screens/__tests__/**/*.test.jsx'

@@ -229,6 +229,99 @@ body[data-theme='serika-light'] .insights-empty-preview__unlock p {
     font-size: 1.2rem;
 }
 
+.keyboard-hotspots {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.72fr) minmax(0, 1.28fr);
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.keyboard-hotspots__list {
+    display: grid;
+    gap: 0.7rem;
+}
+
+.targeted-progress {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.targeted-progress__summary {
+    display: grid;
+    grid-template-columns: minmax(240px, 0.88fr) minmax(0, 1.12fr);
+    gap: 1rem;
+}
+
+.targeted-progress__hero-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.targeted-progress__hero > p,
+.targeted-progress__hero > span {
+    margin: 0;
+    color: var(--text-dim);
+}
+
+.targeted-progress__areas {
+    display: grid;
+    gap: 0.7rem;
+}
+
+.targeted-area-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.86rem 0.95rem;
+}
+
+.targeted-area-row div {
+    display: grid;
+    gap: 0.18rem;
+    min-width: 0;
+}
+
+.targeted-area-row div span {
+    color: var(--text-dim);
+    overflow-wrap: anywhere;
+}
+
+.keyboard-zone-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.86rem 0.95rem;
+}
+
+.keyboard-zone-row div {
+    display: grid;
+    gap: 0.18rem;
+    min-width: 0;
+}
+
+.keyboard-zone-row span {
+    color: var(--text-dim);
+    overflow-wrap: anywhere;
+}
+
+.keyboard-zone-row > span {
+    flex: 0 0 auto;
+    color: var(--main-color);
+    font-family: var(--font-mono);
+}
+
+.insights-hotspots {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
 .insights-empty-preview__unlock {
     display: grid;
     grid-template-columns: 2rem 2.35rem minmax(0, 1fr);
@@ -653,6 +746,12 @@ body[data-theme='serika-light'] .history-metric-pill {
 
 @media (max-width: 980px) {
     .insights-empty-panel {
+        grid-template-columns: 1fr;
+    }
+
+    .keyboard-hotspots,
+    .targeted-progress__summary,
+    .insights-hotspots {
         grid-template-columns: 1fr;
     }
 

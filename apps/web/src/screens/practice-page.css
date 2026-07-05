@@ -66,6 +66,12 @@
     grid-template-columns: minmax(0, 1.06fr) minmax(16rem, 0.94fr);
 }
 
+.adaptive-drill-panel__chips {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
 .practice-brief-panel,
 .adaptive-drill-panel {
     border-radius: 24px;
@@ -206,6 +212,10 @@ body[data-theme='serika-light'] .practice-page--refined .practice-toolbar__suppo
 @media (max-width: 720px) {
     .practice-page--refined {
         gap: 0.78rem;
+    }
+
+    .adaptive-drill-panel__chips {
+        grid-template-columns: 1fr;
     }
 
     .practice-page--refined .panel,
