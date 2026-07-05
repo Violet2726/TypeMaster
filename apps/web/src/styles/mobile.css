@@ -286,6 +286,10 @@ body[data-theme='serika-light'] .typing-stage .live-stat {
         padding: 0.86rem;
     }
 
+    .typing-stage .words-shell::before {
+        background: linear-gradient(180deg, rgba(13, 14, 17, 0.58), transparent);
+    }
+
     .typing-stage .words-shell::after {
         background: linear-gradient(0deg, rgba(13, 14, 17, 0.62), transparent);
     }

@@ -73,9 +73,12 @@ describe('typing area CSS', () => {
     test('keeps the mobile typing window overlay light enough for reading', async () => {
         const mobileCss = await readFile(resolve(stylesRoot, 'mobile.css'), 'utf8');
         const typingExperienceCss = await readFile(resolve(stylesRoot, 'typing-experience.css'), 'utf8');
+        const mobileWordsBefore = getLastBlock(mobileCss, '.typing-stage .words-shell::before');
         const mobileWordsAfter = getLastBlock(mobileCss, '.typing-stage .words-shell::after');
         const focusOverlay = getStandaloneBlock(typingExperienceCss, '.focus-overlay');
 
+        expect(mobileWordsBefore).toContain('rgba(13, 14, 17, 0.58)');
+        expect(mobileWordsBefore).not.toContain('0.94');
         expect(mobileWordsAfter).toContain('rgba(13, 14, 17, 0.62)');
         expect(mobileWordsAfter).not.toContain('0.94');
         expect(focusOverlay).toContain('background: rgba(0, 0, 0, 0.24);');
