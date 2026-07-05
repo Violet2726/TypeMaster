@@ -199,14 +199,23 @@
     }
 
     .practice-context {
-        padding: 0.16rem 0 0;
+        gap: 0.28rem;
+        padding: 0.08rem 0 0;
+    }
+
+    .practice-context__label-row {
+        display: none;
     }
 
     .practice-context h1 {
-        font-size: 1.78rem;
+        font-size: 1.42rem;
+        line-height: 1.08;
         max-width: 100%;
     }
 
+    .practice-context__body {
+        display: none;
+    }
 
     .practice-page--refined .practice-workbench__primary .typing-stage {
         min-height: auto;

@@ -106,4 +106,20 @@ describe('practice page CSS', () => {
         expect(inspectorBadgeRule).toContain('border-color: transparent;');
         expect(inspectorBadgeRule).toContain('background: rgba(118, 118, 128, 0.08);');
     });
+
+    test('keeps the mobile practice context as a single compact title', async () => {
+        const css = await readFile(cssPath, 'utf8');
+        const mobileCss = getMediaBlock(css, '@media (max-width: 720px)');
+        const contextRule = getRuleBody(mobileCss, '.practice-context');
+        const labelRowRule = getRuleBody(mobileCss, '.practice-context__label-row');
+        const titleRule = getRuleBody(mobileCss, '.practice-context h1');
+        const bodyRule = getRuleBody(mobileCss, '.practice-context__body');
+
+        expect(contextRule).toContain('gap: 0.28rem;');
+        expect(contextRule).toContain('padding: 0.08rem 0 0;');
+        expect(labelRowRule).toContain('display: none;');
+        expect(titleRule).toContain('font-size: 1.42rem;');
+        expect(titleRule).toContain('line-height: 1.08;');
+        expect(bodyRule).toContain('display: none;');
+    });
 });
