@@ -859,18 +859,18 @@ body[data-theme='serika-light'] .keyboard-zone-row__bar { background: rgba(0, 0,
     .typing-stage__footer { gap: 0.48rem; }
     .typing-stage__hint { font-size: 0.78rem; line-height: 1.36; }
     .typing-stage .live-stats {
-        gap: 0.28rem;
-        padding: 0.22rem;
-        border: 1px solid var(--panel-stroke);
+        gap: 0.32rem;
+        padding: 0;
+        border-color: transparent;
         border-radius: var(--radius-pill);
-        background: rgba(118, 118, 128, 0.12);
+        background: transparent;
     }
     .typing-stage .live-stat {
-        min-height: 3.05rem;
+        min-height: 2.58rem;
         align-content: center;
-        gap: 0.14rem;
+        gap: 0.1rem;
         justify-items: center;
-        padding: 0.42rem 0.38rem;
+        padding: 0.34rem 0.28rem;
         border-color: transparent;
         border-radius: var(--radius-pill);
         background: transparent;
@@ -888,7 +888,7 @@ body[data-theme='serika-light'] .keyboard-zone-row__bar { background: rgba(0, 0,
         background: transparent;
     }
     .live-stat__icon svg { width: 0.78rem; height: 0.78rem; }
-    .typing-stage .live-stat-value { font-size: 1.18rem; }
+    .typing-stage .live-stat-value { font-size: 1.04rem; }
     .typing-stage .live-stat-label {
         margin-left: 0;
         overflow: hidden;

@@ -38,21 +38,25 @@ describe('typing area CSS', () => {
         expect(lockedActions).toContain('pointer-events: auto;');
     });
 
-    test('keeps mobile live stats compact above the bottom navigation', async () => {
+    test('keeps mobile live stats as a light instrument strip', async () => {
         const workshopCss = await readFile(resolve(componentRoot, 'practice-workshop.css'), 'utf8');
         const practicePageCss = await readFile(resolve(screensRoot, 'practice-page.css'), 'utf8');
         const mobileWorkshopCss = getMediaBlock(workshopCss, '@media (max-width: 720px)', '@media (max-width: 360px)');
         const mobilePracticeCss = getMediaBlock(practicePageCss, '@media (max-width: 720px)');
         const mobileLiveStats = getBlock(mobileWorkshopCss, '.typing-stage .live-stats');
         const mobileLiveStat = getBlock(mobileWorkshopCss, '.typing-stage .live-stat');
+        const mobileLiveStatValue = getBlock(mobileWorkshopCss, '.typing-stage .live-stat-value');
         const mobileWordsContainer = getBlock(
             mobilePracticeCss,
             '.practice-page--refined .practice-workbench__primary .typing-stage .words-container'
         );
 
-        expect(mobileLiveStats).toContain('padding: 0.22rem;');
-        expect(mobileLiveStat).toContain('min-height: 3.05rem;');
+        expect(mobileLiveStats).toContain('padding: 0;');
+        expect(mobileLiveStats).toContain('border-color: transparent;');
+        expect(mobileLiveStats).toContain('background: transparent;');
+        expect(mobileLiveStat).toContain('min-height: 2.58rem;');
         expect(mobileLiveStat).not.toContain('4.15rem');
+        expect(mobileLiveStatValue).toContain('font-size: 1.04rem;');
         expect(mobileWordsContainer).toContain('2.65');
     });
 
