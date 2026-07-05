@@ -66,7 +66,7 @@ describe('HomePage', () => {
     });
 
     test('shows the TypeRift command center as the first-run home', async () => {
-        renderWithProvider(<HomePage />, {
+        const { container } = renderWithProvider(<HomePage />, {
             storageState: {
                 'typemaster:v7:settings': {
                     language: 'zh-CN',
@@ -79,6 +79,9 @@ describe('HomePage', () => {
         expect(screen.getByRole('button', { name: '开始 TypeRift' })).toBeInTheDocument();
         expect(screen.getByText('不迁移旧游戏记录。TypeRift 会从第一次下潜开始建立全新的图鉴和成绩。')).toBeInTheDocument();
         expect(screen.queryByRole('button', { name: /Start assessment/i })).not.toBeInTheDocument();
+        expect(container.querySelector('.home-typerift')).not.toBeInTheDocument();
+        expect(container.querySelectorAll('.app-card-grid .app-card')).toHaveLength(3);
+        expect(container.querySelector('.app-card-grid .app-card--primary')).not.toBeInTheDocument();
     });
 
     test('opens TypeRift as a cardized command-center experience', async () => {

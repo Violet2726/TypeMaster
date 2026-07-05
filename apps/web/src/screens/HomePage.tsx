@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { BarChart3, DoorOpen, Flame, Gauge, Keyboard, Play, Swords, Target } from 'lucide-react';
+import { BarChart3, DoorOpen, Flame, Gauge, Keyboard, Target } from 'lucide-react';
 import { formatDateTime } from '../i18n';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { useHomePageStore } from '../store/app-state-selectors';
@@ -120,32 +120,13 @@ export function HomePage() {
 
             <ProgressStrip ariaLabel={homeCopy.progressAria} items={metricItems} />
 
-            <section id="typerift" ref={typeRiftSectionRef} className="home-typerift" aria-label={homeCopy.typeRiftLaneTitle}>
-                {isTypeRiftOpen ? (
+            {isTypeRiftOpen ? (
+                <section id="typerift" ref={typeRiftSectionRef} className="home-typerift" aria-label={homeCopy.typeRiftLaneTitle}>
                     <EmbeddedGamePage onExit={closeTypeRift} />
-                ) : (
-                    <button className="home-typerift-launch" type="button" onClick={openTypeRift}>
-                        <span className="home-typerift-launch__icon" aria-hidden="true">
-                            <Play size={18} strokeWidth={2.2} />
-                        </span>
-                        <span className="home-typerift-launch__body">
-                            <span>{homeCopy.primaryLane}</span>
-                            <strong>{homeCopy.typeRiftLaneTitle}</strong>
-                            <small>{homeCopy.typeRiftLaneBody}</small>
-                        </span>
-                    </button>
-                )}
-            </section>
+                </section>
+            ) : null}
 
             <section className="app-card-grid" aria-label={homeCopy.loopActionsAria}>
-                <NextActionCard
-                    icon={Swords}
-                    kicker={homeCopy.primaryLane}
-                    label={homeCopy.typeRiftLaneTitle}
-                    description={homeCopy.typeRiftLaneBody}
-                    tone="primary"
-                    onClick={openTypeRift}
-                />
                 <NextActionCard
                     icon={Keyboard}
                     kicker={copy.nav.practice}
