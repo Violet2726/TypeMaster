@@ -29,6 +29,10 @@ function getTrainingTaskBadgeLabel(task, trainingCopy) {
     return trainingCopy.practice.planBadge;
 }
 
+function formatDurationLabel(language, seconds) {
+    return language?.startsWith('zh') ? `${seconds} 秒` : `${seconds}s`;
+}
+
 export function PracticePage() {
     const router = useRouter();
     const pathname = usePathname();
@@ -117,7 +121,9 @@ export function PracticePage() {
             : undefined;
     const lockedSecondaryActionIcon = isAiTextPending ? FileText : PencilLine;
     const activeModeLabel = store.config.mode === 'time' ? store.copy.common.timeMode : store.copy.common.wordsMode;
-    const activeVolumeLabel = store.config.mode === 'time' ? `${store.config.durationSeconds}s` : `${store.config.wordCount}`;
+    const activeVolumeLabel = store.config.mode === 'time'
+        ? formatDurationLabel(store.language, store.config.durationSeconds)
+        : `${store.config.wordCount}`;
     const keyboardLayoutLabel = store.settings.keyboardLayout.toUpperCase();
     const sessionStatusLabel = store.copy.statuses[typingSession.status] || store.copy.statuses.idle;
     const currentTaskBadgeLabel = getTrainingTaskBadgeLabel(currentTrainingTask, trainingCopy);

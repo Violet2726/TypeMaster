@@ -41,15 +41,23 @@ function getModeValue(copy, mode) {
     return mode === 'time' ? copy.common.timeMode : copy.common.wordsMode;
 }
 
-function getVolumeValue(config) {
-    return config.mode === 'time' ? `${config.durationSeconds}s` : `${config.wordCount}`;
+function isChineseLocale(language) {
+    return language?.startsWith('zh');
+}
+
+function formatDurationLabel(language, seconds) {
+    return isChineseLocale(language) ? `${seconds} 秒` : `${seconds}s`;
+}
+
+function getVolumeValue(config, language) {
+    return config.mode === 'time' ? formatDurationLabel(language, config.durationSeconds) : `${config.wordCount}`;
 }
 
 export function ConfigPanel({ copy, language, config, onConfigChange, showAdvanced, onToggleAdvanced }) {
     const trainingCopy = getTrainingCopy(language);
     const sourceValue = getSourceValue(copy, trainingCopy, config.source);
     const modeValue = getModeValue(copy, config.mode);
-    const volumeValue = getVolumeValue(config);
+    const volumeValue = getVolumeValue(config, language);
     const activeOptions = [
         config.includePunctuation ? copy.common.punctuation : null,
         config.includeNumbers ? copy.common.numbers : null
@@ -93,7 +101,7 @@ export function ConfigPanel({ copy, language, config, onConfigChange, showAdvanc
                                     active={config.durationSeconds === value}
                                     onClick={() => onConfigChange({ durationSeconds: value }, { risky: true, intent: 'config' })}
                                 >
-                                    {value}s
+                                    {formatDurationLabel(language, value)}
                                 </SegmentedButton>
                             ))}
                         </div>

@@ -54,6 +54,24 @@ describe('ConfigPanel', () => {
         expect(onConfigChange).toHaveBeenCalledWith({ mode: 'words' }, { risky: true, intent: 'config' });
     });
 
+    test('uses localized duration labels in Chinese', () => {
+        const copy = getCopy('zh-CN');
+
+        render(
+            <ConfigPanel
+                copy={copy}
+                language="zh-CN"
+                config={baseConfig}
+                onConfigChange={vi.fn()}
+                showAdvanced={false}
+                onToggleAdvanced={vi.fn()}
+            />
+        );
+
+        expect(screen.getByRole('button', { name: '30 秒' })).toHaveAttribute('aria-pressed', 'true');
+        expect(screen.queryByRole('button', { name: '30s' })).not.toBeInTheDocument();
+    });
+
     test('announces the advanced section when expanded', () => {
         const copy = getCopy('en-US');
 

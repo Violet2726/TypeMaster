@@ -17,4 +17,33 @@ describe('i18n messages', () => {
 
         expect(chineseKeys).toEqual(englishKeys);
     });
+
+    it('keeps Chinese practice first-screen copy localized', () => {
+        const firstScreenKeys = [
+            'modeTitle',
+            'optionsTitle',
+            'volumeTitle',
+            'wordsLockedTitle',
+            'wordsLockedBody',
+            'focusLost',
+            'pausedTitle',
+            'pausedBody',
+            'runningHint',
+            'idleHint',
+            'helperTitle',
+            'helperBody',
+            'textReadyLabel',
+            'textPendingLabel',
+            'sessionLabel',
+            'timeRemaining',
+            'timeElapsed'
+        ] as const;
+
+        for (const key of firstScreenKeys) {
+            const localizedValue = zhCNMessages.practice[key];
+
+            expect(localizedValue).not.toBe(enUSMessages.practice[key]);
+            expect(localizedValue).not.toMatch(/[A-Za-z]{3,}/);
+        }
+    });
 });

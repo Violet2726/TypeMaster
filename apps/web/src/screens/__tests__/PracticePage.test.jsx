@@ -292,6 +292,25 @@ describe('PracticePage', () => {
         expect(typingArea.compareDocumentPosition(configPanel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     });
 
+    test('uses localized duration summary in Chinese practice controls', () => {
+        const copy = getCopy('zh-CN');
+
+        Object.assign(mockStore, {
+            copy,
+            language: 'zh-CN',
+            config: {
+                ...baseStore.config,
+                mode: 'time',
+                durationSeconds: 30
+            }
+        });
+
+        render(<PracticePage />);
+
+        expect(screen.getByText('30 秒')).toBeInTheDocument();
+        expect(screen.queryByText('30s')).not.toBeInTheDocument();
+    });
+
     test('keeps only one reset action in built-in practice mode', () => {
         render(<PracticePage />);
 
