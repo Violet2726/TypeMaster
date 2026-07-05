@@ -751,6 +751,33 @@ body[data-theme='serika-light'] .keyboard-zone-row__bar { background: rgba(0, 0,
     .config-strip { gap: 0.72rem; }
     .config-setting-row { padding: 0.64rem; }
     .config-strip--compose .config-setting-row--source .config-setting-row__body { display: none; }
+    .config-strip--compose { gap: 0.52rem; }
+    .config-strip--compose .config-settings-list--primary {
+        border-radius: var(--radius-md);
+        background: rgba(118, 118, 128, 0.1);
+    }
+    .config-strip--compose .config-setting-row {
+        gap: 0.46rem;
+        padding: 0.52rem;
+    }
+    .config-strip--compose .config-setting-row--source {
+        display: none;
+    }
+    .config-strip--compose .config-setting-row--mode {
+        border-top: 0;
+    }
+    .config-strip--compose .segmented-group {
+        border-radius: var(--radius-md);
+        background: rgba(118, 118, 128, 0.13);
+    }
+    .config-strip--compose .segment-btn {
+        min-height: 2.1rem;
+    }
+    .config-strip--compose .config-strip__actions .ghost-btn {
+        min-height: 2.24rem;
+        border-radius: var(--radius-md);
+        background: rgba(118, 118, 128, 0.1);
+    }
     .segmented-group { padding: 0.16rem; }
     .segment-btn { min-height: 2.28rem; padding: 0.48rem 0.56rem; font-size: 0.8rem; }
     .typing-stage__source strong { font-size: 0.96rem; }

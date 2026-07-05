@@ -67,6 +67,24 @@ describe('typing area CSS', () => {
         expect(composeSourceBody).toContain('display: none;');
     });
 
+    test('keeps custom compose training settings light on mobile', async () => {
+        const workshopCss = await readFile(resolve(componentRoot, 'practice-workshop.css'), 'utf8');
+        const mobileWorkshopCss = getMediaBlock(workshopCss, '@media (max-width: 720px)', '@media (max-width: 360px)');
+        const composeSourceRow = getBlock(mobileWorkshopCss, '.config-strip--compose .config-setting-row--source');
+        const composeModeRow = getBlock(mobileWorkshopCss, '.config-strip--compose .config-setting-row--mode');
+        const composePrimaryList = getBlock(mobileWorkshopCss, '.config-strip--compose .config-settings-list--primary');
+        const composeSettingRow = getBlock(mobileWorkshopCss, '.config-strip--compose .config-setting-row');
+        const composeActionButton = getBlock(mobileWorkshopCss, '.config-strip--compose .config-strip__actions .ghost-btn');
+
+        expect(composeSourceRow).toContain('display: none;');
+        expect(composeModeRow).toContain('border-top: 0;');
+        expect(composePrimaryList).toContain('border-radius: var(--radius-md);');
+        expect(composePrimaryList).toContain('background: rgba(118, 118, 128, 0.1);');
+        expect(composeSettingRow).toContain('padding: 0.52rem;');
+        expect(composeActionButton).toContain('min-height: 2.24rem;');
+        expect(composeActionButton).toContain('background: rgba(118, 118, 128, 0.1);');
+    });
+
     test('keeps the custom text mobile footer as a light toolbar', async () => {
         const workshopCss = await readFile(resolve(componentRoot, 'practice-workshop.css'), 'utf8');
         const mobileWorkshopCss = getMediaBlock(workshopCss, '@media (max-width: 720px)', '@media (max-width: 360px)');
