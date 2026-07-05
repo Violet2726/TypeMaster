@@ -21,4 +21,15 @@ describe('global CSS boundary', () => {
         expect(rootLayout).not.toMatch(/import\s+['"]\.\.\/index\.css['"]/);
         expect(legacyGlobalCss).not.toMatch(/\.(app-header|panel|practice-page|result-summary|settings-drawer)\b/);
     });
+
+    test('keeps practice route CSS out of TypingArea component visuals', async () => {
+        const practiceRouteCss = await readFile(resolve(appRoot, 'app/practice/practice.css'), 'utf8');
+        const practiceWorkshopCss = await readFile(resolve(appRoot, 'src/features/practice/components/practice-workshop.css'), 'utf8');
+        const practicePageCss = await readFile(resolve(appRoot, 'src/screens/practice-page.css'), 'utf8');
+
+        expect(practiceRouteCss).not.toMatch(/\b(typing-stage|words-shell|typing-empty-state)\b/);
+        expect(practiceWorkshopCss).toMatch(/\.typing-stage\s*\{/);
+        expect(practiceWorkshopCss).toMatch(/\.typing-stage::after\s*\{/);
+        expect(practicePageCss).toMatch(/\.practice-page--refined \.practice-workbench__primary \.typing-stage\s*\{/);
+    });
 });

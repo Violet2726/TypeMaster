@@ -123,27 +123,14 @@
 
 .practice-page--refined .practice-workbench__primary .typing-stage {
     min-height: clamp(36rem, calc(100dvh - 11rem), 48rem);
-    border-radius: 24px;
 }
 
 .practice-page--refined .practice-workbench__primary .typing-stage__head {
-    padding-bottom: 0.78rem;
-}
-
-.practice-page--refined .practice-workbench__primary .typing-stage__source strong {
-    font-size: clamp(1.14rem, 1.7vw, 1.38rem);
-}
-
-.practice-page--refined .practice-workbench__primary .typing-stage .words-shell {
-    border-radius: 24px;
+    grid-template-columns: minmax(0, 1fr) auto;
 }
 
 .practice-page--refined .practice-workbench__primary .typing-stage .words-container {
     height: clamp(18.5rem, 40vh, 25.5rem);
-}
-
-.practice-page--refined .practice-workbench__primary .typing-empty-state__step {
-    border-radius: 18px;
 }
 
 .practice-page--refined .sticky-action-bar {
@@ -158,14 +145,37 @@
     min-height: clamp(32rem, calc(100dvh - 12rem), 44rem);
 }
 
+.practice-workbench--compose .practice-workbench__primary .typing-stage__head {
+    grid-template-columns: 1fr;
+}
+
+.practice-workbench--compose .practice-workbench__primary .typing-stage .words-container,
+.practice-workbench--compose .practice-workbench__primary .typing-stage--unavailable .words-container {
+    height: auto;
+    min-height: clamp(18rem, 34vh, 24rem);
+}
+
+.practice-workbench--compose .typing-empty-state {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+        'copy'
+        'rail';
+    align-content: start;
+    gap: 0.72rem;
+    width: 100%;
+}
+
+.practice-workbench--compose .typing-empty-state__copy > strong,
+.practice-workbench--compose .typing-empty-state__copy p {
+    max-width: 100%;
+}
+
 body[data-theme='serika-light'] .practice-page--refined .practice-toolbar__support-note {
     background: linear-gradient(180deg, var(--tm-white-alpha-940), rgba(248, 250, 255, 0.84));
 }
 
 .practice-page--refined .panel,
 .practice-page--refined .sticky-action-bar,
-.practice-page--refined .practice-workbench__primary .typing-stage,
-.practice-page--refined .practice-workbench__primary .typing-stage .words-shell,
 .practice-workbench__rail .practice-toolbar {
     border-radius: var(--tm-radius-panel);
 }
@@ -196,6 +206,12 @@ body[data-theme='serika-light'] .practice-page--refined .practice-toolbar__suppo
     }
 }
 
+@media (max-width: 860px) {
+    .practice-page--refined .practice-workbench__primary .typing-stage {
+        min-height: auto;
+    }
+}
+
 @media (max-width: 720px) {
     .practice-page--refined {
         gap: 0.78rem;
@@ -207,8 +223,6 @@ body[data-theme='serika-light'] .practice-page--refined .practice-toolbar__suppo
 
     .practice-page--refined .panel,
     .practice-page--refined .sticky-action-bar,
-    .practice-page--refined .practice-workbench__primary .typing-stage,
-    .practice-page--refined .practice-workbench__primary .typing-stage .words-shell,
     .practice-workbench__rail .practice-toolbar,
     .practice-brief-panel,
     .adaptive-drill-panel {
