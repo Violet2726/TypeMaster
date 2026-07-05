@@ -25,4 +25,32 @@ describe('result page CSS', () => {
         expect(summaryHero).toContain('grid-template-columns: minmax(0, 1fr) minmax(10.5rem, 0.42fr);');
         expect(summaryScores).toContain('grid-template-columns: 1fr;');
     });
+
+    test('keeps the replay chart quiet and focused on the primary trend', async () => {
+        const css = await readFile(resolve(stylesRoot, 'result-page.css'), 'utf8');
+        const summaryCard = getBlock(css, '.replay-summary-card');
+        const mergedCanvas = getBlock(css, '.replay-canvas--merged');
+        const plotBackground = getBlock(css, '.chart-plot-bg');
+        const gridLine = getBlock(css, '.replay-grid-line');
+        const axisLabel = getBlock(css, '.replay-axis-label');
+        const mainArea = getBlock(css, '.replay-main-area');
+        const mainLine = getBlock(css, '.replay-main-line');
+        const secondaryLine = getBlock(css, '.replay-secondary-line');
+        const burstBar = getBlock(css, '.replay-burst-bar');
+
+        expect(summaryCard).toContain('background: transparent;');
+        expect(summaryCard).toContain('border-color: transparent;');
+        expect(summaryCard).toContain('box-shadow: none;');
+        expect(mergedCanvas).toContain('padding: 0;');
+        expect(mergedCanvas).toContain('background: transparent;');
+        expect(plotBackground).toContain('fill: transparent;');
+        expect(gridLine).toContain('stroke-opacity: 0.42;');
+        expect(axisLabel).toContain('font-size: 11px;');
+        expect(mainArea).toContain('fill: url(#mergedReplayAreaGradient);');
+        expect(mainLine).toContain('stroke-width: 3.6;');
+        expect(secondaryLine).toContain('stroke-width: 1.6;');
+        expect(secondaryLine).toContain('stroke-dasharray: none;');
+        expect(burstBar).toContain('stroke: rgba(255, 159, 10, 0.2);');
+        expect(burstBar).toContain('stroke-width: 5;');
+    });
 });

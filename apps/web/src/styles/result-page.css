@@ -618,7 +618,7 @@ body[data-theme='serika-light'] .result-challenge-route__item {
 }
 
 .replay-panel--merged {
-    gap: 1.1rem;
+    gap: 1rem;
 }
 
 .chart-empty {
@@ -629,8 +629,8 @@ body[data-theme='serika-light'] .result-challenge-route__item {
 
 .replay-header {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
-    gap: 1rem;
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 300px);
+    gap: 1.1rem;
     align-items: start;
 }
 
@@ -693,13 +693,17 @@ body[data-theme='serika-light'] .result-challenge-route__item {
 
 .replay-summary-card {
     display: grid;
-    gap: 0.8rem;
+    gap: 0.72rem;
+    padding: 0.4rem 0 0;
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
 }
 
 .replay-summary-card__grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.72rem 0.9rem;
+    gap: 0.56rem 0.82rem;
 }
 
 .replay-summary-card__item {
@@ -716,7 +720,7 @@ body[data-theme='serika-light'] .result-challenge-route__item {
 .replay-summary-card__item strong {
     color: var(--text-strong);
     font-family: var(--font-mono);
-    font-size: 1.04rem;
+    font-size: 1rem;
 }
 
 .replay-summary-card__note {
@@ -739,13 +743,19 @@ body[data-theme='serika-light'] .result-challenge-route__item {
     border-color: var(--panel-stroke);
 }
 
+.chart-plot-bg {
+    fill: transparent;
+}
+
 .replay-canvas {
     padding: 0.4rem;
     background: var(--bg-soft);
 }
 
 .replay-canvas--merged {
-    padding: 0.6rem;
+    padding: 0;
+    background: transparent;
+    border-color: transparent;
 }
 
 .result-chart {
@@ -762,19 +772,21 @@ body[data-theme='serika-light'] .result-challenge-route__item {
     height: clamp(300px, 40vw, 392px);
 }
 
-.grid-line,
-.replay-grid-line {
+.grid-line {
     stroke: var(--tm-white-alpha-100);
 }
 
 .replay-grid-line {
+    stroke: var(--tm-white-alpha-100);
     stroke-width: 1;
+    stroke-opacity: 0.42;
 }
 
 .replay-axis-label {
     fill: var(--text-dim);
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: 11px;
+    opacity: 0.72;
 }
 
 .replay-axis-label--x {
@@ -790,7 +802,8 @@ body[data-theme='serika-light'] .result-challenge-route__item {
 }
 
 .replay-main-area {
-    fill: url(#replayAreaGradient);
+    fill: url(#mergedReplayAreaGradient);
+    opacity: 0.58;
 }
 
 .replay-main-line,
@@ -807,20 +820,21 @@ body[data-theme='serika-light'] .replay-grid-line {
     stroke: rgba(0, 0, 0, 0.09);
 }
 
-.chart-line.wpm,
-.replay-main-line {
+.chart-line.wpm {
     stroke: var(--main-color);
     filter: none;
 }
 
 .replay-main-line {
-    stroke-width: 3.2;
+    stroke: var(--main-color);
+    filter: none;
+    stroke-width: 3.6;
 }
 
 .replay-secondary-line {
-    stroke: rgba(121, 163, 214, 0.52);
-    stroke-width: 2.2;
-    stroke-dasharray: 10 8;
+    stroke: rgba(121, 163, 214, 0.34);
+    stroke-width: 1.6;
+    stroke-dasharray: none;
 }
 
 .replay-rhythm-line {
@@ -830,12 +844,13 @@ body[data-theme='serika-light'] .replay-grid-line {
 
 .replay-accuracy-line {
     stroke: var(--success-color);
-    stroke-width: 3;
+    stroke-width: 2.4;
+    opacity: 0.82;
 }
 
 .replay-burst-bar {
-    stroke: rgba(255, 159, 10, 0.36);
-    stroke-width: 8;
+    stroke: rgba(255, 159, 10, 0.2);
+    stroke-width: 5;
     stroke-linecap: round;
 }
 
