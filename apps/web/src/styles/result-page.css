@@ -521,7 +521,34 @@ body[data-theme='serika-light'] .result-completion-stage .result-prescription__i
 }
 
 .result-advice-panel {
-    border-radius: var(--radius-sm);
+    gap: 0.72rem;
+    padding: 1rem 0 0;
+    border: 0;
+    border-top: 1px solid var(--tm-white-alpha-100);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.result-advice-panel .panel-head {
+    align-items: baseline;
+    gap: 0.74rem;
+}
+
+.result-advice-panel h2 {
+    font-size: 1.14rem;
+    line-height: 1.2;
+    letter-spacing: 0;
+}
+
+.result-advice-panel .lead-text,
+.result-advice-panel .muted-text {
+    max-width: 52rem;
+}
+
+body[data-theme='serika-light'] .result-advice-panel {
+    border-top-color: rgba(60, 60, 67, 0.12);
+    background: transparent;
 }
 
 .result-decision-panel .results-actions .action-btn,

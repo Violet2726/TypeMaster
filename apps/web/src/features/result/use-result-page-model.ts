@@ -32,8 +32,7 @@ function buildAdviceModel(copy, language, status, issue, coachRecord) {
         return {
             headline: copy.result.coachLoadingTitle,
             body: copy.result.coachLoadingBody,
-            note: '',
-            canRetry: false
+            note: ''
         };
     }
 
@@ -41,8 +40,7 @@ function buildAdviceModel(copy, language, status, issue, coachRecord) {
         return {
             headline: copy.result.coachErrorTitle,
             body: copy.result.coachErrorBody,
-            note: errorCopy.title,
-            canRetry: true
+            note: errorCopy.title
         };
     }
 
@@ -51,8 +49,7 @@ function buildAdviceModel(copy, language, status, issue, coachRecord) {
         body: coachRecord?.nextDrill?.reason || coachRecord?.summary || copy.result.nextReasonFallback,
         note: status === 'fallback'
             ? `${errorCopy.title}${separator}${copy.result.coachFallbackBody}`
-            : coachRecord?.summary || '',
-        canRetry: status === 'fallback'
+            : coachRecord?.summary || ''
     };
 }
 
@@ -467,15 +464,6 @@ export function useResultPageModel({
         ? buildTargetedFeedbackModel(copy, trainingCopy, session)
         : null;
 
-    const handleRetryAdvice = useCallback(async () => {
-        if (!session) {
-            return;
-        }
-
-        const record = await generateCoachForSession(session.id, { force: true });
-        setCoachRecord(record);
-    }, [generateCoachForSession, session]);
-
     const handleNextDrill = useCallback(async () => {
         if (activeTrainingStep) {
             startTrainingPlanStep();
@@ -564,7 +552,6 @@ export function useResultPageModel({
         comparison,
         copy,
         handleDecisionAction,
-        handleRetryAdvice,
         isChallengeSession,
         nextDrillError,
         nextDrillState,

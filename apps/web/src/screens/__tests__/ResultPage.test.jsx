@@ -427,6 +427,27 @@ describe('ResultPage', () => {
         expect(secondaryGroup).toContainElement(screen.getByRole('button', { name: 'View leaderboard' }));
     });
 
+    test('keeps fallback advice as explanatory support instead of another action entry', () => {
+        Object.assign(mockStore, {
+            ...baseStore,
+            getCoachStatusForSession: () => 'fallback',
+            getAdviceForSession: () => ({
+                headline: 'Use the local plan',
+                summary: 'AI is unavailable right now.',
+                fallbackReasonCode: 'api-key-missing',
+                nextDrill: null
+            })
+        });
+
+        render(<ResultPage />);
+
+        expect(screen.getByRole('heading', { name: 'Use the local plan' })).toBeInTheDocument();
+        expect(screen.getByText('AI is unavailable right now.')).toBeInTheDocument();
+        expect(screen.getByText(/local fallback generated the advice/i)).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Retry advice' })).not.toBeInTheDocument();
+        expect(mockStore.generateCoachForSession).not.toHaveBeenCalled();
+    });
+
     test('shows targeted feedback for adaptive drills', () => {
         Object.assign(mockStore, {
             ...baseStore,

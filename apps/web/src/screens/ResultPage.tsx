@@ -45,7 +45,6 @@ export function ResultPage() {
         comparison,
         copy,
         handleDecisionAction,
-        handleRetryAdvice,
         isChallengeSession,
         nextDrillError,
         nextDrillState,
@@ -401,14 +400,6 @@ export function ResultPage() {
                     <div className="feedback-card feedback-error">
                         <strong>{getErrorMessage(store.language, nextDrillError?.code || 'unknown').title}</strong>
                         <p>{copy.result.nextDrillError}</p>
-                    </div>
-                )}
-
-                {(advice.canRetry || coachStatus === 'error') && (
-                    <div className="results-actions">
-                        <button type="button" className="action-btn" onClick={handleRetryAdvice}>
-                            {copy.common.refreshAdvice}
-                        </button>
                     </div>
                 )}
             </section>

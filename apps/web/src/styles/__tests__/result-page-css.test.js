@@ -73,4 +73,18 @@ describe('result page CSS', () => {
         expect(secondaryAction).toContain('box-shadow: none;');
         expect(css).not.toMatch(/\.result-completion-stage__decision \.results-actions\s*\{[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
     });
+
+    test('keeps the result advice panel explanatory instead of action-heavy', async () => {
+        const css = await readFile(resolve(stylesRoot, 'result-page.css'), 'utf8');
+        const advicePanel = getBlock(css, '.result-advice-panel');
+        const adviceHead = getBlock(css, '.result-advice-panel .panel-head');
+
+        expect(advicePanel).toContain('border: 0;');
+        expect(advicePanel).toContain('border-top: 1px solid var(--tm-white-alpha-100);');
+        expect(advicePanel).toContain('background: transparent;');
+        expect(advicePanel).toContain('box-shadow: none;');
+        expect(advicePanel).toContain('padding: 1rem 0 0;');
+        expect(adviceHead).toContain('align-items: baseline;');
+        expect(css).not.toContain('.result-advice-panel .results-actions');
+    });
 });
