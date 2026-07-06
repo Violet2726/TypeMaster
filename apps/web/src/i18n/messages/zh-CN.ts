@@ -204,7 +204,16 @@ export const zhCNMessages = {
         help: '帮助',
         controls: '运行控制',
         helpTitle: '操作说明',
-        helpBody: '输入敌人词条即可攻击。能量满后按空格释放回声超载，按 Esc 暂停，按 1/2/3 选择升级。',
+        helpCommands: {
+            attack: '攻击',
+            attackInput: '输入目标',
+            surge: '超载',
+            surgeInput: '空格 / 按钮',
+            upgrade: '升级',
+            upgradeInput: '1 / 2 / 3',
+            pause: '暂停',
+            pauseInput: 'Esc'
+        },
         helpDismiss: '知道了',
         modeAria: 'TypeRift 模式选择',
         modeKicker: '构筑式打字生存',

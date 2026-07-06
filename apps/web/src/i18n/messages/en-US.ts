@@ -195,7 +195,16 @@ export const enUSMessages = {
             help: 'Help',
             controls: 'Run controls',
             helpTitle: 'Controls',
-            helpBody: 'Type enemy tags to attack. Press Space to release Echo Surge at full energy, Esc to pause, and 1/2/3 to choose upgrades.',
+            helpCommands: {
+                attack: 'Attack',
+                attackInput: 'Type target',
+                surge: 'Surge',
+                surgeInput: 'Space / button',
+                upgrade: 'Upgrade',
+                upgradeInput: '1 / 2 / 3',
+                pause: 'Pause',
+                pauseInput: 'Esc'
+            },
             helpDismiss: 'Got it',
             modeAria: 'TypeRift mode select',
             modeKicker: 'Roguelite typing survival',

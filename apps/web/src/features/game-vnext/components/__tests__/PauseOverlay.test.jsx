@@ -5,16 +5,16 @@ import { getCopy } from '../../../../i18n';
 
 const stats = {
     areaName: 'Neon Archive',
-    areaNameZh: '霓虹档案馆',
+    areaNameZh: '',
     combo: 12,
     extractAvailable: false,
     score: 4200
 };
 
 describe('PauseOverlay', () => {
-    test('renders pause state as a compact summary with one primary action list', () => {
+    test('renders pause state as a compact sheet with one primary action list', () => {
         const onAction = vi.fn();
-        const { container } = render(
+        const { baseElement } = render(
             <PauseOverlay
                 stats={stats}
                 copy={getCopy('en-US')}
@@ -23,13 +23,17 @@ describe('PauseOverlay', () => {
         );
 
         const dialog = screen.getByRole('dialog', { name: 'TypeRift paused' });
+        expect(dialog).toHaveClass('typerift-overlay--sheet');
         expect(within(dialog).getByRole('heading', { name: 'TypeRift' })).toBeInTheDocument();
-        expect(container.querySelector('.typerift-run-summary')).toBeInTheDocument();
-        expect(container.querySelector('.typerift-stats')).toBeNull();
-        expect(container.querySelectorAll('.typerift-action-row')).toHaveLength(4);
-        expect(container.querySelectorAll('.typerift-action-row--primary')).toHaveLength(1);
+        expect(baseElement.querySelector('.typerift-sheet--pause')).toBeInTheDocument();
+        expect(baseElement.querySelector('.typerift-panel--pause')).toBeNull();
+        expect(baseElement.querySelector('.typerift-run-summary')).toBeInTheDocument();
+        expect(baseElement.querySelector('.typerift-sheet__summary')).toBeInTheDocument();
+        expect(baseElement.querySelector('.typerift-stats')).toBeNull();
+        expect(baseElement.querySelectorAll('.typerift-action-row')).toHaveLength(4);
+        expect(baseElement.querySelectorAll('.typerift-action-row--primary')).toHaveLength(1);
         expect(screen.getByText('4,200')).toBeInTheDocument();
-        expect(screen.getByText('霓虹档案馆')).toBeInTheDocument();
+        expect(screen.getByText('Neon Archive')).toBeInTheDocument();
 
         expect(screen.getByRole('button', { name: 'Extract' })).toBeDisabled();
         fireEvent.click(screen.getByRole('button', { name: 'Resume' }));

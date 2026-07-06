@@ -14,6 +14,7 @@ import UpgradeOverlay from '../features/game-vnext/components/UpgradeOverlay';
 import PauseOverlay from '../features/game-vnext/components/PauseOverlay';
 import RunResultOverlay from '../features/game-vnext/components/RunResultOverlay';
 import CodexOverlay from '../features/game-vnext/components/CodexOverlay';
+import HelpOverlay from '../features/game-vnext/components/HelpOverlay';
 import { useGameEngine } from '../features/game-vnext/hooks/use-game-engine';
 import { useGameInput } from '../features/game-vnext/hooks/use-game-input';
 import { useGameLoop } from '../features/game-vnext/hooks/use-game-loop';
@@ -277,22 +278,7 @@ export default function GamePage({ onExit }: GamePageProps) {
                 <CodexOverlay codex={gameCodex || snapshot?.codexProgress} copy={copy} onClose={() => setShowCodex(false)} />
             )}
             {showHelp && (
-                <div className="typerift-overlay" role="dialog" aria-modal="true" aria-label={copy.game.helpTitle}>
-                    <section className="typerift-panel">
-                        <div className="typerift-panel__inner">
-                            <div className="typerift-heading">
-                                <span>{copy.game.help}</span>
-                                <h2>{copy.game.helpTitle}</h2>
-                                <p>{copy.game.helpBody}</p>
-                            </div>
-                            <div className="typerift-actions">
-                                <button className="typerift-action typerift-action--primary" type="button" onClick={() => setShowHelp(false)} autoFocus>
-                                    {copy.game.helpDismiss}
-                                </button>
-                            </div>
-                        </div>
-                    </section>
-                </div>
+                <HelpOverlay copy={copy} onClose={() => setShowHelp(false)} />
             )}
         </div>
     );
