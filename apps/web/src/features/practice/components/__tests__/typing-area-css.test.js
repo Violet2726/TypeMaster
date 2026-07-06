@@ -53,20 +53,33 @@ describe('typing area CSS', () => {
         const practicePageCss = await readFile(resolve(screensRoot, 'practice-page.css'), 'utf8');
         const mobileWorkshopCss = getMediaBlock(workshopCss, '@media (max-width: 720px)', '@media (max-width: 360px)');
         const mobilePracticeCss = getMediaBlock(practicePageCss, '@media (max-width: 720px)');
+        const mobileFooter = getBlock(mobileWorkshopCss, '.typing-stage__footer');
         const mobileLiveStats = getBlock(mobileWorkshopCss, '.typing-stage .live-stats');
-        const mobileLiveStat = getBlock(mobileWorkshopCss, '.typing-stage .live-stat');
+        const mobileLiveStat = getBlock(mobileWorkshopCss, '.typing-stage .live-stats .live-stat');
+        const mobileLiveStatTop = getBlock(mobileWorkshopCss, '.typing-stage .live-stat__top');
+        const mobileLiveStatIcon = getBlock(mobileWorkshopCss, '.typing-stage .live-stat__icon');
         const mobileLiveStatValue = getBlock(mobileWorkshopCss, '.typing-stage .live-stat-value');
+        const mobileLiveStatLabel = getBlock(mobileWorkshopCss, '.typing-stage .live-stat-label');
         const mobileWordsContainer = getBlock(
             mobilePracticeCss,
             '.practice-page--refined .practice-workbench__primary .typing-stage .words-container'
         );
 
+        expect(mobileFooter).toContain('gap: 0.38rem;');
         expect(mobileLiveStats).toContain('padding: 0;');
         expect(mobileLiveStats).toContain('border-color: transparent;');
         expect(mobileLiveStats).toContain('background: transparent;');
-        expect(mobileLiveStat).toContain('min-height: 2.58rem;');
+        expect(mobileLiveStat).toContain('display: flex;');
+        expect(mobileLiveStat).toContain('min-height: 2.28rem;');
+        expect(mobileLiveStat).toContain('gap: 0.18rem;');
+        expect(mobileLiveStatTop).toContain('display: contents;');
+        expect(mobileLiveStatIcon).toContain('width: 0.88rem;');
         expect(mobileLiveStat).not.toContain('4.15rem');
-        expect(mobileLiveStatValue).toContain('font-size: 1.04rem;');
+        expect(mobileLiveStatValue).toContain('font-size: 0.98rem;');
+        expect(mobileLiveStatValue).toContain('line-height: 1;');
+        expect(mobileLiveStatValue).toContain('flex: 0 0 auto;');
+        expect(mobileLiveStatLabel).toContain('font-size: 0.58rem;');
+        expect(mobileLiveStatLabel).toContain('flex: 0 0 auto;');
         expect(mobileWordsContainer).toContain('2.65');
     });
 
