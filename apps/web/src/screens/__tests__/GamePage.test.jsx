@@ -61,6 +61,9 @@ describe('GamePage', () => {
             const snapshot = JSON.parse(window.render_game_to_text());
             expect(snapshot.phase).toBe('playing');
         });
+        const controlsToolbar = screen.getByRole('toolbar');
+        expect(controlsToolbar).toHaveClass('tm-game-topbar__actions');
+        expect(within(controlsToolbar).getAllByRole('button')).toHaveLength(4);
 
         act(() => {
             window.advanceTime(2200);

@@ -202,6 +202,7 @@ export const zhCNMessages = {
         extract: '撤离',
         settings: '设置',
         help: '帮助',
+        controls: '运行控制',
         helpTitle: '操作说明',
         helpBody: '输入敌人词条即可攻击。能量满后按空格释放回声超载，按 Esc 暂停，按 1/2/3 选择升级。',
         helpDismiss: '知道了',

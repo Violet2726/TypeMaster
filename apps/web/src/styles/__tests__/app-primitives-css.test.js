@@ -18,6 +18,11 @@ function getMediaBlock(css, marker) {
     return start === -1 ? '' : css.slice(start);
 }
 
+function getStandaloneBlock(css, selector) {
+    const match = css.match(new RegExp(`^\\s*${escapeSelector(selector)}\\s*\\{([\\s\\S]*?)\\}`, 'm'));
+    return match?.[1] || '';
+}
+
 describe('app primitives CSS', () => {
     test('keeps the mobile home command surface readable and glanceable', async () => {
         const css = await readFile(resolve(appRoot, 'src/components/app/app-primitives.css'), 'utf8');
@@ -34,5 +39,25 @@ describe('app primitives CSS', () => {
         expect(progressStrip).toContain('grid-template-columns: repeat(3, minmax(0, 1fr));');
         expect(metricCard).toContain('min-height: 3.75rem;');
         expect(metricCard).toContain('background: rgba(118, 118, 128, 0.14);');
+    });
+
+    test('keeps the in-game top bar as a lightweight grouped toolbar', async () => {
+        const css = await readFile(resolve(appRoot, 'src/styles/design-system.css'), 'utf8');
+        const topbar = getStandaloneBlock(css, '.tm-game-topbar');
+        const actionGroupBlocks = Array.from(css.matchAll(/^\.tm-game-topbar__actions\s*\{([\s\S]*?)\}/gm), (match) => match[1]);
+        const actionGroup = actionGroupBlocks.find((block) => block.includes('display: inline-grid;')) || '';
+        const actionButton = getStandaloneBlock(css, '.tm-game-topbar__action');
+        const mobileCss = getMediaBlock(css, '@media (max-width: 720px)');
+        const mobileAction = getStandaloneBlock(mobileCss, '.tm-game-topbar__action');
+
+        expect(topbar).toContain('top: auto;');
+        expect(topbar).toContain('bottom: max(10px, calc(env(safe-area-inset-bottom) + 10px));');
+        expect(actionGroup).toContain('display: inline-grid;');
+        expect(actionGroup).toContain('grid-auto-flow: column;');
+        expect(actionGroup).toContain('padding: 0.18rem;');
+        expect(actionButton).toContain('min-width: var(--tm-touch-target);');
+        expect(actionButton).toContain('min-height: var(--tm-touch-target);');
+        expect(actionButton).toContain('border: 0;');
+        expect(mobileAction).toContain('width: var(--tm-touch-target);');
     });
 });

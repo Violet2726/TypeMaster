@@ -193,6 +193,7 @@ export const enUSMessages = {
             extract: 'Extract',
             settings: 'Settings',
             help: 'Help',
+            controls: 'Run controls',
             helpTitle: 'Controls',
             helpBody: 'Type enemy tags to attack. Press Space to release Echo Surge at full energy, Esc to pause, and 1/2/3 to choose upgrades.',
             helpDismiss: 'Got it',

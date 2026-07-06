@@ -132,6 +132,7 @@ export function GameTopBar({
     subtitle,
     primary,
     actions = [],
+    actionsLabel = 'Game controls',
     className = ''
 }) {
     const actionItems = [primary, ...actions].filter(Boolean);
@@ -144,7 +145,7 @@ export function GameTopBar({
                 {subtitle ? <small>{subtitle}</small> : null}
             </div>
             {actionItems.length ? (
-                <div className="tm-game-topbar__actions">
+                <div className="tm-game-topbar__actions" role="toolbar" aria-label={actionsLabel}>
                     {actionItems.map((action) => {
                         const Icon = action.icon;
                         return (

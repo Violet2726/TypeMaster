@@ -325,33 +325,36 @@ body[data-theme='serika-light'] {
 
 .tm-game-topbar {
     position: absolute;
-    top: max(12px, env(safe-area-inset-top));
-    left: 12px;
-    right: 12px;
+    top: auto;
+    bottom: max(10px, calc(env(safe-area-inset-bottom) + 10px));
+    left: 10px;
+    right: 10px;
     z-index: 95;
-    display: flex;
-    align-items: center;
+    display: grid;
+    grid-template-columns: minmax(0, max-content) auto;
+    align-items: start;
     justify-content: space-between;
-    gap: 0.75rem;
+    gap: 0.65rem;
     pointer-events: none;
 }
 
 .tm-game-topbar__brand,
-.tm-game-topbar__action {
+.tm-game-topbar__actions {
     border: 1px solid var(--panel-stroke);
     border-radius: var(--tm-radius-panel);
-    background: rgba(12, 15, 22, 0.72);
+    background: color-mix(in srgb, #0f1117 76%, transparent);
     color: #ffffff;
-    box-shadow: 0 18px 54px rgba(0, 0, 0, 0.32);
-    backdrop-filter: blur(20px) saturate(145%);
-    -webkit-backdrop-filter: blur(20px) saturate(145%);
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.24);
+    backdrop-filter: blur(18px) saturate(136%);
+    -webkit-backdrop-filter: blur(18px) saturate(136%);
 }
 
 .tm-game-topbar__brand {
     display: grid;
     gap: 0.08rem;
     min-width: 0;
-    padding: 0.56rem 0.74rem;
+    max-width: min(34vw, 320px);
+    padding: 0.48rem 0.64rem;
 }
 
 .tm-game-topbar__brand span,
@@ -363,40 +366,67 @@ body[data-theme='serika-light'] {
 }
 
 .tm-game-topbar__brand strong {
+    overflow: hidden;
     color: #ffffff;
     font-family: var(--font-display);
     font-size: 1rem;
     line-height: 1.08;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .tm-game-topbar__actions {
-    display: flex;
-    flex-wrap: wrap;
+    display: inline-grid;
+    grid-auto-flow: column;
+    gap: 0.12rem;
     justify-content: flex-end;
-    gap: 0.42rem;
+    padding: 0.18rem;
+    pointer-events: auto;
 }
 
 .tm-game-topbar__action {
     display: inline-flex;
-    min-height: 40px;
+    min-width: var(--tm-touch-target);
+    min-height: var(--tm-touch-target);
     align-items: center;
     justify-content: center;
     gap: 0.38rem;
-    padding: 0 0.72rem;
+    padding: 0 0.62rem;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--tm-white-alpha-860);
     font: inherit;
     font-size: 0.82rem;
     font-weight: 760;
+    white-space: nowrap;
     pointer-events: auto;
+    transition:
+        background-color var(--transition-fast),
+        color var(--transition-fast),
+        transform var(--transition-fast);
+}
+
+.tm-game-topbar__action:hover,
+.tm-game-topbar__action:focus-visible {
+    background: var(--tm-white-alpha-100);
+    color: #ffffff;
+    outline: none;
+}
+
+.tm-game-topbar__action:active {
+    transform: scale(0.98);
 }
 
 .tm-game-topbar__action.is-primary {
-    border-color: rgba(10, 132, 255, 0.48);
     background: rgba(10, 132, 255, 0.9);
+    color: #ffffff;
 }
 
 .tm-game-topbar__action:disabled {
     cursor: not-allowed;
-    opacity: 0.52;
+    opacity: 0.42;
+    transform: none;
 }
 
 .apple-command-layout {
@@ -414,25 +444,33 @@ body[data-theme='serika-light'] {
 
 @media (max-width: 720px) {
     .tm-game-topbar {
-        top: max(8px, env(safe-area-inset-top));
+        bottom: max(8px, calc(env(safe-area-inset-bottom) + 8px));
         left: 8px;
         right: 8px;
+        grid-template-columns: minmax(0, 1fr) auto;
         align-items: flex-start;
+        gap: 0.5rem;
     }
 
     .tm-game-topbar__brand {
-        max-width: 44vw;
+        max-width: min(44vw, 172px);
         padding: 0.48rem 0.58rem;
     }
 
+    .tm-game-topbar__brand span,
     .tm-game-topbar__brand small,
     .tm-game-topbar__action span {
         display: none;
     }
 
+    .tm-game-topbar__actions {
+        gap: 0.06rem;
+        padding: 0.12rem;
+    }
+
     .tm-game-topbar__action {
-        width: 40px;
-        min-width: 40px;
+        width: var(--tm-touch-target);
+        min-width: var(--tm-touch-target);
         padding: 0;
     }
 }

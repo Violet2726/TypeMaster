@@ -194,6 +194,7 @@ export default function GamePage({ onExit }: GamePageProps) {
                     eyebrow={copy.game.topEyebrow}
                     title={copy.game.topTitle}
                     subtitle={topSubtitle}
+                    actionsLabel={copy.game.controls}
                     primary={{
                         id: 'exit',
                         label: copy.game.exit,
