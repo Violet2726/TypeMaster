@@ -940,7 +940,8 @@ body[data-theme='serika-light'] .keyboard-zone-row__bar { background: rgba(0, 0,
         grid-template-columns: minmax(0, 1fr) auto;
         align-items: center;
         gap: 0.5rem;
-        padding-bottom: 0.48rem;
+        padding-bottom: 0.36rem;
+        border-bottom: 0;
     }
     .typing-stage__summary {
         display: flex;

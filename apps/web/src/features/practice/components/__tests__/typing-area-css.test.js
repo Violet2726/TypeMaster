@@ -126,7 +126,8 @@ describe('typing area CSS', () => {
         expect(mobileHead).toContain('grid-template-columns: minmax(0, 1fr) auto;');
         expect(mobileHead).toContain('align-items: center;');
         expect(mobileHead).toContain('gap: 0.5rem;');
-        expect(mobileHead).toContain('padding-bottom: 0.48rem;');
+        expect(mobileHead).toContain('padding-bottom: 0.36rem;');
+        expect(mobileHead).toContain('border-bottom: 0;');
         expect(mobileSummary).toContain('display: flex;');
         expect(mobileSummary).toContain('align-items: center;');
         expect(mobileSummary).toContain('gap: 0.44rem;');
