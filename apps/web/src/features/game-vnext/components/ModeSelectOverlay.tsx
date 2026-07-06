@@ -1,7 +1,6 @@
 'use client';
 
-import { CalendarClock, Compass, GraduationCap, Trophy } from 'lucide-react';
-import { MetricCard } from '../../../components/app/AppPrimitives';
+import { BookOpen, CalendarClock, ChevronRight, Compass, GraduationCap, Trophy } from 'lucide-react';
 import type { getCopy } from '../../../i18n';
 import type { GameCodexProgress, GameMode } from '../../../types/game';
 import './dialogs.css';
@@ -20,6 +19,7 @@ export default function ModeSelectOverlay({
     onStart: (mode: GameMode) => void,
 }) {
     const gameCopy = copy.game;
+    const codexValue = `${codexProgress?.discovered || 0}/${codexProgress?.total || 33}`;
     const modes = [
         {
             id: 'expedition',
@@ -59,41 +59,41 @@ export default function ModeSelectOverlay({
                         <h1>{gameCopy.modeTitle}</h1>
                         <p>{gameCopy.modeBody}</p>
                     </div>
-                    <div className="typerift-mode-grid">
+                    <div className="typerift-mode-status" aria-label={`${gameCopy.bestScoreAria}; ${gameCopy.codexProgressAria}`}>
+                        <span>
+                            <Trophy aria-hidden="true" size={15} strokeWidth={2.2} />
+                            <small>{gameCopy.best}</small>
+                            <strong>{Math.round(bestScore || 0).toLocaleString()}</strong>
+                        </span>
+                        <span>
+                            <BookOpen aria-hidden="true" size={15} strokeWidth={2.2} />
+                            <small>{gameCopy.codex}</small>
+                            <strong>{codexValue}</strong>
+                        </span>
+                    </div>
+                    <div className="typerift-mode-list">
                         {modes.map((mode, index) => (
                             <button
                                 key={mode.id}
-                                className={`typerift-mode-card typerift-mode-card--${mode.tone}`}
+                                className={`typerift-mode-row typerift-mode-row--${mode.tone}`}
                                 type="button"
                                 onClick={() => onStart(mode.id)}
                                 autoFocus={index === 0}
                             >
-                                <span className="typerift-mode-card__icon">
+                                <span className="typerift-mode-row__icon">
                                     <mode.icon aria-hidden="true" size={22} strokeWidth={2.1} />
                                 </span>
-                                <span className="typerift-mode-card__copy">
+                                <span className="typerift-mode-row__copy">
                                     <small>{mode.meta}</small>
                                     <strong>{mode.title}</strong>
                                     <span>{mode.body}</span>
                                 </span>
-                                <span className="typerift-mode-card__stats">{mode.stats}</span>
+                                <span className="typerift-mode-row__meta">
+                                    <span>{mode.stats}</span>
+                                    <ChevronRight aria-hidden="true" size={17} strokeWidth={2.2} />
+                                </span>
                             </button>
                         ))}
-                    </div>
-                    <div className="typerift-mode-metrics">
-                        <MetricCard
-                            icon={Trophy}
-                            label={gameCopy.best}
-                            value={Math.round(bestScore || 0).toLocaleString()}
-                            tone="warning"
-                            ariaLabel={gameCopy.bestScoreAria}
-                        />
-                        <MetricCard
-                            label={gameCopy.codex}
-                            value={`${codexProgress?.discovered || 0}/${codexProgress?.total || 33}`}
-                            tone="primary"
-                            ariaLabel={gameCopy.codexProgressAria}
-                        />
                     </div>
                 </div>
             </section>

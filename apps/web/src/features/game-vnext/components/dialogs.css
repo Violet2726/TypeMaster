@@ -67,14 +67,12 @@
     line-height: 1.48;
 }
 
-.typerift-mode-grid,
 .typerift-upgrade-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 10px;
 }
 
-.typerift-mode-card,
 .typerift-upgrade-card {
     position: relative;
     display: grid;
@@ -91,24 +89,93 @@
         transform var(--transition-fast);
 }
 
-.typerift-mode-card {
-    grid-template-rows: auto 1fr auto;
-    min-height: 174px;
-    padding: 14px;
-    background:
-        radial-gradient(circle at 20% 0%, rgba(100,210,255,0.2), transparent 42%),
-        linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.035));
+.typerift-mode-status {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+    max-width: 34rem;
+    margin: 16px auto 18px;
+    padding: 6px;
+    border: 1px solid var(--panel-stroke);
+    border-radius: 8px;
+    background: var(--bg-soft);
 }
 
-.typerift-mode-card--primary {
-    border-color: rgba(100,210,255,0.38);
-    background:
-        radial-gradient(circle at 24% 0%, rgba(100,210,255,0.28), transparent 42%),
-        linear-gradient(180deg, rgba(10,132,255,0.18), rgba(255,255,255,0.04));
+.typerift-mode-status > span {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    min-height: 34px;
+    padding: 0 10px;
+    color: var(--tm-white-alpha-760);
 }
 
-.typerift-mode-card:hover,
-.typerift-mode-card:focus-visible,
+.typerift-mode-status > span + span {
+    border-left: 1px solid var(--panel-stroke);
+}
+
+.typerift-mode-status svg {
+    color: var(--tm-white-alpha-620);
+}
+
+.typerift-mode-status small {
+    overflow: hidden;
+    color: var(--tm-white-alpha-580);
+    font-size: 11px;
+    font-weight: 740;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.typerift-mode-status strong {
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.typerift-mode-list {
+    display: grid;
+    border-top: 1px solid var(--panel-stroke);
+    border-bottom: 1px solid var(--panel-stroke);
+}
+
+.typerift-mode-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) minmax(120px, auto);
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+    min-height: 92px;
+    padding: 14px 4px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition:
+        background-color var(--transition-fast),
+        color var(--transition-fast),
+        transform var(--transition-fast);
+}
+
+.typerift-mode-row + .typerift-mode-row {
+    border-top: 1px solid var(--panel-stroke);
+}
+
+.typerift-mode-row:hover,
+.typerift-mode-row:focus-visible {
+    background: var(--bg-soft);
+    outline: none;
+}
+
+.typerift-mode-row:active {
+    transform: scale(0.99);
+}
+
 .typerift-upgrade-card:hover,
 .typerift-upgrade-card:focus-visible {
     transform: translateY(-1px);
@@ -116,28 +183,34 @@
     outline: none;
 }
 
-.typerift-mode-card__icon {
+.typerift-mode-row__icon {
     display: inline-grid;
     place-items: center;
-    width: 42px;
-    height: 42px;
+    width: 38px;
+    height: 38px;
     border-radius: 8px;
-    background: rgba(255,255,255,0.1);
-    color: #64d2ff;
+    background: var(--surface-2);
+    color: var(--tm-white-alpha-760);
 }
 
-.typerift-mode-card__copy,
 .typerift-upgrade-card__copy {
     display: grid;
     min-width: 0;
     gap: 6px;
 }
 
-.typerift-mode-card__copy {
-    margin-top: 18px;
+.typerift-mode-row--primary .typerift-mode-row__icon {
+    background: var(--main-soft);
+    color: var(--color-sky);
 }
 
-.typerift-mode-card__copy small,
+.typerift-mode-row__copy {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+}
+
+.typerift-mode-row__copy small,
 .typerift-upgrade-card__copy small {
     color: var(--tm-white-alpha-580);
     font-size: 11px;
@@ -145,7 +218,7 @@
     text-transform: uppercase;
 }
 
-.typerift-mode-card__copy strong,
+.typerift-mode-row__copy strong,
 .typerift-upgrade-card__copy strong {
     color: #ffffff;
     font-size: 18px;
@@ -153,41 +226,28 @@
     font-weight: 820;
 }
 
-.typerift-mode-card__copy span,
+.typerift-mode-row__copy span,
 .typerift-upgrade-card__copy span {
     color: var(--tm-white-alpha-680);
     font-size: 13px;
     line-height: 1.42;
 }
 
-.typerift-mode-card__stats {
+.typerift-mode-row__meta {
     display: inline-flex;
-    width: fit-content;
-    min-height: 28px;
     align-items: center;
-    margin-top: 18px;
-    padding: 0 9px;
-    border-radius: 8px;
-    background: rgba(255,255,255,0.08);
-    color: rgba(255,255,255,0.78);
+    justify-content: flex-end;
+    gap: 8px;
+    min-width: 0;
+    color: var(--tm-white-alpha-620);
     font-size: 12px;
     font-weight: 750;
 }
 
-.typerift-mode-metrics {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-    margin-top: 20px;
-}
-
-.typerift-mode-metrics .app-metric-card {
-    min-height: 46px;
-    background: var(--surface-2);
-}
-
-.typerift-mode-metrics .app-metric-card strong {
-    font-size: 1.05rem;
+.typerift-mode-row__meta span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .typerift-upgrade-card {
@@ -361,29 +421,74 @@
 
 @media (max-width: 760px) {
     .typerift-overlay {
-        align-items: flex-end;
-        padding: 14px;
+        align-items: center;
+        padding: 12px;
     }
 
     .typerift-panel,
     .typerift-panel--wide {
         width: 100%;
-        max-height: calc(100% - 28px);
+        max-height: calc(100% - 24px);
     }
 
     .typerift-panel__inner {
         padding: 18px;
     }
 
-    .typerift-mode-grid,
     .typerift-upgrade-grid,
-    .typerift-stats,
-    .typerift-mode-metrics {
+    .typerift-stats {
         grid-template-columns: 1fr;
     }
 
-    .typerift-mode-card {
-        min-height: 154px;
+    .typerift-mode-status {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        margin: 10px 0 12px;
+        padding: 4px;
+    }
+
+    .typerift-mode-status > span {
+        min-height: 32px;
+        padding: 0 8px;
+    }
+
+    .typerift-mode-status > span + span {
+        border-top: 0;
+        border-left: 1px solid var(--panel-stroke);
+    }
+
+    .typerift-mode-row {
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        gap: 9px;
+        min-height: 74px;
+        padding: 9px 2px;
+    }
+
+    .typerift-mode-row__icon {
+        width: 32px;
+        height: 32px;
+    }
+
+    .typerift-mode-row__copy {
+        gap: 2px;
+    }
+
+    .typerift-mode-row__copy small {
+        font-size: 10px;
+    }
+
+    .typerift-mode-row__copy strong {
+        font-size: 15px;
+    }
+
+    .typerift-mode-row__copy span {
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
+    }
+
+    .typerift-mode-row__meta span {
+        display: none;
     }
 
     .typerift-upgrade-card {
