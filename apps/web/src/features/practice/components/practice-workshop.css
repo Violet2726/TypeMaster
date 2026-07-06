@@ -793,6 +793,9 @@ body[data-theme='serika-light'] .keyboard-zone-row__bar { background: rgba(0, 0,
 
 @media (max-width: 720px) {
     .practice-toolbar h2 { font-size: 1.25rem; line-height: 1.12; }
+    .practice-toolbar .config-strip {
+        gap: 0.22rem;
+    }
     .config-summary-list {
         border-color: transparent;
         border-radius: var(--radius-md);
@@ -802,11 +805,16 @@ body[data-theme='serika-light'] .keyboard-zone-row__bar { background: rgba(0, 0,
         min-height: 2.28rem;
         padding: 0.48rem 0.64rem;
     }
+    .config-strip__actions {
+        padding-top: 0.1rem;
+        border-top: 1px solid var(--panel-stroke);
+    }
     .config-strip__actions .ghost-btn {
-        min-height: 2.24rem;
+        justify-content: space-between;
+        padding-inline: 0.62rem;
         border-color: transparent;
         border-radius: var(--radius-md);
-        background: rgba(118, 118, 128, 0.08);
+        background: transparent;
     }
     .config-strip .segmented-group {
         border-color: transparent;
