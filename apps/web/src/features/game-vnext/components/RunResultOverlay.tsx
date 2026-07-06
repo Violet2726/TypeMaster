@@ -1,6 +1,6 @@
 'use client';
 
-import { BookOpen, Home, RotateCcw, Trophy } from 'lucide-react';
+import { BookOpen, ChevronRight, Home, RotateCcw, Trophy } from 'lucide-react';
 import type { getCopy } from '../../../i18n';
 import type { GameResult } from '../../../types/game';
 import './dialogs.css';
@@ -26,45 +26,83 @@ export default function RunResultOverlay({ data, copy, onAction }: { data: GameR
 
     return (
         <div className="typerift-overlay" role="dialog" aria-modal="true" aria-label={resultCopy.aria}>
-            <section className="typerift-panel">
+            <section className="typerift-panel typerift-panel--result">
                 <div className="typerift-panel__inner">
                     <div className="typerift-heading">
                         <span>{verdict(data, resultCopy)}</span>
                         <h2>{Math.round(data.score || 0).toLocaleString()}</h2>
                         {data.isBest ? <p><Trophy aria-hidden="true" size={14} strokeWidth={2.2} /> {resultCopy.newBest}</p> : null}
                     </div>
-                    <div className="typerift-stats">
-                        <div><span>{resultCopy.duration}</span><strong>{formatDuration(data.durationSeconds)}</strong></div>
-                        <div><span>{resultCopy.area}</span><strong>{data.areaNameZh || data.areaName}</strong></div>
-                        <div><span>{resultCopy.defeatedLabel}</span><strong>{data.enemiesDefeated}</strong></div>
-                        <div><span>{resultCopy.boss}</span><strong>{data.bossesDefeated}</strong></div>
-                        <div><span>{resultCopy.speed}</span><strong>{data.wpm}<small> WPM</small></strong></div>
-                        <div><span>{resultCopy.accuracy}</span><strong>{data.accuracy}%</strong></div>
+                    <div className="typerift-run-summary typerift-run-summary--result" aria-label={resultCopy.aria}>
+                        <span>
+                            <small>{resultCopy.duration}</small>
+                            <strong>{formatDuration(data.durationSeconds)}</strong>
+                        </span>
+                        <span>
+                            <small>{resultCopy.area}</small>
+                            <strong>{data.areaNameZh || data.areaName}</strong>
+                        </span>
+                        <span>
+                            <small>{resultCopy.accuracy}</small>
+                            <strong>{data.accuracy}%</strong>
+                        </span>
                     </div>
-                    <div className="typerift-build">
-                        <span>{resultCopy.build}</span>
-                        <div className="typerift-pills">
-                            {build.length ? build.map((upgrade) => (
-                                <b key={upgrade.id}>{upgrade.nameZh || upgrade.name} x{upgrade.stack || 1}</b>
-                            )) : <b>{resultCopy.noUpgrades}</b>}
+                    <div className="typerift-result-section">
+                        <div className="typerift-result-metrics">
+                            <span>
+                                <small>{resultCopy.defeatedLabel}</small>
+                                <strong>{data.enemiesDefeated || 0}</strong>
+                            </span>
+                            <span>
+                                <small>{resultCopy.boss}</small>
+                                <strong>{data.bossesDefeated || 0}</strong>
+                            </span>
+                            <span>
+                                <small>{resultCopy.speed}</small>
+                                <strong>{data.wpm}<small> WPM</small></strong>
+                            </span>
                         </div>
                     </div>
-                    <div className="typerift-insight">
-                        <span>{resultCopy.nextRun}</span>
+                    <section className="typerift-result-section" aria-label={resultCopy.build}>
+                        <span className="typerift-result-section__label">{resultCopy.build}</span>
+                        <div className="typerift-result-build-list">
+                            {build.length ? build.map((upgrade) => (
+                                <span key={upgrade.id}>
+                                    <strong>{upgrade.nameZh || upgrade.name}</strong>
+                                    <small>x{upgrade.stack || 1}</small>
+                                </span>
+                            )) : (
+                                <span>
+                                    <strong>{resultCopy.noUpgrades}</strong>
+                                </span>
+                            )}
+                        </div>
+                    </section>
+                    <section className="typerift-result-section typerift-result-section--insight" aria-label={resultCopy.nextRun}>
+                        <span className="typerift-result-section__label">{resultCopy.nextRun}</span>
                         <strong>{data.recommendation}</strong>
-                    </div>
-                    <div className="typerift-actions">
-                        <button className="typerift-action typerift-action--primary" type="button" onClick={() => onAction('retry')} autoFocus>
-                            <RotateCcw aria-hidden="true" size={18} strokeWidth={2.2} />
-                            {resultCopy.retry}
+                    </section>
+                    <div className="typerift-action-list">
+                        <button className="typerift-action-row typerift-action-row--primary" type="button" onClick={() => onAction('retry')} autoFocus>
+                            <span>
+                                <RotateCcw aria-hidden="true" size={18} strokeWidth={2.2} />
+                                <strong>{resultCopy.retry}</strong>
+                            </span>
+                            <ChevronRight aria-hidden="true" size={17} strokeWidth={2.2} />
                         </button>
-                        <button className="typerift-action" type="button" onClick={() => onAction('codex')}>
-                            <BookOpen aria-hidden="true" size={18} strokeWidth={2.2} />
-                            {resultCopy.codex}
+                        <button className="typerift-action-row" type="button" onClick={() => onAction('codex')}>
+                            <span>
+                                <BookOpen aria-hidden="true" size={18} strokeWidth={2.2} />
+                                <strong>{resultCopy.codex}</strong>
+                            </span>
+                            <ChevronRight aria-hidden="true" size={17} strokeWidth={2.2} />
                         </button>
-                        <button className="typerift-action" type="button" onClick={() => onAction('menu')}>
-                            <Home aria-hidden="true" size={18} strokeWidth={2.2} />
-                            {resultCopy.back}
+                        <button className="typerift-action-row" type="button" onClick={() => onAction('menu')}>
+                            <span>
+                                <Home aria-hidden="true" size={18} strokeWidth={2.2} />
+                                <strong>{resultCopy.back}</strong>
+                            </span>
+                            <ChevronRight aria-hidden="true" size={17} strokeWidth={2.2} />
                         </button>
                     </div>
                 </div>
