@@ -254,7 +254,7 @@ export const zhCNMessages = {
             aria: '选择 TypeRift 升级',
             kicker: '构筑上线',
             title: '选择一次构筑升级',
-            body: '按 1 / 2 / 3 或点击卡牌。武器改变清怪方式，遗物改变风险收益，符文绑定弱字符训练。'
+            body: '按 1 / 2 / 3 或选择一项。武器改变清怪方式，遗物改变风险收益，符文绑定弱字符训练。'
         },
         pauseDialog: {
             aria: 'TypeRift 已暂停',

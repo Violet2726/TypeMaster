@@ -245,7 +245,7 @@ export const enUSMessages = {
                 aria: 'Choose TypeRift upgrade',
                 kicker: 'Construct online',
                 title: 'Choose a build upgrade',
-                body: 'Press 1 / 2 / 3 or pick a card. Weapons clear enemies, relics change risk, and glyphs bind training pressure.'
+                body: 'Press 1 / 2 / 3 or choose a row. Weapons clear enemies, relics change risk, and glyphs bind training pressure.'
             },
             pauseDialog: {
                 aria: 'TypeRift paused',
