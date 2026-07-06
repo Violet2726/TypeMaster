@@ -240,6 +240,7 @@ describe('typing area CSS', () => {
         const configSegmentButton = getBlock(mobileWorkshopCss, '.config-strip .segment-btn');
         const sourceSegmentButton = getBlock(mobileWorkshopCss, '.config-strip .segmented-group--source .segment-btn');
         const volumeSegmentButton = getBlock(mobileWorkshopCss, '.config-strip .segmented-group--volume .segment-btn');
+        const configSegmentButtonIcon = getBlock(mobileWorkshopCss, '.config-strip .segment-btn svg');
         const activeConfigSegment = getBlock(mobileWorkshopCss, ".config-strip .segment-btn[aria-pressed='true']");
 
         expect(configSettingRow).toContain('gap: 0.42rem;');
@@ -256,6 +257,7 @@ describe('typing area CSS', () => {
         expect(sourceSegmentButton).toContain('justify-content: center;');
         expect(sourceSegmentButton).toContain('padding-inline: 0.34rem;');
         expect(volumeSegmentButton).toContain('padding-inline: 0.26rem;');
+        expect(configSegmentButtonIcon).toContain('display: none;');
         expect(activeConfigSegment).toContain('box-shadow: none;');
     });
 
