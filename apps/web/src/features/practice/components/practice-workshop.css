@@ -817,16 +817,29 @@ body[data-theme='serika-light'] .keyboard-zone-row__bar { background: rgba(0, 0,
         background: transparent;
     }
     .config-strip .segmented-group {
+        gap: 0.12rem;
+        padding: 0.12rem;
         border-color: transparent;
         background: rgba(118, 118, 128, 0.1);
     }
+    .config-strip .segmented-group--source {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
     .config-strip .segment-btn {
-        min-height: 2.1rem;
+        min-height: 1.92rem;
+        padding: 0.36rem 0.46rem;
+    }
+    .config-strip .segmented-group--source .segment-btn {
+        justify-content: center;
+        padding-inline: 0.34rem;
     }
     .config-strip .segment-btn[aria-pressed='true'] {
         box-shadow: none;
     }
-    .config-setting-row { padding: 0.64rem; }
+    .config-setting-row {
+        gap: 0.42rem;
+        padding: 0.48rem;
+    }
     .config-strip--compose .config-setting-row--source .config-setting-row__body { display: none; }
     .config-strip--compose { gap: 0.52rem; }
     .config-strip--compose .config-settings-list--primary {

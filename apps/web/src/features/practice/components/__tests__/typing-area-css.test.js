@@ -203,13 +203,24 @@ describe('typing area CSS', () => {
     test('keeps expanded mobile training controls as lightweight segmented rows', async () => {
         const workshopCss = await readFile(resolve(componentRoot, 'practice-workshop.css'), 'utf8');
         const mobileWorkshopCss = getMediaBlock(workshopCss, '@media (max-width: 720px)', '@media (max-width: 360px)');
+        const configSettingRow = getBlock(mobileWorkshopCss, '.config-setting-row');
         const configSegmentedGroup = getBlock(mobileWorkshopCss, '.config-strip .segmented-group');
+        const sourceSegmentedGroup = getBlock(mobileWorkshopCss, '.config-strip .segmented-group--source');
         const configSegmentButton = getBlock(mobileWorkshopCss, '.config-strip .segment-btn');
+        const sourceSegmentButton = getBlock(mobileWorkshopCss, '.config-strip .segmented-group--source .segment-btn');
         const activeConfigSegment = getBlock(mobileWorkshopCss, ".config-strip .segment-btn[aria-pressed='true']");
 
+        expect(configSettingRow).toContain('gap: 0.42rem;');
+        expect(configSettingRow).toContain('padding: 0.48rem;');
         expect(configSegmentedGroup).toContain('border-color: transparent;');
+        expect(configSegmentedGroup).toContain('gap: 0.12rem;');
+        expect(configSegmentedGroup).toContain('padding: 0.12rem;');
         expect(configSegmentedGroup).toContain('background: rgba(118, 118, 128, 0.1);');
-        expect(configSegmentButton).toContain('min-height: 2.1rem;');
+        expect(sourceSegmentedGroup).toContain('grid-template-columns: repeat(3, minmax(0, 1fr));');
+        expect(configSegmentButton).toContain('min-height: 1.92rem;');
+        expect(configSegmentButton).toContain('padding: 0.36rem 0.46rem;');
+        expect(sourceSegmentButton).toContain('justify-content: center;');
+        expect(sourceSegmentButton).toContain('padding-inline: 0.34rem;');
         expect(activeConfigSegment).toContain('box-shadow: none;');
     });
 
