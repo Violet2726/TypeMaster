@@ -229,6 +229,22 @@ describe('typing area CSS', () => {
         expect(activeConfigSegment).toContain('box-shadow: none;');
     });
 
+    test('keeps advanced mobile options as switch rows', async () => {
+        const workshopCss = await readFile(resolve(componentRoot, 'practice-workshop.css'), 'utf8');
+        const mobileWorkshopCss = getMediaBlock(workshopCss, '@media (max-width: 720px)', '@media (max-width: 360px)');
+        const optionSwitchList = getBlock(workshopCss, '.option-switch-list');
+        const optionSwitchRow = getBlock(workshopCss, '.option-switch-row');
+        const optionSwitchVisual = getBlock(workshopCss, '.option-switch-row .apple-toggle');
+        const mobileOptionSwitchRow = getBlock(mobileWorkshopCss, '.config-strip .option-switch-row');
+
+        expect(optionSwitchList).toContain('display: grid;');
+        expect(optionSwitchRow).toContain('justify-content: space-between;');
+        expect(optionSwitchRow).toContain('border-radius: var(--radius-md);');
+        expect(optionSwitchVisual).toContain('pointer-events: none;');
+        expect(mobileOptionSwitchRow).toContain('min-height: 2.58rem;');
+        expect(mobileOptionSwitchRow).toContain('padding: 0.42rem 0.54rem;');
+    });
+
     test('keeps the custom text mobile footer as a light toolbar', async () => {
         const workshopCss = await readFile(resolve(componentRoot, 'practice-workshop.css'), 'utf8');
         const mobileWorkshopCss = getMediaBlock(workshopCss, '@media (max-width: 720px)', '@media (max-width: 360px)');

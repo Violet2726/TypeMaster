@@ -172,7 +172,36 @@ describe('ConfigPanel', () => {
         expect(screen.getByRole('button', { name: copy.practice.settingsHide })).toHaveAttribute('aria-expanded', 'true');
         const advancedPanel = document.getElementById('practice-config-advanced');
         expect(advancedPanel).not.toBeNull();
-        expect(within(advancedPanel).getByRole('button', { name: copy.common.punctuation })).toBeInTheDocument();
+        expect(within(advancedPanel).getByRole('switch', { name: copy.common.punctuation })).toBeInTheDocument();
+    });
+
+    test('renders advanced options as independent switches', () => {
+        const copy = getCopy('en-US');
+        const onConfigChange = vi.fn();
+
+        render(
+            <ConfigPanel
+                copy={copy}
+                language="en-US"
+                config={{
+                    ...baseConfig,
+                    includePunctuation: true
+                }}
+                onConfigChange={onConfigChange}
+                showAdvanced
+                onToggleAdvanced={vi.fn()}
+            />
+        );
+
+        const punctuationSwitch = screen.getByRole('switch', { name: copy.common.punctuation });
+        const numbersSwitch = screen.getByRole('switch', { name: copy.common.numbers });
+
+        expect(punctuationSwitch).toHaveAttribute('aria-checked', 'true');
+        expect(punctuationSwitch).not.toHaveAttribute('aria-pressed');
+        expect(numbersSwitch).toHaveAttribute('aria-checked', 'false');
+        fireEvent.click(numbersSwitch);
+
+        expect(onConfigChange).toHaveBeenCalledWith({ includeNumbers: true }, { risky: true, intent: 'config' });
     });
 
     test('scrolls the settings panel into view when expanding controls', () => {
@@ -204,7 +233,7 @@ describe('ConfigPanel', () => {
 
             expect(scrollIntoView).toHaveBeenCalledWith({
                 behavior: 'smooth',
-                block: 'center',
+                block: 'start',
                 inline: 'nearest'
             });
         } finally {

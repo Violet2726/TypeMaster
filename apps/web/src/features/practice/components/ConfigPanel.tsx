@@ -35,6 +35,23 @@ function SegmentedButton({ active, children, icon: Icon = null, onClick }) {
     );
 }
 
+function OptionSwitch({ checked, children, onClick }) {
+    return (
+        <button
+            type="button"
+            role="switch"
+            aria-checked={checked}
+            className={checked ? 'option-switch-row is-on' : 'option-switch-row'}
+            onClick={onClick}
+        >
+            <span className="option-switch-row__label">{children}</span>
+            <span className={checked ? 'apple-toggle is-on' : 'apple-toggle'} aria-hidden="true">
+                <span className="apple-toggle__thumb" />
+            </span>
+        </button>
+    );
+}
+
 function ConfigSection({ label, value, variant, children }) {
     return (
         <fieldset className={`config-setting-row config-setting-row--${variant}`} aria-label={label}>
@@ -103,7 +120,7 @@ export function ConfigPanel({ copy, language, config, isCustomComposeMode = fals
             window.requestAnimationFrame(() => {
                 panelRef.current?.scrollIntoView({
                     behavior: 'smooth',
-                    block: 'center',
+                    block: 'start',
                     inline: 'nearest'
                 });
             });
@@ -197,13 +214,13 @@ export function ConfigPanel({ copy, language, config, isCustomComposeMode = fals
             {showAdvanced && (
                 <div className="config-settings-list config-settings-list--advanced" id={advancedPanelId}>
                     <ConfigSection label={copy.practice.optionsTitle} value={activeOptions} variant="options">
-                        <div className="segmented-group segmented-group--options">
-                            <SegmentedButton active={config.includePunctuation} onClick={() => onConfigChange({ includePunctuation: !config.includePunctuation }, { risky: true, intent: 'config' })}>
+                        <div className="option-switch-list">
+                            <OptionSwitch checked={config.includePunctuation} onClick={() => onConfigChange({ includePunctuation: !config.includePunctuation }, { risky: true, intent: 'config' })}>
                                 {copy.common.punctuation}
-                            </SegmentedButton>
-                            <SegmentedButton active={config.includeNumbers} onClick={() => onConfigChange({ includeNumbers: !config.includeNumbers }, { risky: true, intent: 'config' })}>
+                            </OptionSwitch>
+                            <OptionSwitch checked={config.includeNumbers} onClick={() => onConfigChange({ includeNumbers: !config.includeNumbers }, { risky: true, intent: 'config' })}>
                                 {copy.common.numbers}
-                            </SegmentedButton>
+                            </OptionSwitch>
                         </div>
                     </ConfigSection>
                 </div>

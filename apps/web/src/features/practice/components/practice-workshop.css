@@ -300,6 +300,61 @@ body[data-theme='serika-light'] .segment-btn:hover {
     background: var(--tm-white-alpha-780);
 }
 
+.option-switch-list {
+    display: grid;
+    gap: 0.42rem;
+}
+
+.option-switch-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-height: 2.88rem;
+    width: 100%;
+    padding: 0.52rem 0.68rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    background: rgba(118, 118, 128, 0.11);
+    color: var(--text-dim);
+    font: inherit;
+    text-align: left;
+}
+
+.option-switch-row__label {
+    min-width: 0;
+    color: inherit;
+    font-size: 0.82rem;
+    font-weight: 720;
+    letter-spacing: 0;
+    line-height: 1.2;
+}
+
+.option-switch-row .apple-toggle {
+    pointer-events: none;
+}
+
+.option-switch-row.is-on {
+    color: var(--text-strong);
+}
+
+.option-switch-row:hover {
+    background: rgba(118, 118, 128, 0.16);
+}
+
+.option-switch-row:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+}
+
+body[data-theme='serika-light'] .option-switch-row {
+    background: rgba(118, 118, 128, 0.09);
+}
+
+body[data-theme='serika-light'] .option-switch-row:hover {
+    background: rgba(118, 118, 128, 0.13);
+}
+
 .config-strip__actions .ghost-btn {
     width: 100%;
     min-height: 2.36rem;
@@ -839,6 +894,10 @@ body[data-theme='serika-light'] .keyboard-zone-row__bar { background: rgba(0, 0,
     }
     .config-strip .segmented-group--volume .segment-btn {
         padding-inline: 0.26rem;
+    }
+    .config-strip .option-switch-row {
+        min-height: 2.58rem;
+        padding: 0.42rem 0.54rem;
     }
     .config-strip .segment-btn[aria-pressed='true'] {
         box-shadow: none;
