@@ -48,7 +48,7 @@ describe('typing area CSS', () => {
         expect(lockedActions).toContain('pointer-events: auto;');
     });
 
-    test('keeps mobile live stats as a light instrument strip', async () => {
+    test('keeps mobile live stats as a quiet status line', async () => {
         const workshopCss = await readFile(resolve(componentRoot, 'practice-workshop.css'), 'utf8');
         const practicePageCss = await readFile(resolve(screensRoot, 'practice-page.css'), 'utf8');
         const mobileWorkshopCss = getMediaBlock(workshopCss, '@media (max-width: 720px)', '@media (max-width: 360px)');
@@ -70,15 +70,18 @@ describe('typing area CSS', () => {
         expect(mobileLiveStats).toContain('border-color: transparent;');
         expect(mobileLiveStats).toContain('background: transparent;');
         expect(mobileLiveStat).toContain('display: flex;');
-        expect(mobileLiveStat).toContain('min-height: 2.28rem;');
-        expect(mobileLiveStat).toContain('gap: 0.18rem;');
+        expect(mobileLiveStat).toContain('align-items: baseline;');
+        expect(mobileLiveStat).toContain('justify-content: flex-start;');
+        expect(mobileLiveStat).toContain('min-height: 1.58rem;');
+        expect(mobileLiveStat).toContain('gap: 0.22rem;');
+        expect(mobileLiveStat).toContain('padding: 0.08rem 0;');
         expect(mobileLiveStatTop).toContain('display: contents;');
-        expect(mobileLiveStatIcon).toContain('width: 0.88rem;');
+        expect(mobileLiveStatIcon).toContain('display: none;');
         expect(mobileLiveStat).not.toContain('4.15rem');
-        expect(mobileLiveStatValue).toContain('font-size: 0.98rem;');
+        expect(mobileLiveStatValue).toContain('font-size: 0.92rem;');
         expect(mobileLiveStatValue).toContain('line-height: 1;');
         expect(mobileLiveStatValue).toContain('flex: 0 0 auto;');
-        expect(mobileLiveStatLabel).toContain('font-size: 0.58rem;');
+        expect(mobileLiveStatLabel).toContain('font-size: 0.66rem;');
         expect(mobileLiveStatLabel).toContain('flex: 0 0 auto;');
         expect(mobileWordsContainer).toContain('2.65');
     });
