@@ -908,9 +908,23 @@ body[data-theme='serika-light'] .keyboard-zone-row__bar { background: rgba(0, 0,
     .config-strip .segmented-group--volume .segment-btn {
         padding-inline: 0.26rem;
     }
+    .config-strip .option-switch-list {
+        gap: 0;
+    }
     .config-strip .option-switch-row {
         min-height: 2.58rem;
         padding: 0.42rem 0.54rem;
+        border-color: transparent;
+        border-radius: 0;
+        background: transparent;
+    }
+    .config-strip .option-switch-row + .option-switch-row {
+        border-top: 1px solid var(--panel-stroke);
+    }
+    .config-strip .option-switch-row:hover,
+    body[data-theme='serika-light'] .config-strip .option-switch-row,
+    body[data-theme='serika-light'] .config-strip .option-switch-row:hover {
+        background: transparent;
     }
     .config-strip .segment-btn[aria-pressed='true'] {
         box-shadow: none;

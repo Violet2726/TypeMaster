@@ -267,14 +267,24 @@ describe('typing area CSS', () => {
         const optionSwitchList = getBlock(workshopCss, '.option-switch-list');
         const optionSwitchRow = getBlock(workshopCss, '.option-switch-row');
         const optionSwitchVisual = getBlock(workshopCss, '.option-switch-row .apple-toggle');
+        const mobileOptionSwitchList = getBlock(mobileWorkshopCss, '.config-strip .option-switch-list');
         const mobileOptionSwitchRow = getBlock(mobileWorkshopCss, '.config-strip .option-switch-row');
+        const mobileOptionSwitchDivider = getBlock(
+            mobileWorkshopCss,
+            '.config-strip .option-switch-row + .option-switch-row'
+        );
 
         expect(optionSwitchList).toContain('display: grid;');
         expect(optionSwitchRow).toContain('justify-content: space-between;');
         expect(optionSwitchRow).toContain('border-radius: var(--radius-md);');
         expect(optionSwitchVisual).toContain('pointer-events: none;');
+        expect(mobileOptionSwitchList).toContain('gap: 0;');
         expect(mobileOptionSwitchRow).toContain('min-height: 2.58rem;');
         expect(mobileOptionSwitchRow).toContain('padding: 0.42rem 0.54rem;');
+        expect(mobileOptionSwitchRow).toContain('border-color: transparent;');
+        expect(mobileOptionSwitchRow).toContain('border-radius: 0;');
+        expect(mobileOptionSwitchRow).toContain('background: transparent;');
+        expect(mobileOptionSwitchDivider).toContain('border-top: 1px solid var(--panel-stroke);');
     });
 
     test('keeps the custom text mobile footer as a light toolbar', async () => {
