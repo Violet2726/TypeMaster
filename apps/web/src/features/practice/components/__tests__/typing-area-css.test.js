@@ -97,9 +97,9 @@ describe('typing area CSS', () => {
         );
         const focusOverlay = getStandaloneBlock(typingExperienceCss, '.focus-overlay');
 
-        expect(mobileWordsBefore).toContain('rgba(13, 14, 17, 0.58)');
+        expect(mobileWordsBefore).toContain('rgba(13, 14, 17, 0.48)');
         expect(mobileWordsBefore).not.toContain('0.94');
-        expect(mobileWordsAfter).toContain('rgba(13, 14, 17, 0.62)');
+        expect(mobileWordsAfter).toContain('rgba(13, 14, 17, 0.52)');
         expect(mobileWordsAfter).not.toContain('0.94');
         expect(mobileNextWord).toContain('color: color-mix(in srgb, var(--text-dim) 82%, transparent);');
         expect(mobileFutureWord).toContain('color: color-mix(in srgb, var(--text-dim) 64%, transparent);');

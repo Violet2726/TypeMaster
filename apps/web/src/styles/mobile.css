@@ -287,11 +287,11 @@ body[data-theme='serika-light'] .typing-stage .live-stat {
     }
 
     .typing-stage .words-shell::before {
-        background: linear-gradient(180deg, rgba(13, 14, 17, 0.58), transparent);
+        background: linear-gradient(180deg, rgba(13, 14, 17, 0.48), transparent);
     }
 
     .typing-stage .words-shell::after {
-        background: linear-gradient(0deg, rgba(13, 14, 17, 0.62), transparent);
+        background: linear-gradient(0deg, rgba(13, 14, 17, 0.52), transparent);
     }
 
     .typing-stage .word[data-line-state='next'] {
