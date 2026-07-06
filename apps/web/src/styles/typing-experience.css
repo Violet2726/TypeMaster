@@ -101,10 +101,15 @@ body[data-theme='serika-light'] .words-shell.is-focused {
 /* --- Words layout --- */
 
 .words {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
     gap: 0.42rem 0.64rem;
 }
 
 .word {
+    display: inline-flex;
+    width: fit-content;
     border-bottom-color: transparent;
 }
 

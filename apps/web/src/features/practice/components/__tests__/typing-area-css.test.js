@@ -109,6 +109,18 @@ describe('typing area CSS', () => {
         expect(focusOverlay).toContain('backdrop-filter: blur(8px);');
     });
 
+    test('keeps typing words flowing as wrapped word groups', async () => {
+        const typingExperienceCss = await readFile(resolve(stylesRoot, 'typing-experience.css'), 'utf8');
+        const words = getBlock(typingExperienceCss, '.words');
+        const word = getBlock(typingExperienceCss, '.word');
+
+        expect(words).toContain('display: flex;');
+        expect(words).toContain('flex-wrap: wrap;');
+        expect(words).toContain('align-items: baseline;');
+        expect(word).toContain('display: inline-flex;');
+        expect(word).toContain('width: fit-content;');
+    });
+
     test('keeps the mobile typing header as a compact status strip', async () => {
         const workshopCss = await readFile(resolve(componentRoot, 'practice-workshop.css'), 'utf8');
         const mobileWorkshopCss = getMediaBlock(workshopCss, '@media (max-width: 720px)', '@media (max-width: 360px)');
