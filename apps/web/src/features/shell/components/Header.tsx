@@ -1,5 +1,6 @@
 ﻿'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Moon, Settings, Sun } from 'lucide-react';
@@ -26,11 +27,27 @@ function resolveRouteLabel(route, copy: AppCopy) {
     return route.fallbackLabel;
 }
 
-function getNavProps(pathname: string, href: string) {
-    const hrefPath = href.split('#')[0] || '/';
-    const isActive = href === '/'
-        ? pathname === '/'
-        : !href.includes('#') && pathname === hrefPath;
+function getCurrentHash() {
+    return typeof window === 'undefined' ? '' : window.location.hash;
+}
+
+function isShellLinkActive(pathname: string, hash: string, href: string) {
+    const [hrefPath = '/', hrefHash = ''] = href.split('#');
+    const normalizedPath = hrefPath || '/';
+
+    if (hrefHash) {
+        return pathname === normalizedPath && hash === `#${hrefHash}`;
+    }
+
+    if (normalizedPath === '/') {
+        return pathname === '/' && !hash;
+    }
+
+    return pathname === normalizedPath;
+}
+
+function getNavProps(pathname: string, hash: string, href: string) {
+    const isActive = isShellLinkActive(pathname, hash, href);
 
     return {
         className: `nav-link${isActive ? ' active' : ''}`,
@@ -40,12 +57,26 @@ function getNavProps(pathname: string, href: string) {
 
 export function Header({ settings, copy, onToggleTheme, onOpenSettings }: HeaderProps) {
     const pathname = usePathname();
+    const [locationHash, setLocationHash] = useState(getCurrentHash);
     const compact = settings.focusMode && pathname === '/practice';
     const ThemeIcon = settings.theme === 'serika-dark' ? Sun : Moon;
     const navItems = getVisibleShellRoutes().map((route) => ({
         ...route,
         label: resolveRouteLabel(route, copy)
     }));
+
+    useEffect(() => {
+        const syncHash = () => setLocationHash(getCurrentHash());
+
+        syncHash();
+        window.addEventListener('hashchange', syncHash);
+        window.addEventListener('popstate', syncHash);
+
+        return () => {
+            window.removeEventListener('hashchange', syncHash);
+            window.removeEventListener('popstate', syncHash);
+        };
+    }, []);
 
     return (
         <>
@@ -59,7 +90,7 @@ export function Header({ settings, copy, onToggleTheme, onOpenSettings }: Header
                     {!compact && (
                         <nav className="nav-links" aria-label="Primary">
                             {navItems.map(({ href, label }) => (
-                                <Link key={href} href={href} {...getNavProps(pathname, href)}>
+                                <Link key={href} href={href} {...getNavProps(pathname, locationHash, href)}>
                                     {label}
                                 </Link>
                             ))}
@@ -87,10 +118,7 @@ export function Header({ settings, copy, onToggleTheme, onOpenSettings }: Header
             {!compact && (
                 <nav className="mobile-tab-bar" aria-label="Mobile navigation">
                     {navItems.map(({ href, label, icon: Icon }) => {
-                        const hrefPath = href.split('#')[0] || '/';
-                        const isActive = href === '/'
-                            ? pathname === '/'
-                            : !href.includes('#') && pathname.startsWith(hrefPath);
+                        const isActive = isShellLinkActive(pathname, locationHash, href);
                         return (
                             <Link
                                 key={href}

@@ -42,6 +42,18 @@ function fillTemplate(template: string, values: Record<string, string | number>)
     ), template);
 }
 
+function replaceHash(nextHash: string) {
+    const oldURL = window.location.href;
+    const nextURL = `${window.location.pathname}${window.location.search}${nextHash}`;
+
+    window.history.replaceState(null, '', nextURL);
+    window.dispatchEvent(
+        typeof HashChangeEvent === 'function'
+            ? new HashChangeEvent('hashchange', { oldURL, newURL: window.location.href })
+            : new Event('hashchange')
+    );
+}
+
 export function HomePage() {
     const navigate = useAppNavigate();
     const typeRiftSectionRef = useRef<HTMLElement>(null);
@@ -79,7 +91,7 @@ export function HomePage() {
     ];
     const openTypeRift = useCallback(() => {
         setIsTypeRiftOpen(true);
-        window.history.replaceState(null, '', '#typerift');
+        replaceHash('#typerift');
         requestAnimationFrame(() => {
             typeRiftSectionRef.current?.scrollIntoView?.({ block: 'start', behavior: 'smooth' });
         });
@@ -88,7 +100,7 @@ export function HomePage() {
     const closeTypeRift = useCallback(() => {
         setIsTypeRiftOpen(false);
         if (window.location.hash === '#typerift') {
-            window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
+            replaceHash('');
         }
     }, []);
 

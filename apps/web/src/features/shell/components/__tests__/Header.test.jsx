@@ -1,6 +1,6 @@
 ﻿/** @vitest-environment jsdom */
-import { render, screen } from '@testing-library/react';
-import { vi } from 'vitest';
+import { act, render, screen, waitFor } from '@testing-library/react';
+import { afterEach, vi } from 'vitest';
 import { Header } from '../Header';
 import { getCopy } from '../../../../i18n';
 import { setMockNavigation } from '../../../../test/next-navigation';
@@ -25,6 +25,17 @@ function renderHeader(pathname = '/') {
     );
 }
 
+function currentLinks(name) {
+    return screen.getAllByRole('link', { name }).filter((link) => (
+        link.getAttribute('aria-current') === 'page'
+    ));
+}
+
+afterEach(() => {
+    window.history.replaceState(null, '', '/');
+    setMockNavigation({ pathname: '/' });
+});
+
 describe('Header', () => {
     test('shows the vNext arcade navigation', () => {
         renderHeader();
@@ -42,5 +53,21 @@ describe('Header', () => {
         const missionLinks = screen.getAllByRole('link', { name: 'Missions' });
         expect(missionLinks.some((link) => link.getAttribute('aria-current') === 'page')).toBe(true);
         expect(screen.queryByRole('link', { name: 'Home', current: 'page' })).not.toBeInTheDocument();
+    });
+
+    test('moves the current marker from Home to TypeRift when the hash route is active', async () => {
+        renderHeader('/');
+
+        expect(currentLinks('Home')).toHaveLength(2);
+
+        act(() => {
+            window.history.replaceState(null, '', '/#typerift');
+            window.dispatchEvent(new Event('hashchange'));
+        });
+
+        await waitFor(() => {
+            expect(currentLinks('TypeRift')).toHaveLength(2);
+        });
+        expect(currentLinks('Home')).toHaveLength(0);
     });
 });

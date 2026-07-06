@@ -6,7 +6,7 @@
 
     .app-main {
         padding-top: 0.6rem;
-        padding-bottom: 5.8rem;
+        padding-bottom: calc(6.4rem + env(safe-area-inset-bottom, 0px));
     }
 
     .container {
@@ -26,12 +26,13 @@
         z-index: 50;
         display: flex;
         align-items: stretch;
-        height: 3.4rem;
-        padding: 0.22rem 0.4rem calc(0.22rem + env(safe-area-inset-bottom, 0px));
+        height: calc(4.15rem + env(safe-area-inset-bottom, 0px));
+        padding: 0.36rem 0.5rem calc(0.36rem + env(safe-area-inset-bottom, 0px));
         border-top: 1px solid var(--panel-stroke);
         background: rgba(10, 10, 12, 0.78);
         backdrop-filter: saturate(180%) blur(22px);
         -webkit-backdrop-filter: saturate(180%) blur(22px);
+        box-shadow: inset 0 1px 0 var(--tm-white-alpha-060);
     }
 
     body[data-theme='serika-light'] .mobile-tab-bar {
@@ -41,6 +42,7 @@
 
     .mobile-tab-bar__item {
         position: relative;
+        isolation: isolate;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -48,7 +50,7 @@
         gap: 0.1rem;
         flex: 1 1 0;
         min-width: 0;
-        min-height: 2.6rem;
+        min-height: 3.2rem;
         padding: 0.28rem 0;
         border-radius: var(--radius-sm);
         color: var(--text-dim);
@@ -58,6 +60,24 @@
         text-decoration: none;
         transition: color var(--transition-fast);
         -webkit-tap-highlight-color: transparent;
+    }
+
+    .mobile-tab-bar__item::before {
+        content: '';
+        position: absolute;
+        top: 0.26rem;
+        left: 50%;
+        z-index: -1;
+        width: 2.2rem;
+        height: 2rem;
+        border-radius: var(--radius-pill);
+        background: transparent;
+        opacity: 0;
+        transform: translateX(-50%) scale(0.9);
+        transition:
+            background-color var(--transition-fast),
+            opacity var(--transition-fast),
+            transform var(--transition-fast);
     }
 
     .mobile-tab-bar__item:active {
@@ -71,12 +91,30 @@
         transition: transform 0.15s ease;
     }
 
+    .mobile-tab-bar__item span {
+        display: block;
+        overflow: hidden;
+        max-width: 100%;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
     .mobile-tab-bar__item.is-active {
         color: var(--main-color);
     }
 
+    .mobile-tab-bar__item.is-active::before {
+        background: var(--main-soft);
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+    }
+
     body[data-theme='serika-light'] .mobile-tab-bar__item.is-active {
         color: #0071e3;
+    }
+
+    body[data-theme='serika-light'] .mobile-tab-bar__item.is-active::before {
+        background: rgba(0, 113, 227, 0.10);
     }
 
     .mobile-tab-bar__item.is-active svg {
