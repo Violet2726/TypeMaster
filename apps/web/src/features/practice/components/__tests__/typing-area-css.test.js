@@ -208,6 +208,8 @@ describe('typing area CSS', () => {
         const configStrip = getBlock(mobileWorkshopCss, '.practice-toolbar .config-strip');
         const summaryList = getBlock(mobileWorkshopCss, '.config-summary-list');
         const summaryItem = getBlock(mobileWorkshopCss, '.config-summary-list__item');
+        const summaryLabel = getBlock(mobileWorkshopCss, '.config-summary-list__item .control-label');
+        const summaryValue = getBlock(mobileWorkshopCss, '.config-summary-list__item strong');
         const actions = getBlock(mobileWorkshopCss, '.config-strip__actions');
         const actionButton = getBlock(mobileWorkshopCss, '.config-strip__actions .ghost-btn');
 
@@ -217,6 +219,12 @@ describe('typing area CSS', () => {
         expect(summaryList).toContain('background: rgba(118, 118, 128, 0.08);');
         expect(summaryItem).toContain('min-height: 2.28rem;');
         expect(summaryItem).toContain('padding: 0.48rem 0.64rem;');
+        expect(summaryLabel).toContain('color: var(--text-strong);');
+        expect(summaryLabel).toContain('font-size: 0.74rem;');
+        expect(summaryLabel).toContain('font-weight: 650;');
+        expect(summaryValue).toContain('color: var(--text-dim);');
+        expect(summaryValue).toContain('font-size: 0.78rem;');
+        expect(summaryValue).toContain('font-weight: 650;');
         expect(actions).toContain('border-top: 1px solid var(--panel-stroke);');
         expect(actionButton).toContain('border-color: transparent;');
         expect(actionButton).toContain('background: transparent;');

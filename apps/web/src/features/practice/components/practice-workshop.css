@@ -860,6 +860,16 @@ body[data-theme='serika-light'] .keyboard-zone-row__bar { background: rgba(0, 0,
         min-height: 2.28rem;
         padding: 0.48rem 0.64rem;
     }
+    .config-summary-list__item .control-label {
+        color: var(--text-strong);
+        font-size: 0.74rem;
+        font-weight: 650;
+    }
+    .config-summary-list__item strong {
+        color: var(--text-dim);
+        font-size: 0.78rem;
+        font-weight: 650;
+    }
     .config-strip__actions {
         padding-top: 0.1rem;
         border-top: 1px solid var(--panel-stroke);
