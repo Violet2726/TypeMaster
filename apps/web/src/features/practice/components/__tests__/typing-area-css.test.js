@@ -206,8 +206,10 @@ describe('typing area CSS', () => {
         const configSettingRow = getBlock(mobileWorkshopCss, '.config-setting-row');
         const configSegmentedGroup = getBlock(mobileWorkshopCss, '.config-strip .segmented-group');
         const sourceSegmentedGroup = getBlock(mobileWorkshopCss, '.config-strip .segmented-group--source');
+        const volumeSegmentedGroup = getBlock(mobileWorkshopCss, '.config-strip .segmented-group--volume');
         const configSegmentButton = getBlock(mobileWorkshopCss, '.config-strip .segment-btn');
         const sourceSegmentButton = getBlock(mobileWorkshopCss, '.config-strip .segmented-group--source .segment-btn');
+        const volumeSegmentButton = getBlock(mobileWorkshopCss, '.config-strip .segmented-group--volume .segment-btn');
         const activeConfigSegment = getBlock(mobileWorkshopCss, ".config-strip .segment-btn[aria-pressed='true']");
 
         expect(configSettingRow).toContain('gap: 0.42rem;');
@@ -217,10 +219,13 @@ describe('typing area CSS', () => {
         expect(configSegmentedGroup).toContain('padding: 0.12rem;');
         expect(configSegmentedGroup).toContain('background: rgba(118, 118, 128, 0.1);');
         expect(sourceSegmentedGroup).toContain('grid-template-columns: repeat(3, minmax(0, 1fr));');
+        expect(volumeSegmentedGroup).toContain('grid-template-columns: repeat(4, minmax(0, 1fr));');
+        expect(volumeSegmentedGroup).toContain('gap: 0.08rem;');
         expect(configSegmentButton).toContain('min-height: 1.92rem;');
         expect(configSegmentButton).toContain('padding: 0.36rem 0.46rem;');
         expect(sourceSegmentButton).toContain('justify-content: center;');
         expect(sourceSegmentButton).toContain('padding-inline: 0.34rem;');
+        expect(volumeSegmentButton).toContain('padding-inline: 0.26rem;');
         expect(activeConfigSegment).toContain('box-shadow: none;');
     });
 

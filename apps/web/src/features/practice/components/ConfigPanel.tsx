@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { Bot, ChevronDown, Clock3, Hash, Library, PencilLine, SlidersHorizontal, Timer } from 'lucide-react';
 import { formatDurationLabel } from '../../../i18n';
 import { getTrainingCopy } from '../../../training/copy';
@@ -76,6 +77,7 @@ function getVolumeValue(config, language) {
 }
 
 export function ConfigPanel({ copy, language, config, isCustomComposeMode = false, onConfigChange, showAdvanced, onToggleAdvanced }) {
+    const panelRef = useRef<HTMLDivElement | null>(null);
     const trainingCopy = getTrainingCopy(language);
     const sourceValue = getSourceValue(copy, trainingCopy, config.source);
     const modeValue = getModeValue(copy, config.mode);
@@ -92,9 +94,24 @@ export function ConfigPanel({ copy, language, config, isCustomComposeMode = fals
         { label: copy.practice.modeTitle, value: modeValue },
         { label: copy.practice.volumeTitle, value: volumeValue }
     ];
+    const handleToggleAdvanced = () => {
+        const shouldScrollIntoView = !showAdvanced;
+
+        onToggleAdvanced();
+
+        if (shouldScrollIntoView) {
+            window.requestAnimationFrame(() => {
+                panelRef.current?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                    inline: 'nearest'
+                });
+            });
+        }
+    };
 
     return (
-        <div className={`config-strip${isCustomComposeMode ? ' config-strip--compose' : ''}`}>
+        <div ref={panelRef} className={`config-strip${isCustomComposeMode ? ' config-strip--compose' : ''}`}>
             {shouldShowPrimarySettings ? (
                 <div className="config-settings-list config-settings-list--primary">
                     <ConfigSection label={copy.practice.sourceTitle} value={sourceValue} variant="source">
@@ -162,7 +179,7 @@ export function ConfigPanel({ copy, language, config, isCustomComposeMode = fals
                     className="ghost-btn ghost-btn--small"
                     aria-expanded={showAdvanced}
                     aria-controls={advancedPanelId}
-                    onClick={onToggleAdvanced}
+                    onClick={handleToggleAdvanced}
                 >
                     <span className="ghost-btn__label">
                         <SlidersHorizontal aria-hidden="true" size={16} strokeWidth={2.2} />

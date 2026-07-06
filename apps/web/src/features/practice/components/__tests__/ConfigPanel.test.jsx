@@ -174,4 +174,46 @@ describe('ConfigPanel', () => {
         expect(advancedPanel).not.toBeNull();
         expect(within(advancedPanel).getByRole('button', { name: copy.common.punctuation })).toBeInTheDocument();
     });
+
+    test('scrolls the settings panel into view when expanding controls', () => {
+        const copy = getCopy('en-US');
+        const originalScrollIntoView = window.HTMLElement.prototype.scrollIntoView;
+        const scrollIntoView = vi.fn();
+        const requestAnimationFrame = vi
+            .spyOn(window, 'requestAnimationFrame')
+            .mockImplementation((callback) => {
+                callback(0);
+                return 1;
+            });
+
+        window.HTMLElement.prototype.scrollIntoView = scrollIntoView;
+
+        try {
+            render(
+                <ConfigPanel
+                    copy={copy}
+                    language="en-US"
+                    config={baseConfig}
+                    onConfigChange={vi.fn()}
+                    showAdvanced={false}
+                    onToggleAdvanced={vi.fn()}
+                />
+            );
+
+            fireEvent.click(screen.getByRole('button', { name: copy.practice.settingsToggle }));
+
+            expect(scrollIntoView).toHaveBeenCalledWith({
+                behavior: 'smooth',
+                block: 'center',
+                inline: 'nearest'
+            });
+        } finally {
+            requestAnimationFrame.mockRestore();
+            if (originalScrollIntoView) {
+                window.HTMLElement.prototype.scrollIntoView = originalScrollIntoView;
+            } else {
+                delete window.HTMLElement.prototype.scrollIntoView;
+            }
+        }
+    });
 });

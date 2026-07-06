@@ -825,6 +825,10 @@ body[data-theme='serika-light'] .keyboard-zone-row__bar { background: rgba(0, 0,
     .config-strip .segmented-group--source {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
+    .config-strip .segmented-group--volume {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.08rem;
+    }
     .config-strip .segment-btn {
         min-height: 1.92rem;
         padding: 0.36rem 0.46rem;
@@ -832,6 +836,9 @@ body[data-theme='serika-light'] .keyboard-zone-row__bar { background: rgba(0, 0,
     .config-strip .segmented-group--source .segment-btn {
         justify-content: center;
         padding-inline: 0.34rem;
+    }
+    .config-strip .segmented-group--volume .segment-btn {
+        padding-inline: 0.26rem;
     }
     .config-strip .segment-btn[aria-pressed='true'] {
         box-shadow: none;
