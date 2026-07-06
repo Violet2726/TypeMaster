@@ -216,18 +216,26 @@ body[data-theme='serika-light'] .word[data-line-state='current'] .letter.pending
 /* --- Focus Overlay --- */
 
 body[data-theme='serika-light'] .focus-overlay {
-    background: var(--tm-white-alpha-640);
-    color: var(--text-strong);
+    border-color: rgba(60, 60, 67, 0.12);
+    background: rgba(118, 118, 128, 0.1);
+    color: var(--text-dim);
 }
 
 .focus-overlay {
-    background: rgba(0, 0, 0, 0.24);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    max-width: 100%;
+    min-height: 1.72rem;
+    padding: 0.34rem 0.58rem;
+    border: 1px solid rgba(118, 118, 128, 0.16);
+    border-radius: var(--radius-pill);
+    background: rgba(118, 118, 128, 0.12);
+    color: var(--text-dim);
     font-weight: 650;
-    font-size: 0.95rem;
-    letter-spacing: 0.02em;
+    font-size: 0.82rem;
+    line-height: 1;
+    letter-spacing: 0;
 }
 
 .typing-stage__source,

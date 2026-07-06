@@ -105,8 +105,14 @@ describe('typing area CSS', () => {
         expect(mobileFutureWord).toContain('color: color-mix(in srgb, var(--text-dim) 64%, transparent);');
         expect(mobilePendingFuture).toContain('color: color-mix(in srgb, var(--text-dim) 78%, transparent);');
         expect(mobileNextPendingFuture).toContain('color: color-mix(in srgb, var(--text-dim) 78%, transparent);');
-        expect(focusOverlay).toContain('background: rgba(0, 0, 0, 0.24);');
-        expect(focusOverlay).toContain('backdrop-filter: blur(8px);');
+        expect(focusOverlay).toContain('display: inline-flex;');
+        expect(focusOverlay).toContain('width: fit-content;');
+        expect(focusOverlay).toContain('max-width: 100%;');
+        expect(focusOverlay).toContain('border-radius: var(--radius-pill);');
+        expect(focusOverlay).toContain('background: rgba(118, 118, 128, 0.12);');
+        expect(focusOverlay).toContain('color: var(--text-dim);');
+        expect(focusOverlay).toContain('letter-spacing: 0;');
+        expect(focusOverlay).not.toContain('blur(8px)');
     });
 
     test('keeps typing words flowing as wrapped word groups', async () => {
