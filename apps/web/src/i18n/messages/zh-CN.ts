@@ -288,10 +288,18 @@ export const zhCNMessages = {
             aria: 'TypeRift 图鉴',
             title: '回声围城图鉴',
             close: '关闭',
+            progress: '进度',
+            enemies: '敌人',
+            bosses: '首领',
+            upgrades: '升级',
             bossDefeated: '首领已击破',
             enemyDiscovered: '敌人已发现',
+            upgradeDiscovered: '升级已记录',
             emptyTitle: '等待首次下潜',
-            emptyBody: 'TypeRift 会从干净的新图鉴开始。'
+            emptyBody: 'TypeRift 会从干净的新图鉴开始。',
+            emptyEnemies: '尚未发现敌人',
+            emptyBosses: '尚未击破首领',
+            emptyUpgrades: '尚未记录升级'
         }
     },
     practice: {

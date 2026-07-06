@@ -279,10 +279,18 @@ export const enUSMessages = {
                 aria: 'TypeRift codex',
                 title: 'Echo Siege Codex',
                 close: 'Close',
+                progress: 'Progress',
+                enemies: 'Enemies',
+                bosses: 'Bosses',
+                upgrades: 'Upgrades',
                 bossDefeated: 'Boss defeated',
                 enemyDiscovered: 'Enemy discovered',
+                upgradeDiscovered: 'Upgrade discovered',
                 emptyTitle: 'Awaiting first descent',
-                emptyBody: 'TypeRift starts with a clean codex.'
+                emptyBody: 'TypeRift starts with a clean codex.',
+                emptyEnemies: 'No enemies discovered',
+                emptyBosses: 'No bosses defeated',
+                emptyUpgrades: 'No upgrades logged'
             }
         },
         practice: {
