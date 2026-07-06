@@ -1,6 +1,6 @@
 'use client';
 
-import { DoorOpen, Home, Play, RotateCcw } from 'lucide-react';
+import { ChevronRight, DoorOpen, Home, Play, RotateCcw } from 'lucide-react';
 import type { getCopy } from '../../../i18n';
 import type { GameHudSnapshot } from '../../../types/game';
 import './dialogs.css';
@@ -12,33 +12,54 @@ export default function PauseOverlay({ stats, copy, onAction }: { stats: GameHud
 
     return (
         <div className="typerift-overlay" role="dialog" aria-modal="true" aria-label={gameCopy.pauseDialog.aria}>
-            <section className="typerift-panel">
+            <section className="typerift-panel typerift-panel--pause">
                 <div className="typerift-panel__inner">
                     <div className="typerift-heading">
                         <span>{gameCopy.pauseDialog.kicker}</span>
                         <h2>{gameCopy.pauseDialog.title}</h2>
                     </div>
-                    <div className="typerift-stats">
-                        <div><span>{gameCopy.pauseDialog.score}</span><strong>{Math.round(stats?.score || 0).toLocaleString()}</strong></div>
-                        <div><span>{gameCopy.pauseDialog.area}</span><strong>{stats?.areaNameZh || stats?.areaName}</strong></div>
-                        <div><span>{gameCopy.pauseDialog.combo}</span><strong>{stats?.combo || 0}</strong></div>
+                    <div className="typerift-run-summary" aria-label={gameCopy.pauseDialog.aria}>
+                        <span>
+                            <small>{gameCopy.pauseDialog.score}</small>
+                            <strong>{Math.round(stats?.score || 0).toLocaleString()}</strong>
+                        </span>
+                        <span>
+                            <small>{gameCopy.pauseDialog.area}</small>
+                            <strong>{stats?.areaNameZh || stats?.areaName}</strong>
+                        </span>
+                        <span>
+                            <small>{gameCopy.pauseDialog.combo}</small>
+                            <strong>{stats?.combo || 0}</strong>
+                        </span>
                     </div>
-                    <div className="typerift-actions">
-                        <button className="typerift-action typerift-action--primary" type="button" onClick={() => onAction('resume')} autoFocus>
-                            <Play aria-hidden="true" size={18} strokeWidth={2.2} />
-                            {gameCopy.resume}
+                    <div className="typerift-action-list">
+                        <button className="typerift-action-row typerift-action-row--primary" type="button" onClick={() => onAction('resume')} autoFocus>
+                            <span>
+                                <Play aria-hidden="true" size={18} strokeWidth={2.2} />
+                                <strong>{gameCopy.resume}</strong>
+                            </span>
+                            <ChevronRight aria-hidden="true" size={17} strokeWidth={2.2} />
                         </button>
-                        <button className="typerift-action" type="button" onClick={() => onAction('retry')}>
-                            <RotateCcw aria-hidden="true" size={18} strokeWidth={2.2} />
-                            {gameCopy.retry}
+                        <button className="typerift-action-row" type="button" onClick={() => onAction('retry')}>
+                            <span>
+                                <RotateCcw aria-hidden="true" size={18} strokeWidth={2.2} />
+                                <strong>{gameCopy.retry}</strong>
+                            </span>
+                            <ChevronRight aria-hidden="true" size={17} strokeWidth={2.2} />
                         </button>
-                        <button className="typerift-action typerift-action--extract" type="button" onClick={() => onAction('extract')} disabled={!stats?.extractAvailable}>
-                            <DoorOpen aria-hidden="true" size={18} strokeWidth={2.2} />
-                            {gameCopy.extract}
+                        <button className="typerift-action-row typerift-action-row--extract" type="button" onClick={() => onAction('extract')} disabled={!stats?.extractAvailable}>
+                            <span>
+                                <DoorOpen aria-hidden="true" size={18} strokeWidth={2.2} />
+                                <strong>{gameCopy.extract}</strong>
+                            </span>
+                            <ChevronRight aria-hidden="true" size={17} strokeWidth={2.2} />
                         </button>
-                        <button className="typerift-action" type="button" onClick={() => onAction('quit')}>
-                            <Home aria-hidden="true" size={18} strokeWidth={2.2} />
-                            {gameCopy.exit}
+                        <button className="typerift-action-row" type="button" onClick={() => onAction('quit')}>
+                            <span>
+                                <Home aria-hidden="true" size={18} strokeWidth={2.2} />
+                                <strong>{gameCopy.exit}</strong>
+                            </span>
+                            <ChevronRight aria-hidden="true" size={17} strokeWidth={2.2} />
                         </button>
                     </div>
                 </div>
