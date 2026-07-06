@@ -234,6 +234,8 @@ describe('typing area CSS', () => {
         const workshopCss = await readFile(resolve(componentRoot, 'practice-workshop.css'), 'utf8');
         const mobileWorkshopCss = getMediaBlock(workshopCss, '@media (max-width: 720px)', '@media (max-width: 360px)');
         const configSettingRow = getBlock(mobileWorkshopCss, '.config-setting-row');
+        const configSettingHead = getBlock(mobileWorkshopCss, '.config-strip .config-setting-row__head');
+        const configSettingValue = getBlock(mobileWorkshopCss, '.config-strip .config-setting-row__value');
         const configSegmentedGroup = getBlock(mobileWorkshopCss, '.config-strip .segmented-group');
         const sourceSegmentedGroup = getBlock(mobileWorkshopCss, '.config-strip .segmented-group--source');
         const volumeSegmentedGroup = getBlock(mobileWorkshopCss, '.config-strip .segmented-group--volume');
@@ -245,6 +247,8 @@ describe('typing area CSS', () => {
 
         expect(configSettingRow).toContain('gap: 0.42rem;');
         expect(configSettingRow).toContain('padding: 0.48rem;');
+        expect(configSettingHead).toContain('justify-content: flex-start;');
+        expect(configSettingValue).toContain('display: none;');
         expect(configSegmentedGroup).toContain('border-color: transparent;');
         expect(configSegmentedGroup).toContain('gap: 0.12rem;');
         expect(configSegmentedGroup).toContain('padding: 0.12rem;');
