@@ -75,12 +75,23 @@ describe('typing area CSS', () => {
         const typingExperienceCss = await readFile(resolve(stylesRoot, 'typing-experience.css'), 'utf8');
         const mobileWordsBefore = getLastBlock(mobileCss, '.typing-stage .words-shell::before');
         const mobileWordsAfter = getLastBlock(mobileCss, '.typing-stage .words-shell::after');
+        const mobileNextWord = getLastBlock(mobileCss, ".typing-stage .word[data-line-state='next']");
+        const mobileFutureWord = getLastBlock(mobileCss, ".typing-stage .word[data-line-state='future']");
+        const mobilePendingFuture = getLastBlock(mobileCss, '.typing-stage .letter.pending-future');
+        const mobileNextPendingFuture = getLastBlock(
+            mobileCss,
+            ".typing-stage .word[data-line-state='next'] .letter.pending-future"
+        );
         const focusOverlay = getStandaloneBlock(typingExperienceCss, '.focus-overlay');
 
         expect(mobileWordsBefore).toContain('rgba(13, 14, 17, 0.58)');
         expect(mobileWordsBefore).not.toContain('0.94');
         expect(mobileWordsAfter).toContain('rgba(13, 14, 17, 0.62)');
         expect(mobileWordsAfter).not.toContain('0.94');
+        expect(mobileNextWord).toContain('color: color-mix(in srgb, var(--text-dim) 82%, transparent);');
+        expect(mobileFutureWord).toContain('color: color-mix(in srgb, var(--text-dim) 64%, transparent);');
+        expect(mobilePendingFuture).toContain('color: color-mix(in srgb, var(--text-dim) 78%, transparent);');
+        expect(mobileNextPendingFuture).toContain('color: color-mix(in srgb, var(--text-dim) 78%, transparent);');
         expect(focusOverlay).toContain('background: rgba(0, 0, 0, 0.24);');
         expect(focusOverlay).toContain('backdrop-filter: blur(8px);');
     });

@@ -294,6 +294,22 @@ body[data-theme='serika-light'] .typing-stage .live-stat {
         background: linear-gradient(0deg, rgba(13, 14, 17, 0.62), transparent);
     }
 
+    .typing-stage .word[data-line-state='next'] {
+        color: color-mix(in srgb, var(--text-dim) 82%, transparent);
+    }
+
+    .typing-stage .word[data-line-state='future'] {
+        color: color-mix(in srgb, var(--text-dim) 64%, transparent);
+    }
+
+    .typing-stage .letter.pending-future {
+        color: color-mix(in srgb, var(--text-dim) 78%, transparent);
+    }
+
+    .typing-stage .word[data-line-state='next'] .letter.pending-future {
+        color: color-mix(in srgb, var(--text-dim) 78%, transparent);
+    }
+
     .typing-stage .words-container {
         height: calc(var(--typing-size) * var(--typing-line-height) * 3);
     }
