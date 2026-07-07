@@ -577,6 +577,8 @@ export const zhCNMessages = {
             weekGoal: '本周目标',
             radarTitle: '能力雷达',
             radarBody: '完成记录后显示速度、准确率、节奏和稳定性。',
+            riskLow: '当前训练节奏足够健康，可以继续推进。',
+            riskHigh: '最近活动正在降温，连续节奏开始摇晃，先稳住回路。',
             achievementsTitle: '成就与图鉴',
             achievementsBody: '把 TypeRift 战绩和训练修复一起沉淀。'
         },

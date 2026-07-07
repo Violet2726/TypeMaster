@@ -252,6 +252,7 @@ export function InsightsPage() {
         insights,
         language,
         latestCoachAdvice,
+        latestCoachComparisonSummary,
         sessions,
         skillProfile,
         streakRisk,
@@ -379,10 +380,10 @@ export function InsightsPage() {
                                 <h2>{latestCoachAdvice?.headline || copy.common.none}</h2>
                             </div>
                             <p>{latestCoachAdvice?.summary || copy.insights.noCoach}</p>
-                            {latestCoachAdvice?.comparison?.summary && (
+                            {latestCoachComparisonSummary && (
                                 <span className="insights-command-card__signal">
                                     <LineChart aria-hidden="true" size={15} strokeWidth={2.25} />
-                                    {latestCoachAdvice.comparison.summary}
+                                    {latestCoachComparisonSummary}
                                 </span>
                             )}
                         </div>
@@ -393,7 +394,7 @@ export function InsightsPage() {
                                     <p className="panel-kicker">{trainingCopy.insights.radarTitle}</p>
                                     <h2>{skillProfile?.level?.label || copy.common.emptyValue}</h2>
                                 </div>
-                                <span className="panel-badge badge-ready">{streakRisk}</span>
+                                <span className={`panel-badge badge-${streakRisk.tone}`}>{streakRisk.label}</span>
                             </div>
                             <p>{skillProfile?.summary || trainingCopy.insights.radarBody}</p>
                             <div className="insights-command-card__metrics">

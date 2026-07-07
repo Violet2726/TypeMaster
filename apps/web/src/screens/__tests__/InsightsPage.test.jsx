@@ -241,4 +241,73 @@ describe('InsightsPage', () => {
         expect(screen.getByText('Protect accuracy')).toBeInTheDocument();
         expect(screen.getByText('2 rounds / Stable for now')).toBeInTheDocument();
     });
+
+    test('localizes cached coach comparison and risk messaging in zh-CN insights mode', async () => {
+        renderWithProvider(<InsightsPage />, {
+            route: '/insights',
+            storageState: {
+                [STORAGE_KEYS.settings]: {
+                    language: 'zh-CN',
+                    keyboardLayout: 'qwerty',
+                    lastConfig: {
+                        source: 'builtin',
+                        mode: 'time',
+                        durationSeconds: 30,
+                        wordCount: 25,
+                        includePunctuation: false,
+                        includeNumbers: false,
+                        aiTemplate: 'daily',
+                        difficulty: 'medium'
+                    }
+                },
+                [STORAGE_KEYS.sessions]: [
+                    {
+                        id: 'session-zh-1',
+                        config: { source: 'builtin' },
+                        sourceTextMeta: { label: '内置词库' },
+                        result: {
+                            wpm: 58,
+                            rawWpm: 63,
+                            accuracy: 96,
+                            consistency: 82,
+                            durationSeconds: 30,
+                            completedAt: '2026-06-09T09:00:00.000Z',
+                            topErrorChars: ['t'],
+                            topErrorWords: ['type']
+                        }
+                    }
+                ],
+                [STORAGE_KEYS.coachAdvices]: [
+                    {
+                        id: 'coach-zh-1',
+                        sessionId: 'session-zh-1',
+                        status: 'complete',
+                        source: 'fallback',
+                        headline: '继续推进，基础节奏已经建立',
+                        summary: '本次成绩 58 WPM，准确率 96%，稳定度 82%。',
+                        strengths: [],
+                        weaknesses: [],
+                        nextDrill: {
+                            label: '开始下一轮',
+                            reason: '继续巩固当前状态。',
+                            configPatch: {},
+                            aiPrompt: ''
+                        },
+                        comparison: {
+                            label: 'mixed',
+                            summary: 'Recent activity is dropping. Your streak is starting to wobble.',
+                            wpmDelta: 0,
+                            accuracyDelta: 0
+                        },
+                        language: 'en-US'
+                    }
+                ]
+            }
+        });
+
+        expect(await screen.findByRole('heading', { name: 'TypeRift 洞察' })).toBeInTheDocument();
+        expect(screen.getByText('相比最近 5 次平均值，速度 +0，准确率 +0%。')).toBeInTheDocument();
+        expect(screen.getByText('最近活动正在降温，连续节奏开始摇晃，先稳住回路。')).toBeInTheDocument();
+        expect(screen.queryByText('Recent activity is dropping. Your streak is starting to wobble.')).not.toBeInTheDocument();
+    });
 });

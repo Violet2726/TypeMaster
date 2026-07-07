@@ -6,6 +6,33 @@ function fillTemplate(template, value) {
     return String(template || '').replace('{value}', value);
 }
 
+function formatSignedValue(value) {
+    return `${value >= 0 ? '+' : ''}${value}`;
+}
+
+function formatCoachComparisonSummary(comparison, language) {
+    if (!comparison) {
+        return '';
+    }
+
+    if (comparison.wpmDelta === null || comparison.accuracyDelta === null) {
+        if (comparison.label === 'baseline') {
+            return language === 'en-US'
+                ? 'This is your first valid sample. Future sessions will start forming a trend baseline.'
+                : '这是你的第一条有效样本，后续结果会开始形成趋势比较。';
+        }
+
+        return comparison.summary || '';
+    }
+
+    const signedWpm = formatSignedValue(comparison.wpmDelta);
+    const signedAccuracy = formatSignedValue(comparison.accuracyDelta);
+
+    return language === 'en-US'
+        ? `Versus the recent 5-session average, speed is ${signedWpm} and accuracy is ${signedAccuracy}%.`
+        : `相比最近 5 次平均值，速度 ${signedWpm}，准确率 ${signedAccuracy}%。`;
+}
+
 function getTargetedToneMeta(copy, tone) {
     if (tone === 'success') {
         return {
@@ -140,7 +167,13 @@ export function useInsightsPageModel({
         trainingCopy,
         buildTargetedDrillTrend(sessions, { limit: 8 })
     ), [copy, sessions, trainingCopy]);
-    const streakRisk = sessionStreak >= 3 ? trainingCopy.insights.riskLow : trainingCopy.insights.riskHigh;
+    const streakRisk = sessionStreak >= 3
+        ? { label: trainingCopy.insights.riskLow, tone: 'ready' }
+        : { label: trainingCopy.insights.riskHigh, tone: 'warning' };
+    const latestCoachComparisonSummary = useMemo(
+        () => formatCoachComparisonSummary(latestCoachAdvice?.comparison, language),
+        [language, latestCoachAdvice?.comparison]
+    );
     const handleKeyboardZoneDrill = useCallback(() => {
         if (!insights.keyboardHotspots.primaryZone) {
             return null;
@@ -163,6 +196,7 @@ export function useInsightsPageModel({
         insights,
         language,
         latestCoachAdvice,
+        latestCoachComparisonSummary,
         sessions,
         skillProfile,
         streakRisk,
