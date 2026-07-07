@@ -359,22 +359,60 @@ export function InsightsPage() {
 
     return (
         <div className="page-stack insights-page">
-            <section className="panel insights-command-center">
-                <div className="insights-command-center__lead">
-                    <div>
-                        <p className="panel-kicker">{copy.nav.insights}</p>
-                        <h1>{copy.insights.title}</h1>
-                        <p className="muted-text">{copy.insights.body}</p>
-                    </div>
+            <AppCommandDeck
+                className="insights-command-deck"
+                tone="primary"
+                kicker={copy.nav.insights}
+                title={copy.insights.title}
+                body={copy.insights.body}
+                actions={(
                     <button type="button" className="action-btn primary" onClick={() => navigate('/practice')}>
                         <Keyboard aria-hidden="true" size={18} strokeWidth={2.2} />
                         {copy.home.primaryCta}
                     </button>
-                </div>
+                )}
+                aside={(
+                    <div className="insights-command-deck__aside-grid">
+                        <div className="insights-command-card insights-command-card--coach">
+                            <div>
+                                <p className="panel-kicker">{copy.insights.latestCoach}</p>
+                                <h2>{latestCoachAdvice?.headline || copy.common.none}</h2>
+                            </div>
+                            <p>{latestCoachAdvice?.summary || copy.insights.noCoach}</p>
+                            {latestCoachAdvice?.comparison?.summary && (
+                                <span className="insights-command-card__signal">
+                                    <LineChart aria-hidden="true" size={15} strokeWidth={2.25} />
+                                    {latestCoachAdvice.comparison.summary}
+                                </span>
+                            )}
+                        </div>
 
-                <div className="insights-command-center__metrics" aria-label={copy.insights.recentTrend}>
+                        <div className="insights-command-card insights-command-card--radar">
+                            <div className="insights-command-card__head">
+                                <div>
+                                    <p className="panel-kicker">{trainingCopy.insights.radarTitle}</p>
+                                    <h2>{skillProfile?.level?.label || copy.common.emptyValue}</h2>
+                                </div>
+                                <span className="panel-badge badge-ready">{streakRisk}</span>
+                            </div>
+                            <p>{skillProfile?.summary || trainingCopy.insights.radarBody}</p>
+                            <div className="insights-command-card__metrics">
+                                {radarMetrics.map((item) => (
+                                    <div key={item.id}>
+                                        <span>{item.label}</span>
+                                        <strong>{item.value}</strong>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+            />
+
+            <section className="panel insights-overview-panel">
+                <div className="insights-overview-panel__metrics" aria-label={copy.insights.recentTrend}>
                     {overviewMetrics.map(({ id, icon: Icon, label, value, tone }) => (
-                        <div key={id} className={`insights-command-center__metric insights-command-center__metric--${tone}`}>
+                        <div key={id} className={`insights-overview-panel__metric insights-overview-panel__metric--${tone}`}>
                             <Icon aria-hidden="true" size={17} strokeWidth={2.25} />
                             <span>{label}</span>
                             <strong>{value}</strong>
@@ -387,37 +425,6 @@ export function InsightsPage() {
                     ariaLabel={copy.common.sessions}
                     items={surfaceMetrics}
                 />
-
-                <div className="insights-command-center__coach">
-                    <div>
-                        <p className="panel-kicker">{copy.insights.latestCoach}</p>
-                        <h2>{latestCoachAdvice?.headline || copy.common.none}</h2>
-                    </div>
-                    <p>{latestCoachAdvice?.summary || copy.insights.noCoach}</p>
-                    {latestCoachAdvice?.comparison?.summary && (
-                        <span className="insights-command-center__signal">
-                            <LineChart aria-hidden="true" size={15} strokeWidth={2.25} />
-                            {latestCoachAdvice.comparison.summary}
-                        </span>
-                    )}
-                </div>
-
-                <div className="insights-command-center__radar">
-                    <div>
-                        <p className="panel-kicker">{trainingCopy.insights.radarTitle}</p>
-                        <h2>{skillProfile?.level?.label || copy.common.emptyValue}</h2>
-                        <p>{skillProfile?.summary || trainingCopy.insights.radarBody}</p>
-                    </div>
-                    <span className="panel-badge badge-ready">{streakRisk}</span>
-                    <div className="insights-command-center__radar-metrics">
-                        {radarMetrics.map((item) => (
-                            <div key={item.id}>
-                                <span>{item.label}</span>
-                                <strong>{item.value}</strong>
-                            </div>
-                        ))}
-                    </div>
-                </div>
             </section>
 
             <section className="panel insights-trend-panel">
