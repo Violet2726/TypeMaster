@@ -1,5 +1,5 @@
 /** @vitest-environment jsdom */
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { getCopy } from '../../../../i18n';
 import { TrendChart } from '../TrendChart';
 
@@ -27,6 +27,8 @@ describe('TrendChart', () => {
 
         expect(screen.getByText('会话复盘')).toBeInTheDocument();
         expect(screen.getByRole('heading', { name: '输入、错误和节奏复盘' })).toBeInTheDocument();
+        expect(screen.getByText('仅基于本轮训练期间捕获的逐秒样本。')).toBeInTheDocument();
+        expect(screen.getByText('切换模式后，可以悬停、拖动或使用方向键逐秒查看本轮。')).toBeInTheDocument();
         expect(screen.getByText('原始速度')).toBeInTheDocument();
         expect(screen.getByText('爆发速度')).toBeInTheDocument();
         expect(screen.getByText('本轮平均')).toBeInTheDocument();
@@ -37,6 +39,8 @@ describe('TrendChart', () => {
         [
             'Session replay',
             'Input, error, and rhythm replay',
+            'Built from per-second samples captured during this session only.',
+            'Switch modes, then hover, drag, or use the arrow keys to inspect the round second by second.',
             'Raw speed',
             'Burst speed',
             'Round averages',
@@ -46,5 +50,16 @@ describe('TrendChart', () => {
         ].forEach((text) => {
             expect(screen.queryByText(text)).not.toBeInTheDocument();
         });
+    });
+
+    test('reveals localized inspection state when using keyboard replay navigation', () => {
+        const { container } = render(<TrendChart copy={getCopy('zh-CN')} language="zh-CN" timeline={timeline} />);
+        const hitArea = container.querySelector('.replay-hit-area');
+
+        expect(hitArea).not.toBeNull();
+        fireEvent.keyDown(hitArea, { key: 'ArrowRight' });
+
+        expect(screen.getByText('选中秒数')).toBeInTheDocument();
+        expect(container.querySelector('.replay-floating-inspect__state')).toHaveTextContent('错误波动');
     });
 });

@@ -87,13 +87,70 @@ export function TrendChart({ copy, language = 'zh-CN', timeline }) {
             burstPoints[activeIndex]?.y ?? frame.bottom
         );
     const tooltipLeft = activeX == null ? 0 : clamp((activeX / width) * 100, 10, 90);
-    const tooltipTop = activeY == null ? 0 : clamp(((activeY - 28) / height) * 100, 8, 66);
+    const tooltipPlacement = activeY != null && activeY < frame.top + 56 ? 'below' : 'above';
+    const tooltipTop = activeY == null
+        ? 0
+        : tooltipPlacement === 'below'
+            ? clamp(((activeY + 36) / height) * 100, 18, 82)
+            : clamp(((activeY - 28) / height) * 100, 14, 68);
     const averageWpm = average(samples.map((sample) => sample.wpm));
     const averageRaw = average(samples.map((sample) => sample.raw));
     const averageAccuracy = average(samples.map((sample) => sample.accuracy).filter((value) => value != null));
     const peakBurst = Math.max(...samples.map((sample) => sample.burst), 0);
     const totalErrorSpikes = samples.reduce((sum, _sample, index) => sum + (getErrorDelta(samples, index) > 0 ? 1 : 0), 0);
     const pauseSet = new Set(pauseMoments);
+    const dataNote = copy.chart.dataNote.replace('{samples}', String(samples.length)).replace('{errors}', String(totalErrorSpikes));
+
+    const resolveReplayState = (index) => {
+        const sample = samples[index];
+        if (!sample) {
+            return {
+                label: copy.chart.stateSteady,
+                tone: 'steady'
+            };
+        }
+
+        if (pauseSet.has(sample.time)) {
+            return {
+                label: copy.chart.statePaused,
+                tone: 'paused'
+            };
+        }
+
+        if (getErrorDelta(samples, index) > 0) {
+            return {
+                label: copy.chart.stateUnstable,
+                tone: 'unstable'
+            };
+        }
+
+        if (sample.burst >= sample.wpm + 12 || sample.burst >= averageWpm + 16) {
+            return {
+                label: copy.chart.stateBurst,
+                tone: 'burst'
+            };
+        }
+
+        if (index > 0 && sample.wpm < (samples[index - 1]?.wpm ?? sample.wpm) - 6) {
+            return {
+                label: copy.chart.stateRecovering,
+                tone: 'recovering'
+            };
+        }
+
+        return {
+            label: copy.chart.stateSteady,
+            tone: 'steady'
+        };
+    };
+
+    const activeState = activeIndex == null ? null : resolveReplayState(activeIndex);
+    const latestState = resolveReplayState(samples.length - 1);
+    const summaryStats = [
+        { id: 'raw', label: copy.chart.avgRaw, value: averageRaw },
+        { id: 'burst', label: copy.chart.peakBurst, value: peakBurst },
+        { id: 'signal', label: `${copy.chart.errors} / ${copy.chart.samples}`, value: `${totalErrorSpikes} / ${samples.length}` }
+    ];
 
     const inspectAt = (clientX) => {
         const rect = svgRef.current?.getBoundingClientRect();
@@ -186,6 +243,10 @@ export function TrendChart({ copy, language = 'zh-CN', timeline }) {
                 <div className="replay-header__left">
                     <p className="panel-kicker">{copy.chart.kicker}</p>
                     <h2>{copy.chart.title}</h2>
+                    <div className="replay-header__meta">
+                        <span>{copy.chart.sourceNote}</span>
+                        <span>{copy.chart.interactionHint}</span>
+                    </div>
                     <div className="replay-legend" role="toolbar" aria-label={copy.chart.title}>
                         {legendItems.map((item) => (
                             <button
@@ -205,38 +266,65 @@ export function TrendChart({ copy, language = 'zh-CN', timeline }) {
 
                 <aside className="replay-summary-card">
                     <span className="summary-label">{copy.chart.summaryTitle}</span>
-                    <div className="replay-summary-card__grid">
-                        <div className="replay-summary-card__item">
+                    <div className="replay-summary-card__lead">
+                        <div className="replay-summary-card__lead-copy">
                             <span>{copy.chart.avgWpm}</span>
                             <strong>{averageWpm}</strong>
                         </div>
-                        <div className="replay-summary-card__item">
-                            <span>{copy.chart.avgRaw}</span>
-                            <strong>{averageRaw}</strong>
-                        </div>
-                        <div className="replay-summary-card__item">
-                            <span>{copy.chart.avgAccuracy}</span>
-                            <strong>{hasAccuracy ? `${averageAccuracy}%` : copy.common.emptyValue}</strong>
-                        </div>
-                        <div className="replay-summary-card__item">
-                            <span>{copy.chart.peakBurst}</span>
-                            <strong>{peakBurst}</strong>
-                        </div>
+                        <span className={`replay-summary-card__state replay-summary-card__state--${latestState.tone}`}>
+                            {latestState.label}
+                        </span>
+                    </div>
+                    <p className="replay-summary-card__support">
+                        {hasAccuracy ? `${copy.chart.avgAccuracy} ${averageAccuracy}%` : copy.chart.noAccuracyData}
+                    </p>
+                    <div className="replay-summary-card__stats">
+                        {summaryStats.map((item) => (
+                            <div key={item.id} className="replay-summary-card__stat">
+                                <span>{item.label}</span>
+                                <strong>{item.value}</strong>
+                            </div>
+                        ))}
                     </div>
                     <p className="replay-summary-card__note">
-                        {copy.chart.dataNote.replace('{samples}', String(samples.length)).replace('{errors}', String(totalErrorSpikes))}
+                        {dataNote}
                     </p>
                 </aside>
             </div>
 
             <div className="chart-canvas replay-canvas replay-canvas--merged">
                 {activeSample && (
-                    <div className="replay-floating-inspect" style={{ left: `${tooltipLeft}%`, top: `${tooltipTop}%` }}>
+                    <div
+                        className={`replay-floating-inspect ${tooltipPlacement === 'below' ? 'replay-floating-inspect--below' : ''}`}
+                        style={{ left: `${tooltipLeft}%`, top: `${tooltipTop}%` }}
+                    >
+                        <div className="replay-floating-inspect__head">
+                            <span className="replay-floating-inspect__label">{copy.chart.inspectTitle}</span>
+                            {activeState && (
+                                <span className={`replay-floating-inspect__state replay-floating-inspect__state--${activeState.tone}`}>
+                                    {activeState.label}
+                                </span>
+                            )}
+                        </div>
                         <strong>{formatDurationLabel(activeSample.time, language)}</strong>
-                        <span>{copy.common.wpm} {activeSample.wpm}</span>
-                        <span>{copy.chart.rawLabel} {activeSample.raw}</span>
-                        <span>{copy.chart.burstLabel} {activeSample.burst}</span>
-                        <span>{copy.common.accuracy} {activeSample.accuracy == null ? copy.common.emptyValue : `${activeSample.accuracy}%`}</span>
+                        <div className="replay-floating-inspect__metrics">
+                            <span>
+                                <small>{copy.common.wpm}</small>
+                                <b>{activeSample.wpm}</b>
+                            </span>
+                            <span>
+                                <small>{copy.chart.rawLabel}</small>
+                                <b>{activeSample.raw}</b>
+                            </span>
+                            <span>
+                                <small>{copy.chart.burstLabel}</small>
+                                <b>{activeSample.burst}</b>
+                            </span>
+                            <span>
+                                <small>{copy.common.accuracy}</small>
+                                <b>{activeSample.accuracy == null ? copy.common.emptyValue : `${activeSample.accuracy}%`}</b>
+                            </span>
+                        </div>
                     </div>
                 )}
 

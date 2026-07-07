@@ -42,7 +42,10 @@ describe('result page CSS', () => {
 
     test('keeps the replay chart quiet and focused on the primary trend', async () => {
         const css = await readFile(resolve(stylesRoot, 'result-page.css'), 'utf8');
+        const headerMeta = getBlock(css, '.replay-header__meta');
         const summaryCard = getBlock(css, '.replay-summary-card');
+        const summaryLeadValue = getBlock(css, '.replay-summary-card__lead-copy strong');
+        const summaryState = getBlock(css, '.replay-summary-card__state');
         const mergedCanvas = getBlock(css, '.replay-canvas--merged');
         const plotBackground = getBlock(css, '.chart-plot-bg');
         const gridLine = getBlock(css, '.replay-grid-line');
@@ -51,10 +54,17 @@ describe('result page CSS', () => {
         const mainLine = getBlock(css, '.replay-main-line');
         const secondaryLine = getBlock(css, '.replay-secondary-line');
         const burstBar = getBlock(css, '.replay-burst-bar');
+        const floatingInspect = getBlock(css, '.replay-floating-inspect');
+        const floatingInspectBelow = getBlock(css, '.replay-floating-inspect--below');
+        const floatingInspectMetrics = getBlock(css, '.replay-floating-inspect__metrics');
 
-        expect(summaryCard).toContain('background: transparent;');
-        expect(summaryCard).toContain('border-color: transparent;');
-        expect(summaryCard).toContain('box-shadow: none;');
+        expect(headerMeta).toContain('display: flex;');
+        expect(headerMeta).toContain('flex-wrap: wrap;');
+        expect(summaryCard).toContain('border: 1px solid var(--panel-stroke);');
+        expect(summaryCard).toContain('border-radius: 22px;');
+        expect(summaryCard).toContain('padding: 0.9rem;');
+        expect(summaryLeadValue).toContain('font-size: 2.4rem;');
+        expect(summaryState).toContain('border-radius: var(--radius-pill);');
         expect(mergedCanvas).toContain('padding: 0;');
         expect(mergedCanvas).toContain('background: transparent;');
         expect(plotBackground).toContain('fill: transparent;');
@@ -66,6 +76,9 @@ describe('result page CSS', () => {
         expect(secondaryLine).toContain('stroke-dasharray: none;');
         expect(burstBar).toContain('stroke: rgba(255, 159, 10, 0.2);');
         expect(burstBar).toContain('stroke-width: 5;');
+        expect(floatingInspect).toContain('backdrop-filter: blur(18px) saturate(140%);');
+        expect(floatingInspectBelow).toContain('transform: translate(-50%, 0);');
+        expect(floatingInspectMetrics).toContain('grid-template-columns: repeat(2, minmax(0, 1fr));');
     });
 
     test('keeps the result decision actions primary-first and low-noise', async () => {
