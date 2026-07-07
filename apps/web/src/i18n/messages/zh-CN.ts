@@ -120,6 +120,30 @@ export const zhCNMessages = {
             description: '出现了无法识别的问题。请稍后再试。'
         }
     },
+    settings: {
+        ...enUSMessages.settings,
+        kicker: '工作区',
+        title: '设置',
+        theme: '主题',
+        fontScale: '字号',
+        focusMode: '专注模式',
+        language: '语言',
+        sound: '提示音',
+        soundComingSoon: '当前版本还没有接入真实提示音。',
+        summaryTitle: '工作区总览',
+        preferencesTitle: '偏好设置',
+        sessionTitle: '训练行为',
+        dataTitle: '数据维护',
+        dataSummaryTitle: '本地训练数据',
+        dataSummaryBody: '导出一份备份，或粘贴数据包来恢复当前训练状态。',
+        themeDark: '深色',
+        themeLight: '浅色',
+        fontSm: '紧凑',
+        fontMd: '标准',
+        fontLg: '宽松',
+        focusOn: '已开启',
+        focusOff: '已关闭'
+    },
     home: {
         ...enUSMessages.home,
         kicker: 'Arcade Coach',

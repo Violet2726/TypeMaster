@@ -2,6 +2,7 @@
 import { render } from '@testing-library/react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { getCopy } from '../../../../i18n';
 import { SettingsDrawer } from '../SettingsDrawer';
 
 const baseCopy = {
@@ -71,5 +72,39 @@ describe('SettingsDrawer', () => {
         expect(screen.getByRole('button', { name: /Sign in and sync/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /Export data/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /Import data/i })).toBeInTheDocument();
+    });
+
+    test('localizes the drawer into Chinese and avoids repeating idle account badges', () => {
+        const { container } = render(
+            <SettingsDrawer
+                isOpen
+                settings={{
+                    language: 'zh-CN',
+                    theme: 'serika-dark',
+                    fontScale: 'md',
+                    focusMode: false,
+                    soundEffects: false,
+                    keyboardLayout: 'qwerty'
+                }}
+                copy={getCopy('zh-CN')}
+                account={null}
+                accountStatus="idle"
+                onClose={() => {}}
+                onChange={() => {}}
+                onSignIn={() => Promise.resolve()}
+                onSignOut={() => Promise.resolve()}
+                onExportData={() => Promise.resolve('{}')}
+                onImportData={() => Promise.resolve()}
+            />
+        );
+
+        expect(screen.getByRole('dialog', { name: '设置' })).toBeInTheDocument();
+        expect(screen.getByText('工作区总览')).toBeInTheDocument();
+        expect(screen.getByText('偏好设置')).toBeInTheDocument();
+        expect(screen.getByText('训练行为')).toBeInTheDocument();
+        expect(screen.getByText('数据维护')).toBeInTheDocument();
+        expect(screen.getByText('本地训练数据')).toBeInTheDocument();
+        expect(container.querySelector('.settings-summary-card__head .panel-badge')).toBeNull();
+        expect(container.querySelector('.settings-account__info .panel-badge')).toBeNull();
     });
 });

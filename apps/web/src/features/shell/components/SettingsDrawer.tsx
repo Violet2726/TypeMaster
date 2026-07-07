@@ -79,6 +79,7 @@ export function SettingsDrawer({
     const layoutLabel = getKeyboardLayoutLabel(settings.keyboardLayout, settings.language);
     const accountLabel = account?.displayName || trainingCopy.account.idle;
     const accountBadge = trainingCopy.account[accountStatus] || trainingCopy.account.idle;
+    const shouldShowAccountBadge = Boolean(account) || (accountStatus !== 'idle' && Boolean(trainingCopy.account[accountStatus]));
 
     if (!isOpen) {
         return null;
@@ -132,9 +133,11 @@ export function SettingsDrawer({
                                 <p className="panel-kicker">{copy.settings.summaryTitle}</p>
                                 <h3>{accountLabel}</h3>
                             </div>
-                            <span className={`panel-badge badge-${account ? 'success' : accountStatus === 'loading' ? 'loading' : 'idle'}`}>
-                                {accountBadge}
-                            </span>
+                            {shouldShowAccountBadge ? (
+                                <span className={`panel-badge badge-${account ? 'success' : accountStatus === 'loading' ? 'loading' : 'idle'}`}>
+                                    {accountBadge}
+                                </span>
+                            ) : null}
                         </div>
                         <div className="settings-summary-card__grid">
                             <span>
@@ -265,9 +268,11 @@ export function SettingsDrawer({
                                     </span>
                                     <div className="settings-account__info">
                                         <strong>{account?.displayName || trainingCopy.account.idle}</strong>
-                                        <span className={`panel-badge badge-${account ? 'success' : accountStatus === 'loading' ? 'loading' : 'idle'}`}>
-                                            {trainingCopy.account[accountStatus] || trainingCopy.account.idle}
-                                        </span>
+                                        {shouldShowAccountBadge ? (
+                                            <span className={`panel-badge badge-${account ? 'success' : accountStatus === 'loading' ? 'loading' : 'idle'}`}>
+                                                {trainingCopy.account[accountStatus] || trainingCopy.account.idle}
+                                            </span>
+                                        ) : null}
                                     </div>
                                 </div>
                                 <p className="muted-text">{trainingCopy.account.body}</p>
