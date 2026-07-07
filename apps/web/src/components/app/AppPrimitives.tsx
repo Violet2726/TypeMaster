@@ -70,6 +70,57 @@ export function AppSheet({
     );
 }
 
+export function AppCommandDeck({
+    actions,
+    aside,
+    badge,
+    body,
+    children,
+    className = '',
+    icon: Icon,
+    kicker,
+    title,
+    tone = 'default',
+    ...props
+}: {
+    actions?: ReactNode;
+    aside?: ReactNode;
+    badge?: ReactNode;
+    body?: ReactNode;
+    children?: ReactNode;
+    className?: string;
+    icon?: IconType;
+    kicker?: ReactNode;
+    title: ReactNode;
+    tone?: 'default' | 'primary';
+} & Omit<HTMLAttributes<HTMLElement>, 'title'>) {
+    return (
+        <section
+            className={cx('app-command-deck', `app-command-deck--${tone}`, aside && 'app-command-deck--with-aside', className)}
+            {...props}
+        >
+            <div className="app-command-deck__copy">
+                {(kicker || Icon || badge) ? (
+                    <div className="app-command-deck__topline">
+                        {(kicker || Icon) ? (
+                            <span className="app-command-deck__status">
+                                {Icon ? <Icon aria-hidden="true" size={15} strokeWidth={2.2} /> : null}
+                                {kicker}
+                            </span>
+                        ) : null}
+                        {badge ? <span className="app-command-deck__status-badge">{badge}</span> : null}
+                    </div>
+                ) : null}
+                <h1>{title}</h1>
+                {body ? <p className="hero-body">{body}</p> : null}
+                {children}
+                {actions ? <div className="app-command-deck__actions">{actions}</div> : null}
+            </div>
+            {aside ? <div className="app-command-deck__aside">{aside}</div> : null}
+        </section>
+    );
+}
+
 export function AppCard({
     action,
     body,

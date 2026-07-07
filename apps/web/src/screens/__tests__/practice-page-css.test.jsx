@@ -20,13 +20,15 @@ function getMediaBlock(css, startMarker) {
 }
 
 describe('practice page CSS', () => {
-    test('keeps the practice context visually lighter than a panel', async () => {
+    test('keeps the practice context attached to the shared command deck shell', async () => {
         const css = await readFile(cssPath, 'utf8');
         const contextRule = getRuleBody(css, '.practice-context');
+        const summaryItemRule = getRuleBody(css, '.practice-context__summary-item');
 
         expect(css).not.toContain('.practice-hero');
-        expect(contextRule).toContain('background: transparent;');
-        expect(contextRule).toContain('box-shadow: none;');
+        expect(contextRule).toContain('margin-bottom: 0.04rem;');
+        expect(summaryItemRule).toContain('border-radius: 18px;');
+        expect(summaryItemRule).toContain('background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.025));');
     });
 
     test('keeps custom compose layout weighted toward the editor', async () => {
@@ -107,17 +109,16 @@ describe('practice page CSS', () => {
         expect(inspectorBadgeRule).toContain('background: rgba(118, 118, 128, 0.08);');
     });
 
-    test('keeps the mobile practice context as a single compact title', async () => {
+    test('keeps the mobile practice context focused on title first', async () => {
         const css = await readFile(cssPath, 'utf8');
         const mobileCss = getMediaBlock(css, '@media (max-width: 720px)');
         const contextRule = getRuleBody(mobileCss, '.practice-context');
-        const labelRowRule = getRuleBody(mobileCss, '.practice-context__label-row');
-        const titleRule = getRuleBody(mobileCss, '.practice-context h1');
-        const bodyRule = getRuleBody(mobileCss, '.practice-context__body');
+        const asideRule = getRuleBody(mobileCss, '.practice-context__aside');
+        const titleRule = getRuleBody(mobileCss, '.practice-context h1,\n    .practice-context .app-command-deck h1');
+        const bodyRule = getRuleBody(mobileCss, '.practice-context .hero-body');
 
-        expect(contextRule).toContain('gap: 0.28rem;');
-        expect(contextRule).toContain('padding: 0.08rem 0 0;');
-        expect(labelRowRule).toContain('display: none;');
+        expect(contextRule).toContain('margin-bottom: 0;');
+        expect(asideRule).toContain('display: none;');
         expect(titleRule).toContain('font-size: 1.42rem;');
         expect(titleRule).toContain('line-height: 1.08;');
         expect(bodyRule).toContain('display: none;');

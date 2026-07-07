@@ -13,51 +13,50 @@
 }
 
 .practice-context {
+    margin-bottom: 0.04rem;
+}
+
+.practice-context .app-command-deck__status-badge {
+    margin-left: auto;
+}
+
+.practice-context__aside {
     display: grid;
-    gap: 0.58rem;
-    padding: 0.32rem clamp(0.16rem, 1vw, 0.5rem) 0.08rem;
-    background: transparent;
-    box-shadow: none;
+    align-content: start;
+    height: 100%;
 }
 
-.practice-context__copy {
+.practice-context__summary-grid {
     display: grid;
-    gap: 0.58rem;
-    max-width: 46rem;
+    gap: 0.62rem;
 }
 
-.practice-context__label-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.58rem;
-    align-items: center;
+.practice-context__summary-item {
+    display: grid;
+    gap: 0.16rem;
+    padding: 0.82rem 0.88rem;
+    border: 1px solid color-mix(in srgb, var(--text-strong) 7%, transparent);
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.025));
 }
 
-.practice-context__kicker {
-    margin: 0;
-    color: var(--text-muted);
-    font-size: 0.75rem;
+.practice-context__summary-item span {
+    color: color-mix(in srgb, var(--text-dim) 78%, var(--text-strong) 22%);
+    font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0;
-    line-height: 1.2;
-    text-transform: uppercase;
 }
 
-.practice-context h1 {
-    margin: 0;
+.practice-context__summary-item strong {
     color: var(--text-strong);
     font-family: var(--font-display);
-    font-size: 2.28rem;
-    line-height: 1.08;
-    letter-spacing: 0;
-    max-width: 22ch;
+    font-size: 1.02rem;
+    line-height: 1.16;
 }
 
-.practice-context__body {
-    margin: 0;
-    max-width: 36rem;
-    font-size: 0.98rem;
-    line-height: 1.58;
+.practice-context__summary-item small {
+    color: color-mix(in srgb, var(--text-dim) 82%, var(--text-strong) 18%);
+    font-size: 0.76rem;
+    line-height: 1.34;
 }
 
 
@@ -163,6 +162,11 @@
     background: var(--tm-surface);
 }
 
+body[data-theme='serika-light'] .practice-context__summary-item {
+    border-color: rgba(60, 60, 67, 0.1);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(246, 246, 248, 0.82));
+}
+
 @media (max-width: 1100px) {
     .practice-workbench,
     .practice-support-grid--split,
@@ -199,21 +203,25 @@
     }
 
     .practice-context {
-        gap: 0.28rem;
-        padding: 0.08rem 0 0;
+        margin-bottom: 0;
     }
 
-    .practice-context__label-row {
+    .practice-context__aside {
         display: none;
     }
 
-    .practice-context h1 {
+    .practice-context .app-command-deck__status-badge {
+        margin-left: 0;
+    }
+
+    .practice-context h1,
+    .practice-context .app-command-deck h1 {
         font-size: 1.42rem;
         line-height: 1.08;
         max-width: 100%;
     }
 
-    .practice-context__body {
+    .practice-context .hero-body {
         display: none;
     }
 

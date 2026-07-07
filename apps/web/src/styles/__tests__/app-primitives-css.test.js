@@ -60,4 +60,18 @@ describe('app primitives CSS', () => {
         expect(actionButton).toContain('border: 0;');
         expect(mobileAction).toContain('width: var(--tm-touch-target);');
     });
+
+    test('keeps the shared command deck as a floating two-column shell that stacks on mobile', async () => {
+        const css = await readFile(resolve(appRoot, 'src/components/app/app-primitives.css'), 'utf8');
+        const deck = getBlock(css, '.app-command-deck');
+        const withAside = getBlock(css, '.app-command-deck--with-aside');
+        const mobileCss = getMediaBlock(css, '@media (max-width: 720px)');
+        const mobileDeck = getBlock(mobileCss, '.app-command-deck,\n    .app-command-deck--with-aside');
+
+        expect(deck).toContain('border-radius: 28px;');
+        expect(deck).toContain('backdrop-filter: blur(20px) saturate(145%);');
+        expect(withAside).toContain('grid-template-columns: minmax(0, 1.05fr) minmax(17rem, 0.95fr);');
+        expect(mobileDeck).toContain('grid-template-columns: 1fr;');
+        expect(mobileDeck).toContain('border-radius: 24px;');
+    });
 });

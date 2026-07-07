@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { BadgeCheck, FileText, PencilLine, WandSparkles } from 'lucide-react';
 import { ConfirmDialog, Inspector } from '@typemaster/ui';
 import { useAppNavigate } from '../application/use-app-navigate';
+import { AppCommandDeck } from '../components/app/AppPrimitives';
 import { AIWorkshop } from '../features/practice/components/AIWorkshop';
 import { ConfigPanel } from '../features/practice/components/ConfigPanel';
 import { CustomTextWorkshop } from '../features/practice/components/CustomTextWorkshop';
@@ -27,6 +28,10 @@ function getTrainingTaskBadgeLabel(task, trainingCopy) {
     }
 
     return trainingCopy.practice.planBadge;
+}
+
+function getPracticeModeLabel(copy, mode) {
+    return mode === 'time' ? copy.common.timeMode : copy.common.wordsMode;
 }
 
 export function PracticePage() {
@@ -116,6 +121,7 @@ export function PracticePage() {
     const sessionStatusLabel = store.copy.statuses[typingSession.status] || store.copy.statuses.idle;
     const currentTaskBadgeLabel = getTrainingTaskBadgeLabel(currentTrainingTask, trainingCopy);
     const shouldShowPracticeSupport = !isCustomComposeMode && Boolean(nextRoundBrief || adaptiveDrillInsight);
+    const practiceModeLabel = getPracticeModeLabel(store.copy, store.config.mode);
     const practiceHeadline = currentTrainingTask
         ? currentTrainingTask.title
         : store.config.source === 'custom'
@@ -142,6 +148,26 @@ export function PracticePage() {
         : isCustomTextPending && lockedSecondaryActionLabel
             ? focusCustomTextEditor
             : undefined;
+    const practiceSummaryItems = [
+        {
+            id: 'source',
+            label: store.copy.common.currentText,
+            value: sourceLabel,
+            note: currentTaskBadgeLabel || store.copy.practice.textReadyLabel
+        },
+        {
+            id: 'mode',
+            label: store.copy.practice.modeTitle,
+            value: practiceModeLabel,
+            note: currentTrainingTask ? currentTrainingTask.summary : primaryActionHint
+        },
+        {
+            id: 'status',
+            label: store.copy.common.status,
+            value: sessionStatusLabel,
+            note: lockTitle
+        }
+    ];
 
     useEffect(() => {
         window.addEventListener('beforeunload', handleBeforeUnload);
@@ -247,18 +273,29 @@ export function PracticePage() {
 
     return (
         <div className={`page-stack practice-page practice-page--refined ${isCustomComposeMode ? 'practice-page--compose' : ''}`}>
-            <header className="practice-context" aria-labelledby="practice-context-title" aria-describedby="practice-context-body">
-                <div className="practice-context__copy">
-                    <div className="practice-context__label-row">
-                        <p className="practice-context__kicker">{currentTrainingTask ? trainingCopy.practice.taskKicker : store.copy.practice.pageTitle}</p>
-                        {currentTaskBadgeLabel ? (
-                            <span className="panel-badge badge-ready">{currentTaskBadgeLabel}</span>
-                        ) : null}
+            <AppCommandDeck
+                aria-describedby="practice-context-body"
+                aria-labelledby="practice-context-title"
+                className="practice-context"
+                tone={currentTrainingTask ? 'primary' : 'default'}
+                kicker={currentTrainingTask ? trainingCopy.practice.taskKicker : store.copy.practice.pageTitle}
+                badge={currentTaskBadgeLabel ? <span className="panel-badge badge-ready">{currentTaskBadgeLabel}</span> : null}
+                title={<span id="practice-context-title">{practiceHeadline}</span>}
+                body={<span id="practice-context-body">{practiceBody}</span>}
+                aside={(
+                    <div className="practice-context__aside">
+                        <div className="practice-context__summary-grid">
+                            {practiceSummaryItems.map((item) => (
+                                <div key={item.id} className="practice-context__summary-item">
+                                    <span>{item.label}</span>
+                                    <strong>{item.value}</strong>
+                                    <small>{item.note}</small>
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                    <h1 id="practice-context-title">{practiceHeadline}</h1>
-                    <p id="practice-context-body" className="practice-context__body">{practiceBody}</p>
-                </div>
-            </header>
+                )}
+            />
 
             {shouldShowPracticeSupport ? (
                 <section className={`practice-support-grid ${adaptiveDrillInsight && nextRoundBrief ? 'practice-support-grid--split' : ''}`}>

@@ -45,10 +45,10 @@ describe('MissionsPage', () => {
         });
 
         expect(container.querySelector('h1')).toBeInTheDocument();
-        expect(container.querySelector('.app-sheet')).not.toBeInTheDocument();
-        expect(container.querySelector('.app-progress-strip')).not.toBeInTheDocument();
+        expect(container.querySelector('.app-command-deck')).toBeInTheDocument();
         expect(container.querySelector('.mission-command')).toBeInTheDocument();
-        expect(container.querySelector('.mission-status-row')).toBeInTheDocument();
+        expect(container.querySelector('.mission-status-row')).not.toBeInTheDocument();
+        expect(container.querySelector('.mission-command__status-grid')).toBeInTheDocument();
         expect(container.querySelectorAll('.mission-status-item')).toHaveLength(3);
     });
 

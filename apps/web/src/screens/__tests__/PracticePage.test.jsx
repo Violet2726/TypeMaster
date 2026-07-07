@@ -220,7 +220,8 @@ describe('PracticePage', () => {
 
         expect(context).not.toBeNull();
         expect(context).not.toHaveClass('panel');
-        expect(context?.querySelector('.practice-context__kicker')).toHaveTextContent(baseStore.copy.practice.pageTitle);
+        expect(context?.querySelector('.app-command-deck__status')).toHaveTextContent(baseStore.copy.practice.pageTitle);
+        expect(context?.querySelector('.practice-context__summary-grid')).not.toBeNull();
         expect(document.querySelector('.practice-hero')).toBeNull();
     });
 

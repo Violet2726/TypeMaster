@@ -81,6 +81,127 @@ body[data-theme='serika-light'] .app-sheet--image {
     font-size: 0.94rem;
 }
 
+.app-command-deck {
+    position: relative;
+    display: grid;
+    gap: 1rem;
+    padding: clamp(1.2rem, 3vw, 1.7rem);
+    border: 1px solid color-mix(in srgb, var(--text-strong) 8%, transparent);
+    border-radius: 28px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.025)),
+        var(--tm-surface);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        0 18px 40px rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(20px) saturate(145%);
+    -webkit-backdrop-filter: blur(20px) saturate(145%);
+}
+
+.app-command-deck--primary {
+    background:
+        radial-gradient(circle at top right, rgba(100, 210, 255, 0.16), transparent 32%),
+        radial-gradient(circle at 0% 0%, rgba(10, 132, 255, 0.13), transparent 44%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.025)),
+        var(--tm-surface);
+}
+
+.app-command-deck--with-aside {
+    grid-template-columns: minmax(0, 1.05fr) minmax(17rem, 0.95fr);
+    align-items: stretch;
+    gap: 1rem 1.1rem;
+}
+
+.app-command-deck__copy {
+    display: grid;
+    gap: 0.66rem;
+    min-width: 0;
+    align-content: start;
+}
+
+.app-command-deck__topline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.58rem;
+}
+
+.app-command-deck__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.44rem;
+    min-height: 2rem;
+    padding: 0.36rem 0.72rem;
+    border: 1px solid color-mix(in srgb, var(--text-strong) 8%, transparent);
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.05);
+    color: color-mix(in srgb, var(--text-dim) 72%, var(--text-strong) 28%);
+    font-size: 0.78rem;
+    font-weight: 750;
+}
+
+.app-command-deck__status svg {
+    color: var(--main-color);
+}
+
+.app-command-deck__status-badge {
+    display: inline-flex;
+}
+
+.app-command-deck h1 {
+    margin: 0;
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 4vw, 3.35rem);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+}
+
+.app-command-deck .hero-body {
+    max-width: 40rem;
+    color: color-mix(in srgb, var(--text-color) 84%, var(--text-strong) 16%);
+    font-size: 1rem;
+    line-height: 1.55;
+}
+
+.app-command-deck__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.66rem;
+    padding-top: 0.12rem;
+}
+
+.app-command-deck__actions .tm-button {
+    min-height: 2.9rem;
+    padding-inline: 1.15rem;
+    border-radius: var(--radius-pill);
+}
+
+.app-command-deck__aside {
+    display: grid;
+    min-width: 0;
+    align-content: start;
+}
+
+body[data-theme='serika-light'] .app-command-deck {
+    border-color: rgba(60, 60, 67, 0.1);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(245, 245, 247, 0.84)),
+        var(--bg-panel);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.96),
+        0 16px 32px rgba(15, 23, 42, 0.08);
+}
+
+body[data-theme='serika-light'] .app-command-deck--primary {
+    background:
+        radial-gradient(circle at top right, rgba(100, 210, 255, 0.16), transparent 32%),
+        radial-gradient(circle at 0% 0%, rgba(0, 113, 227, 0.1), transparent 44%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(245, 245, 247, 0.84)),
+        var(--bg-panel);
+}
+
 .app-card {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
@@ -309,6 +430,29 @@ button.app-card:hover {
     .app-sheet__actions .tm-button,
     .app-card__action,
     .app-card__action .tm-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .app-command-deck,
+    .app-command-deck--with-aside {
+        grid-template-columns: 1fr;
+        gap: 0.82rem;
+        padding: 1rem;
+        border-radius: 24px;
+    }
+
+    .app-command-deck h1 {
+        font-size: clamp(1.9rem, 10vw, 2.7rem);
+        line-height: 0.98;
+    }
+
+    .app-command-deck .hero-body {
+        max-width: none;
+        font-size: 0.95rem;
+    }
+
+    .app-command-deck__actions .tm-button {
         width: 100%;
         justify-content: center;
     }

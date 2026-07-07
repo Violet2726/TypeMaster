@@ -3,63 +3,18 @@
    ============================================ */
 
 .mission-command {
+    margin-bottom: 0.04rem;
+}
+
+.mission-command__aside {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: end;
-    gap: 1rem;
-    padding: 0.28rem 0 0.1rem;
-    background: transparent;
+    align-content: start;
+    height: 100%;
 }
 
-.mission-command__copy {
+.mission-command__status-grid {
     display: grid;
-    gap: 0.46rem;
-    min-width: 0;
-}
-
-.mission-command__kicker {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.42rem;
-    width: fit-content;
-    color: var(--text-dim);
-    font-size: 0.78rem;
-    font-weight: 750;
-}
-
-.mission-command__kicker svg {
-    color: var(--main-color);
-}
-
-.mission-command h1 {
-    margin: 0;
-    color: var(--text-strong);
-    font-family: var(--font-display);
-    font-size: clamp(1.7rem, 3.1vw, 2.35rem);
-    line-height: 1.06;
-    letter-spacing: 0;
-}
-
-.mission-command__body {
-    max-width: 35rem;
-    margin: 0;
-    color: var(--text-color);
-    font-size: 0.95rem;
-    line-height: 1.46;
-}
-
-.mission-command__actions {
-    display: flex;
-    justify-content: flex-end;
-}
-
-.mission-status-row {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0;
-    border-top: 1px solid var(--panel-stroke);
-    border-bottom: 1px solid var(--panel-stroke);
-    background: transparent;
+    gap: 0.62rem;
 }
 
 .mission-status-item {
@@ -67,21 +22,19 @@
     grid-template-columns: auto minmax(0, 1fr);
     align-items: center;
     gap: 0.58rem;
-    min-height: 3.5rem;
-    padding: 0.64rem 0;
-}
-
-.mission-status-item + .mission-status-item {
-    padding-left: 0.8rem;
-    border-left: 1px solid var(--panel-stroke);
+    min-height: 4.15rem;
+    padding: 0.78rem 0.82rem;
+    border: 1px solid color-mix(in srgb, var(--text-strong) 7%, transparent);
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.025));
 }
 
 .mission-status-item__icon {
     display: inline-grid;
     place-items: center;
-    width: 1.64rem;
-    height: 1.64rem;
-    border-radius: 50%;
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 14px;
     background: var(--surface-3);
     color: var(--text-strong);
 }
@@ -130,9 +83,16 @@
 .mission-action-list {
     display: grid;
     gap: 0;
-    border-top: 1px solid var(--panel-stroke);
-    border-bottom: 1px solid var(--panel-stroke);
-    background: transparent;
+    padding: 0.25rem 1rem;
+    border: 1px solid color-mix(in srgb, var(--text-strong) 8%, transparent);
+    border-radius: 24px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.018));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.04),
+        0 16px 36px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(16px) saturate(135%);
+    -webkit-backdrop-filter: blur(16px) saturate(135%);
 }
 
 .mission-action-row {
@@ -149,7 +109,10 @@
     background: transparent;
     color: inherit;
     text-align: left;
-    transition: background var(--transition-fast), color var(--transition-fast);
+    transition:
+        background var(--transition-fast),
+        color var(--transition-fast),
+        transform var(--transition-fast);
 }
 
 .mission-action-row + .mission-action-row {
@@ -157,7 +120,8 @@
 }
 
 .mission-action-row:hover {
-    background: var(--bg-soft);
+    background: rgba(255, 255, 255, 0.04);
+    transform: translateY(-1px);
 }
 
 .mission-action-row:focus-visible {
@@ -170,8 +134,10 @@
     place-items: center;
     width: 1.9rem;
     height: 1.9rem;
-    border-radius: 50%;
-    background: var(--surface-3);
+    border-radius: 14px;
+    border: 1px solid color-mix(in srgb, var(--text-strong) 9%, transparent);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.095), rgba(255, 255, 255, 0.03));
     color: var(--text-strong);
 }
 
@@ -204,12 +170,13 @@
 }
 
 .mission-action-row__copy span {
+    display: -webkit-box;
     overflow: hidden;
-    color: var(--text-dim);
+    color: color-mix(in srgb, var(--text-dim) 82%, var(--text-strong) 18%);
     font-size: 0.8rem;
     line-height: 1.34;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
 }
 
 .mission-action-row__cta {
@@ -223,34 +190,32 @@
     white-space: nowrap;
 }
 
+body[data-theme='serika-light'] .mission-status-item,
+body[data-theme='serika-light'] .mission-action-list {
+    border-color: rgba(60, 60, 67, 0.1);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.78),
+        0 16px 32px rgba(15, 23, 42, 0.08);
+}
+
+body[data-theme='serika-light'] .mission-status-item,
+body[data-theme='serika-light'] .mission-action-list,
+body[data-theme='serika-light'] .mission-action-row__icon {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(246, 246, 248, 0.82));
+}
+
 @media (max-width: 720px) {
-    .mission-command {
-        grid-template-columns: 1fr;
-        align-items: start;
-        gap: 0.82rem;
-    }
-
-    .mission-command h1 {
-        font-size: clamp(1.58rem, 7vw, 2rem);
-    }
-
-    .mission-command__actions,
-    .mission-command__actions .tm-button {
-        width: 100%;
-    }
-
-    .mission-status-row {
-        grid-template-columns: 1fr;
-    }
-
-    .mission-status-item + .mission-status-item {
-        padding-left: 0;
-        border-left: 0;
-        border-top: 1px solid var(--panel-stroke);
+    .mission-command__status-grid {
+        gap: 0.5rem;
     }
 
     .mission-action-row {
         gap: 0.64rem;
+    }
+
+    .mission-action-list {
+        padding-inline: 0.86rem;
+        border-radius: 22px;
     }
 
     .mission-action-row__cta span {

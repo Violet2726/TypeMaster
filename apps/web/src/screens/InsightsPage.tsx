@@ -2,6 +2,7 @@
 
 import { CalendarClock, Gauge, Keyboard, LineChart, ShieldCheck, Swords, Target, Trophy } from 'lucide-react';
 import { MetricStrip } from '@typemaster/ui';
+import { AppCommandDeck } from '../components/app/AppPrimitives';
 import { formatDateTime, formatShortDate, getInlineSeparator } from '../i18n';
 import { useAppNavigate } from '../application/use-app-navigate';
 import { useInsightsPageModel } from '../features/insights/use-insights-page-model';
@@ -164,11 +165,69 @@ function EmptyInsightsPreview({ copy, trainingCopy, onStart, onAssess }) {
     ];
 
     return (
-        <section className="panel empty-panel insights-empty-panel">
-            <div className="insights-empty-panel__copy">
-                <p className="panel-kicker">{copy.nav.insights}</p>
-                <h2>{copy.insights.emptyTitle}</h2>
-                <p className="muted-text">{copy.insights.emptyBody}</p>
+        <AppCommandDeck
+            className="insights-empty-panel"
+            tone="primary"
+            kicker={copy.nav.insights}
+            title={copy.insights.emptyTitle}
+            body={copy.insights.emptyBody}
+            actions={(
+                <>
+                    <button type="button" className="action-btn primary" onClick={onStart}>
+                        <Keyboard aria-hidden="true" size={18} strokeWidth={2.2} />
+                        {copy.insights.emptyAction}
+                    </button>
+                    <button type="button" className="ghost-btn" onClick={onAssess}>
+                        <Target aria-hidden="true" size={17} strokeWidth={2.2} />
+                        {copy.insights.emptyAssessmentAction}
+                    </button>
+                </>
+            )}
+            aside={(
+                <div className="insights-empty-preview" aria-label={copy.nav.insights}>
+                    <div className="insights-empty-preview__eyebrow">
+                        <span>{copy.insights.emptyPreviewKicker}</span>
+                        <strong>{copy.insights.emptyPreviewStatus}</strong>
+                    </div>
+                    <div className="insights-empty-preview__header">
+                        <span className="insights-empty-preview__icon" aria-hidden="true">
+                            <LineChart aria-hidden="true" size={20} strokeWidth={2.2} />
+                        </span>
+                        <div>
+                            <span className="summary-label">{trainingCopy.insights.radarTitle}</span>
+                            <strong>{trainingCopy.insights.weekGoal}</strong>
+                        </div>
+                    </div>
+                    <div className="insights-empty-preview__metrics" aria-label={copy.insights.recentTrend}>
+                        {previewMetrics.map((item) => (
+                            <div key={item.label} className="insights-empty-preview__metric">
+                                <span>{item.label}</span>
+                                <strong>{item.value}</strong>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="insights-empty-preview__unlock-list">
+                        {unlockItems.map(({ icon: Icon, label, body, tone }, index) => (
+                            <div key={label} className={`insights-empty-preview__unlock insights-empty-preview__unlock--${tone}`}>
+                                <span className="insights-empty-preview__unlock-index">{String(index + 1).padStart(2, '0')}</span>
+                                <span className="insights-empty-preview__unlock-icon" aria-hidden="true">
+                                    <Icon size={18} strokeWidth={2.2} />
+                                </span>
+                                <div>
+                                    <strong>{label}</strong>
+                                    <p>{body}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="insights-empty-preview__route" aria-label={copy.insights.emptyRouteTitle}>
+                        <span>{copy.insights.emptyRouteStepOne}</span>
+                        <span>{copy.insights.emptyRouteStepTwo}</span>
+                        <span>{copy.insights.emptyRouteStepThree}</span>
+                    </div>
+                </div>
+            )}
+        >
                 <div className="insights-empty-panel__signals" aria-label={copy.insights.emptySignalsTitle}>
                     {firstRoundSignals.map(({ icon: Icon, label, value }) => (
                         <span key={label}>
@@ -178,61 +237,7 @@ function EmptyInsightsPreview({ copy, trainingCopy, onStart, onAssess }) {
                         </span>
                     ))}
                 </div>
-                <div className="insights-empty-panel__actions">
-                    <button type="button" className="action-btn primary" onClick={onStart}>
-                        <Keyboard aria-hidden="true" size={18} strokeWidth={2.2} />
-                        {copy.insights.emptyAction}
-                    </button>
-                    <button type="button" className="ghost-btn" onClick={onAssess}>
-                        <Target aria-hidden="true" size={17} strokeWidth={2.2} />
-                        {copy.insights.emptyAssessmentAction}
-                    </button>
-                </div>
-            </div>
-
-            <div className="insights-empty-preview" aria-label={copy.nav.insights}>
-                <div className="insights-empty-preview__eyebrow">
-                    <span>{copy.insights.emptyPreviewKicker}</span>
-                    <strong>{copy.insights.emptyPreviewStatus}</strong>
-                </div>
-                <div className="insights-empty-preview__header">
-                    <span className="insights-empty-preview__icon" aria-hidden="true">
-                        <LineChart aria-hidden="true" size={20} strokeWidth={2.2} />
-                    </span>
-                    <div>
-                        <span className="summary-label">{trainingCopy.insights.radarTitle}</span>
-                        <strong>{trainingCopy.insights.weekGoal}</strong>
-                    </div>
-                </div>
-                <div className="insights-empty-preview__metrics" aria-label={copy.insights.recentTrend}>
-                    {previewMetrics.map((item) => (
-                        <div key={item.label} className="insights-empty-preview__metric">
-                            <span>{item.label}</span>
-                            <strong>{item.value}</strong>
-                        </div>
-                    ))}
-                </div>
-                <div className="insights-empty-preview__unlock-list">
-                    {unlockItems.map(({ icon: Icon, label, body, tone }, index) => (
-                        <div key={label} className={`insights-empty-preview__unlock insights-empty-preview__unlock--${tone}`}>
-                            <span className="insights-empty-preview__unlock-index">{String(index + 1).padStart(2, '0')}</span>
-                            <span className="insights-empty-preview__unlock-icon" aria-hidden="true">
-                                <Icon size={18} strokeWidth={2.2} />
-                            </span>
-                            <div>
-                                <strong>{label}</strong>
-                                <p>{body}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-                <div className="insights-empty-preview__route" aria-label={copy.insights.emptyRouteTitle}>
-                    <span>{copy.insights.emptyRouteStepOne}</span>
-                    <span>{copy.insights.emptyRouteStepTwo}</span>
-                    <span>{copy.insights.emptyRouteStepThree}</span>
-                </div>
-            </div>
-        </section>
+        </AppCommandDeck>
     );
 }
 
