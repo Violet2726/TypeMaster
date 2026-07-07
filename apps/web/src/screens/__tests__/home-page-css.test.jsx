@@ -27,6 +27,23 @@ describe('home page CSS', () => {
         expect(actionRow).toContain('min-height: 4.2rem;');
     });
 
+    test('keeps the hero progress panel as a structured command surface', async () => {
+        const css = await readFile(resolve(screenDir, 'home-page.css'), 'utf8');
+        const heroCard = getBlock(css, '.home-status-page-stack .app-feature-card--primary');
+        const heroHead = getBlock(css, '.home-hero-panel__head');
+        const heroBadge = getBlock(css, '.home-hero-panel__badge');
+        const heroList = getBlock(css, '.home-hero-panel__list');
+        const heroLead = getBlock(css, '.home-hero-panel__item:first-child');
+        const heroFooter = getBlock(css, '.home-hero-panel__footer');
+
+        expect(heroCard).toContain('grid-template-columns: auto minmax(0, 1fr) minmax(284px, 360px);');
+        expect(heroHead).toContain('justify-content: space-between;');
+        expect(heroBadge).toContain('border-radius: var(--radius-pill);');
+        expect(heroList).toContain('grid-template-columns: repeat(2, minmax(0, 1fr));');
+        expect(heroLead).toContain('grid-column: 1 / -1;');
+        expect(heroFooter).toContain('display: flex;');
+    });
+
     test('keeps the recent run area as a light status row', async () => {
         const css = await readFile(resolve(screenDir, 'home-page.css'), 'utf8');
         const emptyStatus = getBlock(css, '.home-recent--empty .home-recent-summary__body strong');

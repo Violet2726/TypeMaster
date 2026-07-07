@@ -85,6 +85,9 @@ describe('HomePage', () => {
         expect(container.querySelector('.home-recent-list')).not.toBeInTheDocument();
         expect(container.querySelector('.home-recent-summary')).toBeInTheDocument();
         expect(container.querySelector('.home-recent-summary__detail')).not.toBeInTheDocument();
+        expect(container.querySelector('.home-hero-panel__head')).toBeInTheDocument();
+        expect(container.querySelector('.home-hero-panel__badge')).toBeInTheDocument();
+        expect(container.querySelectorAll('.home-hero-panel__footer-item')).toHaveLength(3);
     });
 
     test('opens TypeRift as a cardized command-center experience', async () => {
@@ -164,7 +167,7 @@ describe('HomePage', () => {
         });
 
         expect(await screen.findByRole('heading', { name: '上一局信号' })).toBeInTheDocument();
-        expect(screen.getAllByText('层数 4')).toHaveLength(2);
+        expect(screen.getAllByText('层数 4')).toHaveLength(3);
         expect(screen.getByLabelText('TypeRift recent status')).toBeInTheDocument();
         expect(screen.getByText('97%')).toBeInTheDocument();
     });

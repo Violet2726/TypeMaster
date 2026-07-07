@@ -111,6 +111,8 @@ export function HomePage() {
                 : homeCopy.firstRunTitle
         }
     ];
+    const heroLoopItems = [copy.nav.typerift, copy.nav.practice, copy.nav.insights];
+    const heroBadge = latestGame ? `${homeCopy.depthLabel} ${getTypeRiftDepth(latestGame) || 1}` : homeCopy.ready;
     const openTypeRift = useCallback(() => {
         setIsTypeRiftOpen(true);
         replaceHash('#typerift');
@@ -145,7 +147,10 @@ export function HomePage() {
             <TodayHero
                 aside={(
                     <div className="home-hero-panel" aria-label={homeCopy.progressAria}>
-                        <p className="home-hero-panel__kicker">{homeCopy.progressAria}</p>
+                        <div className="home-hero-panel__head">
+                            <p className="home-hero-panel__kicker">{homeCopy.progressAria}</p>
+                            <span className="home-hero-panel__badge">{heroBadge}</span>
+                        </div>
                         <div className="home-hero-panel__list">
                             {heroAsideItems.map((item) => (
                                 <article key={item.id} className="home-hero-panel__item">
@@ -153,6 +158,11 @@ export function HomePage() {
                                     <strong>{item.value}</strong>
                                     <small>{item.detail}</small>
                                 </article>
+                            ))}
+                        </div>
+                        <div className="home-hero-panel__footer" aria-label={homeCopy.loopActionsAria}>
+                            {heroLoopItems.map((item) => (
+                                <span key={item} className="home-hero-panel__footer-item">{item}</span>
                             ))}
                         </div>
                     </div>
