@@ -53,6 +53,7 @@ describe('Header', () => {
         const missionLinks = screen.getAllByRole('link', { name: 'Missions' });
         expect(missionLinks.some((link) => link.getAttribute('aria-current') === 'page')).toBe(true);
         expect(screen.queryByRole('link', { name: 'Home', current: 'page' })).not.toBeInTheDocument();
+        expect(screen.getByText('Calibrate today, repair exposed weak zones, and return to the next run with a cleaner build path.')).toBeInTheDocument();
     });
 
     test('moves the current marker from Home to TypeRift when the hash route is active', async () => {
@@ -68,6 +69,7 @@ describe('Header', () => {
         await waitFor(() => {
             expect(currentLinks('TypeRift')).toHaveLength(2);
         });
+        expect(screen.getByText('Type enemy tags, evolve weapons, and decide whether to extract or dive deeper.')).toBeInTheDocument();
         expect(currentLinks('Home')).toHaveLength(0);
     });
 });

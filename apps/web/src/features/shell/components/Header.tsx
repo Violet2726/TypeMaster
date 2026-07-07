@@ -55,6 +55,26 @@ function getNavProps(pathname: string, hash: string, href: string) {
     };
 }
 
+function getActiveNavRoute(navItems, pathname: string, hash: string) {
+    return navItems.find((route) => isShellLinkActive(pathname, hash, route.href)) || navItems[0];
+}
+
+function getRouteSummary(routeId: string, copy: AppCopy) {
+    switch (routeId) {
+        case 'typerift':
+            return copy.home.typeRiftLaneBody;
+        case 'practice':
+            return copy.practice.idleHint;
+        case 'missions':
+            return copy.missions.body;
+        case 'insights':
+            return copy.insights.body;
+        case 'today':
+        default:
+            return copy.home.commandBody;
+    }
+}
+
 export function Header({ settings, copy, onToggleTheme, onOpenSettings }: HeaderProps) {
     const pathname = usePathname();
     const [locationHash, setLocationHash] = useState(getCurrentHash);
@@ -64,6 +84,8 @@ export function Header({ settings, copy, onToggleTheme, onOpenSettings }: Header
         ...route,
         label: resolveRouteLabel(route, copy)
     }));
+    const activeRoute = getActiveNavRoute(navItems, pathname, locationHash);
+    const activeRouteSummary = getRouteSummary(activeRoute.id, copy);
 
     useEffect(() => {
         const syncHash = () => setLocationHash(getCurrentHash());
@@ -82,22 +104,32 @@ export function Header({ settings, copy, onToggleTheme, onOpenSettings }: Header
         <>
             <header className={`app-header ${compact ? 'is-compact' : ''}`}>
                 <div className="container app-header__inner">
-                    <Link href="/" className="logo">
-                        <span className="logo-mark" />
-                        <span className="logo-word">Type<span>Master</span></span>
-                    </Link>
+                    <div className="app-header__start">
+                        <Link href="/" className="logo">
+                            <span className="logo-mark" />
+                            <span className="logo-word">Type<span>Master</span></span>
+                        </Link>
+
+                        {!compact ? (
+                            <div className="nav-context" aria-label={`${activeRoute.label} summary`}>
+                                <span className="nav-context__kicker">{copy.shell.kicker}</span>
+                                <strong>{activeRoute.label}</strong>
+                                <small>{activeRouteSummary}</small>
+                            </div>
+                        ) : null}
+                    </div>
 
                     {!compact && (
                         <nav className="nav-links" aria-label="Primary">
                             {navItems.map(({ href, label }) => (
                                 <Link key={href} href={href} {...getNavProps(pathname, locationHash, href)}>
-                                    {label}
+                                    <span>{label}</span>
                                 </Link>
                             ))}
                         </nav>
                     )}
 
-                    <div className="nav-actions">
+                    <div className="nav-actions" role="toolbar" aria-label="Shell actions">
                         <IconButton
                             className="nav-icon nav-icon--tool"
                             onClick={onToggleTheme}
