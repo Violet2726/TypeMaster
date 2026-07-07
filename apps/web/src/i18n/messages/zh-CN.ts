@@ -86,6 +86,13 @@ export const zhCNMessages = {
         error: '需要处理',
         loading: '处理中'
     },
+    confirm: {
+        ...enUSMessages.confirm,
+        stay: '继续练习',
+        leave: '离开本轮',
+        reset: '重置本轮',
+        apply: '应用更改'
+    },
     errors: {
         ...enUSMessages.errors,
         missing_config: {
@@ -551,6 +558,13 @@ export const zhCNMessages = {
         },
         practice: {
             ...enUSMessages.training.practice,
+            taskKicker: '当前任务',
+            diagnosticBadge: '评估',
+            planBadge: '计划训练',
+            challengeBadge: '挑战轮次',
+            nextBriefKicker: '开始前',
+            nextBriefBadge: '本轮重点',
+            adaptiveKicker: '跟练文本',
             adaptiveFocusLabel: '重点',
             adaptiveSignalLabel: '信号',
             adaptiveHotspotLabel: '热点',

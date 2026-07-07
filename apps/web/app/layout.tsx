@@ -17,6 +17,7 @@ import '../src/styles/result-page.css';
 import '../src/styles/insights-page-full.css';
 import '../src/styles/settings.css';
 import '../src/styles/dialogs.css';
+import '../src/styles/overlays.css';
 import '../src/styles/mobile.css';
 
 export const metadata: Metadata = {

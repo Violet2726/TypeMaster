@@ -401,6 +401,7 @@ export function PracticePage() {
                 isOpen={Boolean(confirmState)}
                 title={confirmState?.title}
                 body={confirmState?.body}
+                tone={confirmState?.tone}
                 confirmLabel={confirmState?.confirmLabel || store.copy.common.confirm}
                 cancelLabel={confirmState?.cancelLabel || store.copy.common.cancel}
                 onConfirm={() => {
@@ -415,6 +416,7 @@ export function PracticePage() {
                 isOpen={Boolean(pendingNavigation)}
                 title={store.copy.practice.confirmLeaveTitle}
                 body={store.copy.practice.confirmLeaveBody}
+                tone="default"
                 confirmLabel={store.copy.confirm.leave}
                 cancelLabel={store.copy.confirm.stay}
                 onConfirm={() => {

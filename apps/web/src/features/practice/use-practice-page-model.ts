@@ -7,6 +7,15 @@ type ConfigChangeOptions = {
     risky?: boolean,
 };
 
+type ConfirmState = {
+    action: () => void,
+    body: string,
+    cancelLabel: string,
+    confirmLabel: string,
+    title: string,
+    tone?: 'danger' | 'default',
+};
+
 function getPrimaryActionLabel(copy, trainingCopy, config, aiPracticeStatus, status, isCustomEmpty) {
     if (config.source === 'ai') {
         if (aiPracticeStatus === 'loading') return copy.common.loading;
@@ -144,7 +153,7 @@ export function usePracticePageModel({
     settings,
     updateConfig
 }) {
-    const [confirmState, setConfirmState] = useState(null);
+    const [confirmState, setConfirmState] = useState<ConfirmState | null>(null);
     const [controlsOpen, setControlsOpen] = useState(() => config.source === 'ai');
     const [customText, setCustomText] = useState(() => settings.customWordBankText || '');
     const bypassBlockerRef = useRef(false);
@@ -254,6 +263,7 @@ export function usePracticePageModel({
                 body: copy.practice.confirmConfigBody,
                 confirmLabel: copy.confirm.apply,
                 cancelLabel: copy.confirm.stay,
+                tone: 'default',
                 action: () => {
                     typingSession.resetSession();
                     commitConfigChange(patch);
@@ -281,6 +291,7 @@ export function usePracticePageModel({
             body: copy.practice.confirmConfigBody,
             confirmLabel: copy.confirm.apply,
             cancelLabel: copy.confirm.stay,
+            tone: 'default',
             action: () => {
                 typingSession.resetSession();
                 resetPracticeToBuiltin();
@@ -299,6 +310,7 @@ export function usePracticePageModel({
             body: copy.practice.confirmConfigBody,
             confirmLabel: copy.confirm.apply,
             cancelLabel: copy.confirm.stay,
+            tone: 'default',
             action: () => {
                 typingSession.resetSession();
                 applyCustomWordBank(customText);

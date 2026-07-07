@@ -14,18 +14,22 @@ export function ConfirmDialog({
         return null;
     }
 
+    const titleId = React.useId();
+    const bodyId = React.useId();
+
     return (
         <div className="modal-overlay" role="presentation" onClick={onCancel}>
             <div
-                className="confirm-dialog"
+                className={`confirm-dialog confirm-dialog--${tone}`}
                 role="dialog"
                 aria-modal="true"
-                aria-label={title}
+                aria-labelledby={title ? titleId : undefined}
+                aria-describedby={body ? bodyId : undefined}
                 onClick={(event) => event.stopPropagation()}
             >
                 <div className="confirm-dialog__body">
-                    <h3>{title}</h3>
-                    <p className="muted-text">{body}</p>
+                    <h3 id={titleId}>{title}</h3>
+                    <p id={bodyId} className="muted-text">{body}</p>
                 </div>
 
                 <div className="confirm-dialog__actions">

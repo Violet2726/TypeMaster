@@ -237,6 +237,46 @@ describe('PracticePage', () => {
         expect(screen.getByText('Keep accuracy at or above 96%')).toBeInTheDocument();
     });
 
+    test('localizes the next-round brief in Chinese', () => {
+        const copy = getCopy('zh-CN');
+
+        Object.assign(mockStore, {
+            ...baseStore,
+            copy,
+            language: 'zh-CN'
+        });
+
+        render(<PracticePage />);
+
+        expect(screen.getByText('开始前')).toBeInTheDocument();
+        expect(screen.getByText('本轮重点')).toBeInTheDocument();
+    });
+
+    test('localizes the reset dialog actions in Chinese', () => {
+        const copy = getCopy('zh-CN');
+
+        Object.assign(mockStore, {
+            ...baseStore,
+            copy,
+            language: 'zh-CN'
+        });
+        Object.assign(mockTypingSession, {
+            ...idleTypingSession,
+            status: 'running',
+            currentInput: 'a'
+        });
+
+        render(<PracticePage />);
+
+        fireEvent.click(screen.getByRole('button', { name: copy.common.resetRound }));
+
+        const dialog = screen.getByRole('dialog', { name: '要重置本轮练习吗？' });
+
+        expect(dialog).toBeInTheDocument();
+        expect(within(dialog).getByRole('button', { name: '继续练习' })).toBeInTheDocument();
+        expect(within(dialog).getByRole('button', { name: '重置本轮' })).toBeInTheDocument();
+    });
+
     test('keeps the practice surface focused once typing has started', () => {
         Object.assign(mockTypingSession, {
             status: 'running',
