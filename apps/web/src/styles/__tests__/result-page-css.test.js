@@ -14,6 +14,18 @@ function getBlock(css, selector) {
 }
 
 describe('result page CSS', () => {
+    test('keeps the empty result state inside the shared command deck shell', async () => {
+        const css = await readFile(resolve(stylesRoot, 'result-page.css'), 'utf8');
+        const emptyPanel = getBlock(css, '.result-empty-panel');
+        const emptyTitle = getBlock(css, '.result-empty-panel h1');
+        const emptyAction = getBlock(css, '.result-empty-panel .app-command-deck__actions .action-btn');
+
+        expect(emptyPanel).toContain('grid-template-columns: minmax(0, 0.72fr) minmax(18rem, 0.5fr);');
+        expect(emptyPanel).toContain('align-items: stretch;');
+        expect(emptyTitle).toContain('max-width: 12ch;');
+        expect(emptyAction).toContain('min-width: 8.8rem;');
+    });
+
     test('keeps the completion stage clear instead of decorative and score-heavy', async () => {
         const css = await readFile(resolve(stylesRoot, 'result-page.css'), 'utf8');
         const completionStage = getBlock(css, '.result-completion-stage');
@@ -22,6 +34,8 @@ describe('result page CSS', () => {
 
         expect(css).not.toMatch(/\.result-completion-stage::before[\s\S]*radial-gradient/);
         expect(completionStage).toContain('grid-template-columns: minmax(0, 1.18fr) minmax(20rem, 0.72fr);');
+        expect(completionStage).toContain('border-radius: 28px;');
+        expect(completionStage).toContain('backdrop-filter: blur(20px) saturate(140%);');
         expect(summaryHero).toContain('grid-template-columns: minmax(0, 1fr) minmax(10.5rem, 0.42fr);');
         expect(summaryScores).toContain('grid-template-columns: 1fr;');
     });
