@@ -164,7 +164,7 @@ describe('HomePage', () => {
         });
 
         expect(await screen.findByRole('heading', { name: '上一局信号' })).toBeInTheDocument();
-        expect(screen.getByText('层数 4')).toBeInTheDocument();
+        expect(screen.getAllByText('层数 4')).toHaveLength(2);
         expect(screen.getByLabelText('TypeRift recent status')).toBeInTheDocument();
         expect(screen.getByText('97%')).toBeInTheDocument();
     });

@@ -21,9 +21,10 @@ describe('home page CSS', () => {
         const actionRow = getBlock(css, '.home-action-row');
 
         expect(actionList).toContain('display: grid;');
-        expect(actionList).toContain('background: transparent;');
+        expect(actionList).toContain('border-radius: 24px;');
+        expect(actionList).toContain('backdrop-filter: blur(16px) saturate(135%);');
         expect(actionRow).toContain('grid-template-columns: auto minmax(0, 1fr) auto;');
-        expect(actionRow).toContain('min-height: 3.55rem;');
+        expect(actionRow).toContain('min-height: 4.2rem;');
     });
 
     test('keeps the recent run area as a light status row', async () => {

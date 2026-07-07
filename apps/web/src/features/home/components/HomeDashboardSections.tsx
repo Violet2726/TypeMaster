@@ -15,6 +15,7 @@ export type ProgressItem = {
 };
 
 export function TodayHero({
+    aside,
     body,
     kicker,
     onOpenMissions,
@@ -23,6 +24,7 @@ export function TodayHero({
     title,
     viewMissionsLabel
 }: {
+    aside?: ReactNode;
     body: string;
     kicker: string;
     onOpenMissions: () => void;
@@ -49,6 +51,7 @@ export function TodayHero({
                     {viewMissionsLabel}
                 </AppButton>
             </div>
+            {aside ? <div className="app-feature-card__aside">{aside}</div> : null}
         </section>
     );
 }

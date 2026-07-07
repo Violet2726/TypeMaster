@@ -89,6 +89,28 @@ export function HomePage() {
             tone: 'success'
         }
     ];
+    const heroAsideItems = [
+        {
+            id: 'focus',
+            label: copy.nav.practice,
+            value: weakFocus || homeCopy.noWeakFocus,
+            detail: homeCopy.focusLaneBody
+        },
+        {
+            id: 'mission',
+            label: copy.nav.missions,
+            value: `${weeklyGoal.completed}/${weeklyGoal.target}`,
+            detail: homeCopy.missionLane
+        },
+        {
+            id: 'signal',
+            label: latestGame ? homeCopy.latestTypeRift : homeCopy.firstRunKicker,
+            value: latestGame ? `${homeCopy.depthLabel} ${getTypeRiftDepth(latestGame) || 1}` : homeCopy.ready,
+            detail: latestGame
+                ? `${latestGame?.result?.accuracy || 0}% · ${formatDuration(latestGame?.durationSeconds || latestGame?.result?.durationSeconds || 0)}`
+                : homeCopy.firstRunTitle
+        }
+    ];
     const openTypeRift = useCallback(() => {
         setIsTypeRiftOpen(true);
         replaceHash('#typerift');
@@ -121,6 +143,20 @@ export function HomePage() {
     return (
         <div className="page-stack page-stack--home home-status-page-stack home-status-page-stack--dashboard">
             <TodayHero
+                aside={(
+                    <div className="home-hero-panel" aria-label={homeCopy.progressAria}>
+                        <p className="home-hero-panel__kicker">{homeCopy.progressAria}</p>
+                        <div className="home-hero-panel__list">
+                            {heroAsideItems.map((item) => (
+                                <article key={item.id} className="home-hero-panel__item">
+                                    <span>{item.label}</span>
+                                    <strong>{item.value}</strong>
+                                    <small>{item.detail}</small>
+                                </article>
+                            ))}
+                        </div>
+                    </div>
+                )}
                 kicker={homeCopy.commandKicker}
                 title={homeCopy.commandTitle}
                 body={homeCopy.commandBody}
