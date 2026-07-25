@@ -35,6 +35,7 @@ tmp/
 
 # Project data (except domain package)
 data
+.data
 !packages/domain/src/data/
 !packages/domain/src/data/words.js
 

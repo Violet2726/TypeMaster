@@ -1,13 +1,14 @@
-import { createNodeVitestConfig } from '@typemaster/config/vitest';
+import { createNodeVitestConfig } from '@typerift/config/vitest';
 
 export default createNodeVitestConfig({
-    include: ['__tests__/**/*.test.ts'],
+    include: ['**/*.test.ts'],
     fileParallelism: false,
-    coverageInclude: ['state/**/*.ts', 'lib/**/*.ts', 'infra/**/*.ts', 'repositories/**/*.ts'],
+    coverageInclude: ['app.ts', 'lib/**/*.ts', 'infra/**/*.ts'],
+    coverageExclude: ['infra/postgres-store.ts', 'infra/db/**/*.ts'],
     coverageThresholds: {
-        lines: 45,
-        functions: 65,
-        statements: 45,
-        branches: 50
+        lines: 80,
+        functions: 80,
+        statements: 80,
+        branches: 70
     }
 });

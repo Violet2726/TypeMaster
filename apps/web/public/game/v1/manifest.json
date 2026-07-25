@@ -1,0 +1,437 @@
+{
+    "contentVersion": 1,
+    "generated": true,
+    "license": "Original project asset generated for TypeRift",
+    "assets": [
+        {
+            "id": "prism-harbor",
+            "kind": "background",
+            "src": "/game/v1/backgrounds/prism-harbor.webp",
+            "width": 1920,
+            "height": 1080,
+            "sha256": "0e252dc477e9fdc17f2617ffd061e54c96a2e7a2d9c950b2838e9625df485170",
+            "colorSpace": "sRGB",
+            "altKey": "asset.background.prism-harbor.alt"
+        },
+        {
+            "id": "quiet-forge",
+            "kind": "background",
+            "src": "/game/v1/backgrounds/quiet-forge.webp",
+            "width": 1920,
+            "height": 1080,
+            "sha256": "7b3c548313e5324ec26506b69143b28054190933826bd495afe60ed25e00ce7d",
+            "colorSpace": "sRGB",
+            "altKey": "asset.background.quiet-forge.alt"
+        },
+        {
+            "id": "black-core",
+            "kind": "background",
+            "src": "/game/v1/backgrounds/black-core.webp",
+            "width": 1920,
+            "height": 1080,
+            "sha256": "a03366d67f28dbd2596e2a42e5c567c1ee92a48a606037088ef3ca2456061eb8",
+            "colorSpace": "sRGB",
+            "altKey": "asset.background.black-core.alt"
+        },
+        {
+            "id": "drift",
+            "kind": "enemy",
+            "src": "/game/v1/enemies/drift.png",
+            "width": 384,
+            "height": 384,
+            "sha256": "ff65a7e026d199382927201af8469e1bc5a49c27ded536750e731dff57722ff0",
+            "colorSpace": "sRGB",
+            "altKey": "asset.enemy.drift.alt"
+        },
+        {
+            "id": "flare",
+            "kind": "enemy",
+            "src": "/game/v1/enemies/flare.png",
+            "width": 384,
+            "height": 384,
+            "sha256": "45b4ca30a20b68fce6646d89b68444a06f93fd41dd2f29af03df953263d12abb",
+            "colorSpace": "sRGB",
+            "altKey": "asset.enemy.flare.alt"
+        },
+        {
+            "id": "veil",
+            "kind": "enemy",
+            "src": "/game/v1/enemies/veil.png",
+            "width": 384,
+            "height": 384,
+            "sha256": "ef43d4c1948433aadbba7b8b2819c2b776b49cfdbfc9fc201c412684c5b8cf5b",
+            "colorSpace": "sRGB",
+            "altKey": "asset.enemy.veil.alt"
+        },
+        {
+            "id": "hinge",
+            "kind": "enemy",
+            "src": "/game/v1/enemies/hinge.png",
+            "width": 384,
+            "height": 384,
+            "sha256": "73212e1c5bf157d657b797c24165bc5a64caa0219506b4a85d8991434d4d64e1",
+            "colorSpace": "sRGB",
+            "altKey": "asset.enemy.hinge.alt"
+        },
+        {
+            "id": "choir",
+            "kind": "enemy",
+            "src": "/game/v1/enemies/choir.png",
+            "width": 384,
+            "height": 384,
+            "sha256": "1ae0afc0479b0df867af1771274c813df8e1fde68d68bf8e128f047cc072595b",
+            "colorSpace": "sRGB",
+            "altKey": "asset.enemy.choir.alt"
+        },
+        {
+            "id": "lattice",
+            "kind": "enemy",
+            "src": "/game/v1/enemies/lattice.png",
+            "width": 384,
+            "height": 384,
+            "sha256": "327c5efcffa593457f890c9cd6ad7ad0e064552b3bc9226804150525b503f054",
+            "colorSpace": "sRGB",
+            "altKey": "asset.enemy.lattice.alt"
+        },
+        {
+            "id": "cipher",
+            "kind": "enemy",
+            "src": "/game/v1/enemies/cipher.png",
+            "width": 384,
+            "height": 384,
+            "sha256": "adf72c849206dbcdade1c186fde47ef4bfb8bd28329f7e7478d205bee3e649c2",
+            "colorSpace": "sRGB",
+            "altKey": "asset.enemy.cipher.alt"
+        },
+        {
+            "id": "warden",
+            "kind": "enemy",
+            "src": "/game/v1/enemies/warden.png",
+            "width": 384,
+            "height": 384,
+            "sha256": "0cc0e3c38ad6693109738d5d708cbce0d11bbd625309559a47393367a256514d",
+            "colorSpace": "sRGB",
+            "altKey": "asset.enemy.warden.alt"
+        },
+        {
+            "id": "echo",
+            "kind": "enemy",
+            "src": "/game/v1/enemies/echo.png",
+            "width": 384,
+            "height": 384,
+            "sha256": "937a9acaeaaa1dad54ca271061ab3892856c232a1266f2605cc2442c646f3861",
+            "colorSpace": "sRGB",
+            "altKey": "asset.enemy.echo.alt"
+        },
+        {
+            "id": "harbor-mind",
+            "kind": "boss",
+            "src": "/game/v1/bosses/harbor-mind.png",
+            "width": 512,
+            "height": 512,
+            "sha256": "d8177bfb50bf84e7b7f764faddfaaa9c4a7774f1233fb18afee0c573b3947c11",
+            "colorSpace": "sRGB",
+            "altKey": "asset.boss.harbor-mind.alt"
+        },
+        {
+            "id": "still-engine",
+            "kind": "boss",
+            "src": "/game/v1/bosses/still-engine.png",
+            "width": 512,
+            "height": 512,
+            "sha256": "7d98aed53f38d056c827ada7ea5b835c5435e9d9fbdf36977a8a08abf8598fc5",
+            "colorSpace": "sRGB",
+            "altKey": "asset.boss.still-engine.alt"
+        },
+        {
+            "id": "terminal-sun",
+            "kind": "boss",
+            "src": "/game/v1/bosses/terminal-sun.png",
+            "width": 512,
+            "height": 512,
+            "sha256": "f3905ef0940bc7de9d46677a7fc971a43d0b10948e57047a59a64f5c796731c8",
+            "colorSpace": "sRGB",
+            "altKey": "asset.boss.terminal-sun.alt"
+        },
+        {
+            "id": "clean-strike",
+            "kind": "upgrade",
+            "src": "/game/v1/upgrades/clean-strike.png",
+            "width": 192,
+            "height": 192,
+            "sha256": "e87ddbf8eec2e7f06c92071a2399a845152b41ce5956fd1442133c1c87526c0e",
+            "colorSpace": "sRGB",
+            "altKey": "asset.upgrade.clean-strike.alt"
+        },
+        {
+            "id": "echo-lance",
+            "kind": "upgrade",
+            "src": "/game/v1/upgrades/echo-lance.png",
+            "width": 192,
+            "height": 192,
+            "sha256": "d098b8716e4a1db6d813ffb9fe145c8b2429cf2bb4e1199730f23f3f885fb0c6",
+            "colorSpace": "sRGB",
+            "altKey": "asset.upgrade.echo-lance.alt"
+        },
+        {
+            "id": "prism-arc",
+            "kind": "upgrade",
+            "src": "/game/v1/upgrades/prism-arc.png",
+            "width": 192,
+            "height": 192,
+            "sha256": "e24c45d7c32f3acbe2c1847034817189bca4f6ed9b3bcf139835a08ba50ea693",
+            "colorSpace": "sRGB",
+            "altKey": "asset.upgrade.prism-arc.alt"
+        },
+        {
+            "id": "quiet-blade",
+            "kind": "upgrade",
+            "src": "/game/v1/upgrades/quiet-blade.png",
+            "width": 192,
+            "height": 192,
+            "sha256": "e2a1e0d22702af6400b6e0137d9ac235cfcc146fe5ff26b1ada9f247fd675b71",
+            "colorSpace": "sRGB",
+            "altKey": "asset.upgrade.quiet-blade.alt"
+        },
+        {
+            "id": "signal-ray",
+            "kind": "upgrade",
+            "src": "/game/v1/upgrades/signal-ray.png",
+            "width": 192,
+            "height": 192,
+            "sha256": "ddc33dc0471ffbdbc8a4adc5f75b0588bcbd19e157051ba3c559333f42aa4082",
+            "colorSpace": "sRGB",
+            "altKey": "asset.upgrade.signal-ray.alt"
+        },
+        {
+            "id": "orbit-burst",
+            "kind": "upgrade",
+            "src": "/game/v1/upgrades/orbit-burst.png",
+            "width": 192,
+            "height": 192,
+            "sha256": "e7ebf424874564afe1528acd4581881e466d1506c04e8dcd275699f3f1674ebb",
+            "colorSpace": "sRGB",
+            "altKey": "asset.upgrade.orbit-burst.alt"
+        },
+        {
+            "id": "terminal-wave",
+            "kind": "upgrade",
+            "src": "/game/v1/upgrades/terminal-wave.png",
+            "width": 192,
+            "height": 192,
+            "sha256": "f096a29bdde1cb8aaecb7a9a9433eb7c505e60182be5f5a241dc532f54cdda28",
+            "colorSpace": "sRGB",
+            "altKey": "asset.upgrade.terminal-wave.alt"
+        },
+        {
+            "id": "lumen-cascade",
+            "kind": "upgrade",
+            "src": "/game/v1/upgrades/lumen-cascade.png",
+            "width": 192,
+            "height": 192,
+            "sha256": "7f0a3917a3ccafa8facd62a416d6a7299b1c830e972362dab21a0aa7fc1d11c8",
+            "colorSpace": "sRGB",
+            "altKey": "asset.upgrade.lumen-cascade.alt"
+        },
+        {
+            "id": "calm-buffer",
+            "kind": "upgrade",
+            "src": "/game/v1/upgrades/calm-buffer.png",
+            "width": 192,
+            "height": 192,
+            "sha256": "c36225c13763b5ee2e88c3dd4152d0edba947a6d15688cc5349d88786087eb03",
+            "colorSpace": "sRGB",
+            "altKey": "asset.upgrade.calm-buffer.alt"
+        },
+        {
+            "id": "steady-heart",
+            "kind": "upgrade",
+            "src": "/game/v1/upgrades/steady-heart.png",
+            "width": 192,
+            "height": 192,
+            "sha256": "8e595c16c784f64f58d2dc839efced1a550c636982fc2bf237cb77aa696de106",
+            "colorSpace": "sRGB",
+            "altKey": "asset.upgrade.steady-heart.alt"
+        },
+        {
+            "id": "glass-memory",
+            "kind": "upgrade",
+            "src": "/game/v1/upgrades/glass-memory.png",
+            "width": 192,
+            "height": 192,
+            "sha256": "16f8268ec3cb478ee1b3595af94f72af01ee485e8850663d4af3ed0c33383d7f",
+            "colorSpace": "sRGB",
+            "altKey": "asset.upgrade.glass-memory.alt"
+        },
+        {
+            "id": "soft-landing",
+            "kind": "upgrade",
+            "src": "/game/v1/upgrades/soft-landing.png",
+            "width": 192,
+            "height": 192,
+            "sha256": "eb9666164f534c30dde4c26572e6c073befc95cc8526e23a1f60ca5aad49e1f2",
+            "colorSpace": "sRGB",
+            "altKey": "asset.upgrade.soft-landing.alt"
+        },
+        {
+            "id": "shard-vault",
+            "kind": "upgrade",
+            "src": "/game/v1/upgrades/shard-vault.png",
+            "width": 192,
+            "height": 192,
+            "sha256": "7b102309d9f655b33d9aef0294e3801cc5da488da85e11e55d3d376edd5f77cf",
+            "colorSpace": "sRGB",
+            "altKey": "asset.upgrade.shard-vault.alt"
+        },
+        {
+            "id": "resonance-loop",
+            "kind": "upgrade",
+            "src": "/game/v1/upgrades/resonance-loop.png",
+            "width": 192,
+            "height": 192,
+            "sha256": "360af631936686078aa821bceac85e3bfc0e94ff384d7f3d84dce57d8bf2014d",
+            "colorSpace": "sRGB",
+            "altKey": "asset.upgrade.resonance-loop.alt"
+        },
+        {
+            "id": "deep-breath",
+            "kind": "upgrade",
+            "src": "/game/v1/upgrades/deep-breath.png",
+            "width": 192,
+            "height": 192,
+            "sha256": "66d76a705a9aa6b45d980ce06f143a038cb5fce559d8acb7a82553e2fd372c2d",
+            "colorSpace": "sRGB",
+            "altKey": "asset.upgrade.deep-breath.alt"
+        },
+        {
+            "id": "second-light",
+            "kind": "upgrade",
+            "src": "/game/v1/upgrades/second-light.png",
+            "width": 192,
+            "height": 192,
+            "sha256": "f49f96976eea3d926cffc9057f8b1eb741c3fd7f473fe939522f5fb21a8743cc",
+            "colorSpace": "sRGB",
+            "altKey": "asset.upgrade.second-light.alt"
+        },
+        {
+            "id": "focus-glyph",
+            "kind": "upgrade",
+            "src": "/game/v1/upgrades/focus-glyph.png",
+            "width": 192,
+            "height": 192,
+            "sha256": "7602778092ff4b98d74f44e800e51b85dea088efce98bdd14fd66c48df550f34",
+            "colorSpace": "sRGB",
+            "altKey": "asset.upgrade.focus-glyph.alt"
+        },
+        {
+            "id": "number-glyph",
+            "kind": "upgrade",
+            "src": "/game/v1/upgrades/number-glyph.png",
+            "width": 192,
+            "height": 192,
+            "sha256": "d8f8f223f51983e755bf698952419952f7d99d7dc7b3f3b7d22acca8454b9396",
+            "colorSpace": "sRGB",
+            "altKey": "asset.upgrade.number-glyph.alt"
+        },
+        {
+            "id": "punctuation-glyph",
+            "kind": "upgrade",
+            "src": "/game/v1/upgrades/punctuation-glyph.png",
+            "width": 192,
+            "height": 192,
+            "sha256": "c37326aaa8707256e2c909a4e0ae433fc654e8cec8dc8d7c1c9fd8bce21b86f7",
+            "colorSpace": "sRGB",
+            "altKey": "asset.upgrade.punctuation-glyph.alt"
+        },
+        {
+            "id": "mirror-glyph",
+            "kind": "upgrade",
+            "src": "/game/v1/upgrades/mirror-glyph.png",
+            "width": 192,
+            "height": 192,
+            "sha256": "1c776d7d6569f5c4717eb5bb42e094ada29875bf0c0ed09aaebbd90a4aa197c5",
+            "colorSpace": "sRGB",
+            "altKey": "asset.upgrade.mirror-glyph.alt"
+        },
+        {
+            "id": "velocity-glyph",
+            "kind": "upgrade",
+            "src": "/game/v1/upgrades/velocity-glyph.png",
+            "width": 192,
+            "height": 192,
+            "sha256": "1c805f0a0a571246614ffcbbeee39a15b8f8a65885f813c3f99c3c08542e35e2",
+            "colorSpace": "sRGB",
+            "altKey": "asset.upgrade.velocity-glyph.alt"
+        },
+        {
+            "id": "fracture-glyph",
+            "kind": "upgrade",
+            "src": "/game/v1/upgrades/fracture-glyph.png",
+            "width": 192,
+            "height": 192,
+            "sha256": "9e7806bfae478b97e72f446003fea5b5126c2dda9daece9045d1ad00dc8dcd8c",
+            "colorSpace": "sRGB",
+            "altKey": "asset.upgrade.fracture-glyph.alt"
+        },
+        {
+            "id": "boss-glyph",
+            "kind": "upgrade",
+            "src": "/game/v1/upgrades/boss-glyph.png",
+            "width": 192,
+            "height": 192,
+            "sha256": "03323af28d295f1bff7e7f3f2e5d0fd0168305cce1a3cb08cb3b617679d25eaa",
+            "colorSpace": "sRGB",
+            "altKey": "asset.upgrade.boss-glyph.alt"
+        },
+        {
+            "id": "black-core-key",
+            "kind": "upgrade",
+            "src": "/game/v1/upgrades/black-core-key.png",
+            "width": 192,
+            "height": 192,
+            "sha256": "47ce14eac30ffbc085f4cb59fc9a8edca7dfa6bd94ad119b4039d7bfa068d5f2",
+            "colorSpace": "sRGB",
+            "altKey": "asset.upgrade.black-core-key.alt"
+        },
+        {
+            "id": "hit",
+            "kind": "audio",
+            "src": "/game/v1/audio/hit.wav",
+            "durationMs": 100,
+            "sha256": "2ccd8006d65a851f2817370244b8e006c647850bf3c1f226c2296ae0c4b5476b",
+            "altKey": "asset.audio.hit.label"
+        },
+        {
+            "id": "error",
+            "kind": "audio",
+            "src": "/game/v1/audio/error.wav",
+            "durationMs": 160,
+            "sha256": "1650687b5e7a75bd4aeae0eedeaf33f44e52368d41c117b8f6b179b78c76bcca",
+            "altKey": "asset.audio.error.label"
+        },
+        {
+            "id": "surge",
+            "kind": "audio",
+            "src": "/game/v1/audio/surge.wav",
+            "durationMs": 520,
+            "sha256": "0ba23f7a2f2a221d649035e80f46a7ebabcf7abfcdb2aa5c45c863f13c901bd8",
+            "altKey": "asset.audio.surge.label"
+        },
+        {
+            "id": "upgrade",
+            "kind": "audio",
+            "src": "/game/v1/audio/upgrade.wav",
+            "durationMs": 440,
+            "sha256": "116042b91a401fcc7a840deb7036db8841e7d596e08d97b07b9c85e580a88f72",
+            "altKey": "asset.audio.upgrade.label"
+        },
+        {
+            "id": "ambient-loop",
+            "kind": "audio",
+            "src": "/game/v1/audio/ambient-loop.wav",
+            "durationMs": 6000,
+            "sha256": "43117b699627c33d4602415d111b87836bfeb7f2f6346ce37a0d61ed0b73b470",
+            "altKey": "asset.audio.ambient-loop.label"
+        }
+    ]
+}

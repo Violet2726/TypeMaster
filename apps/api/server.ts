@@ -1,12 +1,9 @@
 import { serve } from '@hono/node-server';
-import app from './app';
+import { createApi } from './app';
 
-const PORT = 8080;
-serve({
-    fetch: app.fetch,
-    port: PORT
+const port = Number(process.env.PORT ?? 8080);
+const app = await createApi();
+
+serve({ fetch: app.fetch, port }, ({ port: activePort }) => {
+    console.info(JSON.stringify({ level: 'info', service: 'typerift-api', port: activePort }));
 });
-
-console.log(`Server running at http://localhost:${PORT}/`);
-console.log(`AI practice endpoint: http://localhost:${PORT}/api/practice-text`);
-console.log(`AI coach endpoint: http://localhost:${PORT}/api/coach`);

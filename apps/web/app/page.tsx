@@ -1,5 +1,5 @@
-import HomePage from '../src/screens/HomePage';
+import { HubScreen } from '../src/features/hub/HubScreen';
 
-export default function Page() {
-    return <HomePage />;
+export default function HomePage() {
+    return <HubScreen />;
 }

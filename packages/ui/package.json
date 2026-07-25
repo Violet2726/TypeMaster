@@ -1,26 +1,30 @@
 {
-  "name": "@typemaster/ui",
-  "version": "1.0.0",
-  "private": true,
-  "type": "module",
-  "exports": {
-    ".": "./src/index.js"
-  },
-  "peerDependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-  },
-  "devDependencies": {
-    "@testing-library/react": "^16.3.2",
-    "@typemaster/config": "workspace:*",
-    "@vitest/coverage-v8": "^2.1.9",
-    "jsdom": "^26.1.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "vitest": "^2.1.0"
-  },
-  "scripts": {
-    "test": "vitest run --config vitest.config.js",
-    "test:coverage": "vitest run --config vitest.config.js --coverage"
-  }
+    "name": "@typerift/ui",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "exports": {
+        ".": "./src/index.tsx"
+    },
+    "peerDependencies": {
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0"
+    },
+    "devDependencies": {
+        "@types/react": "^18.3.23",
+        "@types/react-dom": "^18.3.7",
+        "@testing-library/react": "^16.3.2",
+        "@typerift/config": "workspace:*",
+        "@vitest/coverage-v8": "^2.1.9",
+        "jsdom": "^26.1.0",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "typescript": "^5.9.2",
+        "vitest": "^2.1.0"
+    },
+    "scripts": {
+        "typecheck": "tsc --noEmit -p tsconfig.json",
+        "test": "vitest run --config vitest.config.js",
+        "test:coverage": "vitest run --config vitest.config.js --coverage"
+    }
 }

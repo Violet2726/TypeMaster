@@ -5,6 +5,6 @@ export default defineConfig({
     out: './drizzle',
     dialect: 'postgresql',
     dbCredentials: {
-        url: process.env.DATABASE_URL || 'postgres://typemaster:typemaster@localhost:5432/typemaster'
+        url: process.env.DATABASE_URL || 'postgres://typerift:typerift@localhost:5432/typerift'
     }
 });

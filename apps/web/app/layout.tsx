@@ -1,46 +1,37 @@
-﻿import type { Metadata, Viewport } from 'next';
+import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
-import { AppFrameWrapper } from '../src/application/AppFrameWrapper';
-import { AppProviders } from '../src/application/AppProviders';
-import '../src/styles/layout.css';
-import '../src/styles/header.css';
-import '../src/styles/buttons.css';
-import '../src/styles/panels.css';
-import '../src/styles/base-page.css';
-import '../src/styles/typography.css';
-import '../src/styles/design-system.css';
-import '../src/components/app/app-primitives.css';
-import '../src/styles/animations.css';
-import '../src/styles/toggle-switch.css';
-import '../src/styles/typing-experience.css';
-import '../src/styles/result-page.css';
-import '../src/styles/insights-page-full.css';
-import '../src/styles/settings.css';
-import '../src/styles/dialogs.css';
-import '../src/styles/overlays.css';
-import '../src/styles/mobile.css';
+import { AppShell } from '../src/components/AppShell';
+import { Providers } from '../src/components/Providers';
+import './styles.css';
 
 export const metadata: Metadata = {
-    title: 'TypeMaster 2.0',
-    description: 'TypeMaster 2.0 typing training workspace'
+    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:5173'),
+    title: { default: 'TypeRift — Turn rhythm into force', template: '%s — TypeRift' },
+    description: 'A deterministic typing roguelite built around rhythm, clarity, and fair competition.',
+    applicationName: 'TypeRift',
+    manifest: '/manifest.webmanifest',
+    openGraph: { title: 'TypeRift', description: 'Turn rhythm into force.', images: ['/og.png'] },
+    icons: { icon: '/icon.svg' }
 };
 
 export const viewport: Viewport = {
     width: 'device-width',
-    initialScale: 1
+    initialScale: 1,
+    colorScheme: 'light dark',
+    themeColor: [
+        { media: '(prefers-color-scheme: light)', color: '#f3f5f8' },
+        { media: '(prefers-color-scheme: dark)', color: '#070a12' }
+    ]
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
     return (
-        <html lang="zh-CN" data-scroll-behavior="smooth">
+        <html lang="zh-CN" suppressHydrationWarning>
             <body>
-                <AppProviders>
-                    <AppFrameWrapper>
-                        {children}
-                    </AppFrameWrapper>
-                </AppProviders>
+                <Providers>
+                    <AppShell>{children}</AppShell>
+                </Providers>
             </body>
         </html>
     );
 }
-

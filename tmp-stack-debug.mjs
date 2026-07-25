@@ -1,0 +1,10 @@
+﻿import { createRun, dispatchRun, tickRun } from './packages/domain/src/index.ts';
+const base = dispatchRun(createRun({ id: 'run', mode: 'expedition', seed: 'seed' }), { type: 'start' }).state;
+const enemy = { id: 'enemy-1', archetypeId: 'drift', word: 'a', typed: '', lane: 0, pressure: 0.2, speed: 0, hp: 1, maxHp: 1, boss: false };
+const ready = { ...base, enemies: [enemy], xp: 70, nextUpgradeXp: 80 };
+const upgraded = dispatchRun(ready, { type: 'type', char: 'a' }).state;
+console.log('phase', upgraded.phase, 'choices', upgraded.upgradeChoices.map(c => c.id+':'+c.stack));
+const stackedInput = { ...upgraded, upgrades: [{ ...upgraded.upgradeChoices[0], stack: 1 }] };
+console.log('input upgrades', stackedInput.upgrades, 'phase', stackedInput.phase);
+const stacked = dispatchRun(stackedInput, { type: 'choose-upgrade', upgradeId: upgraded.upgradeChoices[0].id }).state;
+console.log('result phase', stacked.phase, 'upgrades', stacked.upgrades, 'events?');

@@ -1,41 +1,44 @@
 {
-  "name": "@typemaster/web",
-  "version": "2.0.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "next dev -H 0.0.0.0 -p 5173",
-    "build": "next build",
-    "start": "next start -H 0.0.0.0 -p 4173",
-    "preview": "next start -H 0.0.0.0 -p 4173",
-    "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
-    "test:e2e": "playwright test",
-    "typecheck": "node ./node_modules/typescript/bin/tsc --noEmit -p tsconfig.json"
-  },
-  "dependencies": {
-    "@tanstack/react-query": "^5.90.2",
-    "@typemaster/ai": "workspace:*",
-    "@typemaster/contracts": "workspace:*",
-    "@typemaster/domain": "workspace:*",
-    "@typemaster/ui": "workspace:*",
-    "lucide-react": "^1.17.0",
-    "next": "15.5.6",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "zustand": "^5.0.8"
-  },
-  "devDependencies": {
-    "@playwright/test": "^1.60.0",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.2",
-    "@testing-library/user-event": "^14.6.1",
-    "@types/node": "^24.13.1",
-    "@types/react": "^18.3.23",
-    "@types/react-dom": "^18.3.7",
-    "@vitest/coverage-v8": "^2.1.9",
-    "jsdom": "^26.1.0",
-    "typescript": "^5.9.2",
-    "vitest": "^2.1.0"
-  }
+    "name": "@typerift/web",
+    "version": "2.0.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "next dev -H 0.0.0.0 -p 5173",
+        "build": "next build",
+        "start": "next start -H 0.0.0.0 -p 4173",
+        "preview": "next start -H 0.0.0.0 -p 4173",
+        "test": "vitest run",
+        "test:coverage": "vitest run --coverage",
+        "test:e2e": "playwright test",
+        "typecheck": "node ./node_modules/typescript/bin/tsc --noEmit -p tsconfig.json"
+    },
+    "dependencies": {
+        "@tanstack/react-query": "^5.90.2",
+        "@clerk/nextjs": "^6.32.0",
+        "@typerift/ai": "workspace:*",
+        "@typerift/contracts": "workspace:*",
+        "@typerift/domain": "workspace:*",
+        "@typerift/ui": "workspace:*",
+        "lucide-react": "^1.17.0",
+        "next": "15.5.6",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "zustand": "^5.0.8",
+        "zod": "3.25.76"
+    },
+    "devDependencies": {
+        "@playwright/test": "^1.60.0",
+        "@axe-core/playwright": "^4.10.2",
+        "@testing-library/jest-dom": "^6.9.1",
+        "@testing-library/react": "^16.3.2",
+        "@testing-library/user-event": "^14.6.1",
+        "@types/node": "^24.13.1",
+        "@types/react": "^18.3.23",
+        "@types/react-dom": "^18.3.7",
+        "@vitest/coverage-v8": "^2.1.9",
+        "jsdom": "^26.1.0",
+        "typescript": "^5.9.2",
+        "vitest": "^2.1.0"
+    }
 }

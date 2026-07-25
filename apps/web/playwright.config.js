@@ -17,10 +17,18 @@ export default defineConfig({
             use: { ...devices['Pixel 7'] }
         }
     ],
-    webServer: {
-        command: 'node ./node_modules/next/dist/bin/next dev -H 127.0.0.1 -p 4174',
-        url: 'http://127.0.0.1:4174',
-        reuseExistingServer: false,
-        timeout: 60000
-    }
+    webServer: [
+        {
+            command: 'pnpm --dir ../.. --filter @typerift/api dev',
+            url: 'http://127.0.0.1:8080/health',
+            reuseExistingServer: false,
+            timeout: 60000
+        },
+        {
+            command: 'node ./node_modules/next/dist/bin/next dev -H 127.0.0.1 -p 4174',
+            url: 'http://127.0.0.1:4174',
+            reuseExistingServer: false,
+            timeout: 60000
+        }
+    ]
 });

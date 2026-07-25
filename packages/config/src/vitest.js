@@ -10,19 +10,22 @@ const defaultThresholds = {
 export function createNodeVitestConfig({
     include,
     coverageInclude,
+    coverageExclude = [],
     coverageThresholds = defaultThresholds,
-    fileParallelism = true
+    fileParallelism = true,
+    environment = 'node'
 }) {
     return defineConfig({
         test: {
             globals: true,
-            environment: 'node',
+            environment,
             include,
             fileParallelism,
             coverage: {
                 provider: 'v8',
                 reporter: ['text-summary', 'html'],
                 include: coverageInclude,
+                exclude: coverageExclude,
                 thresholds: coverageThresholds
             }
         }

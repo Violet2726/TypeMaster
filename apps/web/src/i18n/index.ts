@@ -1,56 +1,169 @@
-import { LANGUAGE_META } from './language-meta';
-import { zhCNMessages } from './messages/zh-CN';
-import { enUSMessages } from './messages/en-US';
+export type Locale = 'zh-CN' | 'en-US';
 
-const COPY = {
-    'zh-CN': zhCNMessages,
-    'en-US': enUSMessages
+const zh: Record<string, string> = {
+    'nav.home': '大厅',
+    'nav.missions': '任务',
+    'nav.archive': '档案',
+    'nav.settings': '设置',
+    'hub.eyebrow': '裂隙信号稳定',
+    'hub.title': '把节奏，变成力量。',
+    'hub.subtitle': '每一个正确字符都推动战线。进入 10 分钟远征，构筑你的武器、遗物与符文。',
+    'hub.enter': '进入远征',
+    'hub.daily': '今日裂隙',
+    'hub.dailyMeta': '固定种子 · Standard · 排位',
+    'hub.mission': '下一项任务',
+    'hub.archive': '最近回声',
+    'hub.noRuns': '你的第一段记录正等待被写下。',
+    'onboarding.eyebrow': '首次校准',
+    'onboarding.title': '先听见你的节奏。',
+    'onboarding.subtitle': '输入下方信号，TypeRift 会为普通远征设定舒适压力。Daily Rift 始终保持统一 Standard 规则。',
+    'onboarding.skip': '跳过校准',
+    'onboarding.start': '开始 First Rift',
+    'onboarding.callSign': '呼号',
+    'onboarding.sample': 'the quiet signal becomes a blade of light',
+    'onboarding.ready': '校准完成',
+    'missions.eyebrow': '任务链',
+    'missions.title': '修复弱点，打开下一道裂隙。',
+    'missions.subtitle': '每项任务都指向一局明确的行动；奖励只解锁内容，不改变排位数值。',
+    'missions.startRepair': '开始修复试炼',
+    'missions.daily': '每日',
+    'missions.weekly': '每周',
+    'archive.eyebrow': '共振档案',
+    'archive.title': '你留下的每一道回声。',
+    'archive.subtitle': '战局、洞察、图鉴与成就汇合在这里，并指向下一局。',
+    'archive.start': '继续远征',
+    'archive.runs': '近期战局',
+    'archive.codex': '裂隙图鉴',
+    'archive.achievements': '成就',
+    'archive.locked': '未知信号',
+    'play.loading': '正在对齐裂隙…',
+    'play.pause': '已暂停',
+    'play.resume': '继续战局',
+    'play.extract': '撤离并结算',
+    'play.surge': '释放 Surge',
+    'play.upgrade': '选择一项构筑',
+    'play.keyboard': '完整战局需要物理键盘',
+    'play.keyboardBody': '移动端可进行 60 秒 Quick Pulse；远征与 Daily Rift 请在桌面端继续。',
+    'play.quick': '开始 Quick Pulse',
+    'play.fracture': 'Fracture',
+    'play.energy': 'Surge',
+    'play.area': '区域',
+    'play.wave': '波次',
+    'debrief.eyebrow': '战后复盘',
+    'debrief.title': '这段节奏，已经留下回声。',
+    'debrief.loading': '正在还原战局…',
+    'debrief.accuracy': '准确率',
+    'debrief.speed': '速度',
+    'debrief.score': '得分',
+    'debrief.combo': '最高连击',
+    'debrief.build': '本局构筑',
+    'debrief.insights': '确定性洞察',
+    'debrief.next': '修复弱键',
+    'debrief.again': '再次远征',
+    'settings.title': '设置',
+    'settings.appearance': '外观与可读性',
+    'settings.sound': '声音',
+    'settings.theme': '跟随系统主题',
+    'settings.motion': '减少动态效果',
+    'settings.transparency': '减少透明度',
+    'settings.contrast': '增强对比度',
+    'settings.colorSafe': '色觉安全配色',
+    'settings.noFlash': '无闪烁模式',
+    'settings.reaction': '反应时间辅助',
+    'settings.music': '音乐',
+    'settings.effects': '音效',
+    'settings.voice': '语音',
+    'settings.textScale': '文字大小',
+    'settings.language': 'English interface',
+    'common.shards': 'Shards',
+    'common.level': '共振等级',
+    'common.offline': '离线可用',
+    'common.verified': '已验证',
+    'common.unranked': '非排位'
 };
 
-export function getLanguageMeta(language = 'zh-CN') {
-    return LANGUAGE_META[language] || LANGUAGE_META['zh-CN'];
-}
+const en: Record<string, string> = {
+    'nav.home': 'Hub',
+    'nav.missions': 'Missions',
+    'nav.archive': 'Archive',
+    'nav.settings': 'Settings',
+    'hub.eyebrow': 'Rift signal stable',
+    'hub.title': 'Turn rhythm into force.',
+    'hub.subtitle': 'Every correct character advances the line. Enter a ten-minute expedition and shape a build from weapons, relics, and glyphs.',
+    'hub.enter': 'Enter Expedition',
+    'hub.daily': 'Daily Rift',
+    'hub.dailyMeta': 'Fixed seed · Standard · Ranked',
+    'hub.mission': 'Next mission',
+    'hub.archive': 'Recent echo',
+    'hub.noRuns': 'Your first record is waiting to be written.',
+    'onboarding.eyebrow': 'First calibration',
+    'onboarding.title': 'Listen to your rhythm first.',
+    'onboarding.subtitle': 'Type the signal below and TypeRift will set a comfortable Expedition pressure. Daily Rift always uses shared Standard rules.',
+    'onboarding.skip': 'Skip calibration',
+    'onboarding.start': 'Start First Rift',
+    'onboarding.callSign': 'Call sign',
+    'onboarding.sample': 'the quiet signal becomes a blade of light',
+    'onboarding.ready': 'Calibration complete',
+    'missions.eyebrow': 'Mission chain',
+    'missions.title': 'Repair the weakness. Open the next rift.',
+    'missions.subtitle': 'Every mission points to one clear action. Rewards unlock content without changing ranked power.',
+    'missions.startRepair': 'Start Repair Trial',
+    'missions.daily': 'Daily',
+    'missions.weekly': 'Weekly',
+    'archive.eyebrow': 'Resonance archive',
+    'archive.title': 'Every echo you left behind.',
+    'archive.subtitle': 'Runs, insights, codex entries, and achievements meet here—and point to the next run.',
+    'archive.start': 'Continue Expedition',
+    'archive.runs': 'Recent runs',
+    'archive.codex': 'Rift codex',
+    'archive.achievements': 'Achievements',
+    'archive.locked': 'Unknown signal',
+    'play.loading': 'Aligning the rift…',
+    'play.pause': 'Paused',
+    'play.resume': 'Resume run',
+    'play.extract': 'Extract and settle',
+    'play.surge': 'Release Surge',
+    'play.upgrade': 'Choose one build piece',
+    'play.keyboard': 'Full runs require a physical keyboard',
+    'play.keyboardBody': 'Quick Pulse is a 60-second mobile companion. Continue Expeditions and Daily Rift on desktop.',
+    'play.quick': 'Start Quick Pulse',
+    'play.fracture': 'Fracture',
+    'play.energy': 'Surge',
+    'play.area': 'Area',
+    'play.wave': 'Wave',
+    'debrief.eyebrow': 'Run debrief',
+    'debrief.title': 'This rhythm left an echo.',
+    'debrief.loading': 'Reconstructing run…',
+    'debrief.accuracy': 'Accuracy',
+    'debrief.speed': 'Speed',
+    'debrief.score': 'Score',
+    'debrief.combo': 'Max combo',
+    'debrief.build': 'Run build',
+    'debrief.insights': 'Deterministic insights',
+    'debrief.next': 'Repair weak keys',
+    'debrief.again': 'Run again',
+    'settings.title': 'Settings',
+    'settings.appearance': 'Appearance & legibility',
+    'settings.sound': 'Sound',
+    'settings.theme': 'Follow system theme',
+    'settings.motion': 'Reduce motion',
+    'settings.transparency': 'Reduce transparency',
+    'settings.contrast': 'Increase contrast',
+    'settings.colorSafe': 'Color-safe palette',
+    'settings.noFlash': 'No-flash mode',
+    'settings.reaction': 'Reaction-time assist',
+    'settings.music': 'Music',
+    'settings.effects': 'Effects',
+    'settings.voice': 'Voice',
+    'settings.textScale': 'Text size',
+    'settings.language': '中文界面',
+    'common.shards': 'Shards',
+    'common.level': 'Resonance',
+    'common.offline': 'Offline ready',
+    'common.verified': 'Verified',
+    'common.unranked': 'Unranked'
+};
 
-export function getSupportedLanguages() {
-    return Object.values(LANGUAGE_META);
-}
-
-export function getCopy(language = 'zh-CN') {
-    return COPY[language] || COPY['zh-CN'];
-}
-
-export function getErrorMessage(language = 'zh-CN', code = 'unknown') {
-    const copy = getCopy(language);
-    return copy.errors[code] || copy.errors.unknown;
-}
-
-export function formatDateTime(value, language = 'zh-CN') {
-    if (!value) return getCopy(language).common.emptyValue;
-    return new Intl.DateTimeFormat(language, {
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    }).format(new Date(value));
-}
-
-export function formatShortDate(value, language = 'zh-CN') {
-    if (!value) return getCopy(language).common.emptyValue;
-    return new Intl.DateTimeFormat(language, {
-        month: 'short',
-        day: 'numeric'
-    }).format(new Date(value));
-}
-
-export function formatPercent(value) {
-    return `${Math.round(Number(value || 0))}%`;
-}
-
-export function formatDurationLabel(seconds = 0, language = 'zh-CN') {
-    const normalizedSeconds = Math.max(0, Math.round(Number(seconds || 0)));
-    return language?.startsWith('zh') ? `${normalizedSeconds} 秒` : `${normalizedSeconds}s`;
-}
-
-export function getInlineSeparator(language = 'zh-CN') {
-    return language === 'en-US' ? ' · ' : ' / ';
+export function translate(locale: Locale, key: string) {
+    return (locale === 'en-US' ? en : zh)[key] ?? zh[key] ?? key;
 }

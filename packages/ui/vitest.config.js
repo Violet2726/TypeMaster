@@ -1,6 +1,7 @@
-import { createNodeVitestConfig } from '@typemaster/config/vitest';
+import { createNodeVitestConfig } from '@typerift/config/vitest';
 
 export default createNodeVitestConfig({
-    include: ['src/**/*.test.jsx'],
-    coverageInclude: ['src/**/*.jsx']
+    include: ['src/**/*.test.tsx'],
+    coverageInclude: ['src/**/*.tsx'],
+    environment: 'jsdom'
 });

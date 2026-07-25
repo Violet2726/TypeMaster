@@ -1,22 +1,24 @@
 {
-  "name": "@typemaster/ai",
-  "version": "1.0.0",
-  "private": true,
-  "type": "module",
-  "exports": {
-    ".": "./src/index.js"
-  },
-  "dependencies": {
-    "@typemaster/contracts": "workspace:*",
-    "@typemaster/domain": "workspace:*"
-  },
-  "devDependencies": {
-    "@typemaster/config": "workspace:*",
-    "@vitest/coverage-v8": "^2.1.9",
-    "vitest": "^2.1.0"
-  },
-  "scripts": {
-    "test": "vitest run --config vitest.config.js",
-    "test:coverage": "vitest run --config vitest.config.js --coverage"
-  }
+    "name": "@typerift/ai",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "exports": {
+        ".": "./src/index.ts"
+    },
+    "dependencies": {
+        "@typerift/contracts": "workspace:*",
+        "@typerift/domain": "workspace:*"
+    },
+    "devDependencies": {
+        "@typerift/config": "workspace:*",
+        "@vitest/coverage-v8": "^2.1.9",
+        "typescript": "^5.9.2",
+        "vitest": "^2.1.0"
+    },
+    "scripts": {
+        "typecheck": "tsc --noEmit -p tsconfig.json",
+        "test": "vitest run --config vitest.config.js",
+        "test:coverage": "vitest run --config vitest.config.js --coverage"
+    }
 }
