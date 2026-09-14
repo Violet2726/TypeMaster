@@ -1,12 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import {
-    MissionSchema,
-    PlayerProgressSchema,
-    PlayerSchema,
-    type MissionContract
-} from '@typerift/contracts';
+import { MissionSchema, PlayerProgressSchema, PlayerSchema, type MissionContract } from '@typerift/contracts';
 import * as schema from './db/schema';
 import type { CoachReport, DailyLeaderboardEntry, RunRecord, StateSnapshot, StateStore } from './store';
 
@@ -15,7 +10,7 @@ export async function createPostgresStateStore(databaseUrl: string): Promise<Sta
     const db = drizzle(client, { schema });
     let queue: Promise<unknown> = Promise.resolve();
 
-    const enqueue = <T,>(work: () => Promise<T>) => {
+    const enqueue = <T>(work: () => Promise<T>) => {
         const run = queue.then(work, work);
         queue = run.then(
             () => undefined,
@@ -136,14 +131,12 @@ export async function createPostgresStateStore(databaseUrl: string): Promise<Sta
             const callSigns = Object.fromEntries(players.map((player) => [player.id, PlayerSchema.parse(player.data).callSign]));
             return rows
                 .filter((row) => row.completedAt?.toISOString().startsWith(dateKey))
-                .map(
-                    (row): DailyLeaderboardEntry => ({
-                        id: row.id,
-                        callSign: callSigns[row.playerId] ?? 'Pilot',
-                        verified: row.verified,
-                        result: row.result as RunRecord['result']
-                    })
-                );
+                .map((row): DailyLeaderboardEntry => ({
+                    id: row.id,
+                    callSign: callSigns[row.playerId] ?? 'Pilot',
+                    verified: row.verified,
+                    result: row.result as RunRecord['result']
+                }));
         },
         async getCoachReport(runId) {
             const rows = await db.select().from(schema.coachReports).where(eq(schema.coachReports.runId, runId)).limit(1);

@@ -1,13 +1,7 @@
 import { createHmac, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto';
 import { Redis } from '@upstash/redis';
 import { buildCoachPolishPayload } from '@typerift/ai';
-import {
-    CompleteRunRequestSchema,
-    PlayerSchema,
-    SettingsSchema,
-    StartRunRequestSchema,
-    type PlayerProgressContract
-} from '@typerift/contracts';
+import { CompleteRunRequestSchema, PlayerSchema, SettingsSchema, StartRunRequestSchema, type PlayerProgressContract } from '@typerift/contracts';
 import {
     CONTENT_VERSION,
     EMPTY_PLAYER_PROGRESS,
@@ -124,9 +118,7 @@ export async function createApi(options: AppOptions = {}) {
                 })
             });
             if (!response.ok) throw new Error(`AI coach provider returned ${response.status}.`);
-            const payload = z
-                .object({ choices: z.array(z.object({ message: z.object({ content: z.string() }) })).min(1) })
-                .parse(await response.json());
+            const payload = z.object({ choices: z.array(z.object({ message: z.object({ content: z.string() }) })).min(1) }).parse(await response.json());
             return payload.choices[0]!.message.content.slice(0, 1_200);
         });
         await store.saveCoachReport(data.playerId, {
@@ -218,30 +210,12 @@ export async function createApi(options: AppOptions = {}) {
         return resolvePlayerId(context.req.raw);
     }
 
-    function signTicket(payload: {
-        playerId: string;
-        runId: string;
-        mode: string;
-        difficulty: string;
-        seed: string;
-        expiresAt: string;
-    }) {
-        const body = [
-            payload.playerId,
-            payload.runId,
-            payload.mode,
-            payload.difficulty,
-            payload.seed,
-            payload.expiresAt,
-            String(CONTENT_VERSION)
-        ].join('|');
+    function signTicket(payload: { playerId: string; runId: string; mode: string; difficulty: string; seed: string; expiresAt: string }) {
+        const body = [payload.playerId, payload.runId, payload.mode, payload.difficulty, payload.seed, payload.expiresAt, String(CONTENT_VERSION)].join('|');
         return createHmac('sha256', signingSecret).update(body).digest('base64url');
     }
 
-    function verifyTicket(
-        ticket: string,
-        payload: { playerId: string; runId: string; mode: string; difficulty: string; seed: string; expiresAt: string }
-    ) {
+    function verifyTicket(ticket: string, payload: { playerId: string; runId: string; mode: string; difficulty: string; seed: string; expiresAt: string }) {
         return safeEqual(ticket, signTicket(payload));
     }
 
@@ -320,7 +294,10 @@ export async function createApi(options: AppOptions = {}) {
             return context.json({ error: { code: 'invalid_run', messageKey: 'api.error.invalidRun', requestId: context.get('requestId') } }, 400);
         }
         if (parsed.data.mode === 'daily-rift' && !context.req.header('authorization') && process.env.NODE_ENV === 'production') {
-            return context.json({ error: { code: 'daily_online_required', messageKey: 'api.error.dailyOnlineRequired', requestId: context.get('requestId') } }, 409);
+            return context.json(
+                { error: { code: 'daily_online_required', messageKey: 'api.error.dailyOnlineRequired', requestId: context.get('requestId') } },
+                409
+            );
         }
         const id = parsed.data.clientRunId ?? randomUUID();
         const existing = await store.getRun(id);
@@ -355,10 +332,7 @@ export async function createApi(options: AppOptions = {}) {
         const playerId = await identity(context);
         const parsed = CompleteRunRequestSchema.safeParse(await context.req.json());
         if (!parsed.success) {
-            return context.json(
-                { error: { code: 'invalid_completion', messageKey: 'api.error.invalidCompletion', requestId: context.get('requestId') } },
-                400
-            );
+            return context.json({ error: { code: 'invalid_completion', messageKey: 'api.error.invalidCompletion', requestId: context.get('requestId') } }, 400);
         }
         const id = context.req.param('id');
         const commandLog = parsed.data.commandLog;
@@ -433,24 +407,21 @@ export async function createApi(options: AppOptions = {}) {
 
             let verified = false;
             if (run.mode === 'daily-rift') {
-                if (!parsed.data.ticket || !verifyTicket(parsed.data.ticket, {
-                    playerId,
-                    runId: run.id,
-                    mode: run.mode,
-                    difficulty: run.difficulty,
-                    seed: run.seed,
-                    expiresAt: run.expiresAt
-                })) {
-                    return context.json(
-                        { error: { code: 'invalid_ticket', messageKey: 'api.error.invalidTicket', requestId: context.get('requestId') } },
-                        422
-                    );
+                if (
+                    !parsed.data.ticket ||
+                    !verifyTicket(parsed.data.ticket, {
+                        playerId,
+                        runId: run.id,
+                        mode: run.mode,
+                        difficulty: run.difficulty,
+                        seed: run.seed,
+                        expiresAt: run.expiresAt
+                    })
+                ) {
+                    return context.json({ error: { code: 'invalid_ticket', messageKey: 'api.error.invalidTicket', requestId: context.get('requestId') } }, 422);
                 }
                 if (now().toISOString() > run.expiresAt) {
-                    return context.json(
-                        { error: { code: 'ticket_expired', messageKey: 'api.error.ticketExpired', requestId: context.get('requestId') } },
-                        422
-                    );
+                    return context.json({ error: { code: 'ticket_expired', messageKey: 'api.error.ticketExpired', requestId: context.get('requestId') } }, 422);
                 }
                 verified = true;
             } else if (parsed.data.ticket) {
@@ -570,5 +541,4 @@ export async function createApi(options: AppOptions = {}) {
     return app;
 }
 
-export const createTestApi = () =>
-    createApi({ store: new MemoryStateStore(), signingSecret: 'test-secret', now: () => new Date('2026-07-16T08:00:00.000Z') });
+export const createTestApi = () => createApi({ store: new MemoryStateStore(), signingSecret: 'test-secret', now: () => new Date('2026-07-16T08:00:00.000Z') });

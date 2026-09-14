@@ -64,8 +64,12 @@ export function getWarmAssets(mode: RunMode, areaIndex = 0): GameAsset[] {
 
 /** Everything else, deferred to browser idle time. */
 export function getIdleAssets(mode: RunMode, areaIndex = 0): GameAsset[] {
-    const otherAreas = AREAS.map((_, index) => index).filter((index) => index !== areaIndex).map(background);
-    const otherBosses = BOSSES.map((_, index) => index).filter((index) => index !== areaIndex).map(bossSprite);
+    const otherAreas = AREAS.map((_, index) => index)
+        .filter((index) => index !== areaIndex)
+        .map(background);
+    const otherBosses = BOSSES.map((_, index) => index)
+        .filter((index) => index !== areaIndex)
+        .map(bossSprite);
     const deferredUpgrades = upgradesMatterEarly(mode) ? [] : UPGRADES.map((upgrade) => upgradeIcon(upgrade.id));
     return [...otherAreas, ...otherBosses, ...deferredUpgrades, AUDIO.upgrade, AUDIO.ambient];
 }

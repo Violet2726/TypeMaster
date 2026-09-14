@@ -5,15 +5,7 @@ const DATABASE_VERSION = 1;
 const RESET_MARKER = 'typerift:v2:reset-complete';
 const SETTINGS_KEY = 'typerift:v2:settings';
 const SNAPSHOT_KEY = 'snapshot';
-const LEGACY_PREFIXES = [
-    'typemaster:',
-    'typing-raid:',
-    'typingraid:',
-    'typerift:v7:',
-    'typerift:v6:',
-    'typerift:v1:',
-    'typerift:v1'
-];
+const LEGACY_PREFIXES = ['typemaster:', 'typing-raid:', 'typingraid:', 'typerift:v7:', 'typerift:v6:', 'typerift:v1:', 'typerift:v1'];
 const LEGACY_DATABASES = ['typemaster', 'typemaster-db', 'typing-raid', 'typing-raid-v7', 'typerift-v7', 'typerift-v1'];
 
 export const DEFAULT_SETTINGS: SettingsContract = {

@@ -12,7 +12,10 @@ function desktopOnly(testInfo: TestInfo) {
 }
 
 async function openSettings(page: Page) {
-    await page.locator('.topbar').getByRole('button', { name: /设置|Settings/ }).click();
+    await page
+        .locator('.topbar')
+        .getByRole('button', { name: /设置|Settings/ })
+        .click();
 }
 
 /** Wait until the HUD has a real word to read, then return it. */
@@ -60,9 +63,7 @@ test.describe('entry and hub', () => {
         await page.goto('/');
         await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
         await page.waitForTimeout(350);
-        const metrics = await page.evaluate(
-            () => (window as Window & { __typeriftVitals: { lcp: number; cls: number } }).__typeriftVitals
-        );
+        const metrics = await page.evaluate(() => (window as Window & { __typeriftVitals: { lcp: number; cls: number } }).__typeriftVitals);
         expect(metrics.lcp).toBeGreaterThan(0);
         expect(metrics.lcp).toBeLessThan(2_500);
         expect(metrics.cls).toBeLessThan(0.1);
@@ -149,9 +150,7 @@ test.describe('accessibility preferences', () => {
         await openSettings(page);
         await page.getByRole('slider', { name: /文字大小|Text size/ }).fill('2');
         await page.getByRole('switch', { name: /增强对比度|Increase contrast/ }).check();
-        await expect
-            .poll(() => page.locator('html').evaluate((element) => getComputedStyle(element).getPropertyValue('--user-text-scale').trim()))
-            .toBe('2');
+        await expect.poll(() => page.locator('html').evaluate((element) => getComputedStyle(element).getPropertyValue('--user-text-scale').trim())).toBe('2');
         await expect.poll(() => page.locator('html').getAttribute('data-contrast')).toBe('true');
         // The setting must actually move type, not just the variable.
         await expect.poll(() => page.locator('html').evaluate((element) => getComputedStyle(element).fontSize)).toBe('32px');

@@ -30,8 +30,8 @@ export function OnboardingScreen() {
         return count;
     }, [typed]);
     const accuracy = typed.length ? Math.round((correct / typed.length) * 1000) / 10 : 100;
-    const elapsedMin = Math.max(((startedAt ? Date.now() - startedAt : 0) / 60_000) || 1 / 60, 1 / 60);
-    const wpm = Math.round((correct / 5) / elapsedMin);
+    const elapsedMin = Math.max((startedAt ? Date.now() - startedAt : 0) / 60_000 || 1 / 60, 1 / 60);
+    const wpm = Math.round(correct / 5 / elapsedMin);
 
     async function persist(complete: boolean, difficulty: 'flow' | 'standard' | 'surge' = 'standard') {
         setSaving(true);

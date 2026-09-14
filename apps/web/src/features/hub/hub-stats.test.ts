@@ -50,7 +50,11 @@ describe('hub stats', () => {
 
     it('averages only the recent window', () => {
         const history = Array.from({ length: 12 }, (_, index) =>
-            run({ id: `r${index}`, completedAt: `2026-09-${String(13 - index).padStart(2, '0')}T10:00:00.000Z`, result: { accuracy: index < 10 ? 80 : 100 } as never })
+            run({
+                id: `r${index}`,
+                completedAt: `2026-09-${String(13 - index).padStart(2, '0')}T10:00:00.000Z`,
+                result: { accuracy: index < 10 ? 80 : 100 } as never
+            })
         );
         expect(metricAverage(history.slice(0, 10), 'accuracy')).toBe(80);
     });

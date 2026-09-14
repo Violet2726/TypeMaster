@@ -47,10 +47,10 @@ async function hideDevChrome(page: Page) {
 }
 
 async function applySettings(page: Page, overrides: Partial<typeof BASE_SETTINGS>) {
-    await page.addInitScript(
-        ({ key, settings }) => localStorage.setItem(key, JSON.stringify(settings)),
-        { key: SETTINGS_KEY, settings: { ...BASE_SETTINGS, ...overrides } }
-    );
+    await page.addInitScript(({ key, settings }) => localStorage.setItem(key, JSON.stringify(settings)), {
+        key: SETTINGS_KEY,
+        settings: { ...BASE_SETTINGS, ...overrides }
+    });
 }
 
 test.describe('visual regression', () => {

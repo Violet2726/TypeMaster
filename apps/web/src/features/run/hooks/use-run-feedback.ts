@@ -29,9 +29,12 @@ export function useRunFeedback() {
         }, feedbackDuration(feedback.kind));
     }, []);
 
-    useEffect(() => () => {
-        if (timer.current) clearTimeout(timer.current);
-    }, []);
+    useEffect(
+        () => () => {
+            if (timer.current) clearTimeout(timer.current);
+        },
+        []
+    );
 
     return { feedback: current, pushFeedback: push, clearFeedback: clear };
 }

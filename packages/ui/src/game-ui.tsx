@@ -203,11 +203,7 @@ export type GameButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 /** A button that always clears the 44px touch target, whatever the icon size. */
 export function GameButton({ tone = 'accent', icon, shortcut, block = false, className = '', children, ...props }: GameButtonProps) {
     return (
-        <button
-            type="button"
-            className={`game-button game-button--${tone}${block ? ' is-block' : ''} ${className}`.trim()}
-            {...props}
-        >
+        <button type="button" className={`game-button game-button--${tone}${block ? ' is-block' : ''} ${className}`.trim()} {...props}>
             {icon ? (
                 <span className="game-button__icon" aria-hidden="true">
                     {icon}
@@ -247,13 +243,27 @@ export function GameMeter({ value, max = 100, label, tone = 'accent', segments, 
                 {showValue ? <strong>{Math.round(ratio * 100)}%</strong> : null}
             </div>
             {segments ? (
-                <div className="game-meter__segments" role="progressbar" aria-valuemin={0} aria-valuemax={max} aria-valuenow={Math.round(value)} aria-label={label}>
+                <div
+                    className="game-meter__segments"
+                    role="progressbar"
+                    aria-valuemin={0}
+                    aria-valuemax={max}
+                    aria-valuenow={Math.round(value)}
+                    aria-label={label}
+                >
                     {Array.from({ length: segments }, (_, index) => (
                         <i key={index} className={index < filled ? 'is-on' : ''} />
                     ))}
                 </div>
             ) : (
-                <div className="game-meter__track" role="progressbar" aria-valuemin={0} aria-valuemax={max} aria-valuenow={Math.round(value)} aria-label={label}>
+                <div
+                    className="game-meter__track"
+                    role="progressbar"
+                    aria-valuemin={0}
+                    aria-valuemax={max}
+                    aria-valuenow={Math.round(value)}
+                    aria-label={label}
+                >
                     <span style={{ width: `${ratio * 100}%` }} />
                 </div>
             )}

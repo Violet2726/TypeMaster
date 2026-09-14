@@ -63,7 +63,9 @@ export function MissionsScreen() {
                                         <span>
                                             +{mission.rewardShards} {t('common.shards')}
                                         </span>
-                                        <span>{mission.rewardedAt ? t('missions.rewarded') : mission.completed ? t('missions.complete') : t('missions.active')}</span>
+                                        <span>
+                                            {mission.rewardedAt ? t('missions.rewarded') : mission.completed ? t('missions.complete') : t('missions.active')}
+                                        </span>
                                     </div>
                                 </article>
                             ))}
@@ -86,7 +88,9 @@ export function MissionsScreen() {
                                         <span>
                                             +{mission.rewardShards} {t('common.shards')}
                                         </span>
-                                        <span>{mission.rewardedAt ? t('missions.rewarded') : mission.completed ? t('missions.complete') : t('missions.active')}</span>
+                                        <span>
+                                            {mission.rewardedAt ? t('missions.rewarded') : mission.completed ? t('missions.complete') : t('missions.active')}
+                                        </span>
                                     </div>
                                 </article>
                             ))}

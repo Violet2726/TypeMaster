@@ -84,7 +84,11 @@ export function DebriefScreen({ runId }: { runId: string }) {
 
             <section className="debrief-weak" aria-label={t('debrief.weakest')}>
                 <p className="debrief-weak__label">{t('debrief.weakest')}</p>
-                {result.weakChars.length ? <p className="debrief-weak__keys">{weakLabel}</p> : <p className="debrief-weak__keys is-clear">{t('debrief.noWeak')}</p>}
+                {result.weakChars.length ? (
+                    <p className="debrief-weak__keys">{weakLabel}</p>
+                ) : (
+                    <p className="debrief-weak__keys is-clear">{t('debrief.noWeak')}</p>
+                )}
             </section>
 
             <div className="debrief-next">

@@ -39,10 +39,12 @@ for (const file of files) {
         if (value.startsWith('--')) return;
         if (colorPattern.test(value)) findings.push(`${location}\n    literal colour — declare a semantic token instead`);
         // Radii must come from the radius scale so every surface matches.
-        if (radiusPattern.test(value) && !value.includes('var(')) findings.push(`${location}\n    literal radius — use --radius-control / --radius-card / --radius-sheet / --radius-pill`);
+        if (radiusPattern.test(value) && !value.includes('var('))
+            findings.push(`${location}\n    literal radius — use --radius-control / --radius-card / --radius-sheet / --radius-pill`);
         // Nothing a player must read in real time may rely on sub-13px text.
         const size = fontSizePx(value);
-        if (size !== null && size < MIN_FONT_PX) findings.push(`${location}\n    font size ${size.toFixed(1)}px is below the ${MIN_FONT_PX}px legibility floor`);
+        if (size !== null && size < MIN_FONT_PX)
+            findings.push(`${location}\n    font size ${size.toFixed(1)}px is below the ${MIN_FONT_PX}px legibility floor`);
         // Font sizes must be rem so the "Text size" accessibility setting can scale them.
         if (/font-size:\s*[\d.]+px/i.test(value) && !value.includes('calc(')) {
             findings.push(`${location}\n    px font size — use rem so --user-text-scale can scale it`);

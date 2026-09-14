@@ -332,9 +332,7 @@ export function RunScreen() {
                     }}
                 />
             ) : null}
-            {state.phase === 'upgrade' ? (
-                <UpgradeOverlay state={state} choose={(upgradeId) => send({ type: 'choose-upgrade', upgradeId })} t={t} />
-            ) : null}
+            {state.phase === 'upgrade' ? <UpgradeOverlay state={state} choose={(upgradeId) => send({ type: 'choose-upgrade', upgradeId })} t={t} /> : null}
             {state.phase === 'paused' ? (
                 <PauseOverlay
                     state={state}
