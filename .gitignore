@@ -24,6 +24,7 @@ playwright-report
 # IDE & tool artifacts
 .history
 .codex-screens/
+.workbuddy-ai/
 *.bak
 tmp/
 .tmp-*.png
