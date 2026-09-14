@@ -5,28 +5,29 @@ import { getCriticalAssets } from '../src/features/run/runtime/asset-plan';
 import { waitForHud, waitForPlayable } from './support/fixtures';
 
 /**
- * Performance budgets (guidance §21).
+ * Performance budgets (guidance §21), measured against a production build.
  *
- * Measured against the dev server, which is the slowest realistic target: routes
- * compile on demand and nothing is minified. A production build is faster on every
- * one of these numbers, so the budgets below are deliberately loose where dev-only
- * overhead dominates, and tight where the app is in control.
+ * These are user-facing ceilings, so they are taken on the artefact a user actually loads.
+ * The same numbers on a dev server read an order of magnitude worse — 923ms cold against 99ms
+ * on the built app — because dev serves unminified bundles and compiles routes on demand. That
+ * gap is noise, and noise of that size hides real regressions. `playwright.perf.config.js`
+ * owns the build and the server; run these with `pnpm test:e2e:perf`.
  *
- * Start-up timings take the best of two attempts. Parallel workers share one dev
- * server, so a single sample can be inflated by scheduler contention; a real
- * regression shows up in every attempt, noise does not.
+ * Start-up timings take the best of two attempts. A single sample can be inflated by scheduler
+ * contention, while a genuine regression shows up in every attempt.
  */
 
 const COLD_START_MS = 2_500;
-const WARM_START_MS = 1_500; // production target is 1_000ms
+const CACHED_START_MS = 1_000;
+const HUB_TAP_MS = 800;
 const P95_FRAME_MS = 20; // 60 FPS
 const LONG_TASK_MS = 50;
 const CRITICAL_ASSET_BYTES = 1.5 * 1024 * 1024;
 
 /**
- * Timing budgets only mean something on an unloaded machine. Parallel workers share one dev
- * server, so a bare `playwright test` would measure contention instead of the app. Run the
- * budgets with `pnpm test:e2e:perf`, which pins `--workers=1`.
+ * Timing budgets only mean something on an unloaded machine. The perf config pins `workers: 1`;
+ * this guards the case where someone overrides it on the command line and would otherwise be
+ * measuring scheduler contention instead of the app.
  */
 function quietMachineOnly(testInfo: TestInfo) {
     test.skip(testInfo.config.workers !== 1, 'timing budgets need a quiet machine: run `pnpm test:e2e:perf`');
@@ -47,23 +48,50 @@ async function timeToPlayable(page: Page, attempts: number, enter: (page: Page) 
     return Math.min(...samples);
 }
 
-test('a cold page load becomes playable inside the budget', async ({ page }, testInfo) => {
+test('a cold start becomes playable inside the budget', async ({ browser }, testInfo) => {
     quietMachineOnly(testInfo);
-    // Warm the dev server's route compiler first so we time the app, not the bundler.
+
+    // "Cold" means nothing is cached: no chunks, no fonts, no sprite sheets. Each attempt gets
+    // its own context, because reusing one would let the browser answer from its HTTP cache and
+    // the measurement would quietly become a cached start instead.
+    const baseURL = testInfo.project.use.baseURL as string;
+    const samples: number[] = [];
+
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+        const context = await browser.newContext({ baseURL, viewport: { width: 1440, height: 900 } });
+        const page = await context.newPage();
+        const started = Date.now();
+        await page.goto('/play?mode=quick-pulse', { waitUntil: 'commit' });
+        await waitForHud(page);
+        samples.push(Date.now() - started);
+        await context.close();
+    }
+
+    const elapsed = Math.min(...samples);
+    testInfo.annotations.push({ type: 'cold-start-ms', description: String(elapsed) });
+
+    expect(elapsed).toBeLessThan(COLD_START_MS);
+});
+
+test('a cached page load becomes playable inside the budget', async ({ page }, testInfo) => {
+    quietMachineOnly(testInfo);
+
+    // The first visit fills the HTTP cache; the second is what a returning player gets.
     await page.goto('/play?mode=quick-pulse');
     await waitForPlayable(page);
 
     const elapsed = await timeToPlayable(page, 2, async (target) => {
         await target.goto('/play?mode=quick-pulse', { waitUntil: 'commit' });
     });
-    testInfo.annotations.push({ type: 'cold-start-ms', description: String(elapsed) });
+    testInfo.annotations.push({ type: 'cached-start-ms', description: String(elapsed) });
 
-    expect(elapsed).toBeLessThan(COLD_START_MS);
+    expect(elapsed).toBeLessThan(CACHED_START_MS);
 });
 
-test('a returning player starts a run inside the budget', async ({ page }, testInfo) => {
+test('a returning player starts a run from the hub inside the budget', async ({ page }, testInfo) => {
     quietMachineOnly(testInfo);
-    // Warm the route so the measurement covers the interaction, not the compiler.
+
+    // Warm the route so the measurement covers the interaction, not first-paint work.
     await page.goto('/play?mode=daily-rift');
     await waitForPlayable(page);
 
@@ -82,9 +110,9 @@ test('a returning player starts a run inside the budget', async ({ page }, testI
     }
 
     const elapsed = Math.min(...samples);
-    testInfo.annotations.push({ type: 'warm-start-ms', description: String(elapsed) });
+    testInfo.annotations.push({ type: 'hub-tap-ms', description: String(elapsed) });
 
-    expect(elapsed).toBeLessThan(WARM_START_MS);
+    expect(elapsed).toBeLessThan(HUB_TAP_MS);
 });
 
 test('the run holds 60 FPS and never blocks the main thread', async ({ page }, testInfo) => {

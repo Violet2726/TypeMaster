@@ -44,7 +44,8 @@ export default defineConfig({
     },
     projects: [
         {
-            // Functional gates. Visual and performance have their own projects.
+            // Functional gates. Visual has its own project; the timing budgets live in
+            // `playwright.perf.config.js`, which runs them against a production build.
             name: 'desktop',
             use: { ...devices['Desktop Chrome'], channel: 'chrome', viewport: { width: 1440, height: 900 } },
             testIgnore: [/visual\.spec\.ts/, /performance\.spec\.ts/]
@@ -70,13 +71,6 @@ export default defineConfig({
             name: 'visual',
             use: { ...devices['Desktop Chrome'], channel: 'chrome', viewport: { width: 1440, height: 900 } },
             testMatch: /visual\.spec\.ts/
-        },
-        {
-            // Timing budgets. Run alone (`pnpm test:e2e:perf`) — parallel workers sharing one
-            // dev server inflate every start-up number, which is exactly what these assert on.
-            name: 'performance',
-            use: { ...devices['Desktop Chrome'], channel: 'chrome', viewport: { width: 1440, height: 900 } },
-            testMatch: /performance\.spec\.ts/
         }
     ],
     webServer: managedServers

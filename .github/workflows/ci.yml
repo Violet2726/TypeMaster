@@ -60,6 +60,9 @@ jobs:
       - name: Run desktop/mobile E2E, accessibility, and visual regression
         run: pnpm test:e2e
 
+      - name: Run performance budgets against a production build
+        run: pnpm test:e2e:perf
+
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
