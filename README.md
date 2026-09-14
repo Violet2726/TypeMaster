@@ -51,13 +51,18 @@ pnpm dev
 ## 质量门槛
 
 ```bash
+pnpm check            # format:check + lint + typecheck + test + audit:tokens + build
 pnpm typecheck
 pnpm test
 pnpm test:coverage
 pnpm audit:tokens
 pnpm build
-pnpm test:e2e
+pnpm test:e2e         # 功能 / 响应式 / 视觉回归（跑在 dev server 上）
+pnpm test:e2e:perf    # 性能预算（跑在生产构建上）
+pnpm test:e2e:all     # 两者都跑
 ```
+
+`pnpm test:e2e:perf` 会自行执行生产构建，输出到共享的 `.next`，因此**不要在 `pnpm dev:web` 开启时运行**——Next.js 无法用同一个输出目录同时服务 dev 会话与生产构建。性能预算必须量在生产构建上：同一个应用的冷启动在 dev 上是 923ms，在生产构建上是 237ms，这个量级的噪声会淹没真实回归。
 
 领域与契约采用严格 TypeScript，公开战局类型为 `RunState`、`RunCommand`、`RunEvent`、`RunSnapshot`、`RunResult` 与 `ReplayLog`。Daily Rift 由服务端以固定种子重放命令日志并校验结果哈希；普通离线战局使用客户端 run ID 幂等同步。
 
