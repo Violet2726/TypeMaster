@@ -1,0 +1,20 @@
+# Normalise line endings so the working tree matches `.editorconfig` (end_of_line = lf) on
+# every platform. Without this, a Windows machine with core.autocrlf=true checks files out as
+# CRLF while Prettier and `.editorconfig` both demand LF, so `pnpm format:check` fails on a
+# seemingly random subset of files and the failures look like real style problems.
+* text=auto eol=lf
+
+# Binary assets must never be touched by end-of-line conversion.
+*.png binary
+*.webp binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.wav binary
+*.mp3 binary
+*.ogg binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
