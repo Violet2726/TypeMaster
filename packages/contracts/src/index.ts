@@ -115,6 +115,8 @@ export const SettingsSchema = z
         locale: z.enum(['zh-CN', 'en-US']),
         reduceMotion: z.boolean(),
         reduceTransparency: z.boolean(),
+        /** TypeRift-specific: fewer particles, glows and background complexity even without a system preference. */
+        reduceEffects: z.boolean(),
         enhancedContrast: z.boolean(),
         colorSafe: z.boolean(),
         noFlash: z.boolean(),

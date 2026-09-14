@@ -22,6 +22,7 @@ function Runtime({ children }: PropsWithChildren) {
         root.dataset.theme = settings.theme;
         root.dataset.reduceMotion = String(settings.reduceMotion);
         root.dataset.reduceTransparency = String(settings.reduceTransparency);
+        root.dataset.reduceEffects = String(settings.reduceEffects);
         root.dataset.contrast = String(settings.enhancedContrast);
         root.dataset.colorSafe = String(settings.colorSafe);
         root.dataset.noFlash = String(settings.noFlash);

@@ -36,6 +36,7 @@ export function SettingsSheet() {
                     </select>
                 </label>
                 <Toggle label={t('settings.motion')} checked={settings.reduceMotion} onChange={(value) => update({ reduceMotion: value })} />
+                <Toggle label={t('settings.reduceEffects')} checked={settings.reduceEffects} onChange={(value) => update({ reduceEffects: value })} />
                 <Toggle label={t('settings.transparency')} checked={settings.reduceTransparency} onChange={(value) => update({ reduceTransparency: value })} />
                 <Toggle label={t('settings.contrast')} checked={settings.enhancedContrast} onChange={(value) => update({ enhancedContrast: value })} />
                 <Toggle label={t('settings.colorSafe')} checked={settings.colorSafe} onChange={(value) => update({ colorSafe: value })} />

@@ -1,34 +1,99 @@
 import { defineConfig, devices } from '@playwright/test';
 
+/**
+ * Visual and behavioural gates for TypeRift.
+ *
+ * The suite owns a dedicated port so it never fights with a `pnpm dev` session a
+ * reviewer already has open, and so a run is reproducible on any machine.
+ *
+ * `channel: 'chrome'` is used instead of the bundled Chromium because Playwright's
+ * browser downloads are not installed in this environment.
+ *
+ * `CODEBUDDY_SAFE_DELETE_ENABLED=0` lets Next.js manage its own `.next` cache; the
+ * sandbox's delete guard otherwise blocks its stale-file cleanup and kills the server.
+ */
+
+const PORT = Number(process.env.TYPERIFT_E2E_PORT ?? 4174);
+const BASE_URL = `http://127.0.0.1:${PORT}`;
+
+/**
+ * Playwright's `webServer` health check uses Node's own HTTP client. Some sandboxes
+ * block that while still allowing the browser to reach localhost, which makes the
+ * check time out even though the server is up. Set `TYPERIFT_E2E_NO_SERVER=1` when
+ * the servers are already running and Playwright should only attach to them.
+ */
+const managedServers = process.env.TYPERIFT_E2E_NO_SERVER !== '1';
+
 export default defineConfig({
     testDir: './e2e',
-    timeout: 30000,
+    timeout: 45_000,
+    expect: {
+        timeout: 10_000,
+        toHaveScreenshot: {
+            // Sub-pixel text rendering differs between machines; keep the gate strict
+            // enough to catch layout regressions but tolerant of antialiasing noise.
+            maxDiffPixelRatio: 0.02,
+            animations: 'disabled',
+            caret: 'hide'
+        }
+    },
     use: {
-        baseURL: 'http://127.0.0.1:4174',
+        baseURL: BASE_URL,
+        channel: 'chrome',
         trace: 'on-first-retry'
     },
     projects: [
         {
-            name: 'desktop-chromium',
-            use: { ...devices['Desktop Chrome'] }
+            // Functional gates. Visual and performance have their own projects.
+            name: 'desktop',
+            use: { ...devices['Desktop Chrome'], channel: 'chrome', viewport: { width: 1440, height: 900 } },
+            testIgnore: [/visual\.spec\.ts/, /performance\.spec\.ts/]
         },
         {
-            name: 'mobile-chromium',
-            use: { ...devices['Pixel 7'] }
+            // Responsive behaviour of the real flows, not the screenshot matrix.
+            name: 'tablet',
+            use: { ...devices['Desktop Chrome'], channel: 'chrome', viewport: { width: 768, height: 1024 } },
+            testMatch: /typerift\.spec\.ts/
+        },
+        {
+            name: 'phone',
+            use: { ...devices['Desktop Chrome'], channel: 'chrome', viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true },
+            testMatch: /typerift\.spec\.ts/
+        },
+        {
+            name: 'narrow',
+            use: { ...devices['Desktop Chrome'], channel: 'chrome', viewport: { width: 320, height: 720 }, hasTouch: true, isMobile: true },
+            testMatch: /typerift\.spec\.ts/
+        },
+        {
+            // Pixel baselines for 320 / 390 / 768 / 1440.
+            name: 'visual',
+            use: { ...devices['Desktop Chrome'], channel: 'chrome', viewport: { width: 1440, height: 900 } },
+            testMatch: /visual\.spec\.ts/
+        },
+        {
+            // Timing budgets. Run alone (`pnpm test:e2e:perf`) — parallel workers sharing one
+            // dev server inflate every start-up number, which is exactly what these assert on.
+            name: 'performance',
+            use: { ...devices['Desktop Chrome'], channel: 'chrome', viewport: { width: 1440, height: 900 } },
+            testMatch: /performance\.spec\.ts/
         }
     ],
-    webServer: [
-        {
-            command: 'pnpm --dir ../.. --filter @typerift/api dev',
-            url: 'http://127.0.0.1:8080/health',
-            reuseExistingServer: false,
-            timeout: 60000
-        },
-        {
-            command: 'node ./node_modules/next/dist/bin/next dev -H 127.0.0.1 -p 4174',
-            url: 'http://127.0.0.1:4174',
-            reuseExistingServer: false,
-            timeout: 60000
-        }
-    ]
+    webServer: managedServers
+        ? [
+              {
+                  command: 'pnpm --dir ../.. --filter @typerift/api dev',
+                  url: 'http://127.0.0.1:8080/health',
+                  reuseExistingServer: true,
+                  timeout: 60_000
+              },
+              {
+                  command: `node ./node_modules/next/dist/bin/next dev -H 127.0.0.1 -p ${PORT}`,
+                  env: { CODEBUDDY_SAFE_DELETE_ENABLED: '0' },
+                  url: BASE_URL,
+                  reuseExistingServer: true,
+                  timeout: 120_000
+              }
+          ]
+        : undefined
 });

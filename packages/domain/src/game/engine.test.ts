@@ -30,6 +30,7 @@ describe('deterministic run engine', () => {
             mode: 'daily-rift' as const,
             difficulty: 'standard' as const,
             focusChars: [],
+            endedAtMs: 50,
             entries: [
                 { atMs: 0, command: { type: 'start' as const } },
                 { atMs: 50, command: { type: 'type' as const, char: 'e' } }
@@ -45,7 +46,7 @@ describe('deterministic run engine', () => {
             score: 2_000,
             elapsedMs: 60_000,
             maxCombo: 120,
-            counters: { typed: 100, correct: 98, errors: 2, defeated: 30, bosses: 1 },
+            counters: { typed: 100, correct: 98, errors: 2, defeated: 30, bosses: 1, cleanStreak: 0 },
             endReason: 'timeout'
         });
         const applied = applyRunProgress(

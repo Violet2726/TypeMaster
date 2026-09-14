@@ -6,7 +6,6 @@ import {
     PlayerSchema,
     SettingsSchema,
     StartRunRequestSchema,
-    type PlayerContract,
     type PlayerProgressContract
 } from '@typerift/contracts';
 import {
@@ -54,6 +53,7 @@ const DEFAULT_SETTINGS = SettingsSchema.parse({
     locale: 'zh-CN',
     reduceMotion: false,
     reduceTransparency: false,
+    reduceEffects: false,
     enhancedContrast: false,
     colorSafe: false,
     noFlash: false,
@@ -140,7 +140,7 @@ export async function createApi(options: AppOptions = {}) {
     });
     const inngestHandler = serveInngest({ client: inngest, functions: [coachFunction] });
 
-    const app = new Hono();
+    const app = new Hono<{ Variables: { requestId: string } }>();
     app.use(
         '*',
         cors({
@@ -559,7 +559,8 @@ export async function createApi(options: AppOptions = {}) {
         if (!report || report.playerId !== playerId) {
             return context.json({ error: { code: 'not_found', messageKey: 'api.error.notFound', requestId: context.get('requestId') } }, 404);
         }
-        const { playerId: _playerId, ...payload } = report;
+        const payload: Omit<typeof report, 'playerId'> = { ...report };
+        delete (payload as { playerId?: string }).playerId;
         return context.json(payload);
     });
 

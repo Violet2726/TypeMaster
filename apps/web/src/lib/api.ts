@@ -1,6 +1,8 @@
 import {
+    CoachReportSchema,
     CompleteRunRequestSchema,
     CompleteRunResponseSchema,
+    LeaderboardEntrySchema,
     MissionSnapshotSchema,
     PlayerSchema,
     StartRunRequestSchema,
@@ -15,6 +17,21 @@ import {
     type StartRunRequest
 } from '@typerift/contracts';
 import { z } from 'zod';
+
+/** Typed transport failure so callers can branch on `code` instead of parsing strings. */
+export class ApiError extends Error {
+    readonly status: number;
+    readonly code: string;
+    readonly requestId?: string;
+
+    constructor(input: { status: number; code: string; messageKey: string; requestId?: string }) {
+        super(input.messageKey);
+        this.name = 'ApiError';
+        this.status = input.status;
+        this.code = input.code;
+        this.requestId = input.requestId;
+    }
+}
 
 const MeSchema = z
     .object({
@@ -34,25 +51,28 @@ const MeSchema = z
     })
     .strict();
 
+const RunsSchema = z.object({ runs: z.array(StoredRunSchema) }).strict();
+const LeaderboardSchema = z.object({ date: z.string(), entries: z.array(LeaderboardEntrySchema) }).strict();
+
 async function request<T>(path: string, init?: RequestInit, schema?: z.ZodType<T>): Promise<T> {
     const response = await fetch(path, {
+        credentials: 'include',
         ...init,
         headers: {
             'content-type': 'application/json',
             ...(init?.headers ?? {})
         }
     });
+    const json: unknown = await response.json().catch(() => null);
     if (!response.ok) {
-        let message = `Request failed: ${response.status}`;
-        try {
-            const body = (await response.json()) as { error?: { messageKey?: string } };
-            if (body.error?.messageKey) message = body.error.messageKey;
-        } catch {
-            // ignore parse failures
-        }
-        throw new Error(message);
+        const error = (json as { error?: { code?: string; messageKey?: string; requestId?: string } } | null)?.error;
+        throw new ApiError({
+            status: response.status,
+            code: error?.code ?? 'request_failed',
+            messageKey: error?.messageKey ?? `Request failed: ${response.status}`,
+            requestId: error?.requestId
+        });
     }
-    const json = await response.json();
     return schema ? schema.parse(json) : (json as T);
 }
 
@@ -63,56 +83,27 @@ export const api = {
     patchPlayer(patch: Partial<Pick<PlayerContract, 'locale' | 'callSign' | 'difficulty' | 'onboardingComplete'>>) {
         return request('/api/player', { method: 'PATCH', body: JSON.stringify(patch) }, PlayerSchema);
     },
-    startRun(body: StartRunRequest) {
-        return request('/api/runs/start', { method: 'POST', body: JSON.stringify(StartRunRequestSchema.parse(body)) }, StartRunResponseSchema);
+    startRun(body: StartRunRequest, signal?: AbortSignal) {
+        return request('/api/runs/start', { method: 'POST', body: JSON.stringify(StartRunRequestSchema.parse(body)), signal }, StartRunResponseSchema);
     },
     completeRun(runId: string, body: CompleteRunRequest) {
         return request(
-            `/api/runs/${runId}/complete`,
+            `/api/runs/${encodeURIComponent(runId)}/complete`,
             { method: 'POST', body: JSON.stringify(CompleteRunRequestSchema.parse(body)) },
             CompleteRunResponseSchema
         );
     },
-    listRuns() {
-        return request('/api/runs', undefined, z.object({ runs: z.array(StoredRunSchema) }).strict());
+    runs() {
+        return request('/api/runs', undefined, RunsSchema);
     },
     missions() {
         return request('/api/missions', undefined, MissionSnapshotSchema);
     },
-    dailyLeaderboard() {
-        return request(
-            '/api/leaderboards/daily',
-            undefined,
-            z
-                .object({
-                    date: z.string(),
-                    entries: z.array(
-                        z.object({
-                            rank: z.number(),
-                            callSign: z.string(),
-                            score: z.number(),
-                            accuracy: z.number(),
-                            runId: z.string()
-                        })
-                    )
-                })
-                .strict()
-        );
+    leaderboard() {
+        return request('/api/leaderboards/daily', undefined, LeaderboardSchema);
     },
-    coachReport(runId: string) {
-        return request(
-            `/api/coach-reports/${runId}`,
-            undefined,
-            z
-                .object({
-                    runId: z.string(),
-                    status: z.enum(['local', 'pending', 'ready']),
-                    summaryKey: z.string(),
-                    focusKeys: z.array(z.string()),
-                    polishedText: z.string().nullable()
-                })
-                .strict()
-        );
+    coach(runId: string) {
+        return request(`/api/coach-reports/${encodeURIComponent(runId)}`, undefined, CoachReportSchema);
     }
 };
 

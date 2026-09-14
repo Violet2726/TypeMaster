@@ -75,8 +75,8 @@ export function OnboardingScreen() {
 
     async function finish() {
         const difficulty = accuracy >= 97 && wpm >= 50 ? 'surge' : accuracy >= 90 ? 'standard' : 'flow';
-        const ok = await persist(true, difficulty);
-        router.replace(ok || true ? '/play?mode=first-rift' : '/');
+        await persist(true, difficulty);
+        router.replace('/play?mode=first-rift');
     }
 
     return (

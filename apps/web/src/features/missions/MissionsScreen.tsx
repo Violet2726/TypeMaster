@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { Button, Notice, Progress } from '@typerift/ui';
+import { Notice, Progress } from '@typerift/ui';
 import Link from 'next/link';
 import { api } from '../../lib/api';
 import { translate } from '../../i18n';
@@ -25,9 +25,11 @@ export function MissionsScreen() {
                     <h1>{t('missions.title')}</h1>
                     <p className="lede">{t('missions.subtitle')}</p>
                 </div>
-                <Button>
-                    <Link href="/play?mode=repair-trial">{t('missions.startRepair')}</Link>
-                </Button>
+                {/* A link styled as a button: nesting <a> inside <button> is invalid and breaks
+                    screen readers, so the anchor carries the button classes directly. */}
+                <Link className="tr-button tr-button--primary" href="/play?mode=repair-trial">
+                    <span>{t('missions.startRepair')}</span>
+                </Link>
             </header>
 
             {missions.isLoading ? <p>{t('common.loading')}</p> : null}

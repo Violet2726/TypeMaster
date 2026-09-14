@@ -1,12 +1,6 @@
-import {
-    useEffect,
-    useId,
-    useRef,
-    type ButtonHTMLAttributes,
-    type HTMLAttributes,
-    type PropsWithChildren,
-    type ReactNode
-} from 'react';
+import { useEffect, useId, useRef, useState, type ButtonHTMLAttributes, type HTMLAttributes, type PropsWithChildren, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
+import { useModalBehavior } from './game-ui';
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
     variant?: 'primary' | 'secondary' | 'quiet' | 'danger';
@@ -156,48 +150,20 @@ type SheetProps = PropsWithChildren<{
 
 export function Sheet({ open, title, onClose, children }: SheetProps) {
     const dialogRef = useRef<HTMLElement>(null);
+    const bodyRef = useRef<HTMLDivElement>(null);
     const titleId = useId();
-    useEffect(() => {
-        if (!open) return;
-        const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-        const dialog = dialogRef.current;
-        const focusable = () =>
-            Array.from(dialog?.querySelectorAll<HTMLElement>('button, input, select, textarea, a[href], [tabindex]:not([tabindex="-1"])') ?? []).filter(
-                (element) => !element.hasAttribute('disabled')
-            );
-        focusable()[0]?.focus();
-        const onKeyDown = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') {
-                event.preventDefault();
-                onClose();
-                return;
-            }
-            if (event.key !== 'Tab') return;
-            const controls = focusable();
-            if (controls.length === 0) {
-                event.preventDefault();
-                dialog?.focus();
-                return;
-            }
-            const first = controls[0];
-            const last = controls.at(-1);
-            if (event.shiftKey && document.activeElement === first) {
-                event.preventDefault();
-                last?.focus();
-            } else if (!event.shiftKey && document.activeElement === last) {
-                event.preventDefault();
-                first?.focus();
-            }
-        };
-        document.addEventListener('keydown', onKeyDown);
-        return () => {
-            document.removeEventListener('keydown', onKeyDown);
-            previousFocus?.focus();
-        };
-    }, [onClose, open]);
+    // Portals cannot render on the server, so mount-gate to keep hydration deterministic.
+    const [mounted, setMounted] = useState(false);
 
-    if (!open) return null;
-    return (
+    useEffect(() => setMounted(true), []);
+
+    // Sheets share the modal behaviour with GameDialog: focus trap, Escape, background inert,
+    // scroll locking, and returning focus to whatever opened them. Portalling to <body> is what
+    // makes the rest of the app inert instead of the sheet itself.
+    useModalBehavior({ open: open && mounted, onClose, containerRef: dialogRef, initialFocusRef: bodyRef });
+
+    if (!open || !mounted) return null;
+    return createPortal(
         <div className="tr-sheet-layer" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
             <section ref={dialogRef} className="tr-sheet" role="dialog" aria-modal="true" aria-labelledby={titleId} tabIndex={-1}>
                 <header className="tr-sheet__header">
@@ -206,9 +172,12 @@ export function Sheet({ open, title, onClose, children }: SheetProps) {
                         ×
                     </Button>
                 </header>
-                {children}
+                <div className="tr-sheet__body" ref={bodyRef}>
+                    {children}
+                </div>
             </section>
-        </div>
+        </div>,
+        document.body
     );
 }
 
@@ -229,3 +198,5 @@ export function Panel({ className = '', children, ...props }: PanelProps) {
         </section>
     );
 }
+
+export * from './game-ui';

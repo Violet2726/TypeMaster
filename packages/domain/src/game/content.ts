@@ -17,9 +17,9 @@ export const DIFFICULTY_SPEED: Record<Difficulty, number> = {
 };
 
 export const AREAS = [
-    { id: 'prism-harbor', titleKey: 'area.prismHarbor', asset: '/game/v2/backgrounds/prism-harbor.webp' },
-    { id: 'quiet-forge', titleKey: 'area.quietForge', asset: '/game/v2/backgrounds/quiet-forge.webp' },
-    { id: 'black-core', titleKey: 'area.blackCore', asset: '/game/v2/backgrounds/black-core.webp' }
+    { id: 'prism-harbor', titleKey: 'area.prismHarbor', asset: '/game/v1/backgrounds/prism-harbor.webp' },
+    { id: 'quiet-forge', titleKey: 'area.quietForge', asset: '/game/v1/backgrounds/quiet-forge.webp' },
+    { id: 'black-core', titleKey: 'area.blackCore', asset: '/game/v1/backgrounds/black-core.webp' }
 ] as const;
 
 export const ENEMY_ARCHETYPES = [

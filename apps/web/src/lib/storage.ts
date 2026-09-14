@@ -21,6 +21,7 @@ export const DEFAULT_SETTINGS: SettingsContract = {
     locale: 'zh-CN',
     reduceMotion: false,
     reduceTransparency: false,
+    reduceEffects: false,
     enhancedContrast: false,
     colorSafe: false,
     noFlash: false,
@@ -145,7 +146,11 @@ export async function getLocalSnapshot() {
     const value = (await requestPromise(transaction.objectStore('snapshot').get(SNAPSHOT_KEY))) as (LocalSnapshot & { id: string }) | undefined;
     database.close();
     if (!value) return null;
-    const { id: _id, ...snapshot } = value;
+    const snapshot: LocalSnapshot = {
+        progress: value.progress,
+        pendingSyncCount: value.pendingSyncCount,
+        updatedAt: value.updatedAt
+    };
     return snapshot;
 }
 

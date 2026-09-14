@@ -5,9 +5,7 @@ import {
     MissionSchema,
     PlayerProgressSchema,
     PlayerSchema,
-    type MissionContract,
-    type PlayerContract,
-    type PlayerProgressContract
+    type MissionContract
 } from '@typerift/contracts';
 import * as schema from './db/schema';
 import type { CoachReport, DailyLeaderboardEntry, RunRecord, StateSnapshot, StateStore } from './store';

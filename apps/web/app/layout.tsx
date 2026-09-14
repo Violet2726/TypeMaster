@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { AppShell } from '../src/components/AppShell';
 import { Providers } from '../src/components/Providers';
 import './styles.css';
+import './ui.css';
 
 export const metadata: Metadata = {
     metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:5173'),

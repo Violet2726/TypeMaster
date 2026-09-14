@@ -19,13 +19,13 @@ describe('short-lived UI store', () => {
         useUiStore.getState().closeProfile();
         expect(useUiStore.getState().profileOpen).toBe(false);
     });
-    it('persists v1 settings only', () => {
+    it('persists v2 settings only', () => {
         useUiStore.getState().updateSettings({ reduceMotion: true, locale: 'en-US' });
         expect(useUiStore.getState().settings.reduceMotion).toBe(true);
-        expect(localStorage.getItem('typerift:v1:settings')).toContain('en-US');
+        expect(localStorage.getItem('typerift:v2:settings')).toContain('en-US');
     });
     it('hydrates from strict saved settings', () => {
-        localStorage.setItem('typerift:v1:settings', JSON.stringify({ ...DEFAULT_SETTINGS, textScale: 1.4 }));
+        localStorage.setItem('typerift:v2:settings', JSON.stringify({ ...DEFAULT_SETTINGS, textScale: 1.4 }));
         useUiStore.getState().hydrate();
         expect(useUiStore.getState().settings.textScale).toBe(1.4);
     });

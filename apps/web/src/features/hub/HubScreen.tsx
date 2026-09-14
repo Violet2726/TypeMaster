@@ -1,13 +1,15 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { ActionRow, Button, Notice, Progress, StatList } from '@typerift/ui';
-import { ArrowRight, CalendarDays, CloudOff, Gem, Radar } from 'lucide-react';
+import { ArrowRight, CalendarDays, CloudOff, Compass, Gem, Sparkles, Wrench } from 'lucide-react';
 import Link from 'next/link';
+import { useCallback, useMemo } from 'react';
+import { Notice } from '@typerift/ui';
 import { api } from '../../lib/api';
-import { countOutbox, listLocalRuns } from '../../lib/storage';
+import { countOutbox, listLocalRuns, type LocalRun } from '../../lib/storage';
 import { translate } from '../../i18n';
 import { useUiStore } from '../../store/ui';
+import { activeStreak, aggregateWeakKeys, metricAverage, metricDelta, weeklyInsight } from './hub-stats';
 
 function missionTitle(metric: string | undefined, locale: 'zh-CN' | 'en-US') {
     const names: Record<string, [string, string]> = {
@@ -22,33 +24,55 @@ function missionTitle(metric: string | undefined, locale: 'zh-CN' | 'en-US') {
     return locale === 'en-US' ? value[1] : value[0];
 }
 
+function formatDelta(delta: number | null) {
+    if (delta === null || delta === 0) return null;
+    return `${delta > 0 ? '↑' : '↓'}${Math.abs(delta)}`;
+}
+
+/** Home answers three questions only: what to do now, whether you improved, why to return. */
 export function HubScreen() {
     const locale = useUiStore((state) => state.settings.locale);
-    const t = (key: string) => translate(locale, key);
+    const t = useCallback((key: string) => translate(locale, key), [locale]);
     const me = useQuery({ queryKey: ['me'], queryFn: api.me });
     const runs = useQuery({ queryKey: ['local-runs'], queryFn: listLocalRuns });
     const pending = useQuery({ queryKey: ['outbox-count'], queryFn: countOutbox });
+
+    const history: LocalRun[] = useMemo(() => runs.data ?? [], [runs.data]);
+    const weakKeys = useMemo(() => aggregateWeakKeys(history), [history]);
+    const accuracy = metricAverage(history, 'accuracy');
+    const accuracyDelta = metricDelta(history, 'accuracy');
+    const wpm = metricAverage(history, 'wpm');
+    const wpmDelta = metricDelta(history, 'wpm');
+    const streak = useMemo(() => activeStreak(history, new Date()), [history]);
+    const insight = useMemo(() => weeklyInsight(history, t), [history, t]);
+
+    const hasHistory = history.length > 0;
     const nextMission = me.data?.missionSnapshot.missions.find((mission) => !mission.completed);
-    const latest = runs.data?.[0];
-    const progress = me.data?.progress;
-    const level = progress?.resonanceLevel ?? 1;
-    const xp = progress?.resonanceXp ?? 0;
-    const xpMax = 180 + Math.max(0, level - 1) * 90;
+    const primaryHref = hasHistory ? '/play?mode=expedition' : '/play';
+    const primaryLabel = hasHistory ? t('hub.continue') : t('hub.begin');
 
     return (
         <div className="page hub-page">
-            <header className="page-heading">
+            <header className="hub-hero">
                 <p className="eyebrow">
-                    <Radar size={16} aria-hidden="true" />
-                    {t('hub.eyebrow')}
+                    <Sparkles size={16} aria-hidden="true" />
+                    {t('hub.trainingEyebrow')}
                 </p>
-                <h1>{t('hub.title')}</h1>
-                <p className="lede">{t('hub.subtitle')}</p>
-                <div className="hub-cta">
-                    <Button className="hub-cta__primary" icon={<ArrowRight size={18} />}>
-                        <Link href="/play?mode=expedition">{t('hub.enter')}</Link>
-                    </Button>
-                </div>
+                <h1>{t('hub.trainingTitle')}</h1>
+                {weakKeys.length ? (
+                    <p className="hub-hero__weak">
+                        {t('hub.weakKeys')} <strong>{weakKeys.join(' · ')}</strong>
+                    </p>
+                ) : (
+                    <p className="hub-hero__weak">{t('hub.weakKeysNone')}</p>
+                )}
+                <p className="hub-hero__meta">
+                    {t('hub.expeditionMeta')} · {t('mode.expedition')}
+                </p>
+                <Link className="game-button game-button--accent hub-hero__cta" href={primaryHref}>
+                    {primaryLabel}
+                    <ArrowRight size={18} aria-hidden="true" />
+                </Link>
             </header>
 
             {pending.data ? (
@@ -57,58 +81,56 @@ export function HubScreen() {
                 </Notice>
             ) : null}
             {me.isError ? (
-                <Notice tone="danger" title={t('common.error')}>
+                <Notice tone="info" title={t('common.offline')}>
                     {t('hub.loadFailed')}
                 </Notice>
             ) : null}
 
-            <section className="hub-status" aria-label={t('common.level')}>
-                <StatList
-                    items={[
-                        { label: t('common.level'), value: String(level) },
-                        { label: t('common.shards'), value: String(progress?.shards ?? 0) },
-                        { label: t('profile.activeDays'), value: String(progress?.activeDays ?? 0) },
-                        { label: me.data?.player.callSign ? t('profile.callSign') : t('common.loading'), value: me.data?.player.callSign ?? '—' }
-                    ]}
-                />
-                <div className="hub-status__meter">
-                    <div className="hub-status__meter-label">
-                        <span>{t('hub.resonance')}</span>
-                        <span>
-                            {xp}/{xpMax}
-                        </span>
-                    </div>
-                    <Progress value={xp} max={xpMax} label={t('hub.resonance')} />
-                </div>
+            <section className="hub-signals" aria-label={t('hub.signals')}>
+                <article>
+                    <p className="hub-signal__label">{t('debrief.accuracy')}</p>
+                    <p className="hub-signal__value">{accuracy === null ? '—' : `${accuracy}%`}</p>
+                    <p className="hub-signal__delta">{formatDelta(accuracyDelta) ?? t('hub.noBaseline')}</p>
+                </article>
+                <article>
+                    <p className="hub-signal__label">{t('debrief.speed')}</p>
+                    <p className="hub-signal__value">{wpm === null ? '—' : `${wpm} WPM`}</p>
+                    <p className="hub-signal__delta">{formatDelta(wpmDelta) ?? t('hub.noBaseline')}</p>
+                </article>
+                <article>
+                    <p className="hub-signal__label">{t('hub.streak')}</p>
+                    <p className="hub-signal__value">{streak === 0 ? '—' : t('hub.streakValue').replace('{days}', String(streak))}</p>
+                    <p className="hub-signal__delta">{streak > 0 ? t('hub.streakKeep') : t('hub.streakStart')}</p>
+                </article>
             </section>
 
-            <section className="hub-actions" aria-label={t('hub.actions')}>
-                <ActionRow
-                    eyebrow={t('hub.daily')}
-                    title={t('hub.daily')}
-                    detail={t('hub.dailyMeta')}
-                    href="/play?mode=daily-rift"
-                    action={<CalendarDays size={18} aria-hidden="true" />}
-                />
-                <ActionRow
-                    eyebrow={t('hub.mission')}
-                    title={nextMission ? missionTitle(nextMission.metric, locale) : t('hub.missionsClear')}
-                    detail={
-                        nextMission
-                            ? `${Math.min(nextMission.progress, nextMission.target)} / ${nextMission.target} · +${nextMission.rewardShards} ${t('common.shards')}`
-                            : t('missions.subtitle')
-                    }
-                    href="/missions"
-                    action={<Gem size={18} aria-hidden="true" />}
-                />
-                <ActionRow
-                    eyebrow={t('hub.archive')}
-                    title={latest ? `${latest.result.score.toLocaleString()} · ${latest.result.accuracy}%` : t('hub.noRuns')}
-                    detail={latest ? latest.result.mode.replaceAll('-', ' ') : t('hub.archiveHint')}
-                    href={latest ? `/debrief/${latest.id}` : '/archive'}
-                    action={latest ? <ArrowRight size={18} aria-hidden="true" /> : <CloudOff size={18} aria-hidden="true" />}
-                />
-            </section>
+            <p className="hub-insight">{insight}</p>
+
+            <nav className="hub-secondary" aria-label={t('hub.actions')}>
+                <Link href="/play?mode=repair-trial">
+                    <Wrench size={18} aria-hidden="true" />
+                    <span>{t('hub.focusLab')}</span>
+                </Link>
+                <Link href="/missions">
+                    <Gem size={18} aria-hidden="true" />
+                    <span>{t('nav.missions')}</span>
+                    {nextMission ? <em>{missionTitle(nextMission.metric, locale)}</em> : null}
+                </Link>
+                <Link href="/archive">
+                    <Compass size={18} aria-hidden="true" />
+                    <span>{t('hub.insights')}</span>
+                </Link>
+                <Link href="/play?mode=daily-rift">
+                    <CalendarDays size={18} aria-hidden="true" />
+                    <span>{t('hub.daily')}</span>
+                </Link>
+                {!hasHistory ? (
+                    <span className="hub-secondary__hint">
+                        <CloudOff size={16} aria-hidden="true" />
+                        {t('hub.offlineHint')}
+                    </span>
+                ) : null}
+            </nav>
         </div>
     );
 }

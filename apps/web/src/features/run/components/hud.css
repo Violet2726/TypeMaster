@@ -1,0 +1,317 @@
+/* TypeRift HUD — three-tier information hierarchy.
+ *
+ * Tier 1 (always on):  target word · stability · heat · surge
+ * Tier 2 (transient):  combo · level up · area change · perfect · extraction
+ * Tier 3 (paused / debrief): score · wpm · time · xp · area progress · kills
+ *
+ * Rules this file enforces:
+ *  - The target word is the largest, highest-contrast object on screen (28–44px).
+ *  - No readable label drops below 13px.
+ *  - HUD chrome is near-transparent; only modals are allowed to use glass.
+ *  - Every interactive target is at least 44px.
+ */
+
+.hud {
+    position: fixed;
+    z-index: 20;
+    inset: 0;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: var(--space-3);
+    padding: calc(var(--space-3) + env(safe-area-inset-top, 0px)) var(--space-3) calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+    color: var(--battle-label);
+    pointer-events: none;
+}
+.hud > * {
+    pointer-events: auto;
+}
+.hud__top,
+.hud__bottom {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+.hud__top {
+    justify-content: space-between;
+}
+.hud__bottom {
+    justify-content: space-between;
+}
+
+/* ---------- tier 1: area + survival ---------- */
+
+.hud__area {
+    display: flex;
+    min-height: 44px;
+    flex-direction: column;
+    justify-content: center;
+    margin: 0;
+    padding-left: var(--space-2);
+    text-shadow: 0 1px 12px var(--battle-shadow);
+}
+.hud__area-name {
+    color: var(--battle-label-secondary);
+    font-size: 0.8125rem;
+    font-weight: 640;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+.hud__area-value {
+    font-size: 1rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+.hud__survival {
+    margin-left: auto;
+}
+.hud__hearts {
+    display: inline-flex;
+    gap: 6px;
+}
+.hud__hearts .is-full {
+    color: var(--positive);
+    fill: currentColor;
+}
+.hud__hearts .is-empty {
+    color: var(--battle-label-secondary);
+    opacity: 0.45;
+}
+
+.hud__pause {
+    display: grid;
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    place-items: center;
+    border: 1px solid var(--battle-stroke);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--battle-label);
+    cursor: pointer;
+    transition:
+        background var(--motion-fast) var(--ease-out),
+        transform var(--motion-fast) var(--ease-out);
+}
+.hud__pause:hover {
+    background: var(--battle-stroke);
+}
+.hud__pause:active {
+    transform: scale(0.94);
+}
+
+/* ---------- tier 1: target word ---------- */
+
+.hud__center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+    min-height: 0;
+}
+.hud__target {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    text-align: center;
+}
+.hud__target-label {
+    margin: 0;
+    color: var(--battle-label-secondary);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+.hud__word {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: clamp(28px, 5vw, 44px);
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    line-height: 1.1;
+    text-shadow: 0 2px 30px var(--battle-shadow);
+}
+.hud__word-typed {
+    color: var(--accent);
+}
+.hud__word-rest {
+    color: var(--battle-label);
+}
+.hud__word--calm {
+    color: var(--battle-label-secondary);
+    font-size: clamp(20px, 3vw, 26px);
+}
+
+/* ---------- tier 2: transient feedback ---------- */
+
+.hud__signal {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 6px 14px;
+    border: 1px solid var(--battle-stroke);
+    border-radius: var(--radius-pill);
+    background: var(--battle-glass);
+    font-size: 0.9375rem;
+    font-weight: 660;
+    letter-spacing: 0.02em;
+    animation: hud-signal var(--motion-slow) var(--ease-out);
+}
+.hud__signal strong {
+    font-size: 1.0625rem;
+}
+.hud__signal span {
+    color: var(--battle-label-secondary);
+    font-size: 0.875rem;
+    font-weight: 560;
+}
+.hud__signal--combo strong,
+.hud__signal--perfect strong {
+    color: var(--positive);
+}
+.hud__signal--combo-lost strong {
+    color: var(--danger);
+}
+.hud__signal--level-up strong,
+.hud__signal--extract strong {
+    color: var(--special);
+}
+.hud__signal--area strong,
+.hud__signal--surge strong {
+    color: var(--accent);
+}
+
+@keyframes hud-signal {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ---------- tier 1: heat + surge ---------- */
+
+.hud__heat {
+    display: flex;
+    min-height: 44px;
+    align-items: center;
+    gap: var(--space-2);
+    padding-left: var(--space-2);
+    text-shadow: 0 1px 12px var(--battle-shadow);
+}
+.hud__heat-label {
+    color: var(--battle-label-secondary);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+.hud__heat-track {
+    display: inline-flex;
+    gap: 3px;
+}
+.hud__heat-track i {
+    display: block;
+    width: 20px;
+    height: 8px;
+    border-radius: var(--radius-pill);
+    background: var(--battle-stroke);
+    transition: background var(--motion-fast) linear;
+}
+.hud__heat.is-calm .hud__heat-track i.is-on {
+    background: var(--warning);
+}
+.hud__heat.is-warn .hud__heat-track i.is-on {
+    background: var(--warning);
+}
+.hud__heat.is-critical .hud__heat-track i.is-on {
+    background: var(--danger);
+}
+.hud__heat.is-critical .hud__heat-label {
+    color: var(--danger);
+}
+
+.hud__surge {
+    display: inline-flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: 0 var(--space-4);
+    border: 1px solid var(--battle-stroke);
+    border-radius: var(--radius-control);
+    background: transparent;
+    color: var(--battle-label-secondary);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: not-allowed;
+    transition:
+        background var(--motion-standard) var(--ease-out),
+        color var(--motion-standard),
+        border-color var(--motion-standard),
+        transform var(--motion-fast) var(--ease-out);
+}
+.hud__surge kbd {
+    padding: 2px 6px;
+    border: 1px solid currentColor;
+    border-radius: var(--radius-pill);
+    font-family: var(--font-system);
+    font-size: var(--font-caption);
+    opacity: 0.7;
+}
+.hud__surge.is-ready {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--content-raised);
+    cursor: pointer;
+}
+.hud__surge.is-ready:hover {
+    transform: translateY(-1px);
+}
+.hud__surge.is-ready:active {
+    transform: scale(0.98);
+}
+
+/* ---------- compact: phone portrait ---------- */
+
+@media (max-width: 640px) {
+    .hud {
+        grid-template-rows: auto 1fr auto;
+        gap: var(--space-2);
+    }
+    .hud__bottom {
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+    .hud__surge {
+        flex: 1 1 100%;
+    }
+    .hud__heat-track i {
+        width: 16px;
+    }
+}
+
+/* ---------- regular: tablet / small desktop ---------- */
+
+@media (min-width: 641px) and (max-width: 1024px) {
+    .hud {
+        padding-right: var(--space-4);
+        padding-left: var(--space-4);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hud__signal {
+        animation: none;
+    }
+}
+:root[data-reduce-motion='true'] .hud__signal,
+:root[data-reduce-effects='true'] .hud__signal {
+    animation: none;
+}
