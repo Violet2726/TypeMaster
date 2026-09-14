@@ -123,11 +123,7 @@ function defeatEnemy(state: RunState, target: RunEnemy): { state: RunState; even
     const score = state.score + Math.round(baseScore * scoreMultiplier(state, target));
     const focusBoost = target.word.split('').some((char) => state.focusChars.includes(char)) ? 1 + stacks(state, 'focus-glyph') * 0.2 : 1;
     const gainedXp = Math.round((target.boss ? 82 : 24 + target.word.length * 2) * focusBoost);
-    const energy = clamp(
-        state.energy + (target.boss ? 18 + stacks(state, 'boss-glyph') * 8 : 10 + stacks(state, 'resonance-loop') * 3),
-        0,
-        100
-    );
+    const energy = clamp(state.energy + (target.boss ? 18 + stacks(state, 'boss-glyph') * 8 : 10 + stacks(state, 'resonance-loop') * 3), 0, 100);
     const remaining = state.enemies.filter((enemy) => enemy.id !== target.id);
     const arcTargets = [...remaining]
         .filter((enemy) => !enemy.boss)
@@ -400,9 +396,7 @@ export function dispatchRun(state: RunState, command: RunCommand): { state: RunS
     if (command.type === 'surge' && state.phase === 'running' && state.energy >= 100) {
         const nonBoss = state.enemies.filter((enemy) => !enemy.boss);
         const bossDamage = 2 + stacks(state, 'terminal-wave');
-        const enemies = state.enemies.flatMap((enemy) =>
-            enemy.boss ? [{ ...enemy, hp: Math.max(1, enemy.hp - bossDamage), typed: '' }] : []
-        );
+        const enemies = state.enemies.flatMap((enemy) => (enemy.boss ? [{ ...enemy, hp: Math.max(1, enemy.hp - bossDamage), typed: '' }] : []));
         const next: RunState = {
             ...state,
             enemies,

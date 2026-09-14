@@ -40,17 +40,16 @@ export function ProfileSheet() {
     return (
         <Sheet open={open} title={t('profile.title')} onClose={close}>
             {me.isLoading ? <p>{t('common.loading')}</p> : null}
-            {me.isError ? <Notice tone="danger" title={t('common.error')}>{t('profile.loadFailed')}</Notice> : null}
+            {me.isError ? (
+                <Notice tone="danger" title={t('common.error')}>
+                    {t('profile.loadFailed')}
+                </Notice>
+            ) : null}
             {player && progress ? (
                 <div className="profile-sheet">
                     <label className="field">
                         <span>{t('profile.callSign')}</span>
-                        <input
-                            value={currentSign}
-                            maxLength={24}
-                            onChange={(event) => setCallSign(event.target.value)}
-                            aria-label={t('profile.callSign')}
-                        />
+                        <input value={currentSign} maxLength={24} onChange={(event) => setCallSign(event.target.value)} aria-label={t('profile.callSign')} />
                     </label>
                     <div className="profile-sheet__actions">
                         <Button variant="secondary" onClick={() => void save()} disabled={saving}>

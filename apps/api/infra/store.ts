@@ -194,9 +194,7 @@ export class MemoryStateStore implements StateStore {
                 Object.entries(snapshot.missions).map(([id, missions]) => [id, missions.map((mission) => MissionSchema.parse(mission))])
             ),
             runs: Object.fromEntries(Object.entries(snapshot.runs).map(([id, run]) => [id, RunRecordSchema.parse(run) as RunRecord])),
-            coachReports: Object.fromEntries(
-                Object.entries(snapshot.coachReports).map(([id, report]) => [id, CoachReportSchema.parse(report)])
-            )
+            coachReports: Object.fromEntries(Object.entries(snapshot.coachReports).map(([id, report]) => [id, CoachReportSchema.parse(report)]))
         };
         await this.persist();
     }

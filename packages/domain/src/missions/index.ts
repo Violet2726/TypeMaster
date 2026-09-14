@@ -117,10 +117,7 @@ export function advanceMissions(missions: Mission[], result: RunResult, complete
     return missions.map((mission) => {
         if (mission.completed) return mission;
         const amount = contribution(mission.metric, result);
-        const progress =
-            mission.metric === 'accuracy'
-                ? Math.max(mission.progress, amount)
-                : Math.min(mission.target, mission.progress + amount);
+        const progress = mission.metric === 'accuracy' ? Math.max(mission.progress, amount) : Math.min(mission.target, mission.progress + amount);
         const completed = progress >= mission.target;
         return {
             ...mission,

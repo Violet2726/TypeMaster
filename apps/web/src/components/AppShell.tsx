@@ -13,13 +13,7 @@ function TypeRiftMark() {
     return (
         <svg className="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
             <rect width="32" height="32" rx="9" fill="currentColor" opacity="0.08" />
-            <path
-                d="M7 8.5h18l-5.2 7.4H24L13.5 27l2.4-8.2H8.2L12.4 12H7z"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinejoin="round"
-            />
+            <path d="M7 8.5h18l-5.2 7.4H24L13.5 27l2.4-8.2H8.2L12.4 12H7z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
             <circle cx="22.5" cy="9.5" r="1.4" fill="currentColor" />
         </svg>
     );
