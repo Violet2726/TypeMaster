@@ -6,8 +6,10 @@ import { defineConfig, devices } from '@playwright/test';
  * The suite owns a dedicated port so it never fights with a `pnpm dev` session a
  * reviewer already has open, and so a run is reproducible on any machine.
  *
- * `channel: 'chrome'` is used instead of the bundled Chromium because Playwright's
- * browser downloads are not installed in this environment.
+ * `channel: CHANNEL` is used instead of the bundled Chromium because Playwright's
+ * browser downloads are not installed in this environment. That is the wrong default for CI,
+ * which installs Chromium explicitly, so it is overridable: set `TYPERIFT_E2E_CHANNEL=chromium`
+ * on any machine where the bundled browser is available.
  *
  * `CODEBUDDY_SAFE_DELETE_ENABLED=0` lets Next.js manage its own `.next` cache; the
  * sandbox's delete guard otherwise blocks its stale-file cleanup and kills the server.
@@ -15,6 +17,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 const PORT = Number(process.env.TYPERIFT_E2E_PORT ?? 4174);
 const BASE_URL = `http://127.0.0.1:${PORT}`;
+const CHANNEL = process.env.TYPERIFT_E2E_CHANNEL ?? 'chrome';
 
 /**
  * Playwright's `webServer` health check uses Node's own HTTP client. Some sandboxes
@@ -39,7 +42,7 @@ export default defineConfig({
     },
     use: {
         baseURL: BASE_URL,
-        channel: 'chrome',
+        channel: CHANNEL,
         trace: 'on-first-retry'
     },
     projects: [
@@ -47,29 +50,29 @@ export default defineConfig({
             // Functional gates. Visual has its own project; the timing budgets live in
             // `playwright.perf.config.js`, which runs them against a production build.
             name: 'desktop',
-            use: { ...devices['Desktop Chrome'], channel: 'chrome', viewport: { width: 1440, height: 900 } },
+            use: { ...devices['Desktop Chrome'], channel: CHANNEL, viewport: { width: 1440, height: 900 } },
             testIgnore: [/visual\.spec\.ts/, /performance\.spec\.ts/]
         },
         {
             // Responsive behaviour of the real flows, not the screenshot matrix.
             name: 'tablet',
-            use: { ...devices['Desktop Chrome'], channel: 'chrome', viewport: { width: 768, height: 1024 } },
+            use: { ...devices['Desktop Chrome'], channel: CHANNEL, viewport: { width: 768, height: 1024 } },
             testMatch: /typerift\.spec\.ts/
         },
         {
             name: 'phone',
-            use: { ...devices['Desktop Chrome'], channel: 'chrome', viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true },
+            use: { ...devices['Desktop Chrome'], channel: CHANNEL, viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true },
             testMatch: /typerift\.spec\.ts/
         },
         {
             name: 'narrow',
-            use: { ...devices['Desktop Chrome'], channel: 'chrome', viewport: { width: 320, height: 720 }, hasTouch: true, isMobile: true },
+            use: { ...devices['Desktop Chrome'], channel: CHANNEL, viewport: { width: 320, height: 720 }, hasTouch: true, isMobile: true },
             testMatch: /typerift\.spec\.ts/
         },
         {
             // Pixel baselines for 320 / 390 / 768 / 1440.
             name: 'visual',
-            use: { ...devices['Desktop Chrome'], channel: 'chrome', viewport: { width: 1440, height: 900 } },
+            use: { ...devices['Desktop Chrome'], channel: CHANNEL, viewport: { width: 1440, height: 900 } },
             testMatch: /visual\.spec\.ts/
         }
     ],

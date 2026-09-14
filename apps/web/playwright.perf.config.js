@@ -25,6 +25,13 @@ const PORT = Number(process.env.TYPERIFT_PERF_PORT ?? 4175);
 const BASE_URL = `http://127.0.0.1:${PORT}`;
 
 /**
+ * Playwright's browser downloads are not available in every environment, so the browser is
+ * overridable. CI installs Chromium explicitly and can set `TYPERIFT_E2E_CHANNEL=chromium`;
+ * this sandbox drives the system Chrome instead.
+ */
+const CHANNEL = process.env.TYPERIFT_E2E_CHANNEL ?? 'chrome';
+
+/**
  * Playwright's `webServer` health check uses Node's own HTTP client. Some sandboxes block that
  * while still allowing the browser to reach localhost, which makes the check time out even
  * though the server is up. Set `TYPERIFT_E2E_NO_SERVER=1` when the servers are already running
@@ -40,13 +47,13 @@ export default defineConfig({
     expect: { timeout: 10_000 },
     use: {
         baseURL: BASE_URL,
-        channel: 'chrome',
+        channel: CHANNEL,
         trace: 'on-first-retry'
     },
     projects: [
         {
             name: 'performance',
-            use: { ...devices['Desktop Chrome'], channel: 'chrome', viewport: { width: 1440, height: 900 } }
+            use: { ...devices['Desktop Chrome'], channel: CHANNEL, viewport: { width: 1440, height: 900 } }
         }
     ],
     webServer: managedServers
