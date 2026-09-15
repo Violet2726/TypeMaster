@@ -19,6 +19,8 @@ visit(root);
 const colorPattern = /(?:#[0-9a-f]{3,8}\b|rgba?\(|hsla?\()/i;
 const radiusPattern = /border-radius:\s*[^;]*\d+px/i;
 const fontPattern = /font-size:\s*([\d.]+)(px|rem|em)/i;
+const fontDeclarationPattern = /(?:font-size|--font-[^:]+):\s*([^;]+)/i;
+const pxInsideClampPattern = /clamp\([^)]*\d+(?:\.\d+)?px/i;
 const MIN_FONT_PX = 12.5;
 const findings = [];
 
@@ -36,6 +38,15 @@ for (const file of files) {
     lines.forEach((line, index) => {
         const value = line.trim();
         const location = `${path.relative(root, file)}:${index + 1} ${value}`;
+        const fontDeclaration = value.match(fontDeclarationPattern);
+        // Custom-property lines are declarations too: a px font token would bypass the
+        // normal property check and make the text-scale setting silently incomplete.
+        if (fontDeclaration && /\d+(?:\.\d+)?px/i.test(fontDeclaration[1]) && !value.includes('calc(')) {
+            findings.push(`${location}\n    px font token — use rem so --user-text-scale can scale it`);
+        }
+        if (pxInsideClampPattern.test(value)) {
+            findings.push(`${location}\n    px inside clamp() — use rem so --user-text-scale can scale it`);
+        }
         if (value.startsWith('--')) return;
         if (colorPattern.test(value)) findings.push(`${location}\n    literal colour — declare a semantic token instead`);
         // Radii must come from the radius scale so every surface matches.

@@ -13,6 +13,36 @@ import { createPortal } from 'react-dom';
 
 const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
+type ActiveModal = {
+    layer: HTMLElement;
+};
+
+let modalSequence = 0;
+const activeModals = new Map<number, ActiveModal>();
+const managedInertTargets = new Set<HTMLElement>();
+
+/**
+ * Keep background inertness correct when a modal opens another modal (for example,
+ * pause -> settings). A boolean attribute is not enough: closing the child must not
+ * wake the parent modal's background or the application underneath it.
+ */
+function syncModalInertness() {
+    const bodyChildren = Array.from(document.body.children).filter((child): child is HTMLElement => child instanceof HTMLElement);
+    const stack = Array.from(activeModals.values());
+    const topLayer = stack.at(-1)?.layer ?? null;
+
+    for (const child of bodyChildren) {
+        const shouldBeInert = topLayer ? child !== topLayer : false;
+        if (shouldBeInert) {
+            child.setAttribute('inert', '');
+            managedInertTargets.add(child);
+        } else if (managedInertTargets.has(child)) {
+            child.removeAttribute('inert');
+            managedInertTargets.delete(child);
+        }
+    }
+}
+
 function focusableWithin(scope: HTMLElement | null) {
     if (!scope) return [];
     return Array.from(scope.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
@@ -69,13 +99,13 @@ export function useModalBehavior({
         body.style.overflow = 'hidden';
         if (scrollbar > 0) body.style.paddingRight = `${scrollbar}px`;
 
-        // Everything outside the modal layer becomes inert and unreachable.
         // Walk to the outermost ancestor under <body> so this stays correct whether the
         // modal is portalled (GameDialog) or rendered inline in the app tree (Sheet).
         let layer = container;
         while (layer.parentElement && layer.parentElement !== body) layer = layer.parentElement;
-        const inertTargets = Array.from(body.children).filter((child): child is HTMLElement => child instanceof HTMLElement && child !== layer);
-        for (const target of inertTargets) target.setAttribute('inert', '');
+        const modalId = ++modalSequence;
+        activeModals.set(modalId, { layer });
+        syncModalInertness();
 
         resolveInitialFocus(container, initialFocusRef?.current ?? null).focus();
         const onKeyDown = (event: KeyboardEvent) => {
@@ -105,7 +135,8 @@ export function useModalBehavior({
         document.addEventListener('keydown', onKeyDown);
         return () => {
             document.removeEventListener('keydown', onKeyDown);
-            for (const target of inertTargets) target.removeAttribute('inert');
+            activeModals.delete(modalId);
+            syncModalInertness();
             body.style.overflow = previousOverflow;
             body.style.paddingRight = previousPaddingRight;
             if (previousFocus && document.contains(previousFocus)) previousFocus.focus();

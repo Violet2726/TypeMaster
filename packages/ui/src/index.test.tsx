@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ActionRow, Button, IconButton, Notice, Progress, SegmentedControl, Sheet, StatList } from './index';
+import { ActionRow, Button, GameDialog, IconButton, Notice, Progress, SegmentedControl, Sheet, StatList } from './index';
 
 afterEach(() => cleanup());
 
@@ -59,6 +59,48 @@ describe('TypeRift UI primitives', () => {
                 </Sheet>
             </>
         );
+    });
+
+    it('keeps parent modal inertness when a child modal closes', () => {
+        const view = render(
+            <>
+                <button>Outside</button>
+                <GameDialog open title="Pause" dismissOnEscape={false}>
+                    <button>Open settings</button>
+                </GameDialog>
+                <GameDialog open title="Settings">
+                    <button>Close settings</button>
+                </GameDialog>
+            </>
+        );
+        let layers = Array.from(document.querySelectorAll<HTMLElement>('.game-dialog-layer'));
+        expect(layers).toHaveLength(2);
+        expect(layers[0]?.hasAttribute('inert')).toBe(true);
+        expect(layers[1]?.hasAttribute('inert')).toBe(false);
+        expect(view.container.hasAttribute('inert')).toBe(true);
+
+        view.rerender(
+            <>
+                <button>Outside</button>
+                <GameDialog open title="Pause" dismissOnEscape={false}>
+                    <button>Open settings</button>
+                </GameDialog>
+            </>
+        );
+        layers = Array.from(document.querySelectorAll<HTMLElement>('.game-dialog-layer'));
+        expect(layers).toHaveLength(1);
+        expect(layers[0]?.hasAttribute('inert')).toBe(false);
+        expect(view.container.hasAttribute('inert')).toBe(true);
+
+        view.rerender(
+            <>
+                <button>Outside</button>
+                <GameDialog open={false} title="Pause">
+                    <button>Open settings</button>
+                </GameDialog>
+            </>
+        );
+        expect(screen.getByRole('button', { name: 'Outside' }).hasAttribute('inert')).toBe(false);
     });
 
     it('renders notice, stats and action rows without a generic card', () => {

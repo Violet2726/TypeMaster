@@ -193,6 +193,9 @@ export function RunScreen() {
 
     useEffect(() => {
         const onKeyDown = (event: KeyboardEvent) => {
+            // A nested GameDialog (for example Settings opened from Pause) owns Escape.
+            // The document-level dialog handler marks it handled before this window listener.
+            if (event.defaultPrevented) return;
             if (event.metaKey || event.ctrlKey || event.altKey) return;
             if (event.key === 'Escape') {
                 event.preventDefault();

@@ -124,6 +124,21 @@ test.describe('combat', () => {
         await expect(page.getByRole('dialog')).toHaveCount(0);
     });
 
+    test('settings opened from pause closes without resuming the run', async ({ page }, testInfo) => {
+        test.skip(!isDesktop(testInfo.project.name), 'ranked runs need a physical keyboard');
+        await page.goto('/play?mode=daily-rift');
+        await expect(page.locator('.hud')).toBeVisible({ timeout: 20_000 });
+        await page.keyboard.press('Escape');
+        const pause = page.getByRole('dialog', { name: /已暂停|Paused/ });
+        await expect(pause).toBeVisible();
+        await pause.getByRole('button', { name: /设置|Settings/ }).click();
+        const settings = page.getByRole('dialog', { name: /设置|Settings/ });
+        await expect(settings).toBeVisible();
+        await page.keyboard.press('Escape');
+        await expect(settings).toHaveCount(0);
+        await expect(pause).toBeVisible();
+    });
+
     test('a touch device is routed to Quick Pulse', async ({ page }, testInfo) => {
         test.skip(!isTouch(testInfo.project.name), 'needs a coarse pointer');
         await page.goto('/play?mode=expedition');

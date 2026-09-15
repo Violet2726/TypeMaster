@@ -66,10 +66,10 @@
     --radius-sheet: 24px;
     /* Type scale. Nothing a player must read in real time drops below --font-caption. */
     --font-display: clamp(2.4rem, 5.4vw, 4.2rem);
-    --font-title: 26px;
-    --font-body: 16px;
-    --font-label: 15px;
-    --font-caption: 13px;
+    --font-title: 1.625rem;
+    --font-body: 1rem;
+    --font-label: 0.9375rem;
+    --font-caption: 0.8125rem;
     --shadow-sm: 0 6px 20px var(--shadow-color);
     --shadow-lg: 0 22px 70px var(--shadow-color);
     --motion-fast: 140ms;
@@ -573,9 +573,9 @@ h2 {
     display: grid;
     width: min(100%, 1080px);
     grid-template-columns: 0.9fr 1.1fr;
-    gap: clamp(32px, 7vw, 86px);
+    gap: clamp(2rem, 7vw, 5.375rem);
     align-items: center;
-    padding: clamp(32px, 6vw, 72px);
+    padding: clamp(2rem, 6vw, 4.5rem);
     border: 1px solid var(--separator);
     border-radius: var(--radius-xl);
     background: var(--surface);
@@ -1693,7 +1693,7 @@ h2 {
 }
 .debrief-focus__value {
     margin: var(--space-2) 0 0;
-    font-size: clamp(46px, 9vw, 68px);
+    font-size: clamp(2.875rem, 9vw, 4.25rem);
     font-weight: 720;
     letter-spacing: -0.03em;
     font-variant-numeric: tabular-nums;
