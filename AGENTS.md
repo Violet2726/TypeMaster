@@ -13,10 +13,10 @@ Follow `.editorconfig`: UTF-8, LF, final newline, and four-space indentation. Pr
 Make the first screen the practice experience, not a marketing page. Preserve clear keyboard focus, native touch and system-keyboard support, reduced motion, enhanced contrast, and text scaling. The interface follows system appearance by default and must work in both light and dark themes. Create original artwork; do not use Apple marks or reproduce Apple screens.
 
 ## Local Data
-Settings and the latest 20 practice sessions use the app-owned `typemaster-studio:v1:*` local-storage namespace. First-launch cleanup may remove only the enumerated legacy TypeMaster, Typing Raid, TypeRift, and Pulsefield namespaces and databases in `apps/web/src/lib/storage.ts`; never call `localStorage.clear()` in application code or delete unrelated origin data. The one-time SQL retirement script drops only the five TypeRift-owned tables listed in `scripts/purge-typerift-data.sql`.
+Settings and the latest 20 practice sessions use the app-owned `typemaster-studio:v1:*` local-storage namespace. Read and write only the current application's keys; never call `localStorage.clear()` or delete unrelated origin data.
 
 ## Verification
-For domain changes, cover deterministic transitions, character errors and corrections, timing, pause/resume, and results. For interface changes, verify desktop, tablet, and phone layouts, no horizontal overflow, local-data cleanup, and accessibility. Real iOS Safari is required to verify software-keyboard viewport behavior; mobile emulation does not reproduce the on-screen keyboard.
+For domain changes, cover deterministic transitions, character errors and corrections, timing, pause/resume, and results. For interface changes, verify desktop, tablet, and phone layouts, no horizontal overflow, current-namespace persistence, and accessibility. Real iOS Safari is required to verify software-keyboard viewport behavior; mobile emulation does not reproduce the on-screen keyboard.
 
-## Security and Retirement
-Do not commit secrets. The current application has no runtime API or account integration. Any remaining cleanup of the retired online database or Clerk tenant must be verified in that project's own control plane; do not touch shared tables or unrelated accounts. Preserve Git history.
+## Security
+Do not commit secrets. The current application has no runtime API or account integration. Preserve Git history.

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { applyPracticeCommand, buildRunResult, createPractice, type PracticeCommand } from '@typemaster/domain';
 import { PracticeWorkspace, type WorkspaceView } from '../features/practice/PracticeWorkspace';
-import { DEFAULT_SETTINGS, initializeStorage, loadRuns, loadSettings, saveRun, saveSettings, type Settings, type StoredRun } from '../lib/storage';
+import { DEFAULT_SETTINGS, loadRuns, loadSettings, saveRun, saveSettings, type Settings, type StoredRun } from '../lib/storage';
 import { SettingsDialog } from './SettingsDialog';
 import { TypeMasterMark } from './TypeMasterMark';
 
@@ -14,7 +14,7 @@ function createSeed() {
 export function PracticeApp() {
     const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
     const [runs, setRuns] = useState<StoredRun[]>([]);
-    const [storageState, setStorageState] = useState<'checking' | 'ready' | 'blocked'>('checking');
+    const [storageReady, setStorageReady] = useState(false);
     const [view, setView] = useState<WorkspaceView>('practice');
     const [passageId, setPassageId] = useState('morning-light');
     const [practice, setPractice] = useState(() => createPractice('first-session', DEFAULT_SETTINGS.durationMs, 'morning-light'));
@@ -27,23 +27,9 @@ export function PracticeApp() {
         setRuns(loadRuns());
     }, []);
 
-    const retryStorage = useCallback(async () => {
-        setStorageState('checking');
-        const ready = await initializeStorage();
-        refreshLocalState();
-        setStorageState(ready ? 'ready' : 'blocked');
-    }, [refreshLocalState]);
-
     useEffect(() => {
-        let active = true;
-        void initializeStorage().then((ready) => {
-            if (!active) return;
-            refreshLocalState();
-            setStorageState(ready ? 'ready' : 'blocked');
-        });
-        return () => {
-            active = false;
-        };
+        refreshLocalState();
+        setStorageReady(true);
     }, [refreshLocalState]);
 
     useEffect(() => {
@@ -117,26 +103,13 @@ export function PracticeApp() {
         resetSession(passageId, durationMs);
     };
 
-    if (storageState !== 'ready') {
+    if (!storageReady) {
         return (
             <main className="storage-screen">
                 <TypeMasterMark />
-                {storageState === 'checking' ? (
-                    <p className="storage-message" role="status">
-                        {settings.locale === 'zh-CN' ? '正在准备练习空间…' : 'Preparing your studio…'}
-                    </p>
-                ) : (
-                    <div className="storage-message" role="alert">
-                        <p>
-                            {settings.locale === 'zh-CN'
-                                ? '旧版数据仍在另一个标签页使用。关闭旧页面后即可继续。'
-                                : 'Legacy data is still open in another tab. Close the old page and retry.'}
-                        </p>
-                        <button className="text-action" type="button" onClick={() => void retryStorage()}>
-                            {settings.locale === 'zh-CN' ? '重试' : 'Retry'}
-                        </button>
-                    </div>
-                )}
+                <p className="storage-message" role="status">
+                    {settings.locale === 'zh-CN' ? '正在准备练习空间…' : 'Preparing your studio…'}
+                </p>
             </main>
         );
     }

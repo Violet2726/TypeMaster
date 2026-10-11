@@ -30,6 +30,6 @@ pnpm test:e2e    # desktop, tablet, phone and visual flows
 
 ## 本地记录
 
-偏好和最近 20 次练习保存在当前浏览器的 `typemaster-studio:v1:*` 命名空间。首次启动只清理明确列出的 TypeMaster 旧版、Typing Raid、TypeRift 和 Pulsefield 存储；不会清理同源下其他应用的数据，也不会迁移旧进度。若旧 IndexedDB 仍被其他标签页占用，可以关闭旧页面后重试。
+偏好和最近 20 次练习保存在当前浏览器的 `typemaster-studio:v1:*` 命名空间，不会上传或跨设备同步。
 
 竞品观察与设计取舍见 [产品设计说明](./docs/product-design.md)。

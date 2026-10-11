@@ -30,4 +30,4 @@ Production output is `apps/web/out`. The practice experience makes no API reques
 
 ## Local records
 
-Preferences and the latest 20 sessions stay in the browser's `typemaster-studio:v1:*` namespace. First launch removes only the listed legacy TypeMaster, Typing Raid, TypeRift, and Pulsefield storage. It does not migrate old progress or clear other apps on the same origin. If another tab blocks deletion of a legacy IndexedDB, close the old page and retry.
+Preferences and the latest 20 sessions stay in the browser's `typemaster-studio:v1:*` namespace. They are not uploaded or synced across devices.

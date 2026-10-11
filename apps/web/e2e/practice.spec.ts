@@ -87,31 +87,6 @@ test.describe('TypeMaster Studio', () => {
         await expect(page.locator('.history-row')).toHaveCount(1);
     });
 
-    test('clears only retired product data and keeps other local applications untouched', async ({ page }) => {
-        await page.goto('/');
-        await page.evaluate(async () => {
-            localStorage.removeItem('typemaster-studio:v1:legacy-cleaned');
-            localStorage.setItem('typerift:v2:settings', 'legacy');
-            localStorage.setItem('pulsefield:v1:sessions', 'legacy');
-            localStorage.setItem('another-app:theme', 'dark');
-            await new Promise<void>((resolve, reject) => {
-                const request = indexedDB.open('typerift-v2', 1);
-                request.onupgradeneeded = () => request.result.createObjectStore('runs');
-                request.onsuccess = () => {
-                    request.result.close();
-                    resolve();
-                };
-                request.onerror = () => reject(request.error);
-            });
-        });
-        await page.reload();
-
-        await expect.poll(() => page.evaluate(() => localStorage.getItem('typerift:v2:settings'))).toBeNull();
-        await expect.poll(() => page.evaluate(() => localStorage.getItem('pulsefield:v1:sessions'))).toBeNull();
-        expect(await page.evaluate(() => localStorage.getItem('another-app:theme'))).toBe('dark');
-        await expect.poll(() => page.evaluate(async () => (await indexedDB.databases()).some((database) => database.name === 'typerift-v2'))).toBe(false);
-    });
-
     test('keeps the workspace accessible and free of horizontal overflow', async ({ page }) => {
         await page.goto('/');
         await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
