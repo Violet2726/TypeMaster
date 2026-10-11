@@ -1,6 +1,6 @@
 # TypeMaster Studio
 
-TypeMaster Studio is a calm, text-first space for typing practice. Choose an original English passage and work at your own pace. Speed, accuracy, and keys worth revisiting are recorded on this device. There are no accounts, leaderboards, or game rewards.
+TypeMaster Studio is a calm, text-first space for typing practice. Choose an original English passage and work at your own pace. Speed, accuracy, and keys worth revisiting stay on this device.
 
 The interface defaults to Simplified Chinese and supports English, system light and dark appearance, larger text, increased contrast, and reduced motion. Mac, iPad, and iPhone use the same practice flow with their native keyboards.
 

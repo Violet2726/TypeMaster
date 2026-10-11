@@ -57,6 +57,22 @@ test.describe('TypeMaster Studio', () => {
         expect(visibility?.isVisible).toBe(true);
     });
 
+    test('keeps an end-of-passage caret after a final-character typo and correction', async ({ page }) => {
+        await page.goto('/');
+        const passage = await page.locator('.passage-text').textContent();
+        const mistaken = `${passage!.slice(0, -1)}x`;
+        const input = page.getByRole('textbox', { name: /点击这里/ });
+        await input.fill(mistaken);
+        await expect(page.locator('.passage-character.is-end-caret')).toHaveCount(1);
+
+        await input.press('z');
+        await expect(input).toHaveValue(mistaken);
+        await input.press('Backspace');
+        await expect(input).toHaveValue(mistaken.slice(0, -1));
+        await expect(page.locator('.passage-character.is-end-caret')).toHaveCount(0);
+        await expect(page.locator('.passage-character.is-current')).toHaveCount(1);
+    });
+
     test('saves a completed session locally and exposes useful progress notes', async ({ page }) => {
         await page.clock.install({ time: new Date('2026-10-11T12:00:00.000Z') });
         await page.goto('/');

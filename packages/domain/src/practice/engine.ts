@@ -42,14 +42,14 @@ function typeText(state: PracticeState, text: string): PracticeUpdate {
     let next = state;
     const events: PracticeEvent[] = [];
     for (const character of text) {
-        if (next.phase === 'complete') break;
         if (next.phase === 'ready') {
             next = { ...next, phase: 'running' };
             events.push({ type: 'started' });
         }
 
         const passage = getPassage(next.passageId);
-        const expected = passage.text[next.typed.length] ?? '';
+        if (next.typed.length >= passage.text.length) break;
+        const expected = passage.text[next.typed.length]!;
         const attemptedChars = next.attemptedChars + 1;
         if (character === expected) {
             const typed = next.typed + character;

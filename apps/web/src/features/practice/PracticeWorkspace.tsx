@@ -213,6 +213,10 @@ function PracticeView(props: Props) {
                                                     </span>
                                                 );
                                             })}
+                                            {practice.typed.length === passage.text.length &&
+                                            practice.typed[practice.typed.length - 1] !== passage.text[passage.text.length - 1] ? (
+                                                <span className="passage-character is-current is-end-caret" ref={activeCharacterRef} aria-hidden="true" />
+                                            ) : null}
                                         </p>
                                         <input
                                             ref={inputRef}

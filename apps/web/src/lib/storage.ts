@@ -79,7 +79,7 @@ async function clearLegacyStorage(): Promise<boolean> {
         removeLegacyLocalStorage(localStorage);
         localStorageReady = true;
     } catch {
-        // If browser storage is disabled, no local game data is accessible to migrate.
+        // If browser storage is disabled, no application-owned data is accessible to migrate.
     }
     try {
         const outcomes = await Promise.all(LEGACY_DATABASES.map((name) => deleteLegacyDatabase(indexedDB, name)));
