@@ -7,10 +7,10 @@ dist
 .vite
 .turbo
 *.tsbuildinfo
+/apps/web/out/
 
-# Config (contains API keys)
+# Local credentials and configuration
 config.js
-!packages/domain/src/config.js
 
 # Logs
 *.log
@@ -34,14 +34,9 @@ tmp/
 .vercel
 .env*.local
 
-# Project data (except domain package)
-data
+# Local project data
 .data
-!packages/domain/src/data/
-!packages/domain/src/data/words.js
 
 # Docs (keep markdown, ignore generated)
 docs/*
 !docs/*.md
-!docs/ai-iteration/
-!docs/auto-iteration/

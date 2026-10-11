@@ -1,5 +1,5 @@
 {
-    "name": "@typerift/domain",
+    "name": "@typemaster/domain",
     "version": "1.0.0",
     "private": true,
     "type": "module",
@@ -12,7 +12,7 @@
         "test:coverage": "vitest run --config vitest.config.js --coverage"
     },
     "devDependencies": {
-        "@typerift/config": "workspace:*",
+        "@typemaster/config": "workspace:*",
         "@vitest/coverage-v8": "^2.1.9",
         "typescript": "^5.9.2",
         "vitest": "^2.1.0"

@@ -1,13 +1,14 @@
 import Link from 'next/link';
+
 export default function NotFound() {
     return (
-        <div className="page not-found">
-            <p className="eyebrow">404 · Signal absent</p>
-            <h1>This rift no longer exists.</h1>
-            <p>TypeRift v1 has one clear path. Historical routes are intentionally unavailable.</p>
-            <Link className="tr-button tr-button--primary" href="/">
-                Return to hub
+        <main className="not-found">
+            <p className="eyebrow">TYPEMASTER STUDIO</p>
+            <h1>404</h1>
+            <p>这段文字还没有写下。</p>
+            <Link className="text-action" href="/">
+                回到练习
             </Link>
-        </div>
+        </main>
     );
 }

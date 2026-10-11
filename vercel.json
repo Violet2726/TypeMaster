@@ -1,24 +1,6 @@
 {
     "$schema": "https://openapi.vercel.sh/vercel.json",
     "installCommand": "pnpm install --frozen-lockfile",
-    "builds": [
-        {
-            "src": "apps/api/vercel.ts",
-            "use": "@vercel/node"
-        },
-        {
-            "src": "apps/web/package.json",
-            "use": "@vercel/next"
-        }
-    ],
-    "routes": [
-        {
-            "src": "^/api/(.*)$",
-            "dest": "/apps/api/vercel.ts"
-        },
-        {
-            "src": "^/(.*)$",
-            "dest": "/apps/web/$1"
-        }
-    ]
+    "buildCommand": "pnpm --filter @typemaster/web build",
+    "outputDirectory": "apps/web/out"
 }

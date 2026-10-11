@@ -1,35 +1,33 @@
-[简体中文](./README.md) | English
+# TypeMaster Studio
 
-# TypeRift 1.0
+TypeMaster Studio is a calm, text-first space for typing practice. Choose an original English passage and work at your own pace. Speed, accuracy, and keys worth revisiting are recorded on this device. There are no accounts, leaderboards, or game rewards.
 
-TypeRift is a deterministic typing roguelite built around one fantasy: typing a word is combat. Its single product loop is calibration → hub → run → three-choice build → boss or extraction → debrief → weak-key repair → unlock.
+The interface defaults to Simplified Chinese and supports English, system light and dark appearance, larger text, increased contrast, and reduced motion. Mac, iPad, and iPhone use the same practice flow with their native keyboards.
 
-This is an intentionally incompatible clean slate. Historical TypeMaster / Typing Raid routes, state, contracts, migrations, assets, and browser data are never read or converted. On first launch, v1 deletes only app-owned legacy keys and databases. Clerk identity may remain, while the application profile starts fresh.
+## Develop
 
-## Routes
-
-- `/onboarding`
-- `/`
-- `/play?mode=first-rift|expedition|daily-rift|repair-trial|quick-pulse`
-- `/missions`
-- `/archive`
-- `/debrief/[runId]`
-
-## Development
-
-Node.js 20.9+ and pnpm 10 are required.
+Requires Node.js 20.9+ and pnpm 10.
 
 ```bash
 pnpm install
 pnpm dev
-pnpm check
-pnpm test:e2e
 ```
 
-Web runs on `http://localhost:5173`; API runs on `http://localhost:8080`. Development and tests use `.data/typerift-v1.json` when Postgres is absent. Production fails at startup without `DATABASE_URL`.
+Open `http://localhost:5173`.
 
-The workspace contains strict TypeScript domain and Zod contract packages, a Next.js Canvas/DOM client, and a Hono API backed by five v1 tables. Ranked Daily Rift results are accepted only after server replay verifies seed, content version, command log, and final hash. Offline unranked runs sync idempotently with client run IDs.
+```bash
+pnpm check       # formatting, lint, types, tests, design tokens, static build
+pnpm test:e2e    # desktop, tablet, phone, and visual flows
+```
 
-Original v1 game assets live in `apps/web/public/game/v1`; their manifest includes dimensions, SHA-256, color space, and accessibility label keys. AI coaching is optional and receives aggregate metrics only—never raw input or full keystroke history.
+## Workspace
 
-See [architecture](./docs/architecture.md), [game design](./docs/game-design.md), [art direction](./docs/art-direction.md), and [operations](./docs/operations.md).
+- `apps/web`: Next.js App Router frontend and static export.
+- `packages/domain`: deterministic practice rules and original passages, without React, browser, or network dependencies.
+- `packages/config`: shared Vitest configuration.
+
+Production output is `apps/web/out`. The practice experience makes no API requests and needs no account, database, or runtime service.
+
+## Local records
+
+Preferences and the latest 20 sessions stay in the browser's `typemaster-studio:v1:*` namespace. First launch removes only the listed legacy TypeMaster, Typing Raid, TypeRift, and Pulsefield storage. It does not migrate old progress or clear other apps on the same origin. If another tab blocks deletion of a legacy IndexedDB, close the old page and retry.

@@ -5,7 +5,18 @@ import typescript from 'typescript-eslint';
 import next from '@next/eslint-plugin-next';
 
 export default typescript.config(
-    { ignores: ['**/node_modules/**', '**/.next/**', '**/dist/**', '**/coverage/**', '**/drizzle/meta/**', 'apps/web/public/**', '**/next-env.d.ts'] },
+    {
+        ignores: [
+            '**/node_modules/**',
+            '**/.next/**',
+            '**/out/**',
+            '**/dist/**',
+            '**/coverage/**',
+            '**/drizzle/meta/**',
+            'apps/web/public/**',
+            '**/next-env.d.ts'
+        ]
+    },
     eslint.configs.recommended,
     ...typescript.configs.recommended,
     {

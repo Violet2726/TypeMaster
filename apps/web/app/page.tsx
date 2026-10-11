@@ -1,5 +1,5 @@
-import { HubScreen } from '../src/features/hub/HubScreen';
+import { PracticeApp } from '../src/components/PracticeApp';
 
 export default function HomePage() {
-    return <HubScreen />;
+    return <PracticeApp />;
 }

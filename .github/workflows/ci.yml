@@ -2,21 +2,16 @@ name: CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   build-and-test:
-    name: Build and Test
     runs-on: ubuntu-latest
-
     timeout-minutes: 20
-
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup pnpm
@@ -33,35 +28,32 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Check formatting
+      - name: Format
         run: pnpm format:check
 
-      - name: Run ESLint
+      - name: Lint
         run: pnpm lint
 
-      - name: Run strict typecheck
+      - name: Typecheck
         run: pnpm typecheck
 
-      - name: Run tests
+      - name: Unit tests
         run: pnpm test
 
-      - name: Run coverage gate
+      - name: Coverage
         run: pnpm test:coverage
 
-      - name: Audit semantic design tokens
+      - name: Design tokens
         run: pnpm audit:tokens
 
-      - name: Run production build
+      - name: Static build
         run: pnpm build
 
       - name: Install Playwright Chromium
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: Run desktop/mobile E2E, accessibility, and visual regression
+      - name: Browser flows and visual regression
         run: pnpm test:e2e
-
-      - name: Run performance budgets against a production build
-        run: pnpm test:e2e:perf
 
       - name: Upload Playwright report
         if: always()

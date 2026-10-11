@@ -1,183 +1,164 @@
-import { SettingsSchema, type CompleteRunRequest, type PlayerProgressContract, type RunResultContract, type SettingsContract } from '@typerift/contracts';
+import type { RunResult } from '@typemaster/domain';
 
-const DATABASE = 'typerift-v2';
-const DATABASE_VERSION = 1;
-const RESET_MARKER = 'typerift:v2:reset-complete';
-const SETTINGS_KEY = 'typerift:v2:settings';
-const SNAPSHOT_KEY = 'snapshot';
-const LEGACY_PREFIXES = ['typemaster:', 'typing-raid:', 'typingraid:', 'typerift:v7:', 'typerift:v6:', 'typerift:v1:', 'typerift:v1'];
-const LEGACY_DATABASES = ['typemaster', 'typemaster-db', 'typing-raid', 'typing-raid-v7', 'typerift-v7', 'typerift-v1'];
+export type Settings = {
+    locale: 'zh-CN' | 'en-US';
+    durationMs: 30_000 | 60_000 | 120_000;
+    reduceMotion: boolean;
+    enhancedContrast: boolean;
+    textScale: number;
+};
 
-export const DEFAULT_SETTINGS: SettingsContract = {
-    theme: 'light',
+export type StoredRun = {
+    id: string;
+    completedAt: string;
+    result: RunResult;
+};
+
+export const DEFAULT_SETTINGS: Settings = {
     locale: 'zh-CN',
+    durationMs: 60_000,
     reduceMotion: false,
-    reduceTransparency: false,
-    reduceEffects: false,
     enhancedContrast: false,
-    colorSafe: false,
-    noFlash: false,
-    reactionAssist: false,
-    music: true,
-    effects: true,
-    voice: false,
     textScale: 1
 };
 
-export type LocalRun = {
-    id: string;
-    result: RunResultContract;
-    completedAt: string;
-    verified: boolean;
-};
+const SETTINGS_KEY = 'typemaster-studio:v1:settings';
+const RUNS_KEY = 'typemaster-studio:v1:sessions';
+const CLEANUP_KEY = 'typemaster-studio:v1:legacy-cleaned';
+const LEGACY_PREFIXES = ['typemaster:', 'typing-raid:', 'typingraid:', 'typerift:', 'pulsefield:'];
+const LEGACY_DATABASES = [
+    'typemaster',
+    'typemaster-db',
+    'typing-raid',
+    'typing-raid-v7',
+    'typingraid',
+    'typerift',
+    'typerift-v1',
+    'typerift-v2',
+    'typerift-v6',
+    'typerift-v7'
+];
+const MAX_RUNS = 20;
+let cleanupInFlight: Promise<boolean> | null = null;
 
-export type LocalSnapshot = {
-    progress: PlayerProgressContract;
-    pendingSyncCount: number;
-    updatedAt: string;
-};
-
-function requestPromise<T>(request: IDBRequest<T>) {
-    return new Promise<T>((resolve, reject) => {
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-    });
-}
-
-function openDatabase() {
-    return new Promise<IDBDatabase>((resolve, reject) => {
-        const request = indexedDB.open(DATABASE, DATABASE_VERSION);
-        request.onupgradeneeded = () => {
-            const database = request.result;
-            if (!database.objectStoreNames.contains('runs')) database.createObjectStore('runs', { keyPath: 'id' });
-            if (!database.objectStoreNames.contains('snapshot')) database.createObjectStore('snapshot', { keyPath: 'id' });
-            if (!database.objectStoreNames.contains('outbox')) database.createObjectStore('outbox', { keyPath: 'runId' });
-        };
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-    });
-}
-
-export async function initializeV2Storage() {
-    if (typeof window === 'undefined' || localStorage.getItem(RESET_MARKER)) return;
-    const ownedKeys = Array.from({ length: localStorage.length }, (_, index) => localStorage.key(index)).filter((key): key is string => Boolean(key));
-    for (const key of ownedKeys) {
-        if (LEGACY_PREFIXES.some((prefix) => key.toLowerCase().startsWith(prefix.toLowerCase()))) {
-            localStorage.removeItem(key);
+export function removeLegacyLocalStorage(storage: Pick<Storage, 'length' | 'key' | 'removeItem'>) {
+    const keys = Array.from({ length: storage.length }, (_, index) => storage.key(index)).filter((key): key is string => key !== null);
+    for (const key of keys) {
+        const normalized = key.toLowerCase();
+        if (LEGACY_PREFIXES.some((prefix) => normalized.startsWith(prefix))) {
+            storage.removeItem(key);
         }
     }
-    await Promise.all(
-        LEGACY_DATABASES.map(
-            (name) =>
-                new Promise<void>((resolve) => {
-                    const request = indexedDB.deleteDatabase(name);
-                    request.onsuccess = request.onerror = request.onblocked = () => resolve();
-                })
-        )
-    );
-    localStorage.setItem(RESET_MARKER, new Date().toISOString());
 }
 
-/** @deprecated use initializeV2Storage */
-export const initializeV1Storage = initializeV2Storage;
+export function deleteLegacyDatabase(databaseFactory: IDBFactory, name: string, timeoutMs = 1_500): Promise<boolean> {
+    return new Promise((resolve) => {
+        let settled = false;
+        const finish = (removed: boolean) => {
+            if (settled) return;
+            settled = true;
+            window.clearTimeout(timeout);
+            resolve(removed);
+        };
+        const timeout = window.setTimeout(() => finish(false), timeoutMs);
+        try {
+            const request = databaseFactory.deleteDatabase(name);
+            request.onsuccess = () => finish(true);
+            request.onerror = () => finish(false);
+            request.onblocked = () => finish(false);
+        } catch {
+            finish(false);
+        }
+    });
+}
 
-export function readSettings(): SettingsContract {
-    if (typeof window === 'undefined') return DEFAULT_SETTINGS;
+async function clearLegacyStorage(): Promise<boolean> {
+    let localStorageReady = false;
     try {
-        return SettingsSchema.parse(JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? 'null'));
+        if (localStorage.getItem(CLEANUP_KEY) === 'done') return true;
+        removeLegacyLocalStorage(localStorage);
+        localStorageReady = true;
+    } catch {
+        // If browser storage is disabled, no local game data is accessible to migrate.
+    }
+    try {
+        const outcomes = await Promise.all(LEGACY_DATABASES.map((name) => deleteLegacyDatabase(indexedDB, name)));
+        if (outcomes.some((removed) => !removed)) return false;
+        if (localStorageReady) localStorage.setItem(CLEANUP_KEY, 'done');
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+export function initializeStorage(): Promise<boolean> {
+    if (typeof window === 'undefined') return Promise.resolve(true);
+    if (!cleanupInFlight) {
+        cleanupInFlight = clearLegacyStorage().finally(() => {
+            cleanupInFlight = null;
+        });
+    }
+    return cleanupInFlight;
+}
+
+function parseSettings(value: unknown): Settings {
+    if (!value || typeof value !== 'object') return DEFAULT_SETTINGS;
+    const candidate = value as Partial<Settings>;
+    const scale = [1, 1.25, 1.5, 1.75, 2].includes(candidate.textScale ?? 1) ? (candidate.textScale ?? 1) : 1;
+    return {
+        locale: candidate.locale === 'en-US' ? 'en-US' : 'zh-CN',
+        durationMs: candidate.durationMs === 30_000 || candidate.durationMs === 120_000 ? candidate.durationMs : 60_000,
+        reduceMotion: typeof candidate.reduceMotion === 'boolean' ? candidate.reduceMotion : false,
+        enhancedContrast: typeof candidate.enhancedContrast === 'boolean' ? candidate.enhancedContrast : false,
+        textScale: scale
+    };
+}
+
+export function loadSettings(): Settings {
+    try {
+        return parseSettings(JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? 'null'));
     } catch {
         return DEFAULT_SETTINGS;
     }
 }
 
-export function writeSettings(settings: SettingsContract) {
-    if (typeof window !== 'undefined') localStorage.setItem(SETTINGS_KEY, JSON.stringify(SettingsSchema.parse(settings)));
-}
-
-export async function saveLocalRun(run: LocalRun) {
-    const database = await openDatabase();
-    const transaction = database.transaction('runs', 'readwrite');
-    transaction.objectStore('runs').put(run);
-    await new Promise<void>((resolve, reject) => {
-        transaction.oncomplete = () => resolve();
-        transaction.onerror = () => reject(transaction.error);
-    });
-    database.close();
-}
-
-export async function getLocalRun(id: string) {
-    const database = await openDatabase();
-    const transaction = database.transaction('runs', 'readonly');
-    const value = (await requestPromise(transaction.objectStore('runs').get(id))) as LocalRun | undefined;
-    database.close();
-    return value ?? null;
-}
-
-export async function listLocalRuns() {
-    const database = await openDatabase();
-    const transaction = database.transaction('runs', 'readonly');
-    const values = (await requestPromise(transaction.objectStore('runs').getAll())) as LocalRun[];
-    database.close();
-    return values.sort((a, b) => b.completedAt.localeCompare(a.completedAt));
-}
-
-export async function saveLocalSnapshot(snapshot: LocalSnapshot) {
-    const database = await openDatabase();
-    const transaction = database.transaction('snapshot', 'readwrite');
-    transaction.objectStore('snapshot').put({ id: SNAPSHOT_KEY, ...snapshot });
-    await new Promise<void>((resolve, reject) => {
-        transaction.oncomplete = () => resolve();
-        transaction.onerror = () => reject(transaction.error);
-    });
-    database.close();
-}
-
-export async function getLocalSnapshot() {
-    const database = await openDatabase();
-    const transaction = database.transaction('snapshot', 'readonly');
-    const value = (await requestPromise(transaction.objectStore('snapshot').get(SNAPSHOT_KEY))) as (LocalSnapshot & { id: string }) | undefined;
-    database.close();
-    if (!value) return null;
-    const snapshot: LocalSnapshot = {
-        progress: value.progress,
-        pendingSyncCount: value.pendingSyncCount,
-        updatedAt: value.updatedAt
-    };
-    return snapshot;
-}
-
-export async function queueCompletion(runId: string, payload: CompleteRunRequest) {
-    const database = await openDatabase();
-    const transaction = database.transaction('outbox', 'readwrite');
-    transaction.objectStore('outbox').put({ runId, payload, queuedAt: new Date().toISOString() });
-    await new Promise<void>((resolve, reject) => {
-        transaction.oncomplete = () => resolve();
-        transaction.onerror = () => reject(transaction.error);
-    });
-    database.close();
-}
-
-export async function countOutbox() {
-    const database = await openDatabase();
-    const transaction = database.transaction('outbox', 'readonly');
-    const count = await requestPromise(transaction.objectStore('outbox').count());
-    database.close();
-    return count;
-}
-
-export async function flushOutbox(submit: (runId: string, payload: CompleteRunRequest) => Promise<unknown>) {
-    const database = await openDatabase();
-    const read = database.transaction('outbox', 'readonly');
-    const queued = (await requestPromise(read.objectStore('outbox').getAll())) as Array<{ runId: string; payload: CompleteRunRequest }>;
-    database.close();
-    for (const item of queued.sort((a, b) => a.runId.localeCompare(b.runId))) {
-        try {
-            await submit(item.runId, item.payload);
-            const active = await openDatabase();
-            active.transaction('outbox', 'readwrite').objectStore('outbox').delete(item.runId);
-            active.close();
-        } catch {
-            break;
-        }
+export function saveSettings(settings: Settings) {
+    try {
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(parseSettings(settings)));
+    } catch {
+        // Storage can be disabled by the browser; the current session remains playable.
     }
+}
+
+function isStoredRun(value: unknown): value is StoredRun {
+    if (!value || typeof value !== 'object') return false;
+    const run = value as Partial<StoredRun>;
+    return (
+        typeof run.id === 'string' &&
+        typeof run.completedAt === 'string' &&
+        Boolean(run.result && typeof run.result === 'object' && typeof run.result.wpm === 'number' && typeof run.result.accuracy === 'number')
+    );
+}
+
+export function loadRuns(): StoredRun[] {
+    try {
+        const parsed: unknown = JSON.parse(localStorage.getItem(RUNS_KEY) ?? '[]');
+        return Array.isArray(parsed) ? parsed.filter(isStoredRun).slice(0, MAX_RUNS) : [];
+    } catch {
+        return [];
+    }
+}
+
+export function saveRun(result: RunResult): StoredRun {
+    const run: StoredRun = {
+        id: typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        completedAt: new Date().toISOString(),
+        result
+    };
+    try {
+        localStorage.setItem(RUNS_KEY, JSON.stringify([run, ...loadRuns()].slice(0, MAX_RUNS)));
+    } catch {
+        // Keep the result visible even when persistence is unavailable.
+    }
+    return run;
 }

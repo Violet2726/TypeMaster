@@ -8,12 +8,11 @@ export default defineConfig({
     test: {
         globals: true,
         environment: 'jsdom',
-        setupFiles: ['src/test/setup.ts'],
         include: ['src/**/*.test.{ts,tsx}'],
         coverage: {
             provider: 'v8',
             reporter: ['text-summary', 'html'],
-            include: ['src/i18n/**/*.ts', 'src/lib/api.ts', 'src/store/**/*.ts'],
+            include: ['src/lib/storage.ts'],
             thresholds: {
                 lines: 80,
                 functions: 80,

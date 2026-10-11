@@ -1,19 +1,22 @@
 # Repository Guidelines
 
-## Project Structure & Module Organization
-This repository is a `pnpm` + Turborepo monorepo. Product apps live in `apps/`: `apps/web` is the Next.js App Router frontend, and `apps/api` is the Hono-based API and local server entry. Shared code lives in `packages/`: `domain` for core typing/game rules, `contracts` for shared schemas, `ui` for reusable components, `ai` for coaching text generation, and `config` for shared test config. Put frontend assets in `apps/web/public`, route files in `apps/web/app`, and colocated tests near features or in `__tests__`.
+## Project Structure
+TypeMaster Studio is a pnpm and Turborepo workspace. `apps/web` contains the Next.js App Router interface and browser storage; `packages/domain` contains deterministic typing-practice rules and original passages; `packages/config` contains shared Vitest setup. Put routes and public assets in `apps/web/app` and `apps/web/public`, and colocate frontend tests under `apps/web/src` or `apps/web/e2e`.
 
-## Build, Test, and Development Commands
-Run `pnpm install` once at the repo root. Use `pnpm dev:web` for the frontend on `http://localhost:5173` and `pnpm dev:api` for the API on `http://localhost:8080`. Use `pnpm dev` to run both through Turbo. Build everything with `pnpm build`. Validate types with `pnpm typecheck`. Run all tests with `pnpm test`, coverage with `pnpm test:coverage`, and browser flows with `pnpm test:e2e`. Run the performance budgets with `pnpm test:e2e:perf`; they build and measure production, so do not run them while `pnpm dev:web` is open. `pnpm check` runs the whole local gate chain (format, lint, types, tests, token audit, build). Use `pnpm audit:tokens` when changing design tokens or visual foundations.
+## Development Commands
+Run `pnpm install` at the repository root. Use `pnpm dev` to start the local site at `http://localhost:5173`, `pnpm build` for static output, `pnpm typecheck` for TypeScript, `pnpm test` for Vitest, and `pnpm test:e2e` for Playwright. `pnpm check` runs formatting, lint, types, unit tests, design-token audit, and build.
 
-## Coding Style & Naming Conventions
-Follow `.editorconfig`: UTF-8, LF, final newline, and 4-space indentation. Prefer ESM modules, keep domain logic free of React and IO, and place UI state adapters in `apps/web/src/store` or feature hooks. Use `PascalCase` for React components, `camelCase` for functions and variables, and kebab-case or descriptive folder names for feature areas. Keep comments short and only where structure is not obvious.
+## Coding Style
+Follow `.editorconfig`: UTF-8, LF, final newline, and four-space indentation. Prefer ESM modules. Keep domain logic deterministic and free of React, browser APIs, clocks, and network access. Use `PascalCase` for components and `camelCase` for functions and variables. Keep comments short and focused on non-obvious constraints.
 
-## Testing Guidelines
-Vitest is the default unit and integration test runner across apps and packages; Playwright covers end-to-end browser checks in `apps/web/e2e`. Name tests `*.test.js`, `*.test.jsx`, or `*.test.ts` and keep them close to the code they verify. Before opening a PR, run the smallest relevant package test plus any impacted root checks, then rerun `pnpm test` for cross-package changes.
+## Product and Accessibility
+Make the first screen the practice experience, not a marketing page. Preserve clear keyboard focus, native touch and system-keyboard support, reduced motion, enhanced contrast, and text scaling. The interface follows system appearance by default and must work in both light and dark themes. Create original artwork; do not use Apple marks or reproduce Apple screens.
 
-## Commit & Pull Request Guidelines
-Recent history uses short Chinese commit messages focused on user-visible outcomes, often centered on verbs such as “unify”, “tighten”, or “optimize” a surface or flow. Keep commits scoped and descriptive in the same style. PRs should explain the product intent, list verification commands, link related issues, and include screenshots or recordings for UI changes. Call out config, schema, or migration impact explicitly.
+## Local Data
+Settings and the latest 20 practice sessions use the app-owned `typemaster-studio:v1:*` local-storage namespace. First-launch cleanup may remove only the enumerated legacy TypeMaster, Typing Raid, TypeRift, and Pulsefield namespaces and databases in `apps/web/src/lib/storage.ts`; never call `localStorage.clear()` in application code or delete unrelated origin data. The one-time SQL retirement script drops only the five TypeRift-owned tables listed in `scripts/purge-typerift-data.sql`.
 
-## Security & Configuration Tips
-Do not commit secrets. Use environment variables for Clerk, Postgres, Upstash, Inngest, and optional AI settings. When infra vars are absent, the API falls back to local JSON state, so test both happy-path data flows and fallback behavior when touching persistence.
+## Verification
+For domain changes, cover deterministic transitions, character errors and corrections, timing, pause/resume, and results. For interface changes, verify desktop, tablet, and phone layouts, no horizontal overflow, local-data cleanup, and accessibility. Real iOS Safari is required to verify software-keyboard viewport behavior; mobile emulation does not reproduce the on-screen keyboard.
+
+## Security and Retirement
+Do not commit secrets. The current application has no runtime API or account integration. Any remaining cleanup of the retired online database or Clerk tenant must be verified in that project's own control plane; do not touch shared tables or unrelated accounts. Preserve Git history.

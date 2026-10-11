@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const root = path.resolve(__dirname, '../apps/web');
-const ignored = new Set(['node_modules', '.next', 'coverage']);
+const ignored = new Set(['node_modules', '.next', 'out', 'coverage']);
 const files = [];
 
 function visit(directory) {

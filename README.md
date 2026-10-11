@@ -1,38 +1,8 @@
-[English](./README_EN.md) | 简体中文
+# TypeMaster Studio
 
-# TypeRift 1.0
+TypeMaster Studio 是一间安静、以文字为中心的打字练习空间。选择一段原创英文短文，按自己的节奏练习；速度、准确率和需要回看的按键会在本机记录。没有账号、排行榜或游戏奖励。
 
-TypeRift 是一款以“输入词条即战斗”为核心的确定性打字 Roguelite。产品只有一条主线：首次校准 → 大厅 → 战局 → 三选一构筑 → 首领或撤离 → 复盘 → 弱键修复 → 下一轮解锁。
-
-这是一次不兼容旧版本的全量重建。旧 TypeMaster / Typing Raid 页面、状态、契约、迁移、资产与浏览器数据不会被读取或转换；首次启动只会删除应用拥有的旧键和旧 IndexedDB。Clerk 外部身份仍可保留，但玩家档案从 v1 重新建立。
-
-## 体验入口
-
-- `/onboarding`：可跳过的首次节奏校准与 First Rift。
-- `/`：单主操作的游戏大厅。
-- `/play?mode=…`：`first-rift`、`expedition`、`daily-rift`、`repair-trial`、`quick-pulse`。
-- `/missions`：每日与每周任务。
-- `/archive`：战局、图鉴、成就和洞察。
-- `/debrief/[runId]`：战绩、构筑、任务、教练建议与下一步。
-
-## 工作区
-
-```text
-apps/
-  web/        Next.js App Router、Canvas/DOM 战场、React Query、Zustand、IndexedDB
-  api/        Hono、Clerk、Postgres、Upstash、Inngest、Vercel handler
-packages/
-  domain/     无 React/浏览器/时间/网络依赖的确定性游戏、成长、任务、洞察
-  contracts/  严格 Zod v1 契约
-  ui/         无业务状态的可访问 UI 原语
-  ai/         只接收聚合指标的可选教练润色边界
-  config/     共享测试配置
-docs/
-  art-direction.md
-  architecture.md
-  game-design.md
-  operations.md
-```
+界面默认简体中文，支持英文、系统明暗主题、文字放大、增强对比度和减少动态效果。Mac、iPad 和 iPhone 使用同一套练习流程与设备键盘。
 
 ## 本地开发
 
@@ -43,59 +13,23 @@ pnpm install
 pnpm dev
 ```
 
-- Web：`http://localhost:5173`
-- API：`http://localhost:8080`
-
-未配置基础设施时，开发和测试环境使用 `.data/typerift-v1.json`；生产环境缺少 `DATABASE_URL` 会直接启动失败。
-
-## 质量门槛
+网页地址：`http://localhost:5173`
 
 ```bash
-pnpm check            # format:check + lint + typecheck + test + audit:tokens + build
-pnpm typecheck
-pnpm test
-pnpm test:coverage
-pnpm audit:tokens
-pnpm build
-pnpm test:e2e         # 功能 / 响应式 / 视觉回归（跑在 dev server 上）
-pnpm test:e2e:perf    # 性能预算（跑在生产构建上）
-pnpm test:e2e:all     # 两者都跑
+pnpm check       # format, lint, types, tests, design tokens, static build
+pnpm test:e2e    # desktop, tablet, phone and visual flows
 ```
 
-`pnpm test:e2e:perf` 会自行执行生产构建，输出到共享的 `.next`，因此**不要在 `pnpm dev:web` 开启时运行**——Next.js 无法用同一个输出目录同时服务 dev 会话与生产构建。性能预算必须量在生产构建上：同一个应用的冷启动在 dev 上是 923ms，在生产构建上是 237ms，这个量级的噪声会淹没真实回归。
+## 工作区
 
-领域与契约采用严格 TypeScript，公开战局类型为 `RunState`、`RunCommand`、`RunEvent`、`RunSnapshot`、`RunResult` 与 `ReplayLog`。Daily Rift 由服务端以固定种子重放命令日志并校验结果哈希；普通离线战局使用客户端 run ID 幂等同步。
+- `apps/web`：Next.js App Router 前端与静态导出。
+- `packages/domain`：确定性的练习状态机和原创短文内容，不依赖 React、浏览器或网络。
+- `packages/config`：共享 Vitest 配置。
 
-## 资产
+生产构建输出到 `apps/web/out`。新版练习不请求 API，不需要账号、数据库或运行时服务。
 
-`apps/web/public/game/v1` 包含 3 张区域背景、9 个敌人、3 个首领、24 个升级图标与程序化原创音效。`manifest.json` 记录尺寸、SHA-256、色域和无障碍标签键。源资产处理脚本位于 `scripts/process-generated-assets.py` 与 `scripts/generate-audio-assets.py`。
+## 本地记录
 
-## 环境变量
+偏好和最近 20 次练习保存在当前浏览器的 `typemaster-studio:v1:*` 命名空间。首次启动只清理明确列出的 TypeMaster 旧版、Typing Raid、TypeRift 和 Pulsefield 存储；不会清理同源下其他应用的数据，也不会迁移旧进度。若旧 IndexedDB 仍被其他标签页占用，可以关闭旧页面后重试。
 
-生产必需：
-
-```bash
-DATABASE_URL=postgres://...
-RUN_SIGNING_SECRET=...
-CLERK_SECRET_KEY=sk_...
-CLERK_PUBLISHABLE_KEY=pk_...
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_...
-```
-
-可选增强：
-
-```bash
-UPSTASH_REDIS_REST_URL=https://...
-UPSTASH_REDIS_REST_TOKEN=...
-INNGEST_EVENT_KEY=...
-INNGEST_SIGNING_KEY=...
-AI_COACH_ENABLED=true
-AI_API_URL=https://...
-AI_API_KEY=...
-SENTRY_DSN=https://...
-WEB_ORIGINS=https://example.com
-```
-
-AI 未配置时，本地确定性复盘、任务和所有核心玩法保持完整。AI 边界不会接收自由输入文本或完整按键历史。
-
-设计、架构、玩法与运维说明见 [docs](./docs/architecture.md)。
+竞品观察与设计取舍见 [产品设计说明](./docs/product-design.md)。TypeRift 旧线上数据的待办状态见 [退役说明](./docs/data-retirement.md)。
